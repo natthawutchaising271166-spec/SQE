@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QDIT AURA - ELITE ANALYTICS PRO V2.5 (SYNC ENABLED)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&family=IBM+Plex+Sans+Thai:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --luxury-orange: #f97316;
+            --luxury-red: #ef4444;
+            --luxury-blue: #3b82f6;
+            --luxury-green: #10b981;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-deep: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Full Screen Optimization */
+        * { box-sizing: border-box; }
+        body, html { height: 100vh; width: 100vw; margin: 0; padding: 0; overflow: hidden; }
+
+        body { 
+            font-family: 'Inter', 'IBM Plex Sans Thai', sans-serif; 
+            background: #f1f5f9;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
+            display: flex; flex-direction: column; color: #1e293b;
+        }
+
+        .orbitron { font-family: 'Orbitron', sans-serif; font-variant-numeric: tabular-nums; }
+        
+        /* LOGIN GIMMICKS */
+        #loginOverlay {
+            position: fixed; inset: 0; 
+            background: #0f172a;
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        .login-bg-deco {
+            position: absolute; width: 200%; height: 200%;
+            background-image: 
+                linear-gradient(rgba(249, 115, 22, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(249, 115, 22, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: rotate(15deg);
+            animation: bgMove 60s linear infinite;
+        }
+        @keyframes bgMove { from { transform: rotate(15deg) translateY(0); } to { transform: rotate(15deg) translateY(-500px); } }
+
+        .login-card {
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(30px);
+            border: 1px solid rgba(249, 115, 22, 0.3); padding: 4rem;
+            border-radius: 4rem; width: 480px; text-align: center;
+            box-shadow: 0 0 100px rgba(0,0,0,0.5), inset 0 0 20px rgba(249, 115, 22, 0.1);
+            position: relative; z-index: 10;
+        }
+
+        .dark-neon-input {
+            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; transition: all 0.4s;
+        }
+        .dark-neon-input:focus {
+            border-color: var(--luxury-orange); box-shadow: 0 0 25px rgba(249, 115, 22, 0.3);
+            outline: none; transform: scale(1.02);
+        }
+
+        /* MAIN UI COMPONENTS */
+        .stat-card {
+            background: var(--glass); backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border); position: relative; overflow: hidden;
+            transition: 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.08); }
+
+        .btn-luxury { transition: all 0.3s; cursor: pointer; }
+        .btn-luxury:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-luxury:active { transform: scale(0.95); }
+
+        .neon-input { background: rgba(255, 255, 255, 0.6); border: 1.5px solid rgba(255,255,255,0.8); transition: 0.3s; }
+        .neon-input:focus { background: #fff; border-color: var(--luxury-orange); outline: none; }
+
+        #dashboardModal {
+            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(15px); z-index: 500; align-items: center; justify-content: center;
+        }
+
+        .glass-dash {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .number-glow { text-shadow: 0 0 20px rgba(249, 115, 22, 0.2); }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        .q-path { 
+            stroke-dasharray: 100; stroke-dashoffset: 100; 
+            animation: draw 3s infinite alternate cubic-bezier(0.45, 0, 0.55, 1); 
+            stroke: var(--luxury-orange); stroke-width: 4; fill: none; 
+        }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+
+        tr { opacity: 0; transform: translateY(10px); transition: 0.4s; }
+        tr.visible { opacity: 1; transform: translateY(0); }
+
+        .status-glow { animation: statusPulse 2s infinite ease-in-out; }
+        @keyframes statusPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px var(--color-glow); }
+        }
+
+        #mainContainer { opacity: 0; transform: translateY(20px); height: 100%; display: flex; flex-direction: column; padding: 1.5rem; gap: 1.5rem; }
+
+        /* RANKING BAR STYLES */
+        .bar-container { margin-bottom: 8px; position: relative; cursor: pointer; }
+        .bar-label { font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .bar-bg { background: rgba(0,0,0,0.03); height: 10px; border-radius: 10px; overflow: hidden; position: relative; }
+        .bar-fill { height: 100%; border-radius: 10px; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); position: relative; }
+        .bar-val { font-family: 'Orbitron'; font-size: 11px; color: #1e293b; }
+        
+        .bar-container:hover .bar-fill::after {
+            content: attr(data-pct);
+            position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+            font-family: 'Orbitron'; font-size: 8px; font-weight: 900; color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: white; padding: 1rem 2rem; border-radius: 1rem;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 2000; display: none;
+        }
+
+        .scanline {
+            width: 100%; height: 2px; background: rgba(249, 115, 22, 0.1);
+            position: absolute; top: 0; left: 0; pointer-events: none;
+            animation: scan 4s linear infinite; z-index: 1001;
+        }
+        @keyframes scan { from { top: 0; } to { top: 100%; } }
+
+        /* SYNC ANIMATION */
+        .sync-active { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-slate-100">
+
+    <div id="toast">ACTION COMPLETE</div>
+
+    <div id="loginOverlay">
+        <div class="login-bg-deco"></div>
+        <div class="scanline"></div>
+        <div class="login-card" id="loginCard">
+            <div class="mb-8 relative">
+                <svg class="w-24 h-24 mx-auto" viewBox="0 0 50 50">
+                    <circle class="q-path" cx="25" cy="25" r="20" />
+                    <line class="q-path" x1="35" y1="35" x2="45" y2="45" />
+                </svg>
+                <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-orange-500 text-[8px] font-black px-2 py-0.5 rounded text-white tracking-[0.3em] animate-pulse">SYSTEM ONLINE</div>
+            </div>
+            
+            <h2 class="orbitron font-black text-4xl mb-2 text-white tracking-widest">AURA <span class="text-orange-500">ELITE</span></h2>
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.1em] mb-12">Security Terminal v2.5</p>
+            
+            <div class="space-y-5">
+                <div class="relative">
+                    <input type="text" id="loginName" list="inspectorList" placeholder="INSPECTOR NAME" class="w-full p-5 rounded-2xl dark-neon-input font-bold text-center uppercase text-sm tracking-widest" autofocus>
+                </div>
+                <div class="relative">
+                    <input type="password" id="loginPass" placeholder="ACCESS KEY" class="w-full p-5 rounded-2xl dark-neon-input font-bold text-center text-sm tracking-[0.5em]">
+                </div>
+                <button onclick="login()" class="btn-luxury w-full bg-orange-600 text-white font-black py-5 rounded-2xl text-[12px] uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(234,88,12,0.4)] mt-6 hover:bg-orange-500">
+                    Authenticate User
+                </button>
+            </div>
+            <p class="mt-8 text-[9px] font-bold text-slate-600 uppercase tracking-widest opacity-50">Authorized Personnel Only • IP Logged</p>
+        </div>
+    </div>
+
+    <div id="mainContainer">
+        <header class="grid grid-cols-12 gap-6 shrink-0">
+            <div class="col-span-3 stat-card rounded-[2rem] p-6 flex items-center gap-5">
+                <svg class="w-12 h-12" viewBox="0 0 50 50"><circle class="q-path" cx="25" cy="25" r="20" /><line class="q-path" x1="35" y1="35" x2="45" y2="45" /></svg>
+                <div><h1 class="font-black text-2xl tracking-tighter orbitron text-slate-800">QDIT <span class="text-orange-500 italic">AURA</span></h1><p id="liveClock" class="text-[10px] font-mono text-slate-400 mt-1 uppercase font-bold"></p></div>
+                <button onclick="logout()" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></button>
+            </div>
+            <div class="col-span-9 grid grid-cols-5 gap-4">
+                <div class="stat-card rounded-[2rem] p-5 border-b-4 border-slate-300"><div class="text-[10px] font-black text-slate-400 uppercase">My Total</div><div id="masterQty" class="text-4xl font-black orbitron text-slate-800 mt-1">0</div><div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="masterLot" class="text-orange-500">0</span></div></div>
+                <div class="stat-card rounded-[2rem] p-5 border-b-4 border-orange-400"><div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>SF Fault</span><span id="pctSF" class="text-orange-500">0%</span></div><div id="qtySF" class="text-4xl font-black orbitron text-orange-500 mt-1">0</div><div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotSF">0</span></div></div>
+                <div class="stat-card rounded-[2rem] p-5 border-b-4 border-red-400"><div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>Vendor</span><span id="pctVendor" class="text-red-500">0%</span></div><div id="qtyVendor" class="text-4xl font-black orbitron text-red-500 mt-1">0</div><div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotVendor">0</span></div></div>
+                <div class="stat-card rounded-[2rem] p-5 border-b-4 border-blue-400"><div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>CTC</span><span id="pctCTC" class="text-blue-500">0%</span></div><div id="qtyCTC" class="text-4xl font-black orbitron text-blue-500 mt-1">0</div><div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotCTC">0</span></div></div>
+                <div class="stat-card rounded-[2rem] p-5 border-b-4 border-emerald-400"><div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>Can Use</span><span id="pctCanUse" class="text-emerald-500">0%</span></div><div id="qtyCanUse" class="text-4xl font-black orbitron text-emerald-500 mt-1">0</div><div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotCanUse">0</span></div></div>
+            </div>
+        </header>
+
+        <div class="flex gap-6 flex-grow min-h-0">
+            <aside class="w-[350px] stat-card rounded-[2.5rem] p-8 flex flex-col shrink-0">
+                <h2 class="text-xs font-black uppercase text-slate-800 mb-6 tracking-[0.2em] border-b pb-4 flex justify-between"><span>Entry Terminal</span><span id="currentUserDisp" class="bg-slate-800 text-white px-2 py-0.5 rounded text-[8px]">GUEST</span></h2>
+                <form id="claimForm" class="space-y-4 overflow-y-auto custom-scroll pr-2 flex-grow">
+                    <div><label class="text-[9px] font-black text-slate-400 ml-1">DATE</label><input type="date" id="inputDate" class="w-full p-3.5 text-[11px] rounded-xl neon-input font-bold"></div>
+                    <div class="grid grid-cols-2 gap-3"><select id="shift" class="p-3.5 text-[11px] rounded-xl neon-input font-bold"><option>SHIFT A</option><option>SHIFT B</option><option>SHIFT C</option></select><input type="text" id="lineNo" list="lineList" placeholder="LINE" required class="p-3.5 text-[11px] rounded-xl neon-input font-bold"></div>
+                    <input type="text" id="refNo" list="refList" placeholder="REFERENCE NO" required class="w-full p-3.5 text-[11px] rounded-xl neon-input font-bold">
+                    <div class="grid grid-cols-2 gap-3"><input type="text" id="supplier" list="supList" placeholder="SUPPLIER" required class="p-3.5 text-[11px] rounded-xl neon-input font-bold"><input type="number" id="qty" placeholder="QTY" required class="p-3.5 text-[11px] rounded-xl neon-input font-bold"></div>
+                    <div class="grid grid-cols-2 gap-3"><input type="text" id="partNo" list="ptList" placeholder="PART NO" required class="p-3.5 text-[11px] rounded-xl neon-input font-bold"><input type="text" id="partOn" list="lotList" placeholder="PART NAME" required class="p-3.5 text-[11px] rounded-xl neon-input font-bold"></div>
+                    <input type="text" id="defectName" list="defectList" placeholder="DEFECT TYPE" required class="w-full p-3.5 text-[11px] rounded-xl neon-input font-bold">
+                    <textarea id="remark" placeholder="REMARKS..." rows="2" class="w-full p-3.5 text-[11px] rounded-xl neon-input font-bold resize-none"></textarea>
+                    <select id="judgmentSelect" required onchange="handleJudgmentChange(this.value)" class="w-full p-4 text-[11px] font-black rounded-xl bg-white border cursor-pointer uppercase">
+                        <option value="" disabled selected>-- JUDGMENT --</option>
+                        <option value="SF">SF FAULT</option>
+                        <option value="VENDOR FAULT">VENDOR FAULT</option>
+                        <option value="CTC">CTC FAULT</option>
+                        <option value="CAN USE">CAN USE (OK)</option>
+                    </select>
+                    <button type="submit" id="submitBtn" class="btn-luxury w-full bg-slate-800 text-white font-black py-4 rounded-2xl text-[11px] uppercase tracking-widest shadow-lg mt-2">Commit Data</button>
+                </form>
+            </aside>
+
+            <main class="flex-grow flex flex-col min-w-0 stat-card rounded-[2.5rem] overflow-hidden">
+                <div class="px-8 py-5 flex justify-between items-center bg-white/30 border-b backdrop-blur-md">
+                    <div class="flex gap-2" id="filterContainer">
+                        <button onclick="setFilter('ALL')" id="btn-ALL" class="btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl bg-orange-500 text-white">ALL</button>
+                        <button onclick="setFilter('SF')" id="btn-SF" class="btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">SF</button>
+                        <button onclick="setFilter('VENDOR FAULT')" id="btn-VENDOR" class="btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">VENDOR</button>
+                        <button onclick="setFilter('CTC')" id="btn-CTC" class="btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">CTC</button>
+                        <button onclick="setFilter('CAN USE')" id="btn-CANUSE" class="btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">OK</button>
+                    </div>
+                    <div class="flex gap-3 items-center">
+                        <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="Search..." class="neon-input px-5 py-2.5 rounded-xl text-[11px] font-bold w-32">
+                        
+                        <button id="syncBtn" onclick="syncDataToGoogle()" class="btn-luxury bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-[10px] font-black shadow-lg flex items-center gap-2">
+                            <svg id="syncIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                            SYNC CLOUD
+                        </button>
+
+                        <button onclick="openDashboard()" class="btn-luxury bg-orange-500 text-white px-5 py-2.5 rounded-xl text-[10px] font-black shadow-lg">DASHBOARD</button>
+                        <button onclick="openJobProject()" class="btn-luxury bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black shadow-lg shadow-indigo-200">JOB</button>
+                        <button onclick="document.getElementById('excelImport').click()" class="btn-luxury bg-blue-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black">IMPORT</button>
+                        <button onclick="exportToExcel()" class="btn-luxury bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-black">EXPORT</button>
+                        <input type="file" id="excelImport" hidden accept=".xlsx, .xls" onchange="importExcel(this)">
+                        <button onclick="clearAllData()" class="btn-luxury bg-red-50 text-red-500 px-4 py-2.5 rounded-xl text-[10px] font-black hover:bg-red-500 hover:text-white" title="CLEAR ALL MY DATA">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-grow overflow-auto custom-scroll bg-white/40">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 z-10 bg-white/80 backdrop-blur-md">
+                            <tr class="visible text-[10px] uppercase text-slate-400 font-black border-b">
+                                <th class="pl-8 py-4">Date</th><th>Shift/Line</th><th>Reference</th><th>Supplier / Part Details</th><th class="text-center">Qty</th><th>Defect</th><th>Remark</th><th class="text-center">Status</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="dashboardModal" onclick="closeDashboard()">
+        <div class="glass-dash rounded-[3.5rem] w-[96vw] h-[92vh] p-8 overflow-hidden flex flex-col border border-white/50" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-8 shrink-0">
+                <div>
+                    <h2 class="orbitron font-black text-4xl text-slate-800 tracking-tight">Aura <span class="text-orange-500 italic">Visualizer</span></h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em]">Executive Analytics Insight • <span id="dashUser" class="text-slate-800"></span></p>
+                </div>
+                <div class="flex items-center gap-3 bg-white/40 p-3 px-6 rounded-3xl border border-white shadow-inner">
+                    <input type="date" id="dashStart" onchange="refreshDashboardData()" class="p-2 rounded-xl text-[11px] font-bold border-none bg-transparent outline-none">
+                    <span class="text-slate-400 font-black">→</span>
+                    <input type="date" id="dashEnd" onchange="refreshDashboardData()" class="p-2 rounded-xl text-[11px] font-bold border-none bg-transparent outline-none">
+                    <select id="dashVendor" onchange="refreshDashboardData()" class="p-2 rounded-xl text-[11px] font-bold border-none bg-transparent outline-none w-40"></select>
+                    <button onclick="resetDashFilters()" class="p-2 text-slate-400 hover:text-orange-500 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></button>
+                    <button onclick="closeDashboard()" class="w-10 h-10 rounded-2xl bg-red-500 text-white font-bold hover:scale-110 transition-all shadow-lg shadow-red-200">✕</button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-5 gap-6 mb-8 shrink-0">
+                <div class="stat-card rounded-[3rem] p-7 bg-slate-900 text-white shadow-2xl border-none">
+                    <p class="text-[11px] uppercase opacity-60 font-black tracking-widest mb-1">Total Quantity</p>
+                    <div id="dash-total-qty" class="orbitron text-6xl font-black leading-tight number-glow">0</div>
+                    <div class="mt-3 text-xs font-bold opacity-60">TOTAL LOTS: <span id="dash-total-lot" class="text-orange-400 text-lg ml-1">0</span></div>
+                </div>
+                <div class="stat-card rounded-[3rem] p-7 bg-white/60">
+                    <div class="flex justify-between items-start"><p class="text-[11px] text-orange-600 uppercase font-black tracking-widest">SF Fault</p><span id="dash-sf-pct" class="text-[12px] bg-orange-500 text-white px-3 py-1 rounded-full font-black orbitron">0%</span></div>
+                    <div id="dash-sf-qty" class="orbitron text-6xl font-black text-orange-600 leading-tight">0</div>
+                    <div class="mt-3 text-xs font-bold text-slate-400 uppercase">Lots: <span id="dash-sf-lot" class="text-slate-800 text-lg ml-1">0</span></div>
+                </div>
+                <div class="stat-card rounded-[3rem] p-7 bg-white/60">
+                    <div class="flex justify-between items-start"><p class="text-[11px] text-red-600 uppercase font-black tracking-widest">Vendor</p><span id="dash-ven-pct" class="text-[12px] bg-red-500 text-white px-3 py-1 rounded-full font-black orbitron">0%</span></div>
+                    <div id="dash-ven-qty" class="orbitron text-6xl font-black text-red-600 leading-tight">0</div>
+                    <div class="mt-3 text-xs font-bold text-slate-400 uppercase">Lots: <span id="dash-ven-lot" class="text-slate-800 text-lg ml-1">0</span></div>
+                </div>
+                <div class="stat-card rounded-[3rem] p-7 bg-white/60">
+                    <div class="flex justify-between items-start"><p class="text-[11px] text-blue-600 uppercase font-black tracking-widest">CTC</p><span id="dash-ctc-pct" class="text-[12px] bg-blue-500 text-white px-3 py-1 rounded-full font-black orbitron">0%</span></div>
+                    <div id="dash-ctc-qty" class="orbitron text-6xl font-black text-blue-600 leading-tight">0</div>
+                    <div class="mt-3 text-xs font-bold text-slate-400 uppercase">Lots: <span id="dash-ctc-lot" class="text-slate-800 text-lg ml-1">0</span></div>
+                </div>
+                <div class="stat-card rounded-[3rem] p-7 bg-white/60">
+                    <div class="flex justify-between items-start"><p class="text-[11px] text-emerald-600 uppercase font-black tracking-widest">Can Use</p><span id="dash-ok-pct" class="text-[12px] bg-emerald-500 text-white px-3 py-1 rounded-full font-black orbitron">0%</span></div>
+                    <div id="dash-ok-qty" class="orbitron text-6xl font-black text-emerald-600 leading-tight">0</div>
+                    <div class="mt-3 text-xs font-bold text-slate-400 uppercase">Lots: <span id="dash-ok-lot" class="text-slate-800 text-lg ml-1">0</span></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6 flex-grow overflow-hidden">
+                <div class="col-span-8 stat-card rounded-[3rem] p-8 flex flex-col bg-white/50">
+                    <div class="flex justify-between items-start mb-6">
+                        <h4 class="text-xs font-black uppercase text-slate-400 orbitron tracking-[0.2em]">Monthly Performance Trend</h4>
+                        <div id="monthly-insight" class="text-[11px] font-bold text-slate-800 bg-white/80 px-4 py-2 rounded-2xl border shadow-sm">Calculating Dynamics...</div>
+                    </div>
+                    <div class="flex-grow relative"><canvas id="monthlyTrendChart"></canvas></div>
+                </div>
+                <div class="col-span-4 stat-card rounded-[3rem] p-8 flex flex-col bg-slate-800 text-white shadow-2xl">
+                    <h4 class="text-xs font-black uppercase text-orange-400 orbitron mb-4 tracking-[0.2em]">Top Production Lines</h4>
+                    <div class="flex-grow relative"><canvas id="topLinesRadarChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6 mt-6 shrink-0 h-[220px]">
+                <div class="stat-card rounded-[2.5rem] p-6 flex flex-col bg-white/60">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-4 border-b border-slate-200 pb-2 flex justify-between"><span>Top Suppliers</span><span class="text-orange-500">QTY</span></h3>
+                    <div id="top-suppliers-qty" class="flex-grow overflow-y-auto custom-scroll pr-2"></div>
+                </div>
+                <div class="stat-card rounded-[2.5rem] p-6 flex flex-col bg-white/60">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-4 border-b border-slate-200 pb-2 flex justify-between"><span>Top Defects</span><span class="text-red-500">QTY</span></h3>
+                    <div id="top-defects-qty" class="flex-grow overflow-y-auto custom-scroll pr-2"></div>
+                </div>
+                <div class="stat-card rounded-[2.5rem] p-6 flex flex-col bg-white/60">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-4 border-b border-slate-200 pb-2 flex justify-between"><span>Top Part Nos</span><span class="text-blue-500">QTY</span></h3>
+                    <div id="top-parts-qty" class="flex-grow overflow-y-auto custom-scroll pr-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <datalist id="refList"></datalist><datalist id="lineList"></datalist><datalist id="supList"></datalist><datalist id="ptList"></datalist><datalist id="lotList"></datalist><datalist id="defectList"></datalist><datalist id="inspectorList"></datalist>
+
+    <script>
+        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzI-jFUxTQvKyERc09k-WbdD29BqE3N-P8hMGjdcyETWxmBzfC2POGbhdAYeqErQxj_Rg/exec";
+        let records = JSON.parse(localStorage.getItem('qdit_v12_aura')) || [];
+        let syncedRefs = JSON.parse(localStorage.getItem('aura_synced_refs')) || [];
+        let currentUser = "";
+        let filterType = 'ALL';
+        let charts = {};
+        Chart.register(ChartDataLabels);
+
+        window.onload = () => {
+            document.getElementById('inputDate').valueAsDate = new Date();
+            startTime();
+            
+            const savedUser = sessionStorage.getItem('currentUser');
+            if(savedUser) {
+                currentUser = savedUser;
+                document.getElementById('currentUserDisp').innerText = currentUser;
+                document.getElementById('loginOverlay').style.display = 'none';
+                gsap.set("#mainContainer", { opacity: 1, y: 0 });
+                refreshAll();
+            }
+        };
+
+        function getMyRecords() { return records.filter(r => r.inspector === currentUser); }
+        function saveAndRefresh() { 
+            localStorage.setItem('qdit_v12_aura', JSON.stringify(records)); 
+            refreshAll(); 
+        }
+
+        // --- NEW SYNC LOGIC ---
+        async function syncDataToGoogle() {
+            const myData = getMyRecords();
+            // Filter only NOT YET SYNCED (by Ref)
+            const newToSync = myData.filter(r => !syncedRefs.includes(r.ref));
+
+            if (newToSync.length === 0) {
+                showToast("✅อัพโหลดข้อมูลสำเร็จ");
+                return;
+            }
+
+            const syncBtn = document.getElementById('syncBtn');
+            const syncIcon = document.getElementById('syncIcon');
+            syncBtn.disabled = true;
+            syncIcon.classList.add('sync-active');
+            showToast(`SYNCING ${newToSync.length} RECORDS...`);
+
+            try {
+                // Prepare payload
+                const payload = newToSync.map(r => ({
+                    date: r.date,
+                    shift: r.shift,
+                    inspector: r.inspector,
+                    ref: r.ref,
+                    line: r.line,
+                    supplier: r.supplier,
+                    partNo: r.partNo,
+                    partName: r.partName,
+                    qty: r.qty,
+                    defect: r.defect,
+                    remark: r.remark,
+                    judgment: r.judgment
+                }));
+
+                const response = await fetch(GOOGLE_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // standard for GAS
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Since no-cors doesn't allow reading response, we assume success if no error thrown
+                // Update Local Memory of Synced Refs
+                const justSynced = newToSync.map(r => r.ref);
+                syncedRefs = [...new Set([...syncedRefs, ...justSynced])];
+                localStorage.setItem('aura_synced_refs', JSON.stringify(syncedRefs));
+                
+                showToast("🚀อัพโหลดข้อมูลไปGoogle sheetสำเร็จ");
+            } catch (err) {
+                console.error(err);
+                showToast("❌อัพโหลดข้อมูลไม่สำเร็จ");
+            } finally {
+                syncBtn.disabled = false;
+                syncIcon.classList.remove('sync-active');
+            }
+        }
+
+        async function logout() { 
+            // Auto Sync on logout
+            const myData = getMyRecords();
+            const hasNew = myData.some(r => !syncedRefs.includes(r.ref));
+            
+            if(hasNew) {
+                showToast("AUTO SYNCING BEFORE LOGOUT...");
+                await syncDataToGoogle();
+            }
+            
+            sessionStorage.removeItem('currentUser'); 
+            location.reload(); 
+        }
+
+        function login() {
+            const name = document.getElementById('loginName').value.trim().toUpperCase();
+            if(!name) return shakeElement("#loginCard");
+            if(document.getElementById('loginPass').value !== "1234") return showToast("WRONG ACCESS KEY!");
+            
+            currentUser = name;
+            sessionStorage.setItem('currentUser', currentUser); 
+            document.getElementById('currentUserDisp').innerText = currentUser;
+            
+            const tl = gsap.timeline();
+            tl.to("#loginCard", { scale: 0.9, opacity: 0, duration: 0.3, ease: "power2.in" });
+            tl.to("#loginOverlay", { opacity: 0, duration: 0.8, onComplete: () => { 
+                document.getElementById('loginOverlay').style.display = 'none'; 
+                refreshAll(); 
+            }});
+            tl.to("#mainContainer", { opacity: 1, y: 0, duration: 1, ease: "back.out(1.7)" }, "-=0.4");
+        }
+
+        function startTime() { setInterval(() => { const now = new Date(); document.getElementById('liveClock').innerText = now.toLocaleDateString('en-GB') + ' | ' + now.toLocaleTimeString('en-GB'); }, 1000); }
+        function openJobProject() { window.location.href = "job_project.html"; }
+
+        document.getElementById('claimForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const currentRef = document.getElementById('refNo').value.trim();
+            const isDuplicate = getMyRecords().some(r => r.ref === currentRef);
+            if(isDuplicate) { shakeElement("#refNo"); showToast("DUPLICATE REFERENCE NO!"); return; }
+
+            records.push({
+                id: Date.now(),
+                date: document.getElementById('inputDate').value,
+                shift: document.getElementById('shift').value,
+                inspector: currentUser,
+                ref: currentRef,
+                line: document.getElementById('lineNo').value,
+                supplier: document.getElementById('supplier').value,
+                partNo: document.getElementById('partNo').value,
+                partName: document.getElementById('partOn').value,
+                qty: parseInt(document.getElementById('qty').value) || 0,
+                defect: document.getElementById('defectName').value,
+                remark: document.getElementById('remark').value,
+                judgment: document.getElementById('judgmentSelect').value
+            });
+            saveAndRefresh();
+            e.target.reset();
+            document.getElementById('inputDate').valueAsDate = new Date();
+            handleJudgmentChange('');
+            showToast("✅SAVE DATAสำเร็จ");
+        });
+
+        function cloneRecord(id) {
+            const record = records.find(r => r.id === id);
+            if (record) {
+                document.getElementById('lineNo').value = record.line;
+                document.getElementById('refNo').value = record.ref + "_COPY"; // prevent direct dup
+                document.getElementById('supplier').value = record.supplier;
+                document.getElementById('partNo').value = record.partNo;
+                document.getElementById('partOn').value = record.partName;
+                document.getElementById('qty').value = record.qty;
+                document.getElementById('defectName').value = record.defect;
+                document.getElementById('remark').value = record.remark || '';
+                document.getElementById('judgmentSelect').value = record.judgment;
+                handleJudgmentChange(record.judgment);
+                document.querySelector('aside').scrollIntoView({ behavior: 'smooth' });
+                showToast("RECORD CLONED");
+                gsap.from("#claimForm input, #claimForm select, #claimForm textarea", { backgroundColor: "rgba(249, 115, 22, 0.2)", duration: 0.5, stagger: 0.03 });
+            }
+        }
+
+        function importExcel(input) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                const parseExcelDate = (val) => {
+                    if (!val) return new Date().toISOString().split('T')[0];
+                    if (val instanceof Date) return val.toISOString().split('T')[0];
+                    if (typeof val === 'number') {
+                        const d = XLSX.SSF.parse_date_code(val);
+                        return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
+                    }
+                    return new Date().toISOString().split('T')[0];
+                };
+                const newItems = json.map(r => ({
+                    id: Date.now() + Math.random(),
+                    date: parseExcelDate(r.date || r.Date || r.DATE),
+                    shift: r.shift || r.Shift || "SHIFT A",
+                    inspector: currentUser,
+                    ref: String(r.ref || r.Reference || ""),
+                    line: String(r.line || r.Line || ""),
+                    supplier: String(r.supplier || r.Supplier || ""),
+                    partNo: String(r.partNo || r.PartNo || ""),
+                    partName: String(r.partName || r.PartName || ""),
+                    qty: parseInt(r.qty || r.Qty || 0),
+                    defect: String(r.defect || r.Defect || ""),
+                    remark: String(r.remark || r.Remark || ""),
+                    judgment: String(r.judgment || "SF").toUpperCase().includes("OK") ? "CAN USE" : String(r.judgment || "SF").toUpperCase()
+                }));
+                records = [...records, ...newItems];
+                saveAndRefresh();
+                showToast(`IMPORTED ${newItems.length} ITEMS`);
+                input.value = "";
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function animateNumber(id, target) {
+            const el = document.getElementById(id); if (!el) return;
+            const obj = { val: parseInt(el.innerText.replace(/,/g, '')) || 0 };
+            gsap.to(obj, { val: target, duration: 1, onUpdate: () => el.innerText = Math.floor(obj.val).toLocaleString() });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            tbody.innerHTML = '';
+            const myData = getMyRecords();
+            const filtered = myData.slice().reverse().filter(r => (filterType === 'ALL' || r.judgment === filterType) && Object.values(r).some(v => String(v).toLowerCase().includes(search)));
+            filtered.forEach((r, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "group hover:bg-white/60 border-l-4 border-transparent hover:border-orange-500";
+                
+                // Check Cloud Status
+                const isSynced = syncedRefs.includes(r.ref);
+                const cloudIcon = isSynced ? 'text-emerald-500' : 'text-slate-200';
+                
+                const sm = { 'SF': { dot: 'bg-orange-500', glow: '#f97316', text: 'text-orange-600 bg-orange-50' }, 'VENDOR FAULT': { dot: 'bg-red-500', glow: '#ef4444', text: 'text-red-600 bg-red-50' }, 'CTC': { dot: 'bg-blue-500', glow: '#3b82f6', text: 'text-blue-600 bg-blue-50' }, 'CAN USE': { dot: 'bg-emerald-500', glow: '#10b981', text: 'text-emerald-600 bg-emerald-50' } };
+                const s = sm[r.judgment] || sm['SF'];
+                tr.innerHTML = `
+                    <td class="pl-8 py-5 font-bold text-[11px] text-slate-400">${r.date}</td>
+                    <td class="text-[11px] font-black text-slate-700">${r.shift}<br><span class="text-slate-400 font-bold">L: ${r.line}</span></td>
+                    <td class="text-[11px] font-black text-slate-400 flex items-center gap-2">
+                        <span class="${cloudIcon}" title="Cloud Sync Status">●</span>#${r.ref}
+                    </td>
+                    <td><div class="text-[11px] font-black text-slate-800 uppercase">${r.supplier}</div><div class="text-[10px] text-slate-500 font-bold">${r.partNo} / ${r.partName}</div></td>
+                    <td class="text-center text-lg font-black orbitron italic text-slate-700">${r.qty.toLocaleString()}</td>
+                    <td><div class="text-[11px] font-bold text-slate-600 uppercase">${r.defect}</div></td>
+                    <td class="text-[10px] text-slate-400 font-medium max-w-[150px] truncate" title="${r.remark || '-'}">${r.remark || '-'}</td>
+                    <td class="text-center"><span class="px-4 py-2 rounded-full text-[9px] font-black uppercase border ${s.text} inline-flex items-center gap-2"><span class="w-2 h-2 rounded-full ${s.dot} status-glow" style="--color-glow: ${s.glow}"></span>${r.judgment}</span></td>
+                    <td class="pr-8 text-right whitespace-nowrap">
+                        <button onclick="cloneRecord(${r.id})" class="opacity-0 group-hover:opacity-100 text-blue-500 hover:text-blue-700 transition-all font-bold mr-3 text-sm" title="Quick Clone">📑</button>
+                        <button onclick="del(${r.id})" class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all font-bold">✕</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+                setTimeout(() => tr.classList.add('visible'), idx * 15);
+            });
+        }
+
+        function updateMemoryLists() {
+            const myData = getMyRecords();
+            const setList = (id, key) => {
+                const list = [...new Set(myData.map(r => r[key]))].filter(Boolean);
+                document.getElementById(id).innerHTML = list.map(v => `<option value="${v}">`).join('');
+            };
+            setList('refList', 'ref'); setList('lineList', 'line'); setList('supList', 'supplier');
+            setList('ptList', 'partNo'); setList('lotList', 'partName'); setList('defectList', 'defect');
+            setList('inspectorList', 'inspector');
+        }
+
+        function openDashboard() {
+            document.getElementById('dashboardModal').style.display = 'flex';
+            document.getElementById('dashUser').innerText = currentUser;
+            const myData = getMyRecords();
+            const vendors = [...new Set(myData.map(r => r.supplier))].filter(Boolean).sort();
+            document.getElementById('dashVendor').innerHTML = '<option value="ALL">ALL VENDORS</option>' + vendors.map(v => `<option value="${v}">${v}</option>`).join('');
+            resetDashFilters();
+        }
+
+        function resetDashFilters() {
+            document.getElementById('dashStart').value = "";
+            document.getElementById('dashEnd').value = "";
+            document.getElementById('dashVendor').value = "ALL";
+            refreshDashboardData();
+        }
+
+        function refreshDashboardData() {
+            const start = document.getElementById('dashStart').value;
+            const end = document.getElementById('dashEnd').value;
+            const ven = document.getElementById('dashVendor').value;
+            let data = getMyRecords();
+            if(start) data = data.filter(r => r.date >= start);
+            if(end) data = data.filter(r => r.date <= end);
+            if(ven !== "ALL") data = data.filter(r => r.supplier === ven);
+            
+            const stats = { SF:0, VEN:0, CTC:0, OK:0, tQ:0, sfL:0, venL:0, ctcL:0, okL:0, tL:data.length };
+            data.forEach(r => {
+                stats.tQ += r.qty;
+                if(r.judgment === 'SF') { stats.SF += r.qty; stats.sfL++; }
+                else if(r.judgment === 'VENDOR FAULT') { stats.VEN += r.qty; stats.venL++; }
+                else if(r.judgment === 'CTC') { stats.CTC += r.qty; stats.ctcL++; }
+                else if(r.judgment === 'CAN USE') { stats.OK += r.qty; stats.okL++; }
+            });
+
+            animateNumber('dash-total-qty', stats.tQ);
+            document.getElementById('dash-total-lot').innerText = stats.tL.toLocaleString();
+            
+            const updateSub = (pre, q, l) => {
+                animateNumber(`dash-${pre}-qty`, q);
+                document.getElementById(`dash-${pre}-lot`).innerText = l.toLocaleString();
+                const pct = stats.tQ ? Math.round((q/stats.tQ)*100) : 0;
+                document.getElementById(`dash-${pre}-pct`).innerText = pct + '%';
+            };
+            updateSub('sf', stats.SF, stats.sfL);
+            updateSub('ven', stats.VEN, stats.venL);
+            updateSub('ctc', stats.CTC, stats.ctcL);
+            updateSub('ok', stats.OK, stats.okL);
+            
+            renderCharts(data);
+            renderModernRankings(data, stats.tQ);
+            generateAutoInsight(data, stats);
+        }
+
+        function renderModernRankings(data, totalQty) {
+            const getTop = (arr, key) => {
+                const counts = {};
+                arr.forEach(r => { const val = r[key] || "Unknown"; counts[val] = (counts[val] || 0) + r.qty; });
+                return Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            };
+            const renderBar = (id, list, color) => {
+                const container = document.getElementById(id);
+                if(!list.length) { container.innerHTML = '<div class="text-[10px] text-slate-300 py-10 text-center uppercase orbitron">No Records</div>'; return; }
+                const maxVal = list[0][1];
+                container.innerHTML = list.map(item => {
+                    const pctOfMax = (item[1] / maxVal) * 100;
+                    const pctOfTotal = totalQty ? ((item[1] / totalQty) * 100).toFixed(1) : 0;
+                    return `
+                        <div class="bar-container">
+                            <div class="bar-label"><span class="truncate pr-4 uppercase text-slate-500">${item[0]}</span><span class="bar-val text-slate-800">${item[1].toLocaleString()}</span></div>
+                            <div class="bar-bg">
+                                <div class="bar-fill" style="width: ${pctOfMax}%; background: ${color}" data-pct="${pctOfTotal}%"></div>
+                            </div>
+                        </div>`;
+                }).join('');
+            };
+            renderBar('top-suppliers-qty', getTop(data, 'supplier'), 'linear-gradient(90deg, #f97316, #fb923c)');
+            renderBar('top-defects-qty', getTop(data, 'defect'), 'linear-gradient(90deg, #ef4444, #f87171)');
+            renderBar('top-parts-qty', getTop(data, 'partNo'), 'linear-gradient(90deg, #3b82f6, #60a5fa)');
+        }
+
+        function renderCharts(data) {
+            const commonTooltip = {
+                enabled: true,
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                titleFont: { family: 'Orbitron', size: 13, weight: '900' },
+                bodyFont: { family: 'Inter', size: 12, weight: 'bold' },
+                padding: 15,
+                cornerRadius: 12,
+                displayColors: true,
+                borderColor: 'rgba(249, 115, 22, 0.3)',
+                borderWidth: 1,
+                callbacks: {
+                    label: function(context) {
+                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        let value = context.parsed.y || context.parsed || 0;
+                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) + '%' : '0%';
+                        return ` QTY: ${value.toLocaleString()} (${percentage})`;
+                    }
+                }
+            };
+
+            if(charts.trend) charts.trend.destroy();
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const monthlyData = new Array(12).fill(0);
+            data.forEach(r => { const d = new Date(r.date); if(d.getFullYear() === new Date().getFullYear()) monthlyData[d.getMonth()] += r.qty; });
+            
+            charts.trend = new Chart(document.getElementById('monthlyTrendChart'), {
+                type: 'line',
+                data: { labels: months, datasets: [{ label: 'Quantity', data: monthlyData, borderColor: '#f97316', borderWidth: 4, tension: 0.4, fill: true, backgroundColor: 'rgba(249,115,22,0.1)', pointRadius: 5, pointBackgroundColor: '#fff', pointBorderWidth: 2 }] },
+                options: { 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: false }, 
+                        datalabels: { display: false },
+                        tooltip: commonTooltip 
+                    }, 
+                    scales: { 
+                        x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' } }, 
+                        y: { display: false } 
+                    } 
+                }
+            });
+
+            if(charts.radar) charts.radar.destroy();
+            const lineCounts = {};
+            data.forEach(r => { lineCounts[r.line] = (lineCounts[r.line] || 0) + r.qty; });
+            const topLines = Object.entries(lineCounts).sort((a,b) => b[1] - a[1]).slice(0, 6);
+            
+            charts.radar = new Chart(document.getElementById('topLinesRadarChart'), {
+                type: 'bar',
+                data: { labels: topLines.map(l => l[0]), datasets: [{ label: 'Total Qty', data: topLines.map(l => l[1]), backgroundColor: '#f97316', borderRadius: 12, barThickness: 30 }] },
+                options: { 
+                    maintainAspectRatio: false, 
+                    scales: { 
+                        y: { display: false }, 
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11, weight: 'bold', family: 'Orbitron' } } } 
+                    }, 
+                    plugins: { 
+                        legend: { display: false }, 
+                        datalabels: { display: false },
+                        tooltip: commonTooltip
+                    } 
+                }
+            });
+        }
+
+        function generateAutoInsight(data, stats) {
+            const insightBox = document.getElementById('monthly-insight');
+            if(!data.length) { insightBox.innerText = "NO DATA TO ANALYZE"; return; }
+            const topIssue = stats.SF >= stats.VEN && stats.SF >= stats.CTC ? "SF FAULT" : stats.VEN >= stats.CTC ? "VENDOR FAULT" : "CTC FAULT";
+            insightBox.innerHTML = `Main Concern: <span class="text-red-500 font-black">${topIssue}</span> | Data Health: <span class="text-emerald-500">OPTIMIZED</span>`;
+        }
+
+        function closeDashboard() { document.getElementById('dashboardModal').style.display = 'none'; }
+        
+        function del(id) { 
+            if(confirm("ลบรายการนี้ใช่ไหม?")) { 
+                records = records.filter(r => r.id !== id); 
+                saveAndRefresh(); 
+            } 
+        }
+
+        function clearAllData() {
+            if(confirm("ลบข้อมูลของคุณทั้งหมดใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้")) {
+                records = records.filter(r => r.inspector !== currentUser);
+                saveAndRefresh();
+                showToast("ล้างข้อมูลทั้งหมดเรียบร้อยแล้วจ๊ะ🧹");
+            }
+        }
+        
+        function refreshAll() {
+            const myData = getMyRecords();
+            const stats = { SF:0, VEN:0, CTC:0, OK:0, tQ:0, sfL:0, venL:0, ctcL:0, okL:0 };
+            myData.forEach(r => {
+                stats.tQ += r.qty;
+                if(r.judgment === 'SF') { stats.SF += r.qty; stats.sfL++; }
+                else if(r.judgment === 'VENDOR FAULT') { stats.VEN += r.qty; stats.venL++; }
+                else if(r.judgment === 'CTC') { stats.CTC += r.qty; stats.ctcL++; }
+                else if(r.judgment === 'CAN USE') { stats.OK += r.qty; stats.okL++; }
+            });
+            animateNumber('masterQty', stats.tQ); animateNumber('masterLot', myData.length);
+            animateNumber('qtySF', stats.SF); document.getElementById('lotSF').innerText = stats.sfL;
+            animateNumber('qtyVendor', stats.VEN); document.getElementById('lotVendor').innerText = stats.venL;
+            animateNumber('qtyCTC', stats.CTC); document.getElementById('lotCTC').innerText = stats.ctcL;
+            animateNumber('qtyCanUse', stats.OK); document.getElementById('lotCanUse').innerText = stats.okL;
+            
+            const calcPct = (v) => stats.tQ ? Math.round((v/stats.tQ)*100)+'%' : '0%';
+            document.getElementById('pctSF').innerText = calcPct(stats.SF);
+            document.getElementById('pctVendor').innerText = calcPct(stats.VEN);
+            document.getElementById('pctCTC').innerText = calcPct(stats.CTC);
+            document.getElementById('pctCanUse').innerText = calcPct(stats.OK);
+            renderTable(); updateMemoryLists();
+        }
+
+        function handleJudgmentChange(v) { 
+            document.getElementById('submitBtn').className = `btn-luxury w-full ${v==='SF'?'bg-orange-500':v==='VENDOR FAULT'?'bg-red-500':v==='CTC'?'bg-blue-500':v==='CAN USE'?'bg-emerald-500':'bg-slate-800'} text-white font-black py-4 rounded-2xl text-[11px] uppercase mt-2`; 
+        }
+
+        function setFilter(type) { 
+            filterType = type; 
+            document.querySelectorAll('#filterContainer button').forEach(b => b.className = "btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400");
+            const mapId = { 'ALL':'btn-ALL', 'SF':'btn-SF', 'VENDOR FAULT':'btn-VENDOR', 'CTC':'btn-CTC', 'CAN USE':'btn-CANUSE' };
+            document.getElementById(mapId[type]).className = "btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl bg-orange-500 text-white";
+            renderTable();
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.display = 'block';
+            gsap.fromTo(t, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 });
+            setTimeout(() => gsap.to(t, { y: 50, opacity: 0, duration: 0.4, onComplete: () => t.style.display = 'none' }), 3000);
+        }
+
+        function shakeElement(id) { gsap.to(id, { x: 10, duration: 0.05, repeat: 5, yoyo: true }); }
+
+        function exportToExcel() {
+            const myData = getMyRecords();
+            if(!myData.length) return showToast("NO DATA TO EXPORT");
+            const ws = XLSX.utils.json_to_sheet(myData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "QA_RECORDS");
+            XLSX.writeFile(wb, `QDIT_AURA_EXPORT_${currentUser}.xlsx`);
+        }
+    </script>
+</body>
+</html>
+
+

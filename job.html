@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAP Pearl & Sunset Ultimate 2026 - Masterpiece Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --primary-dark: #E67E00;
+            --primary-light: #FFF4E6;
+            --primary-glow: rgba(255, 140, 0, 0.25);
+            --bg: #F1F5F9;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --border: #E2E8F0;
+            --text: #0F172A;
+            --text-light: #64748B;
+            --work: #10B981;
+            --leave: #F43F5E;
+            --holiday: #3B82F6;
+            --support: #8B5CF6;
+            --sunset: linear-gradient(135deg, #FFB347 0%, #FF8C00 100%);
+            --ai-dark: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.05);
+            --status-rp: #EF4444;
+            --status-vf: #0EA5E9;
+            --status-records: #FDE68A;
+        }
+
+        * { box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        body {
+            font-family: 'Prompt', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #ffffff 0%, #f1f5f9 100%);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 0;
+            z-index: 100;
+            flex-shrink: 0;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.02);
+        }
+
+        .user-box { padding: 0 25px 30px; text-align: center; position: relative; }
+        .user-avatar {
+            width: 85px; height: 85px; border-radius: 24px;
+            background: url('https://cdn-icons-png.flaticon.com/512/3135/3135715.png') center/cover;
+            margin: 0 auto 15px; border: 4px solid white;
+            box-shadow: 0 15px 30px var(--primary-glow);
+            transform: rotate(-3deg);
+        }
+        
+        .name-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .online-status {
+            width: 10px; height: 10px;
+            background: #10B981; border-radius: 50%;
+            animation: pulse-green 2s infinite;
+            display: inline-block;
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .menu-item {
+            padding: 14px 25px; margin: 6px 15px; border-radius: 16px;
+            cursor: pointer; display: flex; align-items: center; gap: 12px;
+            color: var(--text-light); font-weight: 500;
+        }
+        .menu-item:hover { background: var(--primary-light); color: var(--primary); padding-left: 30px; }
+        .menu-item.active { background: var(--sunset); color: white; box-shadow: 0 10px 20px var(--primary-glow); }
+
+        .main-container {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+
+        .page { display: none; flex-direction: column; gap: 25px; height: auto; }
+        .page.active { display: flex; animation: pageIn 0.5s forwards; }
+        
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 25px 40px rgba(0,0,0,0.06); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+        .stat-card { text-align: center; padding: 20px; }
+        .stat-card h2 { margin: 8px 0 0; font-size: 2rem; font-weight: 600; }
+        .stat-card small { font-weight: 500; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
+
+        .chart-container {
+            display: flex; align-items: flex-end; justify-content: space-around;
+            height: 160px; padding: 20px 10px 0; background: rgba(248, 250, 252, 0.5);
+            border-radius: 20px;
+        }
+        .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .bar {
+            width: 18px; border-radius: 12px 12px 4px 4px;
+            background: var(--sunset); cursor: pointer; position: relative;
+            min-height: 5px;
+        }
+        .bar::after {
+            content: attr(data-value); position: absolute; top: -35px; left: 50%;
+            transform: translateX(-50%) translateY(10px); opacity: 0;
+            background: #1E293B; color: white; padding: 5px 10px; border-radius: 8px;
+            font-size: 0.7rem; white-space: nowrap; pointer-events: none;
+        }
+        .bar:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .input-group {
+            display: flex; gap: 12px; background: #F8FAFC; padding: 12px;
+            border-radius: 20px; align-items: center; border: 1px solid var(--border);
+        }
+        .input-group:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); }
+
+        input, select {
+            background: white; border: 1px solid var(--border); padding: 12px 16px;
+            border-radius: 14px; font-family: 'Prompt'; font-size: 0.9rem; outline: none;
+        }
+        input:focus { border-color: var(--primary); }
+
+        .btn-main {
+            background: var(--sunset); border: none; padding: 12px 24px;
+            border-radius: 14px; color: white; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+        .btn-main:hover { transform: scale(1.05); filter: brightness(1.1); }
+
+        .table-area {
+            overflow: hidden; border-radius: 20px; background: white;
+            border: 1px solid #F1F5F9; margin-top: 15px;
+        }
+        .table-scroll { max-height: 400px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            padding: 16px; text-align: left; color: var(--text-light);
+            background: #F8FAFC; position: sticky; top: 0; font-weight: 500;
+            z-index: 10; font-size: 0.85rem; border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 14px 16px; border-bottom: 1px solid #F1F5F9;
+            font-size: 0.9rem; font-weight: 300; color: var(--text);
+        }
+        tr:hover td { background-color: #FFF9F2; color: var(--primary-dark); font-weight: 400; }
+        
+        .del-btn {
+            background: none; border: none; cursor: pointer; opacity: 0.4;
+            padding: 5px; border-radius: 8px;
+        }
+        .del-btn:hover { opacity: 1; background: #fee2e2; }
+
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            padding: 16px 40px; border-radius: 20px; background: #1E293B; color: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); z-index: 1000; font-weight: 500;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        .user-tag {
+            padding: 4px 10px; border-radius: 8px; font-size: 0.7rem;
+            font-weight: 500; color: white; display: inline-flex; align-items: center; gap: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .tag-rp { background: var(--status-rp) !important; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2); }
+        .tag-vf { background: var(--status-vf) !important; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2); }
+        .tag-records { background: var(--status-records) !important; color: #92400E; box-shadow: 0 4px 10px rgba(253, 230, 138, 0.4); }
+
+        .ai-badge {
+            background: var(--ai-dark);
+            color: white; padding: 20px; border-radius: 24px;
+            display: flex; flex-direction: column; gap: 10px;
+            position: relative; overflow: hidden;
+        }
+        .ai-badge::after {
+            content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
+
+        .progress-container {
+            height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%; background: var(--sunset); width: 0%; transition: width 1s ease-in-out;
+        }
+
+        .skill-item {
+            background: #f8fafc; border-radius: 16px; padding: 15px;
+            margin-bottom: 10px; position: relative; border: 1px solid var(--border);
+        }
+        .skill-item:hover { border-color: var(--primary); background: white; }
+        .skill-del-btn {
+            position: absolute; top: 12px; right: 12px; border: none;
+            background: #fee2e2; color: #ef4444; width: 28px; height: 28px;
+            border-radius: 8px; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 0.8rem;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* Dashboard Specific Styles */
+        .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .summary-card {
+            background: white; border-radius: 24px; padding: 25px; 
+            display: flex; align-items: center; gap: 20px; border: 1px solid var(--border);
+        }
+        .summary-icon { 
+            width: 60px; height: 60px; border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        }
+        /* Gimmick Badge */
+        .gimmick-badge {
+            position: absolute; top: 15px; right: 15px; font-size: 0.65rem;
+            background: var(--primary-light); color: var(--primary);
+            padding: 4px 10px; border-radius: 20px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* Sync Button Styling */
+        .sync-btn {
+            background: #10B981 !important;
+            margin-bottom: 10px !important;
+        }
+        .sync-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+            filter: grayscale(0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast">✨ ระบบบันทึกข้อมูลเรียบร้อยแล้ว</div>
+
+    <aside class="sidebar">
+        <div class="user-box">
+            <div class="user-avatar"></div>
+            <div class="name-container">
+                <h3 id="displayUserName" style="margin:0; font-size: 1.1rem; font-weight: 500;">Guest</h3>
+                <div class="online-status"></div>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-light); margin: 6px 0 0; opacity: 0.7; font-weight: 300;">Premium Master Operator</p>
+        </div>
+        <nav style="flex-grow: 1;">
+            <div class="menu-item active" onclick="nav('master-dash', this)"><span>🚀</span> Overview Dashboard</div>
+            <div class="menu-item" onclick="nav('daily', this)"><span>📅</span> Daily Report </div>
+            <div class="menu-item" onclick="nav('support', this)"><span>🛠️</span> Support Production</div>
+            <div class="menu-item" onclick="nav('5s', this)"><span>🧹</span> 5S Smart System</div>
+            <div class="menu-item" onclick="nav('multi', this)"><span>📊</span> Skill Matrix</div>
+            <div class="menu-item" onclick="nav('special', this)"><span>⭐</span> Special Jobs</div>
+        </nav>
+        <div style="padding: 0 20px;">
+            <button id="syncBtn" class="btn-main sync-btn" style="width:100%;" onclick="syncWithGoogleSheets()">🔄 SYNC GOOGLE SHEETS</button>
+            <button class="btn-main" style="width:100%; background: #475569; box-shadow: none;" onclick="window.location.href='index.html'">🏠 กลับสู่หน้าหลัก</button>
+        </div>
+    </aside>
+
+    <main class="main-container">
+        
+        <div id="master-dash" class="page active">
+            <h1 style="margin:0; font-size: 2.2rem; font-weight: 700; background: var(--sunset); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Performance Master Overview</h1>
+            <p style="margin-top: -10px; color: var(--text-light);">วิเคราะห์สรุปผลการดำเนินงานแบบ Real-time</p>
+
+            <div class="dash-grid">
+                <div class="summary-card" style="position:relative;">
+                    <span class="gimmick-badge">Live</span>
+                    <div class="summary-icon" style="background: #E0F2FE; color: #0EA5E9;">🛠️</div>
+                    <div>
+                        <small style="color: var(--text-light);">Total Support</small>
+                        <h2 id="dash-support-count" style="margin:0;">0</h2>
+                    </div>
+                </div>
+                <div class="summary-card" style="position:relative;">
+                    <span class="gimmick-badge">Points</span>
+                    <div class="summary-icon" style="background: #FEF3C7; color: #D97706;">🧹</div>
+                    <div>
+                        <small style="color: var(--text-light);">5S Total Points</small>
+                        <h2 id="dash-5s-count" style="margin:0;">0</h2>
+                    </div>
+                </div>
+                <div class="summary-card" style="position:relative;">
+                    <span class="gimmick-badge">Active</span>
+                    <div class="summary-icon" style="background: #DCFCE7; color: #16A34A;">⭐</div>
+                    <div>
+                        <small style="color: var(--text-light);">Special Projects</small>
+                        <h2 id="dash-special-count" style="margin:0;">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px;">
+                <div class="card">
+                    <span class="gimmick-badge">Analytics</span>
+                    <h3 style="margin-top:0;">📊 Work-Life Activity Trend</h3>
+                    <div style="height: 300px;"><canvas id="masterWorkChart"></canvas></div>
+                </div>
+                <div class="card" style="background: var(--ai-dark); color: white;">
+                    <span class="gimmick-badge" style="background: rgba(255,140,0,0.2); color: #FF8C00; border: 1px solid #FF8C00;">Neural Processing</span>
+                    <h3>🤖 AI Performance Analysis</h3>
+                    <div style="text-align: center; padding: 20px 0;">
+                        <h1 id="dash-avg-skill" style="font-size: 3.5rem; margin: 0; color: var(--primary);">0%</h1>
+                        <p style="opacity: 0.7;">Average Competency Skill</p>
+                    </div>
+                    <div class="progress-container"><div id="dash-skill-bar" class="progress-bar"></div></div>
+                    <p id="dash-insight" style="margin-top: 20px; font-weight: 200; line-height: 1.6;"></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <span class="gimmick-badge">Kpi Status</span>
+                <h3>🔍 Operational Summary</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; text-align: center;">
+                    <div>
+                        <small>Repair (RP)</small>
+                        <h3 id="dash-rp-val" style="color: var(--status-rp);">0</h3>
+                    </div>
+                    <div>
+                        <small>Verify (VF)</small>
+                        <h3 id="dash-vf-val" style="color: var(--status-vf);">0</h3>
+                    </div>
+                    <div>
+                        <small>Days Off</small>
+                        <h3 id="dash-off-val" style="color: var(--leave);">0</h3>
+                    </div>
+                    <div>
+                        <small>Active Skills</small>
+                        <h3 id="dash-skill-count" style="color: var(--support);">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="daily" class="page">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h4 style="margin:0; color:var(--primary); text-transform:uppercase; letter-spacing: 2px; font-weight: 400; font-size: 0.8rem;">Overview</h4>
+                    <h1 style="margin:0; font-size: 2rem; font-weight: 600;">Executive Dashboard</h1>
+                </div>
+                <select id="monthFilter" onchange="refreshDashboard()" style="min-width: 250px;">
+                    <option value="all" selected>📊 สรุปยอดสะสมปี 2026</option>
+                    <option value="0">มกราคม 2026</option><option value="1">กุมภาพันธ์ 2026</option>
+                    <option value="2">มีนาคม 2026</option><option value="3">เมษายน 2026</option>
+                    <option value="4">พฤษภาคม 2026</option><option value="5">มิถุนายน 2026</option>
+                    <option value="6">กรกฎาคม 2026</option><option value="7">สิงหาคม 2026</option>
+                    <option value="8">กันยายน 2026</option><option value="9">ตุลาคม 2026</option>
+                    <option value="10">พฤศจิกายน 2026</option><option value="11">ธันวาคม 2026</option>
+                </select>
+            </div>
+
+            <div class="ai-badge">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.5rem;">🤖</span>
+                        <span style="font-weight: 500; letter-spacing: 1px;">AI EFFICIENCY ANALYSIS</span>
+                    </div>
+                    <div id="effScore" style="font-size: 1.8rem; font-weight: bold; color: var(--primary);">0%</div>
+                </div>
+                <div class="progress-container"><div id="effBar" class="progress-bar"></div></div>
+                <p id="aiInsight" style="margin: 5px 0 0; font-size: 0.9rem; opacity: 0.8; font-weight: 200;">กำลังรวบรวมข้อมูลเพื่อวิเคราะห์ประสิทธิภาพ...</p>
+            </div>
+
+            <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="card stat-card"><small>ตลอดทั้งปี</small><h2 id="st-work" style="color:var(--work)">0</h2></div>
+                <div class="card stat-card"><small>วันที่ลา</small><h2 id="st-leave" style="color:var(--leave)">0</h2></div>
+                <div class="card stat-card"><small>วันหยุดบริษัท</small><h2 id="st-holiday" style="color:var(--holiday)">0</h2></div>
+                <div class="card stat-card" style="background: var(--sunset); border:none; color:white;"><small style="color:rgba(255,255,255,0.8)">เปอร์เซ็นการทำงาน </small><h2 id="st-percent">0%</h2></div>
+            </div>
+
+            <div class="card">
+                <div style="font-weight:600; margin-bottom: 20px; display:flex; align-items:center; gap:10px;">
+                    <span style="font-weight: 500;">📈 Yearly Attendance & Activity Heatmap</span>
+                    <div style="flex-grow:1; height:1px; background: var(--border);"></div>
+                </div>
+                <div class="chart-container" id="yearlyHeatmap"></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px;">
+                <div class="card">
+                    <div style="font-weight:500; margin-bottom: 15px;">🕒 Quick Record (บันทึกวันหยุด/ลา)</div>
+                    <div class="input-group">
+                        <input type="date" id="dailyDate" style="flex-grow:1;">
+                        <select id="dailyType">
+                            <option value="leave">ลางาน (Leave)</option>
+                            <option value="holiday">วันหยุด (Holiday)</option>
+                        </select>
+                        <button class="btn-main" onclick="addDaily()">บันทึก</button>
+                    </div>
+                    <div class="table-area">
+                        <div class="table-scroll" style="max-height: 250px;">
+                            <table>
+                                <thead><tr><th>วันที่</th><th>ประเภท</th><th style="text-align:right;">จัดการ</th></tr></thead>
+                                <tbody id="dailyTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="background: #1E293B; color: white; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;">
+                    <div style="position: absolute; right: -20px; top: -20px; font-size: 8rem; opacity: 0.1;">💡</div>
+                    <h3 style="margin:0; color: var(--primary); font-weight: 800;">System Insight</h3>
+                    <p id="dailyTip" style="font-size: 1rem; line-height: 1.6; opacity: 0.8; margin-top: 15px; position: relative; z-index: 1; font-weight: 300;">พร้อมเริ่มงานที่ยอดเยี่ยมในวันใหม่แล้วหรือยัง?</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="support" class="page">
+            <h1 style="margin:0; font-size: 2rem; font-weight: 600;">Support Production Line</h1>
+            <div class="stats-grid">
+                <div class="card stat-card" style="background: #0F172A; color: white; border: none;"><small style="color: #94A3B8;">Total Support</small><h2 id="sum-total" style="color:#FFF;">0</h2></div>
+                <div class="card stat-card" style="border-left: 5px solid var(--status-rp);"><small>RP Cases</small><h2 id="sum-rp" style="color:var(--status-rp)">0</h2></div>
+                <div class="card stat-card" style="border-left: 5px solid var(--status-vf);"><small>VF Cases</small><h2 id="sum-vf" style="color:var(--status-vf)">0</h2></div>
+                <div class="card stat-card" style="border-left: 5px solid var(--status-records);"><small>Records</small><h2 id="sum-records" style="color:#B45309">0</h2></div>
+                <div class="card stat-card"><small>Top Group</small><h2 id="sum-top-part" style="font-size: 1.2rem;">-</h2></div>
+            </div>
+            <div class="card">
+                <div style="font-weight:500; margin-bottom: 15px;">📥 บันทึกการ Support หน้างาน</div>
+                <div class="input-group" style="display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr auto; gap: 10px;">
+                    <input type="text" id="supProblem" placeholder="รายละเอียดปัญหา">
+                    <select id="supAction">
+                        <option value="Repair">Rework: ซ่อมแซม/คัด</option>
+                        <option value="Replace">Replace: ส่งกลับ/แลกเปลี่ยน</option>
+                    </select>
+                    <input type="text" id="supPart" placeholder="Group Part">
+                    <select id="supReport">
+                        <option value="VF">VF Report</option>
+                        <option value="RP">RP Report</option>
+                        <option value="RECORDS">RECORDS</option>
+                    </select>
+                    <button class="btn-main" onclick="addSupport()">บันทึก</button>
+                </div>
+            </div>
+            <div class="card" style="padding: 0; overflow: hidden;"><div class="table-scroll"><table id="supportTable"><thead><tr><th style="padding-left:24px;">วัน/เวลา</th><th>รายละเอียดปัญหา</th><th>การแก้ไข</th><th>Group Part</th><th>Status</th><th style="text-align:center;">จัดการ</th></tr></thead><tbody id="supportTableBody"></tbody></table></div></div>
+        </div>
+
+        <div id="5s" class="page">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <h1 style="margin:0; font-size: 2rem; font-weight: 600;">5S Excellence System</h1>
+                <input type="month" id="filter5sMonth" value="2026-02" onchange="refresh5S()" style="min-width: 200px;">
+            </div>
+            <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="card stat-card"><small>รวมสะสมทั้งปี</small><h2 id="s5-total-year" style="color:var(--primary)">0</h2></div>
+                <div class="card stat-card"><small>เดือนที่เลือก</small><h2 id="s5-total-month">0</h2></div>
+                <div class="card stat-card"><small>Top Auditor</small><div id="top-owners" style="font-weight:500; font-size: 1.1rem; margin-top: 5px;">-</div></div>
+                <div class="card stat-card"><small>Hot Area</small><div id="top-areas" style="font-weight:500; font-size: 1.1rem; margin-top: 5px;">-</div></div>
+            </div>
+            <div class="card">
+                <div style="font-weight:500; margin-bottom: 20px;">📊 5S Finding Trends</div>
+                <div class="chart-container" id="s5Chart"></div>
+            </div>
+            <div class="card">
+                <div class="input-group" style="display: grid; grid-template-columns: 1fr 100px 1.5fr 1fr auto; gap: 10px;">
+                    <input type="text" id="s5Area" placeholder="ระบุพื้นที่"><input type="number" id="s5Count" placeholder="จำนวน"><input type="text" id="s5Detail" placeholder="รายละเอียด"><input type="text" id="s5Owner" placeholder="ผู้ตรวจสอบ"><button class="btn-main" onclick="add5S()">บันทึก</button>
+                </div>
+                <div class="table-area"><table><thead><tr><th>พื้นที่</th><th>จำนวน</th><th>ตรวจพบ</th><th>ผู้ตรวจ</th><th></th></tr></thead><tbody id="s5TableBody"></tbody></table></div>
+            </div>
+        </div>
+
+        <div id="multi" class="page">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h4 style="margin:0; color:var(--primary); text-transform:uppercase; letter-spacing: 2px; font-weight: 400; font-size: 0.8rem;">Competency</h4>
+                    <h1 style="margin:0; font-size: 2rem; font-weight: 600;">Professional Skill Matrix</h1>
+                </div>
+                <button class="btn-main" style="background: #F43F5E; box-shadow: none;" onclick="clearAllSkills()">ล้างทั้งหมด</button>
+            </div>
+            <div class="card" style="background: white; border: none;">
+                <div style="font-weight:500; margin-bottom: 15px;">🚀 อัปเดตระดับความเชี่ยวชาญ</div>
+                <div class="input-group" style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px; background: #f8fafc;">
+                    <input type="text" id="skillName" placeholder="ชื่อทักษะ">
+                    <input type="number" id="skillValue" placeholder="Level (0-100)" min="0" max="100">
+                    <button class="btn-main" onclick="addSkill()">อัปเดต Matrix</button>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 25px;">
+                <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 450px;">
+                    <div style="font-weight:500; margin-bottom: 20px; align-self: flex-start;">📊 Skill Radar Analysis</div>
+                    <div style="width: 100%; height: 350px;"><canvas id="skillRadarChart"></canvas></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 25px;">
+                    <div class="card" style="text-align:center; background: var(--sunset); color: white; border: none;">
+                        <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.9;">Overall Capability</small>
+                        <h1 id="avgSkill" style="font-size: 4rem; margin:10px 0; font-weight: 700;">0%</h1>
+                        <p id="skillAnalysis" style="font-size: 0.85rem; opacity: 0.9;">บันทึกทักษะเพื่อประเมินผล</p>
+                    </div>
+                    <div class="card" style="flex-grow: 1; padding: 20px;">
+                        <div style="font-weight:500; margin-bottom: 15px;">📝 Skill Inventory</div>
+                        <div id="skillList" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="special" class="page">
+            <h1 style="margin:0; font-size: 2rem; font-weight: 600;">Special Assignments</h1>
+            <div class="card input-group" style="display: grid; grid-template-columns: 1fr 1fr 1.5fr auto; gap: 12px; background: white;">
+                <input type="text" id="specJob" placeholder="ชื่องาน/โครงการ"><input type="text" id="specBy" placeholder="ผู้สั่งงาน"><input type="text" id="specResult" placeholder="ผลลัพธ์"><button class="btn-main" onclick="addSpecial()">บันทึก</button>
+            </div>
+            <div class="card" style="padding: 0; overflow: hidden;"><div class="table-scroll"><table><thead><tr><th style="padding-left:24px;">Project</th><th>Assignor</th><th>Result</th><th style="text-align:center;">Action</th></tr></thead><tbody id="specialTableBody"></tbody></table></div></div>
+        </div>
+    </main>
+
+    <script>
+        const currentUser = sessionStorage.getItem('currentUser') || 'Master Operator';
+        document.getElementById('displayUserName').innerText = currentUser;
+        const STORAGE_KEY = `w_data_${currentUser}`;
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxJS-noIKJCtJXnvYCxKSxYMSr54wzZ6snyCZb08SfaeqaVQvP05aBzGbqcW6sffYVXg/exec";
+
+        let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+            daily: [], s5: [], skills: [], special: [], support: []
+        };
+
+        let skillChart = null;
+        let masterChart = null;
+
+        // --- Google Sheets Sync Logic ---
+        async function syncWithGoogleSheets() {
+            const syncBtn = document.getElementById('syncBtn');
+            syncBtn.classList.add('loading');
+            syncBtn.innerText = "⏳ SYNCING...";
+
+            try {
+                // 1. ส่งข้อมูลปัจจุบันไปบันทึก (POST)
+                const postResponse = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // สำคัญสำหรับ Apps Script
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user: currentUser,
+                        data: db
+                    })
+                });
+
+                // 2. ดึงข้อมูลล่าสุดกลับมา (GET)
+                const getResponse = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}`);
+                const result = await getResponse.json();
+
+                if (result.status === "success" && result.data) {
+                    db = result.data;
+                    saveToLocalOnly(); // อัปเดต LocalStorage จากที่ดึงมา
+                    refreshAllPages();
+                    toast("✅ Sync ข้อมูลกับ Google Sheets เรียบร้อย!");
+                } else {
+                    toast("⚠️ เชื่อมต่อชีทได้ แต่ไม่พบข้อมูลเก่า");
+                }
+            } catch (error) {
+                console.error("Sync Error:", error);
+                toast("❌ เกิดข้อผิดพลาดในการ Sync");
+            } finally {
+                syncBtn.classList.remove('loading');
+                syncBtn.innerText = "🔄 SYNC GOOGLE SHEETS";
+            }
+        }
+
+        function save() { 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); 
+            runAIAnalytics(); 
+            if(document.getElementById('master-dash').classList.contains('active')) refreshMasterDashboard();
+        }
+
+        function saveToLocalOnly() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        }
+
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function nav(id, el) {
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            renderPage(id);
+        }
+
+        function renderPage(id) {
+            if(id === 'master-dash') refreshMasterDashboard();
+            if(id === 'daily') refreshDashboard();
+            if(id === '5s') refresh5S();
+            if(id === 'multi') refreshSkills();
+            if(id === 'special') refreshSpecial();
+            if(id === 'support') refreshSupport();
+        }
+
+        function refreshAllPages() {
+            refreshMasterDashboard();
+            refreshDashboard();
+            refresh5S();
+            refreshSkills();
+            refreshSpecial();
+            refreshSupport();
+            runAIAnalytics();
+        }
+
+        // --- Master Dashboard Logic ---
+        function refreshMasterDashboard() {
+            document.getElementById('dash-support-count').innerText = db.support.length;
+            document.getElementById('dash-5s-count').innerText = db.s5.reduce((s,c) => s + (c.count || 0), 0);
+            document.getElementById('dash-special-count').innerText = db.special.length;
+            
+            const rpCount = db.support.filter(s => s.report === 'RP').length;
+            const vfCount = db.support.filter(s => s.report === 'VF').length;
+            const leaveCount = db.daily.filter(d => d.type === 'leave').length;
+            const skillAvg = db.skills.length ? Math.round(db.skills.reduce((s,c)=>s+(c.value || 0),0)/db.skills.length) : 0;
+
+            document.getElementById('dash-rp-val').innerText = rpCount;
+            document.getElementById('dash-vf-val').innerText = vfCount;
+            document.getElementById('dash-off-val').innerText = leaveCount;
+            document.getElementById('dash-skill-count').innerText = db.skills.length;
+            document.getElementById('dash-avg-skill').innerText = skillAvg + '%';
+            document.getElementById('dash-skill-bar').style.width = skillAvg + '%';
+
+            const ctx = document.getElementById('masterWorkChart').getContext('2d');
+            if(masterChart) masterChart.destroy();
+            
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const supportData = Array(12).fill(0);
+            const s5Data = Array(12).fill(0);
+
+            db.support.forEach(s => {
+                const m = new Date().getMonth(); 
+                supportData[m]++;
+            });
+            db.s5.forEach(s => {
+                if(s.month) {
+                    const m = parseInt(s.month.split('-')[1]) - 1;
+                    s5Data[m] += (s.count || 0);
+                }
+            });
+
+            masterChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        { label: 'Support Activity', data: supportData, borderColor: '#0EA5E9', tension: 0.4, fill: true, backgroundColor: 'rgba(14, 165, 233, 0.1)' },
+                        { label: '5S Findings', data: s5Data, borderColor: '#FF8C00', tension: 0.4, fill: true, backgroundColor: 'rgba(255, 140, 0, 0.1)' }
+                    ]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+
+            const insight = document.getElementById('dash-insight');
+            if(skillAvg > 70 && db.special.length > 2) {
+                insight.innerHTML = "🌟 <b>ยอดเยี่ยม:</b> คุณมีระดับทักษะที่สูงและมีการจัดการงานพิเศษได้ดีมาก รักษามาตรฐานนี้ไว้!";
+            } else if (db.support.length > 10) {
+                insight.innerHTML = "⚠️ <b>ข้อสังเกต:</b> พบการ Support หน้างานบ่อยครั้ง ควรตรวจสอบสาเหตุเชิงลึกในกลุ่ม Part ที่เกิดปัญหาซ้ำ";
+            } else {
+                insight.innerHTML = "💡 <b>คำแนะนำ:</b> เริ่มบันทึกข้อมูลทักษะและงานพิเศษของคุณ เพื่อให้ AI วิเคราะห์ศักยภาพได้แม่นยำขึ้น";
+            }
+        }
+
+        // --- Functions ---
+        function runAIAnalytics() {
+            const totalSkills = db.skills.length;
+            const avgSkill = totalSkills ? db.skills.reduce((s, c) => s + (c.value || 0), 0) / totalSkills : 0;
+            const totalSupport = db.support.length;
+            const totalSpec = db.special.length;
+            let score = (avgSkill * 0.4) + (totalSpec * 5) + (totalSupport * 2);
+            score = Math.min(Math.max(score, 10), 100);
+            const scoreEl = document.getElementById('effScore');
+            const barEl = document.getElementById('effBar');
+            const insightEl = document.getElementById('aiInsight');
+            if(scoreEl) {
+                scoreEl.innerText = Math.round(score) + "%";
+                if(barEl) barEl.style.width = score + "%";
+                if(score > 80) insightEl.innerText = "🌟 High Performer: ยอดเยี่ยมมาก!";
+                else if(score > 50) insightEl.innerText = "📈 Growing: กำลังพัฒนาได้ดี";
+                else insightEl.innerText = "⚙️ Operational: บันทึกงานอย่างต่อเนื่องเพื่อวิเคราะห์";
+            }
+        }
+
+        function addSkill() {
+            const n = document.getElementById('skillName'), v = document.getElementById('skillValue');
+            const val = parseInt(v.value);
+            if(!n.value || isNaN(val)) return;
+            const idx = db.skills.findIndex(s => s.name === n.value);
+            if(idx > -1) db.skills[idx].value = val; else db.skills.push({name:n.value, value:val});
+            save(); toast("📈 อัปเดต Skill Matrix แล้ว");
+            n.value = ''; v.value = '';
+            refreshSkills();
+        }
+
+        function refreshSkills() {
+            const list = document.getElementById('skillList');
+            if(!list) return;
+            const sorted = [...db.skills].sort((a,b) => b.value - a.value);
+            list.innerHTML = sorted.map(s => `
+                <div class="skill-item">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; padding-right: 30px;">
+                        <span style="font-weight:500;">${s.name}</span><b style="color:var(--primary)">${s.value}%</b>
+                    </div>
+                    <div style="height:8px; background:#e2e8f0; border-radius:10px; overflow:hidden;">
+                        <div style="width:${s.value}%; height:100%; background:var(--sunset);"></div>
+                    </div>
+                    <button class="skill-del-btn" onclick="delSkill('${s.name}')">✕</button>
+                </div>
+            `).join('');
+            const avg = db.skills.length ? Math.round(db.skills.reduce((s,c)=>s+(c.value || 0),0)/db.skills.length) : 0;
+            document.getElementById('avgSkill').innerText = avg + '%';
+            updateSkillChart();
+            runAIAnalytics();
+        }
+
+        function updateSkillChart() {
+            const chartCanvas = document.getElementById('skillRadarChart');
+            if(!chartCanvas) return;
+            const ctx = chartCanvas.getContext('2d');
+            if (skillChart) skillChart.destroy();
+            if (db.skills.length < 3) return;
+            skillChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: db.skills.map(s => s.name),
+                    datasets: [{
+                        data: db.skills.map(s => s.value),
+                        backgroundColor: 'rgba(255, 140, 0, 0.2)',
+                        borderColor: '#FF8C00',
+                        pointBackgroundColor: '#FF8C00',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { r: { suggestedMin: 0, suggestedMax: 100, ticks: { display: false }, grid: { color: 'rgba(0,0,0,0.05)' } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function delSkill(name) { if(confirm(`ลบทักษะ ${name}?`)) { db.skills = db.skills.filter(s => s.name !== name); save(); refreshSkills(); } }
+        function clearAllSkills() { if(confirm("ล้างทักษะทั้งหมด?")) { db.skills = []; save(); refreshSkills(); } }
+
+        function addSupport() {
+            const prob = document.getElementById('supProblem').value, act = document.getElementById('supAction').value;
+            const part = document.getElementById('supPart').value, rep = document.getElementById('supReport').value;
+            if(!prob) return;
+            db.support.push({ id: Date.now(), time: new Date().toLocaleString('th-TH'), problem: prob, action: act, part: part || 'General', report: rep });
+            save(); toast("🛠️ บันทึก Support แล้ว");
+            document.getElementById('supProblem').value = ''; refreshSupport();
+        }
+
+        function refreshSupport() {
+            const tbody = document.getElementById('supportTableBody');
+            if(!tbody) return;
+            let rp=0, vf=0, rec=0;
+            tbody.innerHTML = db.support.slice().reverse().map(s => {
+                if(s.report === 'RP') rp++; else if(s.report === 'VF') vf++; else rec++;
+                return `<tr><td style="padding-left:24px;">${s.time}</td><td>${s.problem}</td><td><span class="user-tag" style="background:var(--support)">${s.action}</span></td><td><b>${s.part}</b></td><td><span class="user-tag tag-${s.report.toLowerCase()}">${s.report}</span></td><td style="text-align:center"><button class="del-btn" onclick="delSupport(${s.id})">🗑️</button></td></tr>`;
+            }).join('');
+            document.getElementById('sum-total').innerText = db.support.length;
+            document.getElementById('sum-rp').innerText = rp; document.getElementById('sum-vf').innerText = vf; document.getElementById('sum-records').innerText = rec;
+        }
+
+        function delSupport(id) { db.support = db.support.filter(s => s.id !== id); save(); refreshSupport(); }
+
+        function addDaily() {
+            const d = document.getElementById('dailyDate').value, t = document.getElementById('dailyType').value;
+            if(!d) return; db.daily.push({ date: d, type: t }); save(); refreshDashboard();
+        }
+
+        function deleteDaily(idx) { db.daily.splice(idx, 1); save(); refreshDashboard(); }
+
+        function refreshDashboard() {
+            const f = document.getElementById('monthFilter').value;
+            const filtered = f === 'all' ? db.daily : db.daily.filter(r => new Date(r.date).getMonth() == f);
+            const l = filtered.filter(r => r.type === 'leave').length, h = filtered.filter(r => r.type === 'holiday').length;
+            const totalDays = f === 'all' ? 365 : 30, w = totalDays - (l + h);
+            document.getElementById('st-work').innerText = w;
+            document.getElementById('st-leave').innerText = l;
+            document.getElementById('st-holiday').innerText = h;
+            document.getElementById('st-percent').innerText = Math.round((w/totalDays)*100) + '%';
+            const heatmap = document.getElementById('yearlyHeatmap');
+            if(!heatmap) return;
+            heatmap.innerHTML = '';
+            ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].forEach((m, i) => {
+                const count = db.daily.filter(r => new Date(r.date).getMonth() === i).length;
+                heatmap.innerHTML += `<div class="bar-wrap"><div class="bar" data-value="${count} Off" style="height:${20+(count*10)}px"></div><span style="font-size:0.7rem;">${m}</span></div>`;
+            });
+            document.getElementById('dailyTableBody').innerHTML = filtered.slice().reverse().map(r => `<tr><td>${r.date}</td><td>${r.type}</td><td style="text-align:right"><button class="del-btn" onclick="deleteDaily(${db.daily.indexOf(r)})">🗑️</button></td></tr>`).join('');
+        }
+
+        function add5S() {
+            const a = document.getElementById('s5Area').value, c = document.getElementById('s5Count').value;
+            const d = document.getElementById('s5Detail').value, o = document.getElementById('s5Owner').value;
+            if(!a || !c) return;
+            db.s5.push({ area: a, count: parseInt(c), detail: d, owner: o, month: document.getElementById('filter5sMonth').value, id: Date.now() });
+            save(); refresh5S();
+            ['s5Area','s5Count','s5Detail','s5Owner'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function refresh5S() {
+            const m = document.getElementById('filter5sMonth').value;
+            const filtered = db.s5.filter(r => r.month === m);
+            const areaCounts = {}, ownerCounts = {};
+            filtered.forEach(item => {
+                areaCounts[item.area] = (areaCounts[item.area] || 0) + 1;
+                ownerCounts[item.owner] = (ownerCounts[item.owner] || 0) + 1;
+            });
+            document.getElementById('top-areas').innerText = Object.keys(areaCounts).length ? Object.keys(areaCounts).reduce((a, b) => areaCounts[a] > areaCounts[b] ? a : b) : "-";
+            document.getElementById('top-owners').innerText = Object.keys(ownerCounts).length ? Object.keys(ownerCounts).reduce((a, b) => ownerCounts[a] > ownerCounts[b] ? a : b) : "-";
+            document.getElementById('s5-total-month').innerText = filtered.reduce((s,c)=>s+(c.count || 0), 0);
+            document.getElementById('s5-total-year').innerText = db.s5.reduce((s,c)=>s+(c.count || 0), 0);
+            const s5tbody = document.getElementById('s5TableBody');
+            if(s5tbody) s5tbody.innerHTML = filtered.map(r => `<tr><td>${r.area}</td><td style="color:var(--primary)">${r.count}</td><td>${r.detail}</td><td>${r.owner}</td><td><button class="del-btn" onclick="del5S(${r.id})">✕</button></td></tr>`).join('');
+            const s5chart = document.getElementById('s5Chart'); 
+            if(s5chart) {
+                s5chart.innerHTML = '';
+                for(let i=1; i<=12; i++) {
+                    const val = db.s5.filter(r => r.month && r.month.endsWith(i.toString().padStart(2,'0'))).reduce((s,c)=>s+(c.count || 0),0);
+                    s5chart.innerHTML += `<div class="bar-wrap"><div class="bar" data-value="${val} pts" style="height:${10+(val*2)}px"></div><span style="font-size:0.7rem;">${i}</span></div>`;
+                }
+            }
+        }
+        function del5S(id) { db.s5 = db.s5.filter(r=>r.id!==id); save(); refresh5S(); }
+
+        function addSpecial() {
+            const j = document.getElementById('specJob').value, b = document.getElementById('specBy').value, r = document.getElementById('specResult').value;
+            if(!j || !b) return;
+            db.special.push({ job: j, by: b, res: r, id: Date.now() });
+            save(); refreshSpecial();
+            ['specJob','specBy','specResult'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function refreshSpecial() {
+            const sptbody = document.getElementById('specialTableBody');
+            if(sptbody) sptbody.innerHTML = db.special.slice().reverse().map(s => `<tr><td style="padding-left:24px;"><b>${s.job}</b></td><td>${s.by}</td><td>${s.res}</td><td style="text-align:center"><button class="del-btn" onclick="delSpec(${s.id})">🗑️</button></td></tr>`).join('');
+        }
+        function delSpec(id) { db.special = db.special.filter(s=>s.id!==id); save(); refreshSpecial(); }
+
+        window.onload = () => {
+            const dateInput = document.getElementById('dailyDate');
+            if(dateInput) dateInput.valueAsDate = new Date();
+            refreshAllPages();
+        };
+    </script>
+</body>
+</html>
+
+
