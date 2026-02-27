@@ -542,7 +542,7 @@
         const currentUser = sessionStorage.getItem('currentUser') || 'Master Operator';
         document.getElementById('displayUserName').innerText = currentUser;
         const STORAGE_KEY = `w_data_${currentUser}`;
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxJS-noIKJCtJXnvYCxKSxYMSr54wzZ6snyCZb08SfaeqaVQvP05aBzGbqcW6sffYVXg/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7cMOS-X0oHWdWIdIg8KLemTX2k6qUsc9eg2VqCca_OLK44ujcjmu0ksa6MG4AReP0Vg/exec";
 
         let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
             daily: [], s5: [], skills: [], special: [], support: []
