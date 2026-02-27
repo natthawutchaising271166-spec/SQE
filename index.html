@@ -529,12 +529,30 @@ async function fetchInitialData(inspectorName) {
         function startTime() { setInterval(() => { const now = new Date(); document.getElementById('liveClock').innerText = now.toLocaleDateString('en-GB') + ' | ' + now.toLocaleTimeString('en-GB'); }, 1000); }
         function openJobProject() { window.location.href = "job_project.html"; }
 
-        function handleJudgmentChange(val) {
-            const sel = document.getElementById('judgmentSelect');
-            const colors = { 'SF': '#f97316', 'VENDOR FAULT': '#ef4444', 'CTC': '#3b82f6', 'CAN USE': '#10b981' };
-            sel.style.borderColor = colors[val] || '#e2e8f0';
-            sel.style.color = colors[val] || '#1e293b';
-        }
+ function handleJudgmentChange(val) {
+    const sel = document.getElementById('judgmentSelect');
+    const btn = document.getElementById('submitBtn'); // เพิ่มบรรทัดนี้ครับ
+    
+    const colors = { 
+        'SF': '#f97316', 
+        'VENDOR FAULT': '#ef4444', 
+        'CTC': '#3b82f6', 
+        'CAN USE': '#10b981' 
+    };
+    
+    const targetColor = colors[val] || '#1e293b'; 
+
+    // ส่วนของ Select (ของเดิมในรูปภาพ)
+    sel.style.borderColor = targetColor;
+    sel.style.color = targetColor;
+
+    // ส่วนที่เพิ่มใหม่สำหรับปุ่ม Commit Data
+    if (btn) {
+        btn.style.backgroundColor = targetColor;
+        btn.style.borderColor = targetColor;
+        btn.style.boxShadow = `0 10px 25px -5px ${targetColor}66`;
+    }
+}
 
         document.getElementById('claimForm').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -559,6 +577,7 @@ async function fetchInitialData(inspectorName) {
             });
             saveAndRefresh();
             e.target.reset();
+            handleJudgmentChange('')
             document.getElementById('inputDate').valueAsDate = new Date();
             handleJudgmentChange('');
             showToast("✅SAVE DATAสำเร็จ");
