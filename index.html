@@ -152,6 +152,43 @@
         /* SYNC ANIMATION */
         .sync-active { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        /* วางต่อท้ายในส่วน <style> ประมาณบรรทัดที่ 180-190 */
+:root {
+    --vh: 1vh;
+}
+
+body, html { 
+    height: 100vh; 
+    width: 100vw; 
+    overflow: hidden; /* ล็อคหน้าจอไม่ให้ Scroll ขึ้นลง */
+    position: fixed;
+}
+
+#mainContainer { 
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+/* ล็อค Dashboard ให้พอดีหน้าจอเสมอ */
+#dashboardModal .glass-dash {
+    width: 98vw;
+    height: 96vh;
+    max-height: 96vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ปรับขนาดตัวเลข Dashboard อัตโนมัติถ้าจอเล็ก (เช่น Laptop) */
+@media (max-height: 850px) {
+    .orbitron.text-6xl { font-size: 3.5rem !important; }
+    .stat-card { padding: 1rem !important; }
+    #dashboardModal .grid-cols-5 { gap: 0.75rem; }
+}
     </style>
 </head>
 <body class="bg-slate-100">
@@ -997,7 +1034,29 @@ async function deleteFromCloud(ref) {
             renderTable();
             updateMemoryLists();
         }
-    </script>
+        // วางไว้บรรทัดสุดท้ายก่อนเครื่องหมาย
+function adjustLayout() {
+    // คำนวณความสูงหน้าจอจริงสำหรับ Mobile และ Laptop
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    
+    // บังคับให้ Chart ปรับขนาดตาม Container ใหม่ทันที
+    Object.values(charts).forEach(chart => {
+        if (chart && typeof chart.resize === 'function') {
+            chart.resize();
+        }
+    });
+}
+
+// ตรวจจับการเปลี่ยนขนาดหน้าจอ
+window.addEventListener('resize', adjustLayout);
+// เรียกใช้ทันทีเมื่อโหลดหน้าเว็บ
+window.addEventListener('load', adjustLayout);
+
+// เพิ่มเติม: ปรับให้ Chart.js รองรับการยืดหด (Responsive)
+Chart.defaults.maintainAspectRatio = false;
+Chart.defaults.responsive = true;
+  </script>
 </body>
 </html>
 
