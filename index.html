@@ -22,8 +22,55 @@
         }
 
         /* Full Screen Optimization */
-        * { box-sizing: border-box; }
-        body, html { height: 100vh; width: 100vw; margin: 0; padding: 0; overflow: hidden; }
+/* 1. ปรับความสูงของ Body ให้ยืดหยุ่นตามหน้าจอแต่ไม่เกิด Scrollbar แนวตั้ง */
+body, html { 
+    height: 100%; /* เปลี่ยนจาก 100vh เป็น 100% เพื่อความเสถียร */
+    width: 100%; 
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden; /* ล็อกหน้าจอให้พอดีเป๊ะ */
+}
+
+/* 2. จัดการ Container หลักให้คำนวณพื้นที่ที่เหลือจากการลบ Header */
+#mainContainer { 
+    opacity: 0; 
+    transform: translateY(20px); 
+    height: 100vh; /* บังคับความสูงเท่าหน้าจอพอดี */
+    display: flex; 
+    flex-direction: column; 
+    padding: 1.25rem; /* ลด Padding เล็กน้อยเพื่อให้มีพื้นที่แสดงข้อมูลมากขึ้น */
+    gap: 1.25rem; 
+    box-sizing: border-box;
+}
+/* --- วางแทนที่ของเดิมตั้งแต่บรรทัด 46 เป็นต้นไป --- */
+
+/* 1. บังคับไม่ให้กราฟ (Canvas) ขยายตัวจนล้นหน้าจอ */
+canvas {
+    max-height: 100% !important;
+    width: 100% !important;
+}
+
+/* 2. ปรับเทคนิค Auto-Scaling ให้ครอบคลุมทั้งหน้าหลักและหน้า Dashboard */
+@media (max-width: 1440px) {
+    #mainContainer, .glass-dash {
+        zoom: 0.75; /* ปรับเป็น 0.75 เพื่อให้หน้าจอ Notebook แสดงผลได้ครบถ้วน */
+    }
+}
+
+@media (min-width: 1441px) {
+    #mainContainer, .glass-dash {
+        zoom: 1; /* หน้าจอ PC ใหญ่แสดงผลขนาดปกติ */
+    }
+}
+
+/* 3. ปรับแต่ง Scrollbar ของตารางให้ดู Elite และประหยัดพื้นที่ */
+.custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.custom-scroll::-webkit-scrollbar-track { background: transparent; }
+.custom-scroll::-webkit-scrollbar-thumb { 
+    background: rgba(249, 115, 22, 0.2); 
+    border-radius: 10px; 
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover { background: var(--luxury-orange); }
 
         body {
             font-family: 'Inter', 'IBM Plex Sans Thai', sans-serif;
@@ -268,7 +315,7 @@
     </div>
 
     <div id="dashboardModal" onclick="closeDashboard()">
-        <div class="glass-dash rounded-[3.5rem] w-[96vw] h-[92vh] p-8 overflow-hidden flex flex-col border border-white/50" onclick="event.stopPropagation()">
+        <div class="glass-dash rounded-[3.5rem] w-[96vw] h-[95vh] p-8 overflow-y-auto flex flex-col border border-white/50" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-8 shrink-0">
                 <div>
                     <h2 class="orbitron font-black text-4xl text-slate-800 tracking-tight">SQE <span class="text-orange-500 italic">Dashboard</span></h2>
@@ -1000,5 +1047,6 @@ async function deleteFromCloud(ref) {
     </script>
 </body>
 </html>
+
 
 
