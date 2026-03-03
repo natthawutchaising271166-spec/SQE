@@ -36,10 +36,11 @@
             font-family: 'Prompt', sans-serif;
             margin: 0;
             display: flex;
-            height: 100vh;
+            min-height: 100vh;
             background: var(--bg);
             color: var(--text);
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             background-image: radial-gradient(circle at 50% 50%, #ffffff 0%, #f1f5f9 100%);
         }
 
@@ -266,6 +267,44 @@
             cursor: not-allowed;
             filter: grayscale(0.5);
         }
+
+        /* ทำงานเฉพาะหน้าจอคอมพิวเตอร์ (กว้างกว่า 1024px) */
+@media (min-width: 1025px) {
+    #multi .card[style*="background: var(--sunset)"] {
+        margin-top: 40px; /* เพิ่มระยะห่างด้านบน ขยับลงมาตามความต้องการ */
+        padding: 40px 20px; /* เพิ่มความสูงของกล่องให้ดูใหญ่ขึ้น */
+    }
+    
+    /* หรือถ้าต้องการขยับทั้งคอลัมน์ขวาลงมา */
+    #multi div[style*="display: flex; flex-direction: column; gap: 25px;"] {
+        padding-top: 20px; 
+    }
+}
+        /* Media Queries สำหรับการออโตสเกล */
+@media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar {
+        width: 100%; height: auto; flex-direction: row;
+        padding: 10px; position: sticky; top: 0;
+    }
+    .user-box, .sync-btn, .btn-main span, .menu-item span:last-child {
+        display: none; /* ซ่อนข้อความในมือถือ */
+    }
+    .menu-item { margin: 0 5px; padding: 10px; font-size: 1.5rem; }
+    .main-container { padding: 15px; }
+    
+    /* แก้ไขส่วน Grid ให้ยืดหยุ่นจริง */
+    .dash-grid, .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+        gap: 10px;
+    }
+    
+    /* บังคับทุกอย่างที่ใช้ Inline Style Grid ให้เหลือ 1 คอลัมน์ */
+    div[style*="display: grid"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -399,7 +438,7 @@
                 <p id="aiInsight" style="margin: 5px 0 0; font-size: 0.9rem; opacity: 0.8; font-weight: 200;">กำลังรวบรวมข้อมูลเพื่อวิเคราะห์ประสิทธิภาพ...</p>
             </div>
 
-            <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="stats-grid"> 
                 <div class="card stat-card"><small>ตลอดทั้งปี</small><h2 id="st-work" style="color:var(--work)">0</h2></div>
                 <div class="card stat-card"><small>วันที่ลา</small><h2 id="st-leave" style="color:var(--leave)">0</h2></div>
                 <div class="card stat-card"><small>วันหยุดบริษัท</small><h2 id="st-holiday" style="color:var(--holiday)">0</h2></div>
@@ -414,7 +453,7 @@
                 <div class="chart-container" id="yearlyHeatmap"></div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px;">
+            <div style="display: grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr))">
                 <div class="card">
                     <div style="font-weight:500; margin-bottom: 15px;">🕒 Quick Record (บันทึกวันหยุด/ลา)</div>
                     <div class="input-group">
@@ -552,44 +591,46 @@
         let masterChart = null;
 
         // --- Google Sheets Sync Logic ---
-        async function syncWithGoogleSheets() {
-            const syncBtn = document.getElementById('syncBtn');
-            syncBtn.classList.add('loading');
-            syncBtn.innerText = "⏳ SYNCING...";
+    async function syncWithGoogleSheets() {
+    const syncBtn = document.getElementById('syncBtn');
+    syncBtn.classList.add('loading');
+    syncBtn.innerText = "⏳ SYNCING...";
 
-            try {
-                // 1. ส่งข้อมูลปัจจุบันไปบันทึก (POST)
-                const postResponse = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // สำคัญสำหรับ Apps Script
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        user: currentUser,
-                        data: db
-                    })
-                });
+    try {
+        // 1. ส่งข้อมูลปัจจุบันไปบันทึก (ใช้ฟอร์มแบบดั้งเดิมเพื่อเลี่ยงปัญหา CORS)
+        const formData = new FormData();
+        formData.append('user', currentUser);
+        formData.append('data', JSON.stringify(db));
 
-                // 2. ดึงข้อมูลล่าสุดกลับมา (GET)
-                const getResponse = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}`);
-                const result = await getResponse.json();
+        await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // สำหรับการส่ง (POST) ไป Apps Script ยังคงต้องใช้ no-cors
+            body: formData
+        });
 
-                if (result.status === "success" && result.data) {
-                    db = result.data;
-                    saveToLocalOnly(); // อัปเดต LocalStorage จากที่ดึงมา
-                    refreshAllPages();
-                    toast("✅ Sync ข้อมูลกับ Google Sheets เรียบร้อย!");
-                } else {
-                    toast("⚠️ เชื่อมต่อชีทได้ แต่ไม่พบข้อมูลเก่า");
-                }
-            } catch (error) {
-                console.error("Sync Error:", error);
-                toast("❌ เกิดข้อผิดพลาดในการ Sync");
-            } finally {
-                syncBtn.classList.remove('loading');
-                syncBtn.innerText = "🔄 SYNC GOOGLE SHEETS";
-            }
+        // 2. ดึงข้อมูลล่าสุดกลับมา (GET) - เพิ่ม Timestamp เพื่อป้องกัน Cache
+        const getResponse = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
+        const result = await getResponse.json();
+
+        if (result && result.data) {
+            // อัปเดตข้อมูลในตัวแปรหลักและ LocalStorage
+            db = result.data;
+            saveToLocalOnly(); 
+            
+            // รีเฟรชหน้าจอทั้งหมดเพื่อแสดงข้อมูลใหม่
+            refreshAllPages();
+            toast("✅ Sync ข้อมูลสำเร็จ!");
+        } else {
+            toast("⚠️ เชื่อมต่อสำเร็จแต่ไม่พบข้อมูลเก่า");
         }
+    } catch (error) {
+        console.error("Sync Error:", error);
+        toast("❌ การเชื่อมต่อล้มเหลว ตรวจสอบอินเทอร์เน็ต");
+    } finally {
+        syncBtn.classList.remove('loading');
+        syncBtn.innerText = "🔄 SYNC GOOGLE SHEETS";
+    }
+}
 
         function save() { 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); 
@@ -886,5 +927,6 @@
     </script>
 </body>
 </html>
+
 
 
