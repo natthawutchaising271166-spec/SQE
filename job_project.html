@@ -581,7 +581,7 @@
         const currentUser = sessionStorage.getItem('currentUser') || 'Master Operator';
         document.getElementById('displayUserName').innerText = currentUser;
         const STORAGE_KEY = `w_data_${currentUser}`;
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4SD5ptHWy8zhDiNAoyQkQuunBXQIVkX5H7cfSJflxltQ5QrO307FCYnpdp8o6U_aGsQ/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxJS-noIKJCtJXnvYCxKSxYMSr54wzZ6snyCZb08SfaeqaVQvP05aBzGbqcW6sffYVXg/exec";
 
         let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
             daily: [], s5: [], skills: [], special: [], support: []
@@ -594,49 +594,58 @@ window.addEventListener('load',() => {
   syncWithgooglesheets();
 });
 
-        // --- Google Sheets Sync Logic ---
+// --- Google Sheets Sync Logic (Improved for Real-time) ---
 async function syncWithGoogleSheets() {
     const syncBtn = document.getElementById('syncBtn');
+    if (syncBtn.classList.contains('loading')) return; // ป้องกันการกดซ้ำขณะกำลังทำงาน
+
     syncBtn.classList.add('loading');
-    syncBtn.innerText = "⏳ SAVING...";
+    syncBtn.innerHTML = "⏳ SENDING DATA...";
 
     try {
-        // 1. บันทึกข้อมูลปัจจุบันลง Local ก่อนเพื่อกันพลาด
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-
-        // 2. ส่งข้อมูลไป Google Sheets
-        // หมายเหตุ: การใช้ no-cors จะไม่รู้ผลลัพธ์ ดังนั้นเราจะรอเวลาเล็กน้อย (Delay)
+        // 1. ส่งข้อมูลปัจจุบันจากเครื่องเราขึ้นไปบันทึก (POST)
+        // เราจะส่ง db ทั้งหมดไป เพื่อให้ฝั่ง Google Sheets รวมข้อมูล (Merge)
         await fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors',
+            mode: 'no-cors', // ใช้ no-cors สำหรับ Google Apps Script ในบางกรณี
             cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 user: currentUser,
-                data: db
+                data: db,
+                timestamp: new Date().getTime()
             })
         });
 
-        // 3. รอให้ฝั่ง Server ทำงานแป๊บนึง (ประมาณ 1.5 วินาที) ก่อนจะดึงค่าใหม่
-        syncBtn.innerText = "⏳ REFRESHING...";
-        await new Promise(resolve => setTimeout(resolve, 1500)); 
+        // 2. รอจังหวะให้ฝั่ง Server ประมวลผลเสร็จ (ประมาณ 1 วินาที)
+        syncBtn.innerHTML = "⏳ FETCHING LATEST...";
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // 4. ดึงข้อมูลล่าสุดกลับมา
-        const getResponse = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}`);
+        // 3. ดึงข้อมูลที่อัปเดตล่าสุดจาก Google Sheets กลับมา (GET)
+        const getResponse = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${new Date().getTime()}`);
+        
+        if (!getResponse.ok) throw new Error('Network response was not ok');
+        
         const result = await getResponse.json();
 
         if (result.status === "success" && result.data) {
+            // อัปเดตข้อมูลในตัวแปร db และ LocalStorage ด้วยข้อมูลจาก Cloud
             db = result.data;
-            saveToLocalOnly(); 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+            
+            // รีเฟรชหน้าจอทั้งหมดเพื่อแสดงข้อมูลใหม่ทันที
             refreshAllPages();
-            toast("✅ Sync สำเร็จและอัปเดตข้อมูลแล้ว!");
+            toast("✅ ซิงค์ข้อมูลเรียลไทม์สำเร็จ!");
+        } else {
+            toast("⚠️ ดึงข้อมูลสำเร็จแต่รูปแบบไม่ถูกต้อง");
         }
+
     } catch (error) {
         console.error("Sync Error:", error);
-        toast("❌ Sync ไม่สำเร็จ แต่ข้อมูลยังอยู่ในเครื่องคุณ");
+        toast("❌ การซิงค์ขัดข้อง: " + error.message);
     } finally {
         syncBtn.classList.remove('loading');
-        syncBtn.innerText = "🔄 SYNC GOOGLE SHEETS";
+        syncBtn.innerHTML = "🔄 SYNC GOOGLE SHEETS";
     }
 }
 
@@ -830,14 +839,42 @@ async function syncWithGoogleSheets() {
         function delSkill(name) { if(confirm(`ลบทักษะ ${name}?`)) { db.skills = db.skills.filter(s => s.name !== name); save(); refreshSkills(); } }
         function clearAllSkills() { if(confirm("ล้างทักษะทั้งหมด?")) { db.skills = []; save(); refreshSkills(); } }
 
-        function addSupport() {
-            const prob = document.getElementById('supProblem').value, act = document.getElementById('supAction').value;
-            const part = document.getElementById('supPart').value, rep = document.getElementById('supReport').value;
-            if(!prob) return;
-            db.support.push({ id: Date.now(), time: new Date().toLocaleString('th-TH'), problem: prob, action: act, part: part || 'General', report: rep });
-            save(); toast("🛠️ บันทึก Support แล้ว");
-            document.getElementById('supProblem').value = ''; refreshSupport();
-        }
+function addSupport() {
+    const prob = document.getElementById('supProblem').value;
+    const act = document.getElementById('supAction').value;
+    const part = document.getElementById('supPart').value;
+    const rep = document.getElementById('supReport').value;
+    
+    // ตรวจสอบว่ากรอกข้อมูลหรือยัง
+    if(!prob) { 
+        toast("❌ กรุณากรอกรายละเอียดปัญหา"); 
+        return; 
+    }
+
+    // 1. บันทึกลงในตัวแปร db (Local Variable)
+    db.support.push({ 
+        id: Date.now(), 
+        time: new Date().toLocaleString('th-TH'), 
+        problem: prob, 
+        action: act, 
+        part: part || 'General', 
+        report: rep 
+    });
+
+    // 2. บันทึกลง LocalStorage ของเครื่อง
+    save(); 
+    
+    // 3. สั่ง Sync ขึ้น Google Sheets ทันที (เพื่อให้เครื่องอื่นเห็นข้อมูลใหม่)
+    syncWithGoogleSheets(); 
+    
+    // 4. ล้างค่าในช่องกรอกข้อมูล เพื่อพร้อมสำหรับการคีย์ครั้งต่อไป
+    document.getElementById('supProblem').value = '';
+    document.getElementById('supPart').value = '';
+    
+    // 5. อัปเดตตารางแสดงผลในหน้าปัจจุบันทันที
+    refreshSupport();
+    toast("📥 บันทึกและกำลังซิงค์เรียลไทม์...");
+}
 
         function refreshSupport() {
             const tbody = document.getElementById('supportTableBody');
@@ -927,12 +964,19 @@ async function syncWithGoogleSheets() {
         }
         function delSpec(id) { db.special = db.special.filter(s=>s.id!==id); save(); refreshSpecial(); }
 
+
+    // ตั้งเวลาให้ระบบดึงข้อมูลจาก Google Sheets อัตโนมัติทุกๆ 1 นาที (60,000 มิลลิวินาที)
+setInterval(() => {
+    console.log("🔄 Auto-syncing with Cloud...");
+    syncWithGoogleSheets();
+}, 60000); 
+
         window.onload = () => {
             const dateInput = document.getElementById('dailyDate');
             if(dateInput) dateInput.valueAsDate = new Date();
             refreshAllPages();
         };
-    </script>
+</script>
 </body>
 </html>
 
