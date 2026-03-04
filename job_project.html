@@ -581,7 +581,7 @@
         const currentUser = sessionStorage.getItem('currentUser') || 'Master Operator';
         document.getElementById('displayUserName').innerText = currentUser;
         const STORAGE_KEY = `w_data_${currentUser}`;
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7cMOS-X0oHWdWIdIg8KLemTX2k6qUsc9eg2VqCca_OLK44ujcjmu0ksa6MG4AReP0Vg/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4SD5ptHWy8zhDiNAoyQkQuunBXQIVkX5H7cfSJflxltQ5QrO307FCYnpdp8o6U_aGsQ/exec";
 
         let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
             daily: [], s5: [], skills: [], special: [], support: []
@@ -589,6 +589,10 @@
 
         let skillChart = null;
         let masterChart = null;
+        
+window.addEventListener('load',() => {
+  syncWithgooglesheets();
+});
 
         // --- Google Sheets Sync Logic ---
 async function syncWithGoogleSheets() {
@@ -634,23 +638,7 @@ async function syncWithGoogleSheets() {
         syncBtn.classList.remove('loading');
         syncBtn.innerText = "🔄 SYNC GOOGLE SHEETS";
     }
-}// --- ส่วนที่เพิ่มใหม่: ให้ระบบดึงข้อมูลอัตโนมัติเมื่อเปิดหน้าเว็บ ---
-window.addEventListener('load', async () => {
-    console.log("🚀 Starting Auto-Sync...");
-    
-    // ตรวจสอบว่ามีชื่อ User หรือยัง (อ้างอิงจากระบบเดิมของคุณ)
-    const user = sessionStorage.getItem('currentUser');
-    
-    if (user && user !== 'Guest') {
-        // เรียกฟังก์ชัน Sync ที่คุณเขียนไว้แล้ว เพื่อดึงข้อมูลล่าสุดจาก Sheets
-        await syncWithGoogleSheets();
-        console.log("✅ Auto-Sync Completed for user: " + user);
-    } else {
-        console.log("⚠️ No user found, skipping auto-sync.");
-        // ถ้ายังไม่มีข้อมูลใน LocalStorage เลย ให้รันหน้าว่างๆ ไปก่อน
-        refreshAllPages();
-    }
-});
+}
 
         function save() { 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); 
