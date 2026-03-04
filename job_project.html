@@ -634,7 +634,23 @@ async function syncWithGoogleSheets() {
         syncBtn.classList.remove('loading');
         syncBtn.innerText = "🔄 SYNC GOOGLE SHEETS";
     }
-}
+}// --- ส่วนที่เพิ่มใหม่: ให้ระบบดึงข้อมูลอัตโนมัติเมื่อเปิดหน้าเว็บ ---
+window.addEventListener('load', async () => {
+    console.log("🚀 Starting Auto-Sync...");
+    
+    // ตรวจสอบว่ามีชื่อ User หรือยัง (อ้างอิงจากระบบเดิมของคุณ)
+    const user = sessionStorage.getItem('currentUser');
+    
+    if (user && user !== 'Guest') {
+        // เรียกฟังก์ชัน Sync ที่คุณเขียนไว้แล้ว เพื่อดึงข้อมูลล่าสุดจาก Sheets
+        await syncWithGoogleSheets();
+        console.log("✅ Auto-Sync Completed for user: " + user);
+    } else {
+        console.log("⚠️ No user found, skipping auto-sync.");
+        // ถ้ายังไม่มีข้อมูลใน LocalStorage เลย ให้รันหน้าว่างๆ ไปก่อน
+        refreshAllPages();
+    }
+});
 
         function save() { 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); 
@@ -931,6 +947,7 @@ async function syncWithGoogleSheets() {
     </script>
 </body>
 </html>
+
 
 
 
