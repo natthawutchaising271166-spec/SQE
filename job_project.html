@@ -591,41 +591,45 @@
         let masterChart = null;
 
         // --- Google Sheets Sync Logic ---
-    async function syncWithGoogleSheets() {
+async function syncWithGoogleSheets() {
     const syncBtn = document.getElementById('syncBtn');
     syncBtn.classList.add('loading');
-    syncBtn.innerText = "⏳ SYNCING...";
+    syncBtn.innerText = "⏳ SAVING...";
 
     try {
-        // 1. ส่งข้อมูลปัจจุบันไปบันทึก (ใช้ฟอร์มแบบดั้งเดิมเพื่อเลี่ยงปัญหา CORS)
-        const formData = new FormData();
-        formData.append('user', currentUser);
-        formData.append('data', JSON.stringify(db));
+        // 1. บันทึกข้อมูลปัจจุบันลง Local ก่อนเพื่อกันพลาด
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
 
+        // 2. ส่งข้อมูลไป Google Sheets
+        // หมายเหตุ: การใช้ no-cors จะไม่รู้ผลลัพธ์ ดังนั้นเราจะรอเวลาเล็กน้อย (Delay)
         await fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors', // สำหรับการส่ง (POST) ไป Apps Script ยังคงต้องใช้ no-cors
-            body: formData
+            mode: 'no-cors',
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user: currentUser,
+                data: db
+            })
         });
 
-        // 2. ดึงข้อมูลล่าสุดกลับมา (GET) - เพิ่ม Timestamp เพื่อป้องกัน Cache
-        const getResponse = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
+        // 3. รอให้ฝั่ง Server ทำงานแป๊บนึง (ประมาณ 1.5 วินาที) ก่อนจะดึงค่าใหม่
+        syncBtn.innerText = "⏳ REFRESHING...";
+        await new Promise(resolve => setTimeout(resolve, 1500)); 
+
+        // 4. ดึงข้อมูลล่าสุดกลับมา
+        const getResponse = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}`);
         const result = await getResponse.json();
 
-        if (result && result.data) {
-            // อัปเดตข้อมูลในตัวแปรหลักและ LocalStorage
+        if (result.status === "success" && result.data) {
             db = result.data;
             saveToLocalOnly(); 
-            
-            // รีเฟรชหน้าจอทั้งหมดเพื่อแสดงข้อมูลใหม่
             refreshAllPages();
-            toast("✅ Sync ข้อมูลสำเร็จ!");
-        } else {
-            toast("⚠️ เชื่อมต่อสำเร็จแต่ไม่พบข้อมูลเก่า");
+            toast("✅ Sync สำเร็จและอัปเดตข้อมูลแล้ว!");
         }
     } catch (error) {
         console.error("Sync Error:", error);
-        toast("❌ การเชื่อมต่อล้มเหลว ตรวจสอบอินเทอร์เน็ต");
+        toast("❌ Sync ไม่สำเร็จ แต่ข้อมูลยังอยู่ในเครื่องคุณ");
     } finally {
         syncBtn.classList.remove('loading');
         syncBtn.innerText = "🔄 SYNC GOOGLE SHEETS";
@@ -927,6 +931,7 @@
     </script>
 </body>
 </html>
+
 
 
 
