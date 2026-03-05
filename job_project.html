@@ -599,56 +599,51 @@ async function syncWithGoogleSheets() {
     if (syncBtn.classList.contains('loading')) return;
 
     syncBtn.classList.add('loading');
-    syncBtn.innerText = "⏳ PROCESSING...";
+    syncBtn.innerText = "⏳ SYNCING...";
 
     try {
-        // 1. ดึงข้อมูลล่าสุดจาก Cloud มาเช็คก่อนเสมอ (ป้องกันการส่งค่าว่างไปทับ)
-        const getResponse = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${new Date().getTime()}`);
-        const result = await getResponse.json();
+        // 1. ดึงข้อมูลล่าสุดจาก Cloud มาก่อน
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
+        const result = await response.json();
 
         if (result.status === "success" && result.data) {
-            // เช็คว่าข้อมูลบน Cloud มีอยู่จริงหรือไม่
-            const cloudHasData = Object.values(result.data).some(arr => Array.isArray(arr) && arr.length > 0);
-            const localHasData = Object.values(db).some(arr => Array.isArray(arr) && arr.length > 0);
-
-            if (cloudHasData && !localHasData) {
-                // กรณี: เครื่องใหม่/แท็บเล็ต (ในเครื่องว่างแต่ Cloud มี) ให้ดึงลงมา
-                db = result.data;
+            const cloudData = result.data;
+            
+            // 2. Logic การ Merge ข้อมูล (เลือกเอาข้อมูลที่มีจำนวน Record มากกว่า หรือรวมกัน)
+            // ในที่นี้แนะนำให้ "อัปเดต Local ด้วย Cloud" หาก Cloud มีข้อมูลใหม่กว่า
+            // หรือถ้า Local มีการเปลี่ยนแปลง ให้ส่งขึ้นไป
+            
+            // ตรวจสอบความเปลี่ยนแปลง (เช็คแบบง่ายด้วยจำนวน Array รวม)
+            const getLength = (obj) => Object.values(obj).reduce((acc, cur) => acc + (Array.isArray(cur) ? cur.length : 0), 0);
+            
+            if (getLength(cloudData) >= getLength(db)) {
+                // ถ้าบน Cloud มีข้อมูลเยอะกว่าหรือเท่ากัน ให้เชื่อ Cloud
+                db = cloudData;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-                console.log("📥 Downloaded data from Cloud to Device");
-            } else if (localHasData) {
-                // กรณี: มีข้อมูลใหม่ในเครื่อง ให้ส่งขึ้นไปบันทึก (POST)
+                console.log("📥 Sync: Updated from Cloud");
+            } else {
+                // ถ้าในเครื่องมีข้อมูลใหม่ที่ยังไม่ได้ส่ง (เยอะกว่าบน Cloud)
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'no-cors', // หมายเหตุ: no-cors จะทำให้เราอ่าน Response ของ POST ไม่ได้ แต่ข้อมูลจะถูกส่งไป
                     cache: 'no-cache',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user: currentUser, data: db })
                 });
-                console.log("📤 Uploaded local data to Cloud");
+                console.log("📤 Sync: Uploaded to Cloud");
             }
-        }
-
-        // 2. โหลดข้อมูลล่าสุดกลับมาแสดงผลที่หน้าจออีกครั้งเพื่อความชัวร์
-        const finalGet = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${new Date().getTime()}`);
-        const finalResult = await finalGet.json();
-        
-        if (finalResult.data) {
-            db = finalResult.data;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+            
             refreshAllPages();
             toast("✅ ซิงค์ข้อมูลเรียลไทม์สำเร็จ!");
         }
-
     } catch (error) {
         console.error("Sync Error:", error);
-        toast("❌ การซิงค์ขัดข้อง");
+        toast("❌ การซิงค์ขัดข้อง: " + error.message);
     } finally {
         syncBtn.classList.remove('loading');
         syncBtn.innerText = "🔄 SYNC GOOGLE SHEETS";
     }
 }
-
 
         function save() { 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); 
@@ -979,3 +974,4 @@ setInterval(() => {
 </script>
 </body>
 </html>
+
