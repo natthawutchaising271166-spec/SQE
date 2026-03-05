@@ -492,20 +492,21 @@
             </div>
             <div class="card">
                 <div style="font-weight:500; margin-bottom: 15px;">📥 บันทึกการ Support หน้างาน</div>
-                <div class="input-group" style="display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr auto; gap: 10px;">
-                    <input type="text" id="supProblem" placeholder="รายละเอียดปัญหา">
-                    <select id="supAction">
-                        <option value="Repair">Rework: ซ่อมแซม/คัด</option>
-                        <option value="Replace">Replace: ส่งกลับ/แลกเปลี่ยน</option>
-                    </select>
-                    <input type="text" id="supPart" placeholder="Group Part">
-                    <select id="supReport">
-                        <option value="VF">VF Report</option>
-                        <option value="RP">RP Report</option>
-                        <option value="RECORDS">RECORDS</option>
-                    </select>
-                    <button class="btn-main" onclick="addSupport()">บันทึก</button>
-                </div>
+                <div class="input-group" style="display: grid; grid-template-columns: 1.2fr 2fr 1.5fr 1fr 1fr auto; gap: 10px;">
+    <input type="date" id="supDate"> <input type="text" id="supProblem" placeholder="รายละเอียดปัญหา">
+    <select id="supAction">
+        <option value="Repair">Rework: ซ่อมแซม/คัด</option>
+        <option value="Replace">Replace: ส่งกลับ/แลกเปลี่ยน</option>
+    </select>
+    <input type="text" id="supPart" placeholder="Group Part">
+    <select id="supReport">
+        <option value="VF">VF Report</option>
+        <option value="RP">RP Report</option>
+        <option value="RECORDS">RECORDS</option>
+    </select>
+    <button class="btn-main" onclick="addSupport()">บันทึก</button>
+</div>
+
             </div>
             <div class="card" style="padding: 0; overflow: hidden;"><div class="table-scroll"><table id="supportTable"><thead><tr><th style="padding-left:24px;">วัน/เวลา</th><th>รายละเอียดปัญหา</th><th>การแก้ไข</th><th>Group Part</th><th>Status</th><th style="text-align:center;">จัดการ</th></tr></thead><tbody id="supportTableBody"></tbody></table></div></div>
         </div>
@@ -602,43 +603,32 @@ async function syncWithGoogleSheets() {
     syncBtn.innerText = "⏳ SYNCING...";
 
     try {
-        // 1. ดึงข้อมูลล่าสุดจาก Cloud มาก่อน
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
-        const result = await response.json();
+        // 1. ส่งข้อมูลปัจจุบันในเครื่อง (ที่ลบแล้ว) ขึ้นไปทับบน Google Sheets ทันที
+        // วิธีนี้จะทำให้ Google Sheets อัปเดตตามหน้าเว็บล่าสุด
+        await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // สำคัญ: ต้องใช้ no-cors สำหรับ Google Apps Script บางกรณี
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user: currentUser, data: db })
+        });
 
+        console.log("📤 Data sent to Cloud");
+
+        // 2. รอสักครู่แล้วดึงข้อมูลกลับมาเช็คเพื่อความชัวร์
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${new Date().getTime()}`);
+        const result = await response.json();
+        
         if (result.status === "success" && result.data) {
-            const cloudData = result.data;
-            
-            // 2. Logic การ Merge ข้อมูล (เลือกเอาข้อมูลที่มีจำนวน Record มากกว่า หรือรวมกัน)
-            // ในที่นี้แนะนำให้ "อัปเดต Local ด้วย Cloud" หาก Cloud มีข้อมูลใหม่กว่า
-            // หรือถ้า Local มีการเปลี่ยนแปลง ให้ส่งขึ้นไป
-            
-            // ตรวจสอบความเปลี่ยนแปลง (เช็คแบบง่ายด้วยจำนวน Array รวม)
-            const getLength = (obj) => Object.values(obj).reduce((acc, cur) => acc + (Array.isArray(cur) ? cur.length : 0), 0);
-            
-            if (getLength(cloudData) >= getLength(db)) {
-                // ถ้าบน Cloud มีข้อมูลเยอะกว่าหรือเท่ากัน ให้เชื่อ Cloud
-                db = cloudData;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-                console.log("📥 Sync: Updated from Cloud");
-            } else {
-                // ถ้าในเครื่องมีข้อมูลใหม่ที่ยังไม่ได้ส่ง (เยอะกว่าบน Cloud)
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // หมายเหตุ: no-cors จะทำให้เราอ่าน Response ของ POST ไม่ได้ แต่ข้อมูลจะถูกส่งไป
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user: currentUser, data: db })
-                });
-                console.log("📤 Sync: Uploaded to Cloud");
-            }
-            
+            db = result.data;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
             refreshAllPages();
-            toast("✅ ซิงค์ข้อมูลเรียลไทม์สำเร็จ!");
+            toast("✅ ซิงค์และอัปเดตฐานข้อมูลสำเร็จ!");
         }
+
     } catch (error) {
         console.error("Sync Error:", error);
-        toast("❌ การซิงค์ขัดข้อง: " + error.message);
+        toast("❌ การซิงค์ขัดข้อง");
     } finally {
         syncBtn.classList.remove('loading');
         syncBtn.innerText = "🔄 SYNC GOOGLE SHEETS";
@@ -713,10 +703,21 @@ async function syncWithGoogleSheets() {
             const supportData = Array(12).fill(0);
             const s5Data = Array(12).fill(0);
 
-            db.support.forEach(s => {
-                const m = new Date().getMonth(); 
-                supportData[m]++;
-            });
+// เปลี่ยนจากเดิมที่ใช้เดือนปัจจุบัน (new Date().getMonth()) 
+// ให้เป็นการอ่านค่าจาก "วันที่" ในตารางแทน
+
+db.support.forEach(s => {
+    // ตรวจสอบว่าในข้อมูลมี field 'date' หรือ 'time' ที่เป็นรูปแบบ 2026-01-xx หรือไม่
+    const dateSource = s.date || s.time; 
+    if (dateSource) {
+        // แยกเอาค่าเดือนออกมา (เช่น 2026-01-12 จะได้ index คือ 0 สำหรับเดือน Jan)
+        const m = new Date(dateSource).getMonth();
+        if (m >= 0 && m <= 11) {
+            supportData[m]++;
+        }
+    }
+});
+
             db.s5.forEach(s => {
                 if(s.month) {
                     const m = parseInt(s.month.split('-')[1]) - 1;
@@ -841,23 +842,25 @@ function addSupport() {
     const part = document.getElementById('supPart').value;
     const rep = document.getElementById('supReport').value;
     
-    // ตรวจสอบว่ากรอกข้อมูลหรือยัง
-    if(!prob) { 
-        toast("❌ กรุณากรอกรายละเอียดปัญหา"); 
-        return; 
+    // --- จุดที่แก้ไข: ดึงค่าจากช่องวันที่ที่เราเลือก ---
+    const selectedDate = document.getElementById('supDate').value; 
+    
+    if(!prob || !selectedDate) {
+        toast("❌ กรุณากรอกข้อมูลและเลือกวันที่");
+        return;
     }
 
-    // 1. บันทึกลงในตัวแปร db (Local Variable)
-    db.support.push({ 
-        id: Date.now(), 
-        time: new Date().toLocaleString('th-TH'), 
-        problem: prob, 
-        action: act, 
-        part: part || 'General', 
-        report: rep 
+    db.support.push({
+        id: Date.now(),
+        date: selectedDate, // บันทึกวันที่ตามที่เลือก (เช่น 2026-01-12)
+        time: selectedDate, // ใช้แสดงผลในตารางให้ตรงกัน
+        problem: prob,
+        action: act,
+        part: part,
+        report: rep
     });
 
-    // 2. บันทึกลง LocalStorage ของเครื่อง
+    //2. บันทึกลง LocalStorage และ Sync
     save(); 
     
     // 3. สั่ง Sync ขึ้น Google Sheets ทันที (เพื่อให้เครื่องอื่นเห็นข้อมูลใหม่)
@@ -870,8 +873,8 @@ function addSupport() {
     // 5. อัปเดตตารางแสดงผลในหน้าปัจจุบันทันที
     refreshSupport();
     toast("📥 บันทึกและกำลังซิงค์เรียลไทม์...");
-}
 
+    }
         function refreshSupport() {
             const tbody = document.getElementById('supportTableBody');
             if(!tbody) return;
@@ -884,7 +887,16 @@ function addSupport() {
             document.getElementById('sum-rp').innerText = rp; document.getElementById('sum-vf').innerText = vf; document.getElementById('sum-records').innerText = rec;
         }
 
-        function delSupport(id) { db.support = db.support.filter(s => s.id !== id); save(); refreshSupport(); }
+        function delSupport(id) {
+    if(confirm("ยืนยันการลบรายการนี้หรือไม่?")) {
+        // กรองเอาเฉพาะรายการที่ ID ไม่ตรงกับที่กดลบ (คือการลบออกนั่นเอง)
+        db.support = db.support.filter(item => item.id !== id);
+        
+        save(); // บันทึกลง LocalStorage
+        refreshSupport(); // อัปเดตตารางหน้าเว็บ
+        toast("🗑️ ลบรายการเรียบร้อย (กด Sync เพื่ออัปเดตบน Cloud)");
+    }
+}
 
         function addDaily() {
             const d = document.getElementById('dailyDate').value, t = document.getElementById('dailyType').value;
@@ -964,14 +976,21 @@ function addSupport() {
 setInterval(() => {
     console.log("🔄 Auto-syncing with Cloud...");
     syncWithGoogleSheets();
-}, 300000); 
+}, 3000000); 
 
         window.onload = () => {
             const dateInput = document.getElementById('dailyDate');
             if(dateInput) dateInput.valueAsDate = new Date();
             refreshAllPages();
+
+            // ใส่ไว้ในส่วนท้ายของสคริปต์
+document.getElementById('supDate').valueAsDate = new Date();
+
         };
 </script>
 </body>
 </html>
+>
+
+
 
