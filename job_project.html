@@ -594,60 +594,61 @@ window.addEventListener('load',() => {
   syncWithgooglesheets();
 });
 
-// --- Google Sheets Sync Logic (Improved for Real-time) ---
 async function syncWithGoogleSheets() {
     const syncBtn = document.getElementById('syncBtn');
-    if (syncBtn.classList.contains('loading')) return; // ป้องกันการกดซ้ำขณะกำลังทำงาน
+    if (syncBtn.classList.contains('loading')) return;
 
     syncBtn.classList.add('loading');
-    syncBtn.innerHTML = "⏳ SENDING DATA...";
+    syncBtn.innerText = "⏳ PROCESSING...";
 
     try {
-        // 1. ส่งข้อมูลปัจจุบันจากเครื่องเราขึ้นไปบันทึก (POST)
-        // เราจะส่ง db ทั้งหมดไป เพื่อให้ฝั่ง Google Sheets รวมข้อมูล (Merge)
-        await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors', // ใช้ no-cors สำหรับ Google Apps Script ในบางกรณี
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user: currentUser,
-                data: db,
-                timestamp: new Date().getTime()
-            })
-        });
-
-        // 2. รอจังหวะให้ฝั่ง Server ประมวลผลเสร็จ (ประมาณ 1 วินาที)
-        syncBtn.innerHTML = "⏳ FETCHING LATEST...";
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // 3. ดึงข้อมูลที่อัปเดตล่าสุดจาก Google Sheets กลับมา (GET)
+        // 1. ดึงข้อมูลล่าสุดจาก Cloud มาเช็คก่อนเสมอ (ป้องกันการส่งค่าว่างไปทับ)
         const getResponse = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${new Date().getTime()}`);
-        
-        if (!getResponse.ok) throw new Error('Network response was not ok');
-        
         const result = await getResponse.json();
 
         if (result.status === "success" && result.data) {
-            // อัปเดตข้อมูลในตัวแปร db และ LocalStorage ด้วยข้อมูลจาก Cloud
-            db = result.data;
+            // เช็คว่าข้อมูลบน Cloud มีอยู่จริงหรือไม่
+            const cloudHasData = Object.values(result.data).some(arr => Array.isArray(arr) && arr.length > 0);
+            const localHasData = Object.values(db).some(arr => Array.isArray(arr) && arr.length > 0);
+
+            if (cloudHasData && !localHasData) {
+                // กรณี: เครื่องใหม่/แท็บเล็ต (ในเครื่องว่างแต่ Cloud มี) ให้ดึงลงมา
+                db = result.data;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+                console.log("📥 Downloaded data from Cloud to Device");
+            } else if (localHasData) {
+                // กรณี: มีข้อมูลใหม่ในเครื่อง ให้ส่งขึ้นไปบันทึก (POST)
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user: currentUser, data: db })
+                });
+                console.log("📤 Uploaded local data to Cloud");
+            }
+        }
+
+        // 2. โหลดข้อมูลล่าสุดกลับมาแสดงผลที่หน้าจออีกครั้งเพื่อความชัวร์
+        const finalGet = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${new Date().getTime()}`);
+        const finalResult = await finalGet.json();
+        
+        if (finalResult.data) {
+            db = finalResult.data;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-            
-            // รีเฟรชหน้าจอทั้งหมดเพื่อแสดงข้อมูลใหม่ทันที
             refreshAllPages();
             toast("✅ ซิงค์ข้อมูลเรียลไทม์สำเร็จ!");
-        } else {
-            toast("⚠️ ดึงข้อมูลสำเร็จแต่รูปแบบไม่ถูกต้อง");
         }
 
     } catch (error) {
         console.error("Sync Error:", error);
-        toast("❌ การซิงค์ขัดข้อง: " + error.message);
+        toast("❌ การซิงค์ขัดข้อง");
     } finally {
         syncBtn.classList.remove('loading');
-        syncBtn.innerHTML = "🔄 SYNC GOOGLE SHEETS";
+        syncBtn.innerText = "🔄 SYNC GOOGLE SHEETS";
     }
 }
+
 
         function save() { 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); 
@@ -964,7 +965,6 @@ function addSupport() {
         }
         function delSpec(id) { db.special = db.special.filter(s=>s.id!==id); save(); refreshSpecial(); }
 
-
     // ตั้งเวลาให้ระบบดึงข้อมูลจาก Google Sheets อัตโนมัติทุกๆ 1 นาที (60,000 มิลลิวินาที)
 setInterval(() => {
     console.log("🔄 Auto-syncing with Cloud...");
@@ -979,8 +979,3 @@ setInterval(() => {
 </script>
 </body>
 </html>
-
-
-
-
-
