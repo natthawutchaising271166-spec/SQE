@@ -884,7 +884,37 @@ function addSupport() {
             document.getElementById('sum-rp').innerText = rp; document.getElementById('sum-vf').innerText = vf; document.getElementById('sum-records').innerText = rec;
         }
 
-        function delSupport(id) { db.support = db.support.filter(s => s.id !== id); save(); refreshSupport(); }
+        
+
+    async function delSupport(id) {
+    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้? ข้อมูลใน Google Sheets จะถูกอัปเดตด้วย")) {
+        // 1. ลบข้อมูลใน Local State
+        db.support = db.support.filter(s => s.id !== id);
+        
+        
+        // 2. บันทึกลง LocalStorage
+        saveToLocalOnly(); 
+        
+        // 3. แสดงผลหน้าจอใหม่ทันที
+        refreshSupport();
+        if(document.getElementById('master-dash').classList.contains('active')) refreshMasterDashboard();
+
+        // 4. ส่งข้อมูลที่อัปเดตแล้วขึ้น Cloud ทันที (Background Sync)
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user: currentUser, data: db })
+            });
+            toast("🗑️ ลบข้อมูลและอัปเดต Cloud เรียบร้อย");
+        } catch (error) {
+            console.error("Cloud Delete Error:", error);
+            toast("⚠️ ลบในเครื่องแล้ว แต่การเชื่อมต่อ Cloud ขัดข้อง");
+        }
+    }
+}
 
         function addDaily() {
             const d = document.getElementById('dailyDate').value, t = document.getElementById('dailyType').value;
@@ -974,5 +1004,6 @@ setInterval(() => {
 </script>
 </body>
 </html>
+
 
 
