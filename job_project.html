@@ -965,11 +965,11 @@ function addSupport() {
         }
         function delSpec(id) { db.special = db.special.filter(s=>s.id!==id); save(); refreshSpecial(); }
 
-    // ตั้งเวลาให้ระบบดึงข้อมูลจาก Google Sheets อัตโนมัติทุกๆ 1 นาที (60,000 มิลลิวินาที)
+    // ตั้งเวลาให้ระบบดึงข้อมูลจาก Google Sheets อัตโนมัติทุกๆ 5 นาที (300,000 มิลลิวินาที)
 setInterval(() => {
     console.log("🔄 Auto-syncing with Cloud...");
     syncWithGoogleSheets();
-}, 60000); 
+}, 300000); 
 
         window.onload = () => {
             const dateInput = document.getElementById('dailyDate');
