@@ -715,7 +715,7 @@ Chart.defaults.plugins.tooltip.borderWidth = 1;
 const currentUser = sessionStorage.getItem('currentUser') || 'Master Operator';
 document.getElementById('displayUserName').innerHTML = currentUser + ' <span class="online-dot"></span>';
 const STORAGE_KEY = `w_data_${currentUser}`;
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxJS-noIKJCtJXnvYCxKSxYMSr54wzZ6snyCZb08SfaeqaVQvP05aBzGbqcW6sffYVXg/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2-I9KJnfgBCpgF9juLVY2Grmp2EBsayaEkfrago3XLYgaYU9XRNUJLE7nFaTBn9CQ/exec";
 
 let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {daily:[],s5:[],skills:[],special:[],support:[]};
 let skillChart=null, masterChart=null, doughnutChart=null, supStatusChart=null, supTrendChart=null, attendChart=null, s5Chart=null;
@@ -971,3 +971,4 @@ function delSpecial(i){db.special.splice(i,1);save();refreshSpecial();}
 </script>
 </body>
 </html>
+
