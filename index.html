@@ -1,909 +1,1855 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QDIT AURA - ELITE ANALYTICS PRO V2.5 (SYNC ENABLED)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&family=IBM+Plex+Sans+Thai:wght@300;500;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>QDIT AURA · SQE Support V3</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&family=IBM+Plex+Sans+Thai:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --or:#f97316;--red:#ef4444;--blue:#3b82f6;--green:#10b981;
+  --glass:rgba(255,255,255,.72);--glass-b:rgba(255,255,255,.5);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{
+  height:100%;margin:0;padding:0;overflow:hidden;
+  font-family:'Inter','IBM Plex Sans Thai',sans-serif;color:#1e293b;
+  background:#f1f5f9;
+  background-image:
+    radial-gradient(circle at 10% 20%,rgba(249,115,22,.08) 0%,transparent 40%),
+    radial-gradient(circle at 90% 80%,rgba(59,130,246,.08) 0%,transparent 40%);
+}
+.orbitron{font-family:'Orbitron',sans-serif;font-variant-numeric:tabular-nums}
 
-    <style>
-        :root {
-            --luxury-orange: #f97316;
-            --luxury-red: #ef4444;
-            --luxury-blue: #3b82f6;
-            --luxury-green: #10b981;
-            --glass: rgba(255, 255, 255, 0.7);
-            --glass-deep: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.5);
-        }
+/* ════════════════════════════════
+   LOGIN — EPIC ANIMATION
+════════════════════════════════ */
+#loginOverlay{
+  position:fixed;inset:0;background:#060a14;z-index:9999;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+#loCanvas{position:absolute;inset:0;z-index:0;pointer-events:none}
+.lo-hex{
+  position:absolute;inset:0;z-index:1;
+  background-image:
+    linear-gradient(rgba(249,115,22,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(249,115,22,.03) 1px,transparent 1px);
+  background-size:60px 60px;animation:hexDrift 60s linear infinite;
+}
+@keyframes hexDrift{to{background-position:60px 60px}}
+.lo-orb{position:absolute;border-radius:50%;pointer-events:none}
+.lo-orb-1{width:700px;height:700px;top:-250px;right:-200px;background:radial-gradient(circle,rgba(249,115,22,.12) 0%,transparent 65%);animation:orbA 10s ease-in-out infinite}
+.lo-orb-2{width:550px;height:550px;bottom:-200px;left:-180px;background:radial-gradient(circle,rgba(59,130,246,.1) 0%,transparent 65%);animation:orbA 13s ease-in-out infinite reverse}
+.lo-orb-3{width:250px;height:250px;top:38%;left:12%;background:radial-gradient(circle,rgba(16,185,129,.08) 0%,transparent 70%);animation:orbA 7s ease-in-out infinite;animation-delay:-3s}
+@keyframes orbA{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(35px,-45px) scale(1.1)}66%{transform:translate(-25px,25px) scale(.92)}}
+/* Pulse rings */
+.lo-rings{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:1}
+.lo-ring{position:absolute;border-radius:50%;border:1px solid rgba(249,115,22,.06);animation:rPulse 4s ease-in-out infinite}
+.lo-ring:nth-child(1){width:800px;height:800px;margin:-400px 0 0 -400px}
+.lo-ring:nth-child(2){width:580px;height:580px;margin:-290px 0 0 -290px;animation-delay:-1.3s;border-color:rgba(59,130,246,.07)}
+.lo-ring:nth-child(3){width:360px;height:360px;margin:-180px 0 0 -180px;animation-delay:-2.6s;border-color:rgba(16,185,129,.06)}
+@keyframes rPulse{0%,100%{opacity:.3;transform:scale(.98)}50%{opacity:1;transform:scale(1.04)}}
+/* Card */
+.lo-card{
+  background:rgba(6,10,20,.9);backdrop-filter:blur(50px);
+  border:1px solid rgba(249,115,22,.2);
+  padding:3.5rem 3rem;border-radius:2.5rem;
+  width:460px;max-width:94vw;text-align:center;
+  position:relative;z-index:10;
+  box-shadow:0 0 0 1px rgba(249,115,22,.05),0 50px 140px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.04);
+  animation:cardIn .9s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(40px) scale(.93)}to{opacity:1;transform:translateY(0) scale(1)}}
+.lo-card::before{content:'';position:absolute;inset:0;border-radius:2.5rem;background:linear-gradient(135deg,rgba(249,115,22,.05) 0%,transparent 50%,rgba(59,130,246,.03) 100%);pointer-events:none}
+/* Scan line */
+.lo-scan{position:absolute;inset:0;border-radius:2.5rem;overflow:hidden;pointer-events:none;z-index:1}
+.lo-scan::after{content:'';position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(249,115,22,.5),transparent);animation:scan 3.5s linear infinite}
+@keyframes scan{from{top:-2px}to{top:100%}}
+/* Corner accents */
+.lo-c{position:absolute;width:18px;height:18px;pointer-events:none}
+.lo-c.tl{top:18px;left:18px;border-top:2px solid rgba(249,115,22,.45);border-left:2px solid rgba(249,115,22,.45);border-radius:3px 0 0 0}
+.lo-c.tr{top:18px;right:18px;border-top:2px solid rgba(249,115,22,.45);border-right:2px solid rgba(249,115,22,.45);border-radius:0 3px 0 0}
+.lo-c.bl{bottom:18px;left:18px;border-bottom:2px solid rgba(249,115,22,.45);border-left:2px solid rgba(249,115,22,.45);border-radius:0 0 0 3px}
+.lo-c.br{bottom:18px;right:18px;border-bottom:2px solid rgba(249,115,22,.45);border-right:2px solid rgba(249,115,22,.45);border-radius:0 0 3px 0}
+/* Logo wrap */
+.lo-logo-w{position:relative;display:inline-block;margin-bottom:1.8rem}
+.lo-lr{position:absolute;border-radius:50%;border:1px solid rgba(249,115,22,.15);top:50%;left:50%;animation:lrA 3s ease-in-out infinite}
+.lo-lr:nth-child(1){width:108px;height:108px;margin:-54px 0 0 -54px}
+.lo-lr:nth-child(2){width:138px;height:138px;margin:-69px 0 0 -69px;animation-delay:-.9s;border-color:rgba(249,115,22,.07)}
+.lo-lr:nth-child(3){width:168px;height:168px;margin:-84px 0 0 -84px;animation-delay:-1.8s;border-color:rgba(249,115,22,.04)}
+@keyframes lrA{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.18);opacity:1}}
+/* Glitch title */
+.lo-glitch{position:relative;display:inline-block}
+.lo-glitch::after{content:attr(data-t);position:absolute;top:0;left:0;width:100%;clip-path:polygon(0 30%,100% 30%,100% 55%,0 55%);transform:translateX(-4px);opacity:0;animation:glitch 6s infinite}
+@keyframes glitch{
+  0%,84%,100%{opacity:0}
+  85%{opacity:.8;transform:translateX(4px);color:#f97316}
+  86%{opacity:.5;transform:translateX(-5px);color:#3b82f6;filter:hue-rotate(40deg)}
+  87%{opacity:.7;transform:translateX(2px)}
+  88%{opacity:0}
+}
+/* Inputs */
+.lo-in{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:#fff;
+  width:100%;padding:1rem 1.25rem;border-radius:1rem;font-weight:700;
+  text-align:center;letter-spacing:.15em;font-size:.85rem;transition:all .35s;outline:none;
+  position:relative;z-index:2;
+}
+.lo-in::placeholder{color:rgba(255,255,255,.2)}
+.lo-in:focus{border-color:var(--or);background:rgba(249,115,22,.07);box-shadow:0 0 0 3px rgba(249,115,22,.14),0 0 50px rgba(249,115,22,.08);transform:scale(1.02)}
+/* Button */
+.lo-btn{
+  background:linear-gradient(135deg,#f97316 0%,#dc2626 100%);color:#fff;width:100%;
+  padding:1.15rem;border-radius:1rem;font-weight:900;font-size:.78rem;
+  letter-spacing:.3em;cursor:pointer;border:none;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(249,115,22,.3),0 0 60px rgba(249,115,22,.2);
+  transition:all .3s;z-index:2;position:relative;margin-top:1.5rem;
+}
+.lo-btn::before{
+  content:'';position:absolute;top:-50%;left:-60%;width:35%;height:200%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+  transform:skewX(-20deg);animation:btnShine 2.8s infinite;
+}
+@keyframes btnShine{0%,100%{left:-60%}50%{left:130%}}
+.lo-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 0 0 1px rgba(249,115,22,.5),0 0 80px rgba(249,115,22,.35)}
+.lo-btn:active{transform:scale(.97)}
+.lo-btn:disabled{opacity:.4;transform:none;cursor:not-allowed}
+.lo-btn:disabled::before{animation:none}
+/* Q SVG */
+.q-path{stroke-dasharray:100;stroke-dashoffset:100;animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1);stroke:var(--or);stroke-width:4;fill:none}
+@keyframes qDraw{to{stroke-dashoffset:0}}
+/* Progress */
+#loProgress{display:none;flex-direction:column;gap:12px;margin-top:1.5rem;position:relative;z-index:2}
+.lo-step{display:flex;align-items:center;gap:10px;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.22);transition:all .4s;letter-spacing:.08em}
+.lo-step.active{color:#f97316;animation:stp .8s ease-in-out infinite}
+.lo-step.done{color:rgba(255,255,255,.8)}
+@keyframes stp{0%,100%{opacity:1}50%{opacity:.45}}
+.lo-dot{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.04);border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.6rem;transition:all .4s}
+.lo-step.done .lo-dot{background:#10b981;border-color:#10b981;box-shadow:0 0 14px rgba(16,185,129,.4)}
+.lo-step.active .lo-dot{background:rgba(249,115,22,.14);border-color:#f97316;box-shadow:0 0 14px rgba(249,115,22,.4)}
+.lo-bar-t{height:4px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;margin-top:.5rem;position:relative}
+.lo-bar{height:100%;background:linear-gradient(90deg,#f97316,#fbbf24,#10b981);background-size:200% 100%;border-radius:99px;width:0%;transition:width .5s cubic-bezier(.22,.68,0,1.2);animation:barShift 2s linear infinite}
+@keyframes barShift{to{background-position:-200% 0}}
 
-        /* --- AUTO-SCALE CSS --- */
-        html, body { 
-            height: 100vh; width: 100vw; margin: 0; padding: 0; 
-            overflow: hidden; background: #f1f5f9; 
-        }
+/* ════════════════════════════════
+   LIVE SYNC INDICATOR
+════════════════════════════════ */
+#syncPulse{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.62rem;font-weight:800;letter-spacing:.08em;
+  padding:4px 9px;border-radius:8px;
+  background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10b981;
+  transition:all .4s;cursor:default;
+}
+#syncPulse.syncing{background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.25);color:#f97316}
+#syncPulse.offline{background:rgba(239,68,68,.09);border-color:rgba(239,68,68,.2);color:#ef4444}
+.sdot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:sdotA 1.4s ease-in-out infinite}
+@keyframes sdotA{0%,100%{opacity:.3;transform:scale(.7)}50%{opacity:1;transform:scale(1.4)}}
 
-        #app-scaler {
-            width: 2200px; /* ขนาดตั้งต้นสำหรับคอมพิวเตอร์ */
-            height: 1090px; 
-            transform-origin: top left;
-            transition: transform 0.1s ease-out;
-            display: flex; flex-direction: column;
-            padding: 1.5rem; gap: 1.5rem;
-        }
+/* ════════════════════════════════
+   APP SHELL
+════════════════════════════════ */
+#appShell{
+  position:fixed;inset:0;display:flex;flex-direction:column;
+  padding:1.5rem;gap:1.5rem;
+  opacity:0;visibility:hidden;transition:opacity .6s ease;
+}
+#appShell.visible{opacity:1;visibility:visible;animation:pageIn .5s ease both}
+@keyframes pageIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
+.glass{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-b)}
+.stat-card{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-b)}
+.card-lift{transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s}
+.card-lift:hover{transform:translateY(-3px);box-shadow:0 15px 45px -10px rgba(0,0,0,.08)}
+.neon-in{background:rgba(255,255,255,.6);border:1.5px solid rgba(255,255,255,.85);transition:all .25s;outline:none}
+.neon-in:focus{background:#fff;border-color:var(--or);box-shadow:0 0 0 3px rgba(249,115,22,.12);transform:scale(1.01)}
+.btn{
+  transition:all .22s cubic-bezier(.34,1.56,.64,1);
+  cursor:pointer;border:none;font-family:inherit;position:relative;overflow:hidden;
+}
+.btn:hover{filter:brightness(1.12);transform:translateY(-2px);box-shadow:0 6px 20px -4px rgba(0,0,0,.18)}
+.btn:active{transform:scale(.94)!important}
+/* Button ripple */
+.btn::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:radial-gradient(circle at var(--rx,50%) var(--ry,50%),rgba(255,255,255,.28) 0%,transparent 65%);
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.btn.ripple::after{opacity:1;animation:rippleOut .5s ease-out forwards}
+@keyframes rippleOut{from{opacity:.7;transform:scale(.6)}to{opacity:0;transform:scale(2.2)}}
 
-        body {
-            font-family: 'Inter', 'IBM Plex Sans Thai', sans-serif;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
-            color: #1e293b;
-        }
+/* Table rows */
+tbody tr{opacity:0;transform:translateY(10px) scale(.99);transition:all .28s cubic-bezier(.22,.68,0,1.2)}
+tbody tr.vis{opacity:1;transform:translateY(0) scale(1)}
+tbody tr:hover{background:rgba(255,255,255,.7)!important;transition:background .15s}
 
-        .orbitron { font-family: 'Orbitron', sans-serif; font-variant-numeric: tabular-nums; }
-      
-        /* LOGIN GIMMICKS */
-        #loginOverlay {
-            position: fixed; inset: 0;
-            background: #0f172a;
-            z-index: 1000; display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
-        }
+/* Hover row left-border slide */
+tbody tr td:first-child{position:relative}
+tbody tr td:first-child::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;
+  background:linear-gradient(180deg,#f97316,#ea580c);border-radius:0 3px 3px 0;
+  opacity:0;transform:scaleY(.3);transition:all .22s cubic-bezier(.34,1.56,.64,1);
+}
+tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 
-        .login-bg-deco {
-            position: absolute; width: 200%; height: 200%;
-            background-image:
-                linear-gradient(rgba(249, 115, 22, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(249, 115, 22, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            transform: rotate(15deg);
-            animation: bgMove 60s linear infinite;
-        }
-        @keyframes bgMove { from { transform: rotate(15deg) translateY(0); } to { transform: rotate(15deg) translateY(-500px); } }
+/* Input fields */
+.neon-in{
+  background:rgba(255,255,255,.6);border:1.5px solid rgba(255,255,255,.85);
+  transition:all .22s cubic-bezier(.22,.68,0,1.2);outline:none;
+}
+.neon-in:focus{
+  background:#fff;border-color:var(--or);
+  box-shadow:0 0 0 3px rgba(249,115,22,.12),0 4px 16px -4px rgba(249,115,22,.15);
+  transform:scale(1.015);
+}
+.neon-in:hover:not(:focus){background:rgba(255,255,255,.82);border-color:rgba(249,115,22,.3)}
 
-        .login-card {
-            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(30px);
-            border: 1px solid rgba(249, 115, 22, 0.3); padding: 4rem;
-            border-radius: 4rem; width: 480px; text-align: center;
-            box-shadow: 0 0 100px rgba(0,0,0,0.5), inset 0 0 20px rgba(249, 115, 22, 0.1);
-            position: relative; z-index: 10;
-        }
+/* Select judgment */
+#judgmentSelect{transition:all .28s cubic-bezier(.34,1.56,.64,1)}
+#judgmentSelect:focus{transform:scale(1.015);outline:none}
 
-        .dark-neon-input {
-            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white; transition: all 0.4s;
-        }
-        .dark-neon-input:focus {
-            border-color: var(--luxury-orange); box-shadow: 0 0 25px rgba(249, 115, 22, 0.3);
-            outline: none; transform: scale(1.02);
-        }
+/* Sidebar form items stagger */
+.form-item-anim{
+  animation:formItemIn .35s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes formItemIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
 
-        /* MAIN UI COMPONENTS */
-        .stat-card {
-            background: var(--glass); backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border); position: relative; overflow: hidden;
-            transition: 0.3s;
-        }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.08); }
+/* Filter buttons */
+#filterContainer button{
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
+  position:relative;overflow:hidden;
+}
+#filterContainer button.active-filter{
+  box-shadow:0 4px 14px -2px rgba(249,115,22,.35);
+  transform:translateY(-1px);
+}
 
-        .btn-luxury { transition: all 0.3s; cursor: pointer; }
-        .btn-luxury:hover { filter: brightness(1.1); transform: translateY(-1px); }
-        .btn-luxury:active { transform: scale(0.95); }
+/* KPI cards pulse on update */
+@keyframes kpiFlash{
+  0%{box-shadow:0 0 0 0 rgba(249,115,22,.5)}
+  50%{box-shadow:0 0 0 8px rgba(249,115,22,0)}
+  100%{box-shadow:none}
+}
+.kpi-flash{animation:kpiFlash .6s ease-out}
 
-        .neon-input { background: rgba(255, 255, 255, 0.6); border: 1.5px solid rgba(255,255,255,0.8); transition: 0.3s; }
-        .neon-input:focus { background: #fff; border-color: var(--luxury-orange); outline: none; }
+/* Sync button spin smooth */
+.spin{animation:spinA .9s linear infinite}
+@keyframes spinA{to{transform:rotate(360deg)}}
 
-        #dashboardModal {
-            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(15px); z-index: 500; align-items: center; justify-content: center;
-        }
+/* Scrollbar */
+.scroll::-webkit-scrollbar{width:3px;height:3px}
+.scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:10px}
+.scroll::-webkit-scrollbar-thumb:hover{background:rgba(249,115,22,.3)}
 
-        .glass-dash {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            /* ฟิกขนาดให้ Dashboard คงที่เพื่อรอการ Scale */
-            width: 2100px; 
-            height: 980px;
-        }
+/* Status dot */
+.s-dot{animation:sdot 2s infinite}
+@keyframes sdot{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.3);opacity:1}}
 
-        .number-glow { text-shadow: 0 0 20px rgba(249, 115, 22, 0.2); }
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+/* Row delete animation */
+@keyframes rowDelete{to{opacity:0;transform:translateX(40px) scale(.95);max-height:0;padding:0;margin:0}}
+.row-deleting{animation:rowDelete .3s ease-in forwards}
 
-        .q-path {
-            stroke-dasharray: 100; stroke-dashoffset: 100;
-            animation: draw 3s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
-            stroke: var(--luxury-orange); stroke-width: 4; fill: none;
-        }
-        @keyframes draw { to { stroke-dashoffset: 0; } }
+/* Submit button success pulse */
+@keyframes btnSuccess{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.07)}
+  70%{transform:scale(.97)}
+  100%{transform:scale(1)}
+}
+.btn-success{animation:btnSuccess .5s cubic-bezier(.34,1.56,.64,1)}
 
-        tr { opacity: 0; transform: translateY(10px); transition: 0.4s; }
-        tr.visible { opacity: 1; transform: translateY(0); }
+/* Smooth card entrance for KPI header */
+@keyframes kpiCardIn{
+  from{opacity:0;transform:translateY(14px) scale(.96)}
+  to{opacity:1;transform:none}
+}
+#kpiGrid > div{animation:kpiCardIn .45s cubic-bezier(.34,1.56,.64,1) both}
+#kpiGrid > div:nth-child(1){animation-delay:.05s}
+#kpiGrid > div:nth-child(2){animation-delay:.1s}
+#kpiGrid > div:nth-child(3){animation-delay:.15s}
+#kpiGrid > div:nth-child(4){animation-delay:.2s}
+#kpiGrid > div:nth-child(5){animation-delay:.25s}
 
-        .status-glow { animation: statusPulse 2s infinite ease-in-out; }
-        @keyframes statusPulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px var(--color-glow); }
-        }
+/* Sidebar entrance */
+#sidebar{animation:sideIn .5s cubic-bezier(.34,1.56,.64,1) both .1s}
+@keyframes sideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:none}}
 
-        /* RANKING BAR STYLES */
-        .bar-container { margin-bottom: 8px; position: relative; cursor: pointer; }
-        .bar-label { font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .bar-bg { background: rgba(0,0,0,0.03); height: 10px; border-radius: 10px; overflow: hidden; position: relative; }
-        .bar-fill { height: 100%; border-radius: 10px; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); position: relative; }
-        .bar-val { font-family: 'Orbitron'; font-size: 11px; color: #1e293b; }
-      
-        .bar-container:hover .bar-fill::after {
-            content: attr(data-pct);
-            position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
-            font-family: 'Orbitron'; font-size: 8px; font-weight: 900; color: white;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
+/* Main panel entrance */
+#mainPanel{animation:panelIn .5s cubic-bezier(.22,.68,0,1.2) both .15s}
+@keyframes panelIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 
-        #toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #1e293b; color: white; padding: 1rem 2rem; border-radius: 1rem;
-            font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 2000; display: none;
-        }
+/* Toolbar button hover glow */
+#toolbarBtns .btn{font-size:.68rem!important}
+#toolbarBtns .btn:hover{filter:brightness(1.08);box-shadow:0 4px 16px -3px rgba(0,0,0,.22)}
 
-        .scanline {
-            width: 100%; height: 2px; background: rgba(249, 115, 22, 0.1);
-            position: absolute; top: 0; left: 0; pointer-events: none;
-            animation: scan 4s linear infinite; z-index: 1001;
-        }
-        @keyframes scan { from { top: 0; } to { top: 100%; } }
+/* Brand card clock tick */
+#liveClock{transition:color .3s}
 
-        .sync-active { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+/* Bar ranking hover */
+.bar-wrap{transition:transform .18s cubic-bezier(.34,1.56,.64,1)}
+.bar-wrap:hover{transform:translateX(3px)}
+.bar-wrap:hover .bar-fill{filter:brightness(1.15)}
 
-        /* DASHBOARD CHART FIX */
-        .chart-box { flex-grow: 1; min-height: 0; position: relative; width: 100%; }
-        canvas { width: 100% !important; height: 100% !important; }
+/* Smooth number change */
+[id^="qty"],[id^="lot"],[id^="pct"],[id^="master"]{transition:all .2s ease}
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  background:#0f172a;color:#fff;padding:13px 28px;border-radius:1rem;
+  font-weight:800;font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;
+  box-shadow:0 15px 40px rgba(0,0,0,.3);z-index:99999;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  white-space:nowrap;border:1px solid rgba(249,115,22,.2);
+}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#syncBadge{
+  position:fixed;top:12px;right:12px;z-index:8000;
+  background:#0f172a;border:1px solid rgba(249,115,22,.3);color:#fff;
+  font-size:.68rem;font-weight:800;padding:7px 14px;border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);display:none;
+  animation:bdgIn .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes bdgIn{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
+/* ════════════════════════════════════
+   DASHBOARD — PIXEL-PERFECT VIEWPORT FIT
+   NO overflow. NO background patterns.
+════════════════════════════════════ */
+#dashboardModal{
+  position:fixed;inset:0;display:none;
+  align-items:stretch;justify-content:stretch;
+  background:rgba(6,10,20,.84);backdrop-filter:blur(24px);
+  z-index:5000;
+}
+/* Pure frosted glass — absolutely NO grid/pattern backgrounds */
+.glass-dash{
+  width:100%;height:100%;height:100dvh;
+  background:rgba(248,250,252,.97);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+/* ── TOP BAR — ขยายสูงขึ้น ── */
+.dash-topbar{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  height:62px;padding:0 1.4rem;gap:.75rem;
+  background:rgba(255,255,255,.8);border-bottom:1px solid rgba(203,213,225,.55);
+  backdrop-filter:blur(18px);
+}
 
-    </style>
+/* ── BODY ── */
+.dash-body{
+  flex:1 1 0;min-height:0;display:flex;flex-direction:column;
+  gap:.55rem;
+  padding:.75rem 1.1rem .75rem;
+  overflow:hidden;
+}
+
+/* ── KPI STRIP ── */
+.dash-kpi-row{
+  flex:0 0 auto;display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:.55rem;
+  height:clamp(78px,10.5vh,105px);
+}
+.dkpi{
+  display:flex;flex-direction:column;justify-content:space-between;
+  border-radius:1.15rem;
+  padding:.7rem .85rem;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s;
+  animation:dkpiIn .5s cubic-bezier(.34,1.56,.64,1) both;
+  cursor:default;
+}
+.dkpi:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 12px 30px -8px rgba(0,0,0,.13);}
+@keyframes dkpiIn{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}
+
+/* ── INSIGHT STATS ROW ── */
+.dash-stats-row{
+  flex:0 0 auto;display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:.55rem;
+  height:clamp(52px,7vh,72px);
+}
+.d-stat{
+  display:flex;align-items:center;gap:.55rem;
+  border-radius:.9rem;
+  padding:.4rem .75rem;
+  background:rgba(255,255,255,.75);border:1px solid rgba(203,213,225,.5);
+  animation:dkpiIn .45s ease-out both;
+  overflow:hidden;
+}
+.d-stat-icon{
+  width:clamp(24px,2.5vw,32px);height:clamp(24px,2.5vw,32px);
+  border-radius:.55rem;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:clamp(.75rem,1.2vw,.95rem);
+}
+
+/* ══ CHARTS ROW — ลดสัดส่วนลง เหลือ 37% ของ body ══ */
+.dash-charts-row{
+  flex:0 0 37%;
+  display:grid;
+  grid-template-columns:1.7fr 1fr 1.1fr;
+  gap:.55rem;
+  min-height:0;overflow:hidden;
+}
+.dash-chart-card{
+  display:flex;flex-direction:column;min-height:0;
+  border-radius:1.2rem;
+  padding:.65rem .85rem;
+  overflow:hidden;
+  animation:dchartIn .55s ease-out both;
+}
+@keyframes dchartIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:none}}
+.dash-chart-wrap{
+  position:relative;flex:1 1 0;min-height:0;width:100%;overflow:hidden;
+}
+.dash-chart-wrap canvas{
+  position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;
+}
+.donut-wrap{
+  position:relative;flex:1 1 0;min-height:0;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.donut-center{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+
+/* ══ RANKINGS ROW — ขยายใหญ่ขึ้น เอา flex:1 เติมพื้นที่ที่เหลือ ══ */
+.dash-rank-row{
+  flex:1 1 0;min-height:0;display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:.55rem;
+}
+.dash-rank-card{
+  display:flex;flex-direction:column;min-height:0;
+  border-radius:1.1rem;
+  padding:.65rem .8rem;overflow:hidden;
+  animation:drankIn .45s ease-out both;
+}
+@keyframes drankIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ── BAR ranking ── */
+.bar-wrap{margin-bottom:7px;cursor:pointer}
+.bar-lbl{
+  font-size:clamp(.57rem,.73vw,.66rem);font-weight:800;color:#475569;
+  margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;gap:4px;
+}
+.bar-lbl .bar-k{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.bar-bg{background:rgba(0,0,0,.05);height:10px;border-radius:10px;overflow:hidden}
+.bar-fill{height:100%;border-radius:10px;transition:width 1.1s cubic-bezier(.16,1,.3,1);width:0%}
+/* ── Responsive ── */
+@media(max-width:1200px){
+  .dash-charts-row{grid-template-columns:1.5fr 1fr 1fr}
+}
+@media(max-width:1050px){
+  .dash-kpi-row{grid-template-columns:repeat(3,1fr)}
+  .dash-stats-row{grid-template-columns:repeat(2,1fr)}
+  .dash-charts-row{grid-template-columns:1fr 1fr;flex:0 0 38%}
+}
+@media(max-width:768px){
+  .glass-dash{overflow-y:auto}
+  .dash-body{overflow-y:auto;gap:.45rem}
+  .dash-kpi-row{grid-template-columns:repeat(2,1fr);height:auto}
+  .dash-stats-row{grid-template-columns:repeat(2,1fr);height:auto}
+  .dash-charts-row{grid-template-columns:1fr;flex:0 0 auto;height:260px}
+  .dash-chart-card:not(:first-child){display:none}
+  .dash-rank-row{flex:0 0 auto;height:220px;display:grid}
+}
+.spin{animation:spinA .9s linear infinite}
+@keyframes spinA{to{transform:rotate(360deg)}}
+.form-in{animation:formIn .4s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes formIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+
+/* ════ RESPONSIVE ════ */
+@media(max-width:1100px){
+  #appShell{padding:.75rem;gap:.75rem}
+  #brandCard{display:none!important}
+  #appHeader{grid-template-columns:1fr!important}
+  #kpiGrid{grid-template-columns:repeat(5,1fr)!important}
+  #sidebar{width:240px!important}
+}
+@media(max-width:900px){
+  #appShell{padding:.6rem;gap:.6rem}
+  #kpiGrid{grid-template-columns:repeat(3,1fr)!important}
+  #sidebar{width:210px!important}
+}
+@media(max-width:700px){
+  html,body{overflow:auto}
+  #appShell{position:relative;height:auto;overflow:visible;padding:.5rem;gap:.5rem}
+  #appHeader{display:flex!important;flex-direction:column!important}
+  #kpiGrid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:.5rem}
+  #sidebar{display:none!important}
+  #mainPanel{border-radius:1rem!important}
+  #toolbarBtns button:not(#syncBtnMain):not(#dashBtn):not(#jobBtn){display:none}
+}
+
+</style>
 </head>
 <body>
 
-    <div id="toast">ACTION COMPLETE</div>
-    
-    <div id="loginOverlay">
-        <div class="login-bg-deco"></div>
-        <div class="scanline"></div>
-        <div class="login-card" id="loginCard">
-            <div class="mb-8 relative">
-                <svg class="w-24 h-24 mx-auto" viewBox="0 0 50 50">
-                    <circle class="q-path" cx="25" cy="25" r="20" />
-                    <line class="q-path" x1="35" y1="35" x2="45" y2="45" />
-                </svg>
-                <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-orange-500 text-[8px] font-black px-2 py-0.5 rounded text-white tracking-[0.3em] animate-pulse">SYSTEM ONLINE</div>
-            </div>
-          
-            <h2 class="orbitron font-black text-4xl mb-2 text-white tracking-widest">SQE <span class="text-orange-500">support</span></h2>
-            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.1em] mb-12">Security Terminal v2.5</p>
-          
-            <div class="space-y-5">
-                <div class="relative">
-                    <input type="text" id="loginName" list="inspectorList" placeholder="INSPECTOR NAME" class="w-full p-5 rounded-2xl dark-neon-input font-bold text-center uppercase text-sm tracking-widest" autofocus>
-                </div>
-                <div class="relative">
-                    <input type="password" id="loginPass" placeholder="PASSWORD" class="w-full p-5 rounded-2xl dark-neon-input font-bold text-center text-sm tracking-[0.5em]">
-                </div>
-                <button id="loginBtn" onclick="login()" class="btn-luxury w-full bg-orange-600 text-white font-black py-5 rounded-2xl text-[12px] uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(234,88,12,0.4)] mt-6 hover:bg-orange-500">
-                    SIGN IN
-                </button>
-            </div>
-            <p class="mt-8 text-[9px] font-bold text-slate-600 uppercase tracking-widest opacity-50">Authorized Personnel Only • IP Logged</p>
-        </div>
+<div id="toast"></div>
+<div id="syncBadge"><span id="syncBadgeIcon" style="margin-right:6px">●</span><span id="syncBadgeText"></span></div>
+
+<!-- ══════════════════════════════
+     LOGIN  —  EPIC ANIMATION
+══════════════════════════════ -->
+<div id="loginOverlay">
+  <canvas id="loCanvas"></canvas>
+  <div class="lo-hex"></div>
+  <div class="lo-orb lo-orb-1"></div>
+  <div class="lo-orb lo-orb-2"></div>
+  <div class="lo-orb lo-orb-3"></div>
+  <div class="lo-rings">
+    <div class="lo-ring"></div>
+    <div class="lo-ring"></div>
+    <div class="lo-ring"></div>
+  </div>
+  <div class="lo-card" id="loCard">
+    <div class="lo-scan"></div>
+    <div class="lo-c tl"></div><div class="lo-c tr"></div>
+    <div class="lo-c bl"></div><div class="lo-c br"></div>
+
+    <!-- Logo -->
+    <div class="lo-logo-w">
+      <div class="lo-lr"></div>
+      <div class="lo-lr"></div>
+      <div class="lo-lr"></div>
+      <svg class="w-20 h-20 mx-auto relative z-10" viewBox="0 0 50 50">
+        <circle class="q-path" cx="25" cy="25" r="20"/>
+        <line class="q-path" x1="35" y1="35" x2="45" y2="45"/>
+      </svg>
     </div>
 
-    <div id="app-scaler" style="opacity: 0;">
-        <header class="grid grid-cols-12 gap-6 shrink-0">
-            <div class="col-span-3 stat-card rounded-[2rem] p-6 flex items-center gap-5">
-                <svg class="w-12 h-12" viewBox="0 0 50 50"><circle class="q-path" cx="25" cy="25" r="20" /><line class="q-path" x1="35" y1="35" x2="45" y2="45" /></svg>
-                <div><h1 class="font-black text-2xl tracking-tighter orbitron text-slate-800">SQE <span class="text-orange-500 italic">support</span></h1><p id="liveClock" class="text-[10px] font-mono text-slate-400 mt-1 uppercase font-bold"></p></div>
-                <button onclick="logout()" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></button>
-            </div>
-            <div class="col-span-9 grid grid-cols-5 gap-4">
-                <div class="stat-card rounded-[2rem] p-5 border-b-4 border-slate-300"><div class="text-[10px] font-black text-slate-400 uppercase">My Total</div><div id="masterQty" class="text-4xl font-black orbitron text-slate-800 mt-1">0</div><div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="masterLot" class="text-orange-500">0</span></div></div>
-                <div class="stat-card rounded-[2rem] p-5 border-b-4 border-orange-400"><div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>SF Fault</span><span id="pctSF" class="text-orange-500">0%</span></div><div id="qtySF" class="text-4xl font-black orbitron text-orange-500 mt-1">0</div><div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotSF">0</span></div></div>
-                <div class="stat-card rounded-[2rem] p-5 border-b-4 border-red-400"><div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>Vendor</span><span id="pctVendor" class="text-red-500">0%</span></div><div id="qtyVendor" class="text-4xl font-black orbitron text-red-500 mt-1">0</div><div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotVendor">0</span></div></div>
-                <div class="stat-card rounded-[2rem] p-5 border-b-4 border-blue-400"><div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>CTC</span><span id="pctCTC" class="text-blue-500">0%</span></div><div id="qtyCTC" class="text-4xl font-black orbitron text-blue-500 mt-1">0</div><div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotCTC">0</span></div></div>
-                <div class="stat-card rounded-[2rem] p-5 border-b-4 border-emerald-400"><div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>Can Use</span><span id="pctCanUse" class="text-emerald-500">0%</span></div><div id="qtyCanUse" class="text-4xl font-black orbitron text-emerald-500 mt-1">0</div><div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotCanUse">0</span></div></div>
-            </div>
-        </header>
+    <h2 class="orbitron font-black text-4xl mb-2 text-white tracking-widest lo-glitch" data-t="SQE support">
+      SQE <span class="text-orange-500">support</span>
+    </h2>
+    <p class="text-[10px] font-bold text-slate-600 uppercase tracking-[.15em] mb-10" style="position:relative;z-index:2">
+      <span id="loSubtitle" class="text-slate-500">Security Terminal v3.0</span>
+      <span class="ml-2 inline-flex items-center gap-1 text-emerald-500 text-[9px] font-black"><span class="sdot"></span>ONLINE</span>
+    </p>
 
-        <div class="flex gap-6 flex-grow min-h-0">
-            <aside class="w-[350px] stat-card rounded-[2.5rem] p-8 flex flex-col shrink-0">
-                <h2 class="text-xs font-black uppercase text-slate-800 mb-6 tracking-[0.2em] border-b pb-4 flex justify-between"><span>Entry Terminal</span><span id="currentUserDisp" class="bg-slate-800 text-white px-2 py-0.5 rounded text-[8px]">GUEST</span></h2>
-                <form id="claimForm" class="space-y-4 overflow-y-auto custom-scroll pr-2 flex-grow">
-                    <div><label class="text-[9px] font-black text-slate-400 ml-1">DATE</label><input type="date" id="inputDate" class="w-full p-3.5 text-[11px] rounded-xl neon-input font-bold"></div>
-                    <div class="grid grid-cols-2 gap-3"><select id="shift" class="p-3.5 text-[11px] rounded-xl neon-input font-bold"><option>SHIFT A</option><option>SHIFT B</option><option>SHIFT C</option></select><input type="text" id="lineNo" list="lineList" placeholder="LINE" required class="p-3.5 text-[11px] rounded-xl neon-input font-bold"></div>
-                    <input type="text" id="refNo" list="refList" placeholder="REFERENCE NO" required class="w-full p-3.5 text-[11px] rounded-xl neon-input font-bold">
-                    <div class="grid grid-cols-2 gap-3"><input type="text" id="supplier" list="supList" placeholder="SUPPLIER" required class="p-3.5 text-[11px] rounded-xl neon-input font-bold"><input type="number" id="qty" placeholder="QTY" required class="p-3.5 text-[11px] rounded-xl neon-input font-bold"></div>
-                    <div class="grid grid-cols-2 gap-3"><input type="text" id="partNo" list="ptList" placeholder="PART NO" required class="p-3.5 text-[11px] rounded-xl neon-input font-bold"><input type="text" id="partOn" list="lotList" placeholder="PART NAME" required class="p-3.5 text-[11px] rounded-xl neon-input font-bold"></div>
-                    <input type="text" id="defectName" list="defectList" placeholder="DEFECT TYPE" required class="w-full p-3.5 text-[11px] rounded-xl neon-input font-bold">
-                    <textarea id="remark" placeholder="REMARKS..." rows="2" class="w-full p-3.5 text-[11px] rounded-xl neon-input font-bold resize-none"></textarea>
-                    <select id="judgmentSelect" required onchange="handleJudgmentChange(this.value)" class="w-full p-4 text-[11px] font-black rounded-xl bg-white border cursor-pointer uppercase">
-                        <option value="" disabled selected>-- JUDGMENT --</option>
-                        <option value="SF">SF FAULT</option>
-                        <option value="VENDOR FAULT">VENDOR FAULT</option>
-                        <option value="CTC">CTC FAULT</option>
-                        <option value="CAN USE">CAN USE (OK)</option>
-                    </select>
-                    <button type="submit" id="submitBtn" class="btn-luxury w-full bg-slate-800 text-white font-black py-4 rounded-2xl text-[11px] uppercase tracking-widest shadow-lg mt-2">Commit Data</button>
-                </form>
-            </aside>
-
-            <main class="flex-grow flex flex-col min-w-0 stat-card rounded-[2.5rem] overflow-hidden">
-                <div class="px-8 py-5 flex justify-between items-center bg-white/30 border-b backdrop-blur-md">
-                    <div class="flex gap-2" id="filterContainer">
-                        <button onclick="setFilter('ALL')" id="btn-ALL" class="btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl bg-orange-500 text-white">ALL</button>
-                        <button onclick="setFilter('SF')" id="btn-SF" class="btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">SF</button>
-                        <button onclick="setFilter('VENDOR FAULT')" id="btn-VENDOR" class="btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">VENDOR</button>
-                        <button onclick="setFilter('CTC')" id="btn-CTC" class="btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">CTC</button>
-                        <button onclick="setFilter('CAN USE')" id="btn-CANUSE" class="btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">OK</button>
-                    </div>
-                    <div class="flex gap-3 items-center">
-                        <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="Search..." class="neon-input px-5 py-2.5 rounded-xl text-[11px] font-bold w-32">
-                      
-                        <button id="syncBtn" onclick="syncDataToGoogle()" class="btn-luxury bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-[10px] font-black shadow-lg flex items-center gap-2">
-                            <svg id="syncIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                            SYNC CLOUD
-                        </button>
-
-                        <button onclick="openDashboard()" class="btn-luxury bg-orange-500 text-white px-5 py-2.5 rounded-xl text-[10px] font-black shadow-lg">DASHBOARD</button>
-                        <button onclick="openJobProject()" class="btn-luxury bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black shadow-lg shadow-indigo-200">JOB</button>
-                        <button onclick="document.getElementById('excelImport').click()" class="btn-luxury bg-blue-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black">IMPORT</button>
-                        <button onclick="exportToExcel()" class="btn-luxury bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-black">EXPORT</button>
-                        <input type="file" id="excelImport" hidden accept=".xlsx, .xls" onchange="importExcel(this)">
-                        <button onclick="clearAllData()" class="btn-luxury bg-red-50 text-red-500 px-4 py-2.5 rounded-xl text-[10px] font-black hover:bg-red-500 hover:text-white" title="CLEAR ALL MY DATA">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="flex-grow overflow-auto custom-scroll bg-white/40">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 z-10 bg-white/80 backdrop-blur-md">
-                            <tr class="visible text-[10px] uppercase text-slate-400 font-black border-b">
-                                <th class="pl-8 py-4">Date</th><th>Shift/Line</th><th>Reference</th><th>Supplier / Part Details</th><th class="text-center">Qty</th><th>Defect</th><th>Remark</th><th class="text-center">Status</th><th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </main>
-        </div>
+    <div id="loginForm" class="space-y-4" style="position:relative;z-index:2">
+      <input type="text" id="loginName" list="inspectorList" placeholder="INSPECTOR NAME" class="lo-in" autofocus autocomplete="off">
+      <input type="password" id="loginPass" placeholder="ACCESS KEY" class="lo-in">
+      <button id="loginBtn" onclick="login()" class="lo-btn">⚡ AUTHENTICATE</button>
     </div>
 
-    <div id="dashboardModal" onclick="closeDashboard()">
-        <div class="glass-dash rounded-[3.5rem] p-8 overflow-hidden flex flex-col border border-white/50" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-8 shrink-0">
-                <div>
-                    <h2 class="orbitron font-black text-4xl text-slate-800 tracking-tight">SQE <span class="text-orange-500 italic">Dashboard</span></h2>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em]">Executive Analytics Insight • <span id="dashUser" class="text-slate-800"></span></p>
-                </div>
-                <div class="flex items-center gap-3 bg-white/40 p-3 px-6 rounded-3xl border border-white shadow-inner">
-                    <input type="date" id="dashStart" onchange="refreshDashboardData()" class="p-2 rounded-xl text-[11px] font-bold border-none bg-transparent outline-none">
-                    <span class="text-slate-400 font-black">→</span>
-                    <input type="date" id="dashEnd" onchange="refreshDashboardData()" class="p-2 rounded-xl text-[11px] font-bold border-none bg-transparent outline-none">
-                    <select id="dashVendor" onchange="refreshDashboardData()" class="p-2 rounded-xl text-[11px] font-bold border-none bg-transparent outline-none w-40"></select>
-                    <button onclick="resetDashFilters()" class="p-2 text-slate-400 hover:text-orange-500 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></button>
-                    <button onclick="closeDashboard()" class="w-10 h-10 rounded-2xl bg-red-500 text-white font-bold hover:scale-110 transition-all shadow-lg shadow-red-200">✕</button>
-                </div>
-            </div>
-          
-            <div class="grid grid-cols-5 gap-6 mb-8 shrink-0">
-                <div class="stat-card rounded-[3rem] p-7 bg-slate-900 text-white shadow-2xl border-none">
-                    <p class="text-[11px] uppercase opacity-60 font-black tracking-widest mb-1">Total Quantity</p>
-                    <div id="dash-total-qty" class="orbitron text-6xl font-black leading-tight number-glow">0</div>
-                    <div class="mt-3 text-xs font-bold opacity-60">TOTAL LOTS: <span id="dash-total-lot" class="text-orange-400 text-lg ml-1">0</span></div>
-                </div>
-                <div class="stat-card rounded-[3rem] p-7 bg-white/60">
-                    <div class="flex justify-between items-start"><p class="text-[11px] text-orange-600 uppercase font-black tracking-widest">SF Fault</p><span id="dash-sf-pct" class="text-[12px] bg-orange-500 text-white px-3 py-1 rounded-full font-black orbitron">0%</span></div>
-                    <div id="dash-sf-qty" class="orbitron text-6xl font-black text-orange-600 leading-tight">0</div>
-                    <div class="mt-3 text-xs font-bold text-slate-400 uppercase">Lots: <span id="dash-sf-lot" class="text-slate-800 text-lg ml-1">0</span></div>
-                </div>
-                <div class="stat-card rounded-[3rem] p-7 bg-white/60">
-                    <div class="flex justify-between items-start"><p class="text-[11px] text-red-600 uppercase font-black tracking-widest">Vendor</p><span id="dash-ven-pct" class="text-[12px] bg-red-500 text-white px-3 py-1 rounded-full font-black orbitron">0%</span></div>
-                    <div id="dash-ven-qty" class="orbitron text-6xl font-black text-red-600 leading-tight">0</div>
-                    <div class="mt-3 text-xs font-bold text-slate-400 uppercase">Lots: <span id="dash-ven-lot" class="text-slate-800 text-lg ml-1">0</span></div>
-                </div>
-                <div class="stat-card rounded-[3rem] p-7 bg-white/60">
-                    <div class="flex justify-between items-start"><p class="text-[11px] text-blue-600 uppercase font-black tracking-widest">CTC</p><span id="dash-ctc-pct" class="text-[12px] bg-blue-500 text-white px-3 py-1 rounded-full font-black orbitron">0%</span></div>
-                    <div id="dash-ctc-qty" class="orbitron text-6xl font-black text-blue-600 leading-tight">0</div>
-                    <div class="mt-3 text-xs font-bold text-slate-400 uppercase">Lots: <span id="dash-ctc-lot" class="text-slate-800 text-lg ml-1">0</span></div>
-                </div>
-                <div class="stat-card rounded-[3rem] p-7 bg-white/60">
-                    <div class="flex justify-between items-start"><p class="text-[11px] text-emerald-600 uppercase font-black tracking-widest">Can Use</p><span id="dash-ok-pct" class="text-[12px] bg-emerald-500 text-white px-3 py-1 rounded-full font-black orbitron">0%</span></div>
-                    <div id="dash-ok-qty" class="orbitron text-6xl font-black text-emerald-600 leading-tight">0</div>
-                    <div class="mt-3 text-xs font-bold text-slate-400 uppercase">Lots: <span id="dash-ok-lot" class="text-slate-800 text-lg ml-1">0</span></div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-12 gap-6 flex-grow overflow-hidden">
-                <div class="col-span-8 stat-card rounded-[3rem] p-8 flex flex-col bg-white/50">
-                    <div class="flex justify-between items-start mb-6">
-                        <h4 class="text-xs font-black uppercase text-slate-400 orbitron tracking-[0.2em]">Monthly Performance Trend</h4>
-                        <div id="monthly-insight" class="text-[11px] font-bold text-slate-800 bg-white/80 px-4 py-2 rounded-2xl border shadow-sm">Calculating Dynamics...</div>
-                    </div>
-                    <div class="chart-box"><canvas id="monthlyTrendChart"></canvas></div>
-                </div>
-                <div class="col-span-4 stat-card rounded-[3rem] p-8 flex flex-col bg-slate-800 text-white shadow-2xl">
-                    <h4 class="text-xs font-black uppercase text-orange-400 orbitron mb-4 tracking-[0.2em]">Top Production Lines</h4>
-                    <div class="chart-box"><canvas id="topLinesRadarChart"></canvas></div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-6 mt-6 shrink-0 h-[220px]">
-                <div class="stat-card rounded-[2.5rem] p-6 flex flex-col bg-white/60">
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-4 border-b border-slate-200 pb-2 flex justify-between"><span>Top Suppliers</span><span class="text-orange-500">QTY</span></h3>
-                    <div id="top-suppliers-qty" class="flex-grow overflow-y-auto custom-scroll pr-2"></div>
-                </div>
-                <div class="stat-card rounded-[2.5rem] p-6 flex flex-col bg-white/60">
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-4 border-b border-slate-200 pb-2 flex justify-between"><span>Top Defects</span><span class="text-red-500">QTY</span></h3>
-                    <div id="top-defects-qty" class="flex-grow overflow-y-auto custom-scroll pr-2"></div>
-                </div>
-                <div class="stat-card rounded-[2.5rem] p-6 flex flex-col bg-white/60">
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-4 border-b border-slate-200 pb-2 flex justify-between"><span>Top Part Nos</span><span class="text-blue-500">QTY</span></h3>
-                    <div id="top-parts-qty" class="flex-grow overflow-y-auto custom-scroll pr-2"></div>
-                </div>
-            </div>
-        </div>
+    <div id="loProgress" style="position:relative;z-index:2">
+      <div class="lo-bar-t"><div class="lo-bar" id="loBar"></div></div>
+      <div class="lo-step" id="ls1"><div class="lo-dot">1</div><span>VERIFY CREDENTIALS</span></div>
+      <div class="lo-step" id="ls2"><div class="lo-dot">2</div><span>LAUNCHING DASHBOARD</span></div>
+      <div class="lo-step" id="ls3"><div class="lo-dot">3</div><span>SYNCING CLOUD DATA</span><span id="ls2note" style="margin-left:auto;font-size:.6rem;opacity:.65;font-weight:400"></span></div>
     </div>
 
-    <datalist id="refList"></datalist><datalist id="lineList"></datalist><datalist id="supList"></datalist><datalist id="ptList"></datalist><datalist id="lotList"></datalist><datalist id="defectList"></datalist><datalist id="inspectorList"></datalist>
+    <p class="mt-8 text-[9px] text-slate-700 uppercase tracking-widest opacity-40 font-bold" style="position:relative;z-index:2">
+      Authorized Personnel Only · Encrypted · IP Logged
+    </p>
+  </div>
+</div>
 
-    <script>
-        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzntKyjg6RLpiTc1UGMOaucN4bNbhgTNeasI4tWe4ASy-xmyX_4JkQLTXONYP66-Yziig/exec";
-        let records = JSON.parse(localStorage.getItem('qdit_v12_aura')) || [];
-        let syncedRefs = JSON.parse(localStorage.getItem('aura_synced_refs')) || [];
-        let currentUser = "";
-        let filterType = 'ALL';
-        let charts = {};
-        Chart.register(ChartDataLabels);
+<!-- ══════════ APP SHELL ══════════ -->
+<div id="appShell">
 
-        // --- ฟังก์ชั่นปรับขนาดหน้าจออัตโนมัติ ---
-        function applyAutoScale() {
-            const scaler = document.getElementById('app-scaler');
-            const dashboard = document.querySelector('.glass-dash');
-            
-            const baseW = 2200;
-            const baseH = 1080;
-            const winW = window.innerWidth;
-            const winH = window.innerHeight;
-            
-            const scale = Math.min(winW / baseW, winH / baseH);
-            
-            // ปรับ Scale ของ App หลัก
-            scaler.style.transform = `scale(${scale})`;
-            scaler.style.marginLeft = `${(winW - (baseW * scale)) / 2}px`;
-            scaler.style.marginTop = `${(winH - (baseH * scale)) / 2}px`;
+  <header id="appHeader" style="display:grid;grid-template-columns:3fr 9fr;gap:1.5rem;flex-shrink:0">
+    <!-- Brand -->
+    <div id="brandCard" class="stat-card rounded-[2rem] p-6 flex items-center gap-5 card-lift relative">
+      <svg class="w-12 h-12 shrink-0" viewBox="0 0 50 50">
+        <circle class="q-path" cx="25" cy="25" r="20"/>
+        <line class="q-path" x1="35" y1="35" x2="45" y2="45"/>
+      </svg>
+      <div>
+        <h1 class="font-black text-2xl tracking-tighter orbitron text-slate-800">SQE <span class="text-orange-500 italic">support</span></h1>
+        <p id="liveClock" class="text-[10px] font-mono text-slate-400 mt-1 uppercase font-bold"></p>
+        <!-- Live sync indicator -->
+        <div id="syncPulse" class="mt-2" title="Real-time cloud sync status">
+          <span class="sdot"></span><span id="syncPulseText">LIVE SYNC</span>
+        </div>
+      </div>
+      <button onclick="logout()" title="Logout" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </button>
+    </div>
+    <!-- KPI Strip -->
+    <div id="kpiGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem">
+      <div class="stat-card rounded-[2rem] p-5 card-lift border-b-4 border-slate-300">
+        <div class="text-[10px] font-black text-slate-400 uppercase">My Total</div>
+        <div id="masterQty" class="text-4xl font-black orbitron text-slate-800 mt-1">0</div>
+        <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="masterLot" class="text-orange-500">0</span></div>
+      </div>
+      <div class="stat-card rounded-[2rem] p-5 card-lift border-b-4 border-orange-400">
+        <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>SF Fault</span><span id="pctSF" class="text-orange-500">0%</span></div>
+        <div id="qtySF" class="text-4xl font-black orbitron text-orange-500 mt-1">0</div>
+        <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotSF">0</span></div>
+      </div>
+      <div class="stat-card rounded-[2rem] p-5 card-lift border-b-4 border-red-400">
+        <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>Vendor</span><span id="pctVendor" class="text-red-500">0%</span></div>
+        <div id="qtyVendor" class="text-4xl font-black orbitron text-red-500 mt-1">0</div>
+        <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotVendor">0</span></div>
+      </div>
+      <div class="stat-card rounded-[2rem] p-5 card-lift border-b-4 border-blue-400">
+        <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>CTC</span><span id="pctCTC" class="text-blue-500">0%</span></div>
+        <div id="qtyCTC" class="text-4xl font-black orbitron text-blue-500 mt-1">0</div>
+        <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotCTC">0</span></div>
+      </div>
+      <div class="stat-card rounded-[2rem] p-5 card-lift border-b-4 border-emerald-400">
+        <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>Can Use</span><span id="pctCanUse" class="text-emerald-500">0%</span></div>
+        <div id="qtyCanUse" class="text-4xl font-black orbitron text-emerald-500 mt-1">0</div>
+        <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Lots: <span id="lotCanUse">0</span></div>
+      </div>
+    </div>
+  </header>
 
-            // ปรับ Scale ของ Dashboard แยกต่างหากเมื่อแสดงผล (ถ้าหน้าจอเล็กมาก)
-            if(window.getComputedStyle(document.getElementById('dashboardModal')).display !== 'none') {
-                const dashScale = Math.min(winW / 2200, winH / 1080) * 0.95;
-                dashboard.style.transform = `scale(${dashScale})`;
-            }
-        }
+  <div class="flex gap-6 flex-grow min-h-0">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="stat-card rounded-[2.5rem] p-8 flex flex-col shrink-0 scroll overflow-y-auto" style="width:350px">
+      <h2 class="text-xs font-black uppercase text-slate-800 mb-6 tracking-[.2em] border-b pb-4 flex justify-between items-center">
+        <span>Entry Terminal</span>
+        <span id="currentUserDisp" class="bg-slate-800 text-white px-2 py-0.5 rounded text-[8px]">GUEST</span>
+      </h2>
+      <form id="claimForm" class="space-y-4 overflow-y-auto scroll pr-2 flex-grow form-in">
+        <div><label class="text-[9px] font-black text-slate-400 ml-1">DATE</label>
+          <input type="date" id="inputDate" class="w-full p-3.5 text-[11px] rounded-xl neon-in font-bold"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <select id="shift" class="p-3.5 text-[11px] rounded-xl neon-in font-bold"><option>SHIFT A</option><option>SHIFT B</option><option>SHIFT C</option></select>
+          <input type="text" id="lineNo" list="lineList" placeholder="LINE" class="p-3.5 text-[11px] rounded-xl neon-in font-bold">
+        </div>
+        <input type="text" id="refNo" list="refList" placeholder="REFERENCE NO *" required class="w-full p-3.5 text-[11px] rounded-xl neon-in font-bold">
+        <div class="grid grid-cols-2 gap-3">
+          <input type="text" id="supplier" list="supList" placeholder="SUPPLIER *" required class="p-3.5 text-[11px] rounded-xl neon-in font-bold">
+          <input type="number" id="qty" placeholder="QTY *" required class="p-3.5 text-[11px] rounded-xl neon-in font-bold">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <input type="text" id="partNo" list="ptList" placeholder="PART NO *" required class="p-3.5 text-[11px] rounded-xl neon-in font-bold">
+          <input type="text" id="partOn" list="lotList" placeholder="PART NAME *" required class="p-3.5 text-[11px] rounded-xl neon-in font-bold">
+        </div>
+        <input type="text" id="defectName" list="defectList" placeholder="DEFECT TYPE *" required class="w-full p-3.5 text-[11px] rounded-xl neon-in font-bold">
+        <textarea id="remark" placeholder="REMARKS..." rows="2" class="w-full p-3.5 text-[11px] rounded-xl neon-in font-bold resize-none"></textarea>
+        <select id="judgmentSelect" required onchange="handleJudgment(this.value)"
+                class="w-full p-4 text-[11px] font-black rounded-xl bg-white border cursor-pointer uppercase transition-all">
+          <option value="" disabled selected>── JUDGMENT ──</option>
+          <option value="SF">SF FAULT</option>
+          <option value="VENDOR FAULT">VENDOR FAULT</option>
+          <option value="CTC">CTC FAULT</option>
+          <option value="CAN USE">CAN USE (OK)</option>
+        </select>
+        <button type="submit" id="submitBtn"
+                class="btn w-full bg-slate-800 text-white font-black py-4 rounded-2xl text-[11px] uppercase tracking-widest shadow-lg mt-2">
+          Commit Data
+        </button>
+      </form>
+    </aside>
 
-        window.addEventListener('resize', applyAutoScale);
+    <!-- MAIN PANEL -->
+    <main id="mainPanel" class="flex-grow flex flex-col min-w-0 stat-card rounded-[2.5rem] overflow-hidden">
+      <div class="px-8 py-5 flex justify-between items-center bg-white/30 border-b backdrop-blur-md shrink-0 flex-wrap gap-3">
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="setFilter('ALL')" id="btn-ALL" class="btn text-[10px] font-black px-5 py-2.5 rounded-xl bg-orange-500 text-white">ALL</button>
+          <button onclick="setFilter('SF')" id="btn-SF" class="btn text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">SF</button>
+          <button onclick="setFilter('VENDOR FAULT')" id="btn-VENDOR" class="btn text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">VENDOR</button>
+          <button onclick="setFilter('CTC')" id="btn-CTC" class="btn text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">CTC</button>
+          <button onclick="setFilter('CAN USE')" id="btn-CANUSE" class="btn text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400">OK</button>
+        </div>
+        <div id="toolbarBtns" class="flex gap-3 items-center flex-wrap">
+          <input type="text" id="searchInput" oninput="smoothSearch()" placeholder="🔍 Search..." class="neon-in px-5 py-2.5 rounded-xl text-[11px] font-bold w-36">
+          <button id="syncBtnMain" onclick="syncToCloud()" class="btn bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-[10px] font-black shadow-lg flex items-center gap-2">
+            <svg id="syncIcon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            SYNC
+          </button>
+          <button id="dashBtn" onclick="openDashboard()" class="btn bg-orange-500 text-white px-5 py-2.5 rounded-xl text-[10px] font-black shadow-lg">DASHBOARD</button>
+          <button id="jobBtn" onclick="openJobProject()" class="btn bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black shadow-lg shadow-indigo-200">JOB</button>
+          <button onclick="document.getElementById('xlsIn').click()" class="btn bg-blue-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black">IMPORT</button>
+          <button onclick="exportToExcel()" class="btn bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-black">EXPORT</button>
+          <input type="file" id="xlsIn" hidden accept=".xlsx,.xls" onchange="importExcel(this)">
+          <button onclick="clearAllData()" class="btn bg-red-50 text-red-500 px-4 py-2.5 rounded-xl text-[10px] font-black hover:bg-red-500 hover:text-white" title="Clear all">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="flex-grow overflow-auto scroll bg-white/40">
+        <table class="w-full text-left border-collapse">
+          <thead class="sticky top-0 z-10 bg-white/80 backdrop-blur-md">
+            <tr class="vis text-[10px] uppercase text-slate-400 font-black border-b">
+              <th class="pl-8 py-4">Date</th><th>Shift/Line</th><th>Reference</th>
+              <th>Supplier / Part</th><th class="text-center">Qty</th>
+              <th>Defect</th><th>Remark</th><th class="text-center">Status</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
 
-        window.onload = () => {
-            document.getElementById('inputDate').valueAsDate = new Date();
-            startTime();
-            applyAutoScale();
-          
-            const savedUser = sessionStorage.getItem('currentUser');
-            if(savedUser) {
-                currentUser = savedUser;
-                document.getElementById('currentUserDisp').innerText = currentUser;
-                document.getElementById('loginOverlay').style.display = 'none';
-                gsap.set("#app-scaler", { opacity: 1, y: 0 });
-                refreshAll();
-            }
-        };
+<!-- ══════════════════════════════════════════
+     DASHBOARD MODAL — FULL VIEWPORT FIT
+     ✓ No overflow  ✓ No bg patterns
+     ✓ Rich UX  ✓ Staggered animations
+══════════════════════════════════════════ -->
+<div id="dashboardModal" onclick="closeDashboard()">
+<div class="glass-dash" onclick="event.stopPropagation()">
 
-        function getMyRecords() { return records.filter(r => r.inspector === currentUser); }
-        function saveAndRefresh() {
-            localStorage.setItem('qdit_v12_aura', JSON.stringify(records));
-            refreshAll();
-        }
+  <!-- ══ TOP BAR ══ -->
+  <div class="dash-topbar">
+    <!-- Left: Logo + Title + Live badge + User -->
+    <div class="flex items-center gap-2.5 shrink-0 min-w-0">
+      <div class="w-7 h-7 rounded-xl bg-orange-500/15 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4" viewBox="0 0 50 50" fill="none">
+          <circle stroke="#f97316" stroke-width="4.5" cx="25" cy="25" r="18"/>
+          <line stroke="#f97316" stroke-width="4.5" stroke-linecap="round" x1="35" y1="35" x2="44" y2="44"/>
+        </svg>
+      </div>
+      <h2 class="orbitron font-black text-slate-800 tracking-tight leading-none whitespace-nowrap" style="font-size:clamp(.82rem,1.6vw,1.3rem)">
+        SQE <span class="text-orange-500 italic">Analytics</span>
+      </h2>
+      <div class="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 font-black px-1.5 py-0.5 rounded-lg" style="font-size:.6rem">
+        <span style="width:5px;height:5px;border-radius:50%;background:currentColor;animation:sdotA 1.4s ease-in-out infinite;display:inline-block"></span>
+        LIVE
+      </div>
+      <span class="text-slate-400 font-bold truncate" style="font-size:.64rem">· <span id="dashUser" class="text-slate-600 font-black"></span></span>
+    </div>
+    <!-- Right: Filters + Close -->
+    <div class="flex items-center gap-1.5 flex-wrap justify-end shrink-0">
+      <div class="flex items-center gap-1 bg-white/80 px-2.5 py-1 rounded-xl border border-slate-200 shadow-sm">
+        <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <input type="date" id="dashStart" onchange="refreshDash()" class="text-[10px] font-bold bg-transparent outline-none border-none text-slate-600 w-24">
+        <span class="text-slate-300 font-black text-xs">—</span>
+        <input type="date" id="dashEnd" onchange="refreshDash()" class="text-[10px] font-bold bg-transparent outline-none border-none text-slate-600 w-24">
+      </div>
+      <select id="dashVendor" onchange="refreshDash()" class="text-[10px] font-bold bg-white/80 border border-slate-200 outline-none rounded-xl px-2 py-1 text-slate-600 shadow-sm" style="max-width:120px"></select>
+      <button onclick="resetDashFilters()" title="Reset" class="p-1.5 text-slate-400 hover:text-orange-500 bg-white/70 rounded-xl border border-slate-200 transition-all hover:scale-110 hover:border-orange-300">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      </button>
+      <button onclick="closeDashboard()" class="w-7 h-7 rounded-xl bg-red-500 text-white font-black text-xs hover:bg-red-600 hover:scale-110 transition-all shadow-md flex items-center justify-center">✕</button>
+    </div>
+  </div>
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 3000);
-        }
+  <!-- ══ BODY ══ -->
+  <div class="dash-body">
 
-        function shakeElement(id) {
-            gsap.fromTo(id, { x: -10 }, { x: 10, repeat: 5, yoyo: true, duration: 0.05 });
-        }
+    <!-- ① KPI STRIP — 5 cards -->
+    <div class="dash-kpi-row">
+      <!-- Total -->
+      <div class="dkpi bg-slate-900 text-white shadow-xl" style="animation-delay:.0s">
+        <div class="flex justify-between items-start">
+          <p class="uppercase opacity-55 font-black tracking-widest" style="font-size:clamp(.55rem,.7vw,.65rem)">Total QTY</p>
+          <span class="bg-orange-500/20 text-orange-400 font-black px-1.5 py-0.5 rounded-md leading-tight" style="font-size:.58rem">ALL</span>
+        </div>
+        <div id="dTotalQty" class="orbitron font-black leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem);text-shadow:0 0 25px rgba(249,115,22,.3)">0</div>
+        <div class="font-bold opacity-55 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dTotalLot" class="text-orange-400 font-black">0</span></div>
+      </div>
+      <!-- SF -->
+      <div class="dkpi bg-white/80 border-b-4 border-orange-400 shadow-sm" style="animation-delay:.07s">
+        <div class="flex justify-between items-start">
+          <p class="text-orange-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">SF Fault</p>
+          <span id="dSFpct" class="bg-orange-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
+        </div>
+        <div id="dSFqty" class="orbitron font-black text-orange-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
+        <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dSFlot" class="text-slate-800 font-black">0</span></div>
+      </div>
+      <!-- Vendor -->
+      <div class="dkpi bg-white/80 border-b-4 border-red-400 shadow-sm" style="animation-delay:.13s">
+        <div class="flex justify-between items-start">
+          <p class="text-red-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">Vendor</p>
+          <span id="dVENpct" class="bg-red-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
+        </div>
+        <div id="dVENqty" class="orbitron font-black text-red-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
+        <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dVENlot" class="text-slate-800 font-black">0</span></div>
+      </div>
+      <!-- CTC -->
+      <div class="dkpi bg-white/80 border-b-4 border-blue-400 shadow-sm" style="animation-delay:.19s">
+        <div class="flex justify-between items-start">
+          <p class="text-blue-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">CTC</p>
+          <span id="dCTCpct" class="bg-blue-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
+        </div>
+        <div id="dCTCqty" class="orbitron font-black text-blue-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
+        <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dCTClot" class="text-slate-800 font-black">0</span></div>
+      </div>
+      <!-- Can Use -->
+      <div class="dkpi bg-white/80 border-b-4 border-emerald-400 shadow-sm" style="animation-delay:.25s">
+        <div class="flex justify-between items-start">
+          <p class="text-emerald-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">Can Use</p>
+          <span id="dOKpct" class="bg-emerald-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
+        </div>
+        <div id="dOKqty" class="orbitron font-black text-emerald-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
+        <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dOKlot" class="text-slate-800 font-black">0</span></div>
+      </div>
+    </div>
 
-async function fetchInitialData(inspectorName) {
-    showToast("🚀 FETCHING YOUR CLOUD DATA...");
-    try {
-        const response = await fetch(`${GOOGLE_URL}?inspector=${encodeURIComponent(inspectorName)}`);
-        const result = await response.json();
-       
-        if (result && result.status === "success" && Array.isArray(result.data)) {
-            const cloudData = result.data.map(r => ({
-                id: r.id || Date.now() + Math.random(),
-                date: r.date,
-                shift: r.shift,
-                inspector: r.inspector,
-                ref: String(r.ref),
-                line: r.line,
-                supplier: r.supplier,
-                partNo: r.partNo,
-                partName: r.partName,
-                qty: parseInt(r.qty) || 0,
-                defect: r.defect,
-                remark: r.remark,
-                judgment: r.judgment
-            }));
+    <!-- ② INSIGHT STATS ROW — 4 quick metrics -->
+    <div class="dash-stats-row">
+      <div class="d-stat" style="animation-delay:.3s">
+        <div class="d-stat-icon bg-red-500/10">🚫</div>
+        <div class="min-w-0">
+          <div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Rejection Rate</div>
+          <div id="dRejRate" class="orbitron font-black text-red-500 leading-tight" style="font-size:clamp(.9rem,1.6vw,1.4rem)">0%</div>
+        </div>
+      </div>
+      <div class="d-stat" style="animation-delay:.36s">
+        <div class="d-stat-icon bg-blue-500/10">🏆</div>
+        <div class="min-w-0">
+          <div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Top Shift</div>
+          <div id="dTopShift" class="orbitron font-black text-blue-500 leading-tight truncate" style="font-size:clamp(.9rem,1.6vw,1.4rem)">—</div>
+        </div>
+      </div>
+      <div class="d-stat" style="animation-delay:.42s">
+        <div class="d-stat-icon bg-orange-500/10">📦</div>
+        <div class="min-w-0">
+          <div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Avg QTY/Lot</div>
+          <div id="dAvgQty" class="orbitron font-black text-orange-500 leading-tight" style="font-size:clamp(.9rem,1.6vw,1.4rem)">0</div>
+        </div>
+      </div>
+      <div class="d-stat" style="animation-delay:.48s">
+        <div class="d-stat-icon bg-emerald-500/10">📅</div>
+        <div class="min-w-0">
+          <div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Active Days</div>
+          <div id="dActiveDays" class="orbitron font-black text-emerald-500 leading-tight" style="font-size:clamp(.9rem,1.6vw,1.4rem)">0</div>
+        </div>
+      </div>
+    </div>
 
-            const cloudRefs = cloudData.map(r => r.ref);
-            syncedRefs = [...cloudRefs]; 
-            localStorage.setItem('aura_synced_refs', JSON.stringify(syncedRefs));
+    <!-- ③ CHARTS ROW: Trend | Fault Donut | Shift Analysis -->
+    <div class="dash-charts-row">
 
-            const localRefs = records.map(r => r.ref);
-            const newFromCloud = cloudData.filter(r => !localRefs.includes(r.ref));
-           
-            if (newFromCloud.length > 0) {
-                records = [...records, ...newFromCloud];
-                localStorage.setItem('qdit_v12_aura', JSON.stringify(records));
-            }
-            showToast(`✅ LOADED ${newFromCloud.length} RECORDS FROM CLOUD`);
-        } else {
-            syncedRefs = [];
-            localStorage.setItem('aura_synced_refs', JSON.stringify(syncedRefs));
-        }
-    } catch (err) {
-        console.error("Fetch Error:", err);
-        showToast("⚠️ COULD NOT REACH CLOUD");
-    }
+      <!-- Monthly Performance Trend -->
+      <div class="dash-chart-card bg-white/80 border border-slate-200/60 shadow-sm" style="animation-delay:.2s">
+        <div class="shrink-0 flex justify-between items-start mb-1.5">
+          <div>
+            <h4 class="orbitron font-black text-slate-700 uppercase tracking-[.1em]" style="font-size:clamp(.58rem,.8vw,.7rem)">📈 Monthly Performance Trend</h4>
+            <p class="text-slate-400 font-bold" style="font-size:clamp(.5rem,.65vw,.58rem)">Total quantity per month</p>
+          </div>
+          <div id="monthlyInsight" class="font-bold text-slate-700 bg-orange-50 border border-orange-200 rounded-xl" style="font-size:clamp(.54rem,.7vw,.64rem);padding:2px 9px;white-space:nowrap">—</div>
+        </div>
+        <div class="dash-chart-wrap"><canvas id="trendChart"></canvas></div>
+      </div>
+
+      <!-- Fault Distribution Donut -->
+      <div class="dash-chart-card shadow-xl" style="background:linear-gradient(145deg,#0f172a,#1e293b);animation-delay:.28s">
+        <div class="shrink-0 mb-1">
+          <h4 class="orbitron font-black text-orange-400 uppercase tracking-[.1em]" style="font-size:clamp(.58rem,.8vw,.7rem)">🎯 Fault Distribution</h4>
+          <p class="text-slate-500 font-bold" style="font-size:clamp(.5rem,.65vw,.58rem)">Judgment breakdown</p>
+        </div>
+        <div class="donut-wrap">
+          <canvas id="donutChart"></canvas>
+          <div class="donut-center">
+            <div id="donutTotal" class="orbitron font-black text-white leading-none" style="font-size:clamp(.85rem,1.6vw,1.45rem)">0</div>
+            <div class="text-slate-500 font-bold uppercase" style="font-size:clamp(.46rem,.62vw,.56rem)">Total QTY</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Production Lines -->
+      <div class="dash-chart-card bg-white/80 border border-slate-200/60 shadow-sm" style="animation-delay:.36s">
+        <div class="shrink-0 mb-1.5">
+          <h4 class="orbitron font-black text-slate-700 uppercase tracking-[.1em]" style="font-size:clamp(.58rem,.8vw,.7rem)">🏭 Top Lines</h4>
+          <p class="text-slate-400 font-bold" style="font-size:clamp(.5rem,.65vw,.58rem)">Highest QTY production lines</p>
+        </div>
+        <div class="dash-chart-wrap"><canvas id="radarChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ④ RANKINGS — Suppliers | Defects | Parts -->
+    <div class="dash-rank-row">
+
+      <div class="dash-rank-card bg-white/80 border border-slate-200/60 shadow-sm" style="animation-delay:.44s">
+        <div class="shrink-0 flex justify-between items-center pb-1 mb-1 border-b border-slate-200/80">
+          <span class="font-black text-slate-600 uppercase tracking-widest flex items-center gap-1" style="font-size:clamp(.54rem,.72vw,.64rem)">
+            <span class="text-orange-500">■</span> Top Suppliers
+          </span>
+          <span class="text-orange-500 font-black orbitron" style="font-size:clamp(.52rem,.68vw,.6rem)">QTY</span>
+        </div>
+        <div id="rankSuppliers" class="flex-grow overflow-y-auto scroll"></div>
+      </div>
+
+      <div class="dash-rank-card bg-white/80 border border-slate-200/60 shadow-sm" style="animation-delay:.51s">
+        <div class="shrink-0 flex justify-between items-center pb-1 mb-1 border-b border-slate-200/80">
+          <span class="font-black text-slate-600 uppercase tracking-widest flex items-center gap-1" style="font-size:clamp(.54rem,.72vw,.64rem)">
+            <span class="text-red-500">■</span> Top Defects
+          </span>
+          <span class="text-red-500 font-black orbitron" style="font-size:clamp(.52rem,.68vw,.6rem)">QTY</span>
+        </div>
+        <div id="rankDefects" class="flex-grow overflow-y-auto scroll"></div>
+      </div>
+
+      <div class="dash-rank-card bg-white/80 border border-slate-200/60 shadow-sm" style="animation-delay:.58s">
+        <div class="shrink-0 flex justify-between items-center pb-1 mb-1 border-b border-slate-200/80">
+          <span class="font-black text-slate-600 uppercase tracking-widest flex items-center gap-1" style="font-size:clamp(.54rem,.72vw,.64rem)">
+            <span class="text-blue-500">■</span> Top Parts
+          </span>
+          <span class="text-blue-500 font-black orbitron" style="font-size:clamp(.52rem,.68vw,.6rem)">QTY</span>
+        </div>
+        <div id="rankParts" class="flex-grow overflow-y-auto scroll"></div>
+      </div>
+
+    </div>
+  </div><!-- /dash-body -->
+</div>
+</div>
+
+<datalist id="refList"></datalist><datalist id="lineList"></datalist>
+<datalist id="supList"></datalist><datalist id="ptList"></datalist>
+<datalist id="lotList"></datalist><datalist id="defectList"></datalist>
+<datalist id="inspectorList"></datalist>
+
+<script>
+/* ══ CONFIG ══ */
+const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbzntKyjg6RLpiTc1UGMOaucN4bNbhgTNeasI4tWe4ASy-xmyX_4JkQLTXONYP66-Yziig/exec';
+const STORAGE_KEY = 'qdit_v3_records';
+const SYNCED_KEY  = 'qdit_v3_synced';
+const POLL_MS     = 15000; // real-time: every 15s
+
+let records     = safeJSON(STORAGE_KEY, []);
+let syncedRefs  = safeJSON(SYNCED_KEY,  []);
+let currentUser = '';
+let filterType  = 'ALL';
+let charts      = {};
+let pushDebounce, pollingTimer;
+
+Chart.register(ChartDataLabels);
+
+function safeJSON(k,def){try{return JSON.parse(localStorage.getItem(k))||def;}catch(e){return def;}}
+const $id = id => document.getElementById(id);
+function getMyRecords(){return records.filter(r=>r.inspector===currentUser);}
+function saveLocal(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(records));
+  localStorage.setItem(SYNCED_KEY, JSON.stringify(syncedRefs));
+}
+function saveAndRefresh(){invalidateSearchCache();saveLocal();refreshAll();schedulePush();}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+/* ── CLOUD BANNER ── */
+let _bannerHideT;
+function showCloudBanner(title,sub){
+  const b=$id('cloudBanner');if(!b)return;
+  $id('cloudBannerTitle').textContent=title||'กำลังโหลดข้อมูล…';
+  $id('cloudBannerSub').textContent=sub||'';
+  $id('cloudBannerSpinner').style.display='block';
+  $id('cloudBannerDot').style.display='flex';
+  b.style.display='flex';
+  clearTimeout(_bannerHideT);
+}
+function hideCloudBanner(successMsg){
+  const b=$id('cloudBanner');if(!b)return;
+  // Show success state briefly then slide away
+  if(successMsg){
+    $id('cloudBannerTitle').textContent=successMsg;
+    $id('cloudBannerSub').textContent='';
+    $id('cloudBannerSpinner').style.display='none';
+    $id('cloudBannerDot').style.display='none';
+    b.style.borderTopColor='rgba(16,185,129,.3)';
+    b.style.background='linear-gradient(90deg,rgba(5,46,22,.96),rgba(6,78,59,.96))';
+    $id('cloudBannerTitle').style.color='#10b981';
+  }
+  clearTimeout(_bannerHideT);
+  _bannerHideT=setTimeout(()=>{
+    b.style.transition='transform .35s ease-in,opacity .35s';
+    b.style.transform='translateY(100%)';
+    b.style.opacity='0';
+    setTimeout(()=>{b.style.display='none';b.style.transform='';b.style.opacity='';
+      b.style.borderTopColor='';b.style.background='';
+      if($id('cloudBannerTitle'))$id('cloudBannerTitle').style.color='';
+    },380);
+  },successMsg?2200:0);
 }
 
-        async function syncDataToGoogle() {
-            const myData = getMyRecords();
-            const newToSync = myData.filter(r => !syncedRefs.includes(r.ref));
+/* ── TOAST ── */
+let toastT;
+function toast(msg){
+  const el=$id('toast');el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),3200);
+}
 
-            if (newToSync.length === 0) {
-                showToast("✅อัพโหลดข้อมูลสำเร็จ");
-                return;
-            }
+/* ── SYNC BADGE ── */
+function showSyncBadge(msg,color){
+  const b=$id('syncBadge');
+  $id('syncBadgeText').textContent=msg;
+  $id('syncBadgeIcon').style.color=color||'#10b981';
+  b.style.display='block';clearTimeout(b._t);
+  b._t=setTimeout(()=>b.style.display='none',4000);
+}
 
-            const syncBtn = document.getElementById('syncBtn');
-            const syncIcon = document.getElementById('syncIcon');
-            syncBtn.disabled = true;
-            syncIcon.classList.add('sync-active');
-            showToast(`SYNCING ${newToSync.length} RECORDS...`);
+/* ── SYNC PULSE INDICATOR ── */
+function setSyncPulse(state,text){
+  const el=$id('syncPulse');if(!el)return;
+  el.className='';
+  el.classList.add('sdot'[0]); // keep dot child
+  el.className=`mt-2 inline-flex items-center gap-1 text-[.62rem] font-black uppercase tracking-[.08em] px-2 py-1 rounded-lg border transition-all ${
+    state==='syncing' ? 'bg-orange-500/10 border-orange-500/25 text-orange-400' :
+    state==='offline' ? 'bg-red-500/10 border-red-500/2 text-red-400' :
+                        'bg-emerald-500/10 border-emerald-500/2 text-emerald-400'
+  }`;
+  $id('syncPulseText').textContent=text||'LIVE SYNC';
+}
 
-            try {
-                const payload = newToSync.map(r => ({
-                    date: r.date, shift: r.shift, inspector: r.inspector,
-                    ref: r.ref, line: r.line, supplier: r.supplier,
-                    partNo: r.partNo, partName: r.partName, qty: r.qty,
-                    defect: r.defect, remark: r.remark, judgment: r.judgment
-                }));
+/* ── SHAKE ── */
+function shake(el){if(!el)return;gsap.fromTo(el,{x:-8},{x:8,repeat:5,yoyo:true,duration:.06,ease:'power1.inOut'});}
 
-                await fetch(GOOGLE_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+/* ── Ripple ── */
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.btn');
+  if(!btn)return;
+  const r=btn.getBoundingClientRect();
+  btn.style.setProperty('--rx',((e.clientX-r.left)/r.width*100)+'%');
+  btn.style.setProperty('--ry',((e.clientY-r.top)/r.height*100)+'%');
+  btn.classList.remove('ripple');
+  void btn.offsetWidth;
+  btn.classList.add('ripple');
+  setTimeout(()=>btn.classList.remove('ripple'),520);
+});
 
-                const justSynced = newToSync.map(r => r.ref);
-                syncedRefs = [...new Set([...syncedRefs, ...justSynced])];
-                localStorage.setItem('aura_synced_refs', JSON.stringify(syncedRefs));
-                showToast("🚀อัพโหลดข้อมูลไปGoogle sheetสำเร็จ");
-                renderTable();
-            } catch (err) {
-                showToast("❌อัพโหลดข้อมูลไม่สำเร็จ");
-            } finally {
-                syncBtn.disabled = false;
-                syncIcon.classList.remove('sync-active');
-            }
+/* ── Filter button active state ── */
+function updateFilterBtns(type){
+  document.querySelectorAll('#filterContainer button').forEach(b=>b.classList.remove('active-filter'));
+  const map={'ALL':'btn-ALL','SF':'btn-SF','VENDOR FAULT':'btn-VENDOR','CTC':'btn-CTC','CAN USE':'btn-CANUSE'};
+  const target=$id(map[type]);
+  if(target)target.classList.add('active-filter');
+}
+
+/* ── Smooth row delete ── */
+function delRow(id,trEl){
+  if(!confirm('ลบรายการนี้?'))return;
+  if(trEl){
+    trEl.classList.add('row-deleting');
+    setTimeout(()=>{
+      const r=records.find(x=>x.id===id);
+      if(!r)return;
+      records=records.filter(x=>x.id!==id);
+      syncedRefs=syncedRefs.filter(ref=>ref!==r.ref);
+      saveAndRefresh();toast('🗑 ลบข้อมูลแล้ว');
+    },290);
+  }else{ del(id); }
+}
+
+/* ── ANIMATE NUMBER ── */
+function animNum(id,target){
+  const el=$id(id);if(!el)return;
+  const obj={v:parseInt(el.textContent.replace(/,/g,''))||0};
+  gsap.to(obj,{v:target,duration:.9,ease:'power2.out',onUpdate:()=>el.textContent=Math.floor(obj.v).toLocaleString()});
+}
+
+/* ══ PARTICLE CANVAS (Login BG) ══ */
+function initParticles(){
+  const cv=$id('loCanvas');if(!cv)return;
+  const ctx=cv.getContext('2d');
+  let W,H,pts=[];
+  const resize=()=>{W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;};
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<80;i++) pts.push({
+    x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
+    vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4,
+    r:Math.random()*1.5+.5,
+    color:[
+      'rgba(249,115,22,',
+      'rgba(59,130,246,',
+      'rgba(16,185,129,'
+    ][Math.floor(Math.random()*3)],
+    a:Math.random()*.6+.2
+  });
+  const draw=()=>{
+    if(!$id('loginOverlay')||$id('loginOverlay').style.display==='none'){return;}
+    requestAnimationFrame(draw);
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color+p.a+')';ctx.fill();
+    });
+    // Connect nearby particles
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<120){
+          ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+          ctx.strokeStyle='rgba(249,115,22,'+((.12*(1-d/120)))+')';
+          ctx.lineWidth=.5;ctx.stroke();
         }
+      }
+    }
+  };
+  draw();
+}
 
-        async function logout() {
-            const myData = getMyRecords();
-            const hasNew = myData.some(r => !syncedRefs.includes(r.ref));
-            if(hasNew) {
-                showToast("AUTO SYNCING BEFORE LOGOUT...");
-                await syncDataToGoogle();
-            }
-            sessionStorage.removeItem('currentUser');
-            location.reload();
+/* ══ CLOUD ══ */
+async function fetchFromCloud(inspector,ms){
+  ms=ms||9000;
+  const ctrl=new AbortController();
+  const t=setTimeout(()=>ctrl.abort(),ms);
+  try{
+    const res=await fetch(GOOGLE_URL+'?inspector='+encodeURIComponent(inspector)+'&t='+Date.now(),{signal:ctrl.signal});
+    clearTimeout(t);
+    if(!res.ok)return[];
+    const text=await res.text();
+    let r;try{r=JSON.parse(text);}catch(e){return[];}
+    if(!r||r.status!=='success'||!Array.isArray(r.data))return[];
+    return r.data.map(d=>({
+      id:      d.id||(Date.now()+'_'+Math.random()),
+      date:    d.date||'', shift:d.shift||'SHIFT A',
+      inspector:d.inspector||inspector, ref:String(d.ref||''),
+      line:    d.line||'', supplier:d.supplier||'',
+      partNo:  d.partNo||'', partName:d.partName||'',
+      qty:     parseInt(d.qty)||0, defect:d.defect||'',
+      remark:  d.remark||'', judgment:d.judgment||'SF'
+    }));
+  }catch(err){clearTimeout(t);return[];}
+}
+
+async function pushToCloud(rows){
+  if(!rows.length)return;
+  await fetch(GOOGLE_URL,{
+    method:'POST',mode:'no-cors',cache:'no-cache',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(rows.map(r=>({
+      date:r.date,shift:r.shift,inspector:r.inspector,ref:r.ref,
+      line:r.line,supplier:r.supplier,partNo:r.partNo,partName:r.partName,
+      qty:r.qty,defect:r.defect,remark:r.remark,judgment:r.judgment
+    })))
+  });
+}
+
+function schedulePush(){
+  clearTimeout(pushDebounce);
+  pushDebounce=setTimeout(async()=>{  /* debounced 1.2s */
+    const unsync=getMyRecords().filter(r=>!syncedRefs.includes(r.ref));
+    if(!unsync.length)return;
+    try{
+      await pushToCloud(unsync);
+      unsync.forEach(r=>{if(!syncedRefs.includes(r.ref))syncedRefs.push(r.ref);});
+      saveLocal();showSyncBadge('☁️ Auto-synced','#10b981');
+      setSyncPulse('live','LIVE SYNC');
+    }catch(e){}
+  },1000);
+}
+
+/* ══ REAL-TIME POLLING — every 15s ══ */
+function startPolling(){
+  if(pollingTimer)clearInterval(pollingTimer);
+  pollingTimer=setInterval(async()=>{
+    setSyncPulse('syncing','SYNCING…');
+    try{
+      const cloud=await fetchFromCloud(currentUser,8000);
+      if(!cloud.length){setSyncPulse('offline','OFFLINE');return;}
+      syncedRefs=cloud.map(r=>r.ref); // reset to cloud truth
+      const ex=new Set(records.map(r=>r.ref));
+      const nr=cloud.filter(r=>!ex.has(r.ref));
+      if(nr.length){
+        nr.forEach(r=>records.push(r));
+        saveLocal();refreshAll();
+        showSyncBadge('🔔 +'+nr.length+' new','#60a5fa');
+        setSyncPulse('live','↓ '+nr.length+' NEW');
+        setTimeout(()=>setSyncPulse('live','LIVE SYNC'),3000);
+      }else{
+        setSyncPulse('live','LIVE SYNC');
+      }
+    }catch(e){setSyncPulse('offline','OFFLINE');}
+  },POLL_MS);
+}
+
+/* ══ MANUAL SYNC ══ */
+async function syncToCloud(){
+  const btn=$id('syncBtnMain'),icon=$id('syncIcon');
+  btn.disabled=true;icon.classList.add('spin');
+  setSyncPulse('syncing','SYNCING…');
+  const cloud=await fetchFromCloud(currentUser,8000);
+  if(cloud.length){
+    syncedRefs=cloud.map(r=>r.ref);
+    const ex=new Set(records.map(r=>r.ref));
+    const nr=cloud.filter(r=>!ex.has(r.ref));
+    nr.forEach(r=>records.push(r));
+    saveLocal();if(nr.length)refreshAll();
+  }
+  const unsync=getMyRecords().filter(r=>!syncedRefs.includes(r.ref));
+  let pushed=0;
+  if(unsync.length){
+    try{
+      await pushToCloud(unsync);
+      unsync.forEach(r=>{if(!syncedRefs.includes(r.ref))syncedRefs.push(r.ref);});
+      saveLocal();pushed=unsync.length;
+    }catch(e){}
+  }
+  btn.disabled=false;icon.classList.remove('spin');
+  const pulled=cloud.filter(r=>!new Set(getMyRecords().map(x=>x.ref)).has(r.ref)).length;
+  toast('✅ ↑'+pushed+' pushed  ↓'+pulled+' pulled');
+  setSyncPulse('live','LIVE SYNC');
+}
+
+/* ══ LOGIN PROGRESS ══ */
+async function setStep(n,state){
+  for(let i=1;i<=3;i++){
+    const el=$id('ls'+i);if(!el)continue;
+    el.classList.remove('active','done');
+    if(i<n)el.classList.add('done');
+    if(i===n)el.classList.add(state);
+  }
+  const pcts={1:20,2:60,3:88};
+  $id('loBar').style.width=(pcts[n]||20)+'%';
+}
+
+/* ══ LOGIN — เปิด App ทันที + Cloud sync ใน background ══ */
+async function login(){
+  const name=($id('loginName').value||'').trim().toUpperCase();
+  const pass=$id('loginPass').value;
+  if(!name){shake($id('loginName'));toast('❌ กรุณาระบุชื่อ');return;}
+  if(pass!=='1234'){
+    $id('loginPass').style.borderColor='#ef4444';
+    gsap.fromTo('#loginPass',{x:0},{x:[-8,8,-6,6,-4,4,0],duration:.5});
+    setTimeout(()=>$id('loginPass').style.borderColor='',1500);
+    toast('⛔ รหัสผ่านไม่ถูกต้อง');return;
+  }
+
+  currentUser=name;
+  sessionStorage.setItem('currentUser',name);
+  $id('loginForm').style.display='none';
+  $id('loProgress').style.display='flex';
+  $id('loginBtn').disabled=true;
+
+  /* Step 1 */
+  await setStep(1,'active');await sleep(200);await setStep(1,'done');
+
+  /* Step 2 — launch app now */
+  await setStep(2,'active');$id('loBar').style.width='55%';await sleep(100);
+  $id('currentUserDisp').textContent=name;
+
+  const tl=gsap.timeline();
+  tl.to('#loCard',{scale:.88,opacity:0,y:-20,duration:.3,ease:'power3.in'});
+  tl.to('#loginOverlay',{opacity:0,duration:.45,ease:'power2.in',
+    onComplete:()=>{$id('loginOverlay').style.display='none';}
+  });
+  tl.to('#appShell',{opacity:1,duration:.55,ease:'back.out(1.6)',
+    onStart:()=>{
+      $id('appShell').style.visibility='visible';
+      $id('appShell').classList.add('visible');
+      refreshAll();
+    }
+  },'-=0.2');
+  await setStep(2,'done');
+
+  /* Step 3 — cloud in background, show banner inside app */
+  await setStep(3,'active');
+  $id('ls2note').textContent='syncing…';
+  setSyncPulse('syncing','SYNCING…');
+  showCloudBanner('กำลังโหลดข้อมูลจาก Cloud…','ข้อมูลล่าสุดกำลังถูกดึงมา');
+
+  fetchFromCloud(name,10000).then(cloud=>{
+    $id('loBar').style.width='100%';
+    setStep(3,'done');
+    if(cloud.length>0){
+      syncedRefs=cloud.map(r=>r.ref);
+      const ex=new Set(records.map(r=>r.ref));
+      const nr=cloud.filter(r=>!ex.has(r.ref));
+      nr.forEach(r=>records.push(r));
+      saveLocal();
+      if(nr.length){
+        refreshAll();
+        hideCloudBanner('✅ โหลดข้อมูลเสร็จ — +'+nr.length+' รายการจาก Cloud');
+        toast('✅ Cloud: +'+nr.length+' รายการใหม่');
+      }else{
+        hideCloudBanner('✅ ข้อมูลทันสมัยแล้ว ไม่มีรายการใหม่');
+      }
+      setSyncPulse('live','LIVE SYNC');
+    }else{
+      syncedRefs=[];saveLocal();
+      hideCloudBanner('⚠️ ไม่สามารถเชื่อมต่อ Cloud ได้');
+      setSyncPulse('offline','OFFLINE');
+    }
+    startPolling();
+  });
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&$id('loginOverlay').style.display!=='none')login();});
+
+/* ══ SESSION RESUME — ลอกอินแล้วกลับมา ══ */
+window.addEventListener('load',async()=>{
+  $id('inputDate').valueAsDate=new Date();
+  startClock();
+  initParticles();
+
+  // Fix viewport after returning from JOB page
+  forceViewportReset();
+
+  const saved=sessionStorage.getItem('currentUser');
+  if(saved){
+    currentUser=saved;
+    $id('currentUserDisp').textContent=saved;
+    $id('loginOverlay').style.display='none';
+    $id('appShell').classList.add('visible');
+    refreshAll(); // instant local data
+    setSyncPulse('syncing','SYNCING…');
+    showCloudBanner('กำลังซิงค์ข้อมูลล่าสุด…','ดึงข้อมูลจาก Google Sheets');
+    const cloud=await fetchFromCloud(saved,10000);
+    if(cloud.length>0){
+      syncedRefs=cloud.map(r=>r.ref);
+      const ex=new Set(records.map(r=>r.ref));
+      const nr=cloud.filter(r=>!ex.has(r.ref));
+      nr.forEach(r=>records.push(r));
+      saveLocal();
+      if(nr.length){refreshAll();hideCloudBanner('✅ ซิงค์เสร็จ — +'+nr.length+' รายการใหม่');}
+      else hideCloudBanner('✅ ข้อมูลทันสมัยแล้ว');
+      setSyncPulse('live','LIVE SYNC');
+    }else{syncedRefs=[];saveLocal();hideCloudBanner('⚠️ Offline — ใช้ข้อมูลในเครื่อง');setSyncPulse('offline','OFFLINE');}
+    startPolling();
+  }
+});
+
+/* ══ FIX VIEWPORT — กลับจากหน้า JOB ══ */
+function forceViewportReset(){
+  // Reset any GSAP transforms left on root elements
+  gsap.set(['html','body','#appShell'],{clearProps:'all'});
+  // Force layout recalc
+  document.documentElement.style.display='none';
+  void document.documentElement.offsetHeight;
+  document.documentElement.style.display='';
+  // Ensure viewport meta is correct
+  let vm=document.querySelector('meta[name=viewport]');
+  if(vm){
+    const orig=vm.content;
+    vm.content='width=device-width, initial-scale=1.0, viewport-fit=cover';
+    // Brief re-trigger to force mobile Safari to reflow
+    setTimeout(()=>{vm.content=orig;},80);
+  }
+}
+
+// Also fire on pageshow (back/forward navigation cache)
+window.addEventListener('pageshow',e=>{
+  forceViewportReset();
+  if(e.persisted && currentUser){
+    // Returned from JOB page via bfcache — re-init layout
+    setTimeout(()=>{
+      refreshAll();
+      // Re-trigger CSS animation reset
+      const shell=$id('appShell');
+      if(shell){
+        shell.classList.remove('visible');
+        void shell.offsetWidth;
+        shell.classList.add('visible');
+      }
+    },50);
+  }
+});
+
+/* ══ LOGOUT ══ */
+async function logout(){
+  const unsync=getMyRecords().filter(r=>!syncedRefs.includes(r.ref));
+  if(unsync.length){toast('⏳ Auto syncing…');await pushToCloud(unsync);}
+  if(pollingTimer)clearInterval(pollingTimer);
+  sessionStorage.removeItem('currentUser');location.reload();
+}
+
+/* ══ CLOCK ══ */
+function startClock(){
+  const tick=()=>{const n=new Date();const el=$id('liveClock');if(el)el.textContent=n.toLocaleDateString('en-GB')+' · '+n.toLocaleTimeString('en-GB');};
+  tick();setInterval(tick,1000);
+}
+
+/* ══ JUDGMENT COLOR ══ */
+function handleJudgment(val){
+  const sel=$id('judgmentSelect'),btn=$id('submitBtn');
+  const c={'SF':'#f97316','VENDOR FAULT':'#ef4444','CTC':'#3b82f6','CAN USE':'#10b981'};
+  const color=c[val]||'#1e293b';
+  sel.style.borderColor=color;sel.style.color=color;
+  if(btn){btn.style.backgroundColor=color;btn.style.boxShadow=`0 10px 25px -5px ${color}66`;}
+}
+
+/* ══ FORM SUBMIT ══ */
+$id('claimForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const ref=$id('refNo').value.trim();
+  if(getMyRecords().some(r=>r.ref===ref)){shake($id('refNo'));toast('⚠️ Duplicate Reference No!');return;}
+  records.push({
+    id:Date.now(),date:$id('inputDate').value,shift:$id('shift').value,
+    inspector:currentUser,ref,line:$id('lineNo').value,
+    supplier:$id('supplier').value,partNo:$id('partNo').value,
+    partName:$id('partOn').value,qty:parseInt($id('qty').value)||0,
+    defect:$id('defectName').value,remark:$id('remark').value,
+    judgment:$id('judgmentSelect').value
+  });
+  saveAndRefresh();
+  /* Flash submit button green */
+  const sb=$id('submitBtn');
+  if(sb){
+    const orig=sb.style.backgroundColor;
+    sb.style.backgroundColor='#10b981';sb.style.boxShadow='0 10px 25px -5px #10b98166';
+    sb.classList.add('btn-success');
+    setTimeout(()=>{sb.style.backgroundColor=orig;sb.style.boxShadow='';sb.classList.remove('btn-success');},700);
+  }
+  /* Animate form fields clear */
+  const fields=['refNo','supplier','qty','partNo','partOn','defectName','remark'];
+  fields.forEach((fid,i)=>{
+    const f=$id(fid); if(!f)return;
+    gsap.fromTo(f,{backgroundColor:'rgba(16,185,129,.08)'},{backgroundColor:'rgba(255,255,255,.6)',duration:.6,delay:i*.03});
+  });
+  e.target.reset();handleJudgment('');
+  $id('inputDate').valueAsDate=new Date();
+  toast('✅ บันทึกข้อมูลสำเร็จ');
+});
+
+/* ══ FILTER ══ */
+function setFilter(type){
+  filterType=type;
+  ['ALL','SF','VENDOR','CTC','CANUSE'].forEach(b=>{
+    const el=$id('btn-'+b);if(!el)return;
+    const on=b===(type==='CAN USE'?'CANUSE':type==='VENDOR FAULT'?'VENDOR':type);
+    el.className='btn text-[10px] font-black px-5 py-2.5 rounded-xl '+(on?'bg-orange-500 text-white shadow-lg shadow-orange-200':'text-slate-400 hover:bg-slate-100');
+  });
+  updateFilterBtns(type);
+  /* Animate table body out then in */
+  const tb=$id('tableBody');
+  gsap.to(tb,{opacity:0,y:6,duration:.12,ease:'power2.in',onComplete:()=>{
+    renderTable();
+    gsap.to(tb,{opacity:1,y:0,duration:.22,ease:'power2.out'});
+  }});
+}
+
+/* ══ SMOOTH SEARCH ══ */
+let searchDebounce;
+function smoothSearch(){
+  clearTimeout(searchDebounce);
+  const tb=$id('tableBody');
+  gsap.to(tb,{opacity:.4,duration:.1});
+  searchDebounce=setTimeout(()=>{
+    renderTable();
+    gsap.to(tb,{opacity:1,duration:.2,ease:'power1.out'});
+  },120);
+}
+
+/* ══ RENDER TABLE — fast DocumentFragment, no setTimeout loops ══ */
+const SM_MAP={
+  'SF':          {dot:'bg-orange-500',cls:'text-orange-600 bg-orange-50'},
+  'VENDOR FAULT':{dot:'bg-red-500',   cls:'text-red-600 bg-red-50'},
+  'CTC':         {dot:'bg-blue-500',  cls:'text-blue-600 bg-blue-50'},
+  'CAN USE':     {dot:'bg-emerald-500',cls:'text-emerald-600 bg-emerald-50'}
+};
+// Cached search strings — rebuilt only when records change
+let _searchCache=null, _searchCacheLen=-1;
+function getSearchCache(){
+  if(_searchCache&&_searchCacheLen===records.length)return _searchCache;
+  _searchCache=records.map(r=>(r.date+' '+r.shift+' '+r.ref+' '+r.line+' '+r.supplier+' '+r.partNo+' '+r.partName+' '+r.defect+' '+r.remark+' '+r.judgment).toLowerCase());
+  _searchCacheLen=records.length;
+  return _searchCache;
+}
+function invalidateSearchCache(){_searchCache=null;_searchCacheLen=-1;}
+
+function renderTable(){
+  const tbody=$id('tableBody');
+  const search=($id('searchInput').value||'').toLowerCase();
+  const myR=getMyRecords();
+  const cache=getSearchCache();
+  // Build index map for quick cache lookup
+  const myIdx=records.reduce((m,r,i)=>{m[r.id]=i;return m;},{});
+  const syncSet=new Set(syncedRefs);
+
+  const filtered=[];
+  for(let i=myR.length-1;i>=0;i--){
+    const r=myR[i];
+    if(filterType!=='ALL'&&r.judgment!==filterType)continue;
+    if(search){const idx=myIdx[r.id];if(idx===undefined||!cache[idx].includes(search))continue;}
+    filtered.push(r);
+  }
+
+  // Build all rows in DocumentFragment — single DOM write
+  const frag=document.createDocumentFragment();
+  const rows=[];
+  filtered.forEach(r=>{
+    const s=SM_MAP[r.judgment]||SM_MAP['SF'];
+    const synced=syncSet.has(r.ref);
+    const tr=document.createElement('tr');
+    tr.className='group hover:bg-white/60 border-l-4 border-transparent hover:border-orange-500';
+    tr.innerHTML=`
+      <td class="pl-8 py-5 font-bold text-[11px] text-slate-400">${r.date}</td>
+      <td class="text-[11px] font-black text-slate-700">${r.shift}<br><span class="text-slate-400 font-bold">L: ${r.line}</span></td>
+      <td class="text-[11px] font-black text-slate-400"><span style="color:${synced?'#10b981':'#cbd5e1'}" title="Cloud sync">●</span> #${r.ref}</td>
+      <td><div class="text-[11px] font-black text-slate-800 uppercase">${r.supplier}</div>
+          <div class="text-[10px] text-slate-500 font-bold">${r.partNo} / ${r.partName}</div></td>
+      <td class="text-center text-lg font-black orbitron italic text-slate-700">${r.qty.toLocaleString()}</td>
+      <td><div class="text-[11px] font-bold text-slate-600 uppercase">${r.defect}</div></td>
+      <td class="text-[10px] text-slate-400 font-medium max-w-[150px] truncate" title="${r.remark||''}">${r.remark||'—'}</td>
+      <td class="text-center">
+        <span class="px-4 py-2 rounded-full text-[9px] font-black uppercase border ${s.cls} inline-flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full ${s.dot} s-dot"></span>${r.judgment}
+        </span>
+      </td>
+      <td class="pr-8 text-right whitespace-nowrap">
+        <button onclick="cloneRecord(${r.id})" class="btn opacity-0 group-hover:opacity-100 text-blue-500 hover:text-blue-700 transition-all mr-2 text-sm rounded-lg px-1.5 py-0.5 hover:bg-blue-50" title="Clone">📑</button>
+        <button onclick="delRow(${r.id},this.closest('tr'))" class="btn opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 rounded-lg px-1.5 py-0.5 hover:bg-red-50" title="Delete">✕</button>
+      </td>`;
+    frag.appendChild(tr);
+    rows.push(tr);
+  });
+
+  tbody.innerHTML=''; // single clear
+  tbody.appendChild(frag); // single write
+
+  // Stagger vis with RAF — no setTimeout loops
+  requestAnimationFrame(()=>{
+    rows.forEach((tr,i)=>{
+      if(i<12){tr.classList.add('vis');}// first 12: immediate
+      else{setTimeout(()=>tr.classList.add('vis'),(i-12)*12);} // rest: gentle stagger
+    });
+  });
+}
+
+/* ══ CLONE / DELETE / CLEAR ══ */
+function cloneRecord(id){
+  const r=records.find(x=>x.id===id);if(!r)return;
+  $id('lineNo').value=r.line;$id('refNo').value=r.ref+'_COPY';
+  $id('supplier').value=r.supplier;$id('partNo').value=r.partNo;
+  $id('partOn').value=r.partName;$id('qty').value=r.qty;
+  $id('defectName').value=r.defect;$id('remark').value=r.remark||'';
+  $id('judgmentSelect').value=r.judgment;handleJudgment(r.judgment);
+  toast('📑 Record cloned');
+}
+function del(id){
+  const r=records.find(x=>x.id===id);
+  if(!r||!confirm('ลบ Ref: '+r.ref+' ใช่หรือไม่?'))return;
+  records=records.filter(x=>x.id!==id);
+  syncedRefs=syncedRefs.filter(ref=>ref!==r.ref);
+  saveAndRefresh();toast('🗑 Deleted');
+}
+function clearAllData(){
+  if(!confirm('ลบข้อมูลของคุณทั้งหมดใช่หรือไม่?'))return;
+  records=records.filter(r=>r.inspector!==currentUser);
+  syncedRefs=[];saveAndRefresh();toast('🧹 Cleared');
+}
+
+/* ══ DATALISTS ══ */
+function updateDataLists(){
+  const d=getMyRecords();
+  const setList=(id,key)=>{
+    const el=$id(id);if(!el)return;
+    el.innerHTML=[...new Set(d.map(r=>r[key]).filter(Boolean))].map(v=>`<option value="${v}">`).join('');
+  };
+  setList('refList','ref');setList('lineList','line');setList('supList','supplier');
+  setList('ptList','partNo');setList('lotList','partName');setList('defectList','defect');
+  setList('inspectorList','inspector');
+}
+
+/* ══ REFRESH ALL — batched, non-blocking ══ */
+let _refreshRAF=null;
+let _lastKpiHash='';
+function refreshAll(){
+  invalidateSearchCache();
+  // Cancel pending RAF refresh (debounce rapid calls)
+  if(_refreshRAF)cancelAnimationFrame(_refreshRAF);
+  _refreshRAF=requestAnimationFrame(()=>{
+    _refreshRAF=null;
+    // 1. KPI calc (synchronous, fast)
+    const d=getMyRecords();
+    let tQ=0,sf=0,ven=0,ctc=0,ok=0,sfL=0,venL=0,ctcL=0,okL=0;
+    d.forEach(r=>{tQ+=r.qty;
+      if(r.judgment==='SF')               {sf+=r.qty;sfL++;}
+      else if(r.judgment==='VENDOR FAULT'){ven+=r.qty;venL++;}
+      else if(r.judgment==='CTC')         {ctc+=r.qty;ctcL++;}
+      else if(r.judgment==='CAN USE')     {ok+=r.qty;okL++;}
+    });
+    animNum('masterQty',tQ);$id('masterLot').textContent=d.length;
+    const pct=(v,t)=>t>0?Math.round((v/t)*100)+'%':'0%';
+    animNum('qtySF',sf);     $id('lotSF').textContent=sfL;   $id('pctSF').textContent=pct(sf,tQ);
+    animNum('qtyVendor',ven);$id('lotVendor').textContent=venL;$id('pctVendor').textContent=pct(ven,tQ);
+    animNum('qtyCTC',ctc);   $id('lotCTC').textContent=ctcL; $id('pctCTC').textContent=pct(ctc,tQ);
+    animNum('qtyCanUse',ok); $id('lotCanUse').textContent=okL;$id('pctCanUse').textContent=pct(ok,tQ);
+
+    // 2. Table render
+    renderTable();
+
+    // 3. KPI flash — only when values actually changed
+    const kpiHash=tQ+','+sf+','+ven+','+ctc+','+ok;
+    if(kpiHash!==_lastKpiHash){
+      _lastKpiHash=kpiHash;
+      const cards=$id('kpiGrid')?.querySelectorAll('.stat-card');
+      if(cards)cards.forEach((c,i)=>setTimeout(()=>{c.classList.add('kpi-flash');setTimeout(()=>c.classList.remove('kpi-flash'),620);},i*50));
+    }
+
+    // 4. Datalists — defer to idle time so it never blocks render
+    if('requestIdleCallback' in window){
+      requestIdleCallback(updateDataLists,{timeout:2000});
+    }else{setTimeout(updateDataLists,200);}
+  });
+}
+
+/* ══ DASHBOARD ══ */
+function openDashboard(){
+  $id('dashboardModal').style.display='flex';
+  $id('dashUser').textContent=currentUser;
+  const vendors=[...new Set(getMyRecords().map(r=>r.supplier))].filter(Boolean).sort();
+  $id('dashVendor').innerHTML='<option value="ALL">ALL VENDORS</option>'+vendors.map(v=>`<option value="${v}">${v}</option>`).join('');
+  resetDashFilters();
+  // Entrance: backdrop fade + content stagger via CSS animation-delay
+  gsap.fromTo('#dashboardModal',{opacity:0},{opacity:1,duration:.3,ease:'power2.out'});
+  gsap.fromTo('.glass-dash',{opacity:0,y:16},{opacity:1,y:0,duration:.38,ease:'back.out(1.4)',delay:.05});
+}
+function closeDashboard(){
+  gsap.to('.glass-dash',{opacity:0,y:10,duration:.18,ease:'power2.in',onComplete:()=>{
+    $id('dashboardModal').style.display='none';
+    gsap.set(['.glass-dash','#dashboardModal'],{clearProps:'all'});
+  }});
+}
+function resetDashFilters(){
+  $id('dashStart').value='';$id('dashEnd').value='';$id('dashVendor').value='ALL';
+  refreshDash();
+}
+function refreshDash(){
+  const start=$id('dashStart').value,end=$id('dashEnd').value,ven=$id('dashVendor').value;
+  let data=getMyRecords();
+  if(start)data=data.filter(r=>r.date>=start);
+  if(end)  data=data.filter(r=>r.date<=end);
+  if(ven!=='ALL')data=data.filter(r=>r.supplier===ven);
+
+  let tQ=0,sf=0,ven2=0,ctc=0,ok=0,sfL=0,venL=0,ctcL=0,okL=0;
+  data.forEach(r=>{tQ+=r.qty;
+    if(r.judgment==='SF')           {sf+=r.qty;sfL++;}
+    else if(r.judgment==='VENDOR FAULT'){ven2+=r.qty;venL++;}
+    else if(r.judgment==='CTC')     {ctc+=r.qty;ctcL++;}
+    else if(r.judgment==='CAN USE') {ok+=r.qty;okL++;}
+  });
+  animNum('dTotalQty',tQ);$id('dTotalLot').textContent=data.length;
+  const pct=(v,t)=>t>0?Math.round((v/t)*100)+'%':'0%';
+  const upd=(pre,qty,lot,p)=>{animNum('d'+pre+'qty',qty);$id('d'+pre+'lot').textContent=lot;$id('d'+pre+'pct').textContent=p;};
+  upd('SF',sf,sfL,pct(sf,tQ));upd('VEN',ven2,venL,pct(ven2,tQ));
+  upd('CTC',ctc,ctcL,pct(ctc,tQ));upd('OK',ok,okL,pct(ok,tQ));
+  /* Insight stats */
+  const rejQ=sf+ven2+ctc;
+  const rejRateEl=$id('dRejRate');if(rejRateEl)rejRateEl.textContent=tQ>0?Math.round((rejQ/tQ)*100)+'%':'0%';
+  const shiftMap={};data.forEach(r=>{shiftMap[r.shift]=(shiftMap[r.shift]||0)+r.qty;});
+  const topShift=Object.entries(shiftMap).sort((a,b)=>b[1]-a[1])[0];
+  const topShiftEl=$id('dTopShift');if(topShiftEl)topShiftEl.textContent=topShift?topShift[0].replace('SHIFT ','S'):'—';
+  const avgEl=$id('dAvgQty');if(avgEl)avgEl.textContent=data.length>0?Math.round(tQ/data.length).toLocaleString():'0';
+  const days=new Set(data.map(r=>r.date)).size;
+  const daysEl=$id('dActiveDays');if(daysEl)daysEl.textContent=days;
+
+  if(data.length>1){
+    const cnt=new Array(12).fill(0);
+    data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m))cnt[m]+=r.qty;});
+    const peak=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][cnt.indexOf(Math.max(...cnt))];
+    const top=sf>=ven2&&sf>=ctc?'SF FAULT':ven2>=ctc?'VENDOR FAULT':'CTC FAULT';
+    $id('monthlyInsight').innerHTML='Peak: <b>'+peak+'</b> · Main: <span style="color:#ef4444;font-weight:900">'+top+'</span>';
+  }else{$id('monthlyInsight').textContent='—';}
+
+  renderDashCharts(data);
+  renderRankings(data);
+}
+
+function renderDashCharts(data){
+  // Destroy existing
+  ['trend','donut','radar'].forEach(k=>{if(charts[k]){charts[k].destroy();charts[k]=null;}});
+
+  const noGrid={display:false};
+  const noTick=color=>({grid:noGrid,ticks:{font:{size:10,weight:'bold'},color:color||'#94a3b8'}});
+  const tooltip={
+    enabled:true,backgroundColor:'rgba(6,10,20,.92)',
+    titleFont:{family:'Orbitron',size:11,weight:'900'},bodyFont:{family:'Inter',size:10,weight:'bold'},
+    padding:10,cornerRadius:8,borderColor:'rgba(249,115,22,.25)',borderWidth:1
+  };
+
+  /* ── Monthly Trend (line) ── */
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const byMonth=new Array(12).fill(0);
+  data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m))byMonth[m]+=r.qty;});
+  const peakIdx=byMonth.indexOf(Math.max(...byMonth));
+  if(data.length>1){
+    const sfQ=data.filter(r=>r.judgment==='SF').reduce((s,r)=>s+r.qty,0);
+    const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
+    const ctcQ=data.filter(r=>r.judgment==='CTC').reduce((s,r)=>s+r.qty,0);
+    const top=sfQ>=venQ&&sfQ>=ctcQ?'SF':venQ>=ctcQ?'VENDOR':'CTC';
+    $id('monthlyInsight').innerHTML='Peak: <b>'+mo[peakIdx]+'</b> · <span style="color:#ef4444;font-weight:900">'+top+' dominant</span>';
+  } else $id('monthlyInsight').textContent='—';
+
+  const tCtx=$id('trendChart');
+  if(tCtx) charts.trend=new Chart(tCtx,{
+    type:'line',
+    data:{labels:mo,datasets:[{
+      label:'Qty',data:byMonth,
+      borderColor:'#f97316',borderWidth:3,tension:.42,fill:true,
+      backgroundColor:ctx=>{
+        const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||200);
+        g.addColorStop(0,'rgba(249,115,22,.18)');g.addColorStop(1,'rgba(249,115,22,.01)');return g;
+      },
+      pointRadius:4,pointBackgroundColor:'#fff',pointBorderColor:'#f97316',pointBorderWidth:2.5,
+      pointHoverRadius:7,pointHoverBorderWidth:3
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},datalabels:{display:false},tooltip},
+      scales:{
+        x:{grid:{display:false},border:{display:false},ticks:{font:{size:10,weight:'bold'},color:'#94a3b8'}},
+        y:{grid:{display:false},border:{display:false},ticks:{display:false}}
+      },
+      animation:{duration:900,easing:'easeOutQuart'}
+    }
+  });
+
+  /* ── Fault Mix Donut ── */
+  const sfQ=data.filter(r=>r.judgment==='SF').reduce((s,r)=>s+r.qty,0);
+  const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
+  const ctcQ=data.filter(r=>r.judgment==='CTC').reduce((s,r)=>s+r.qty,0);
+  const okQ=data.filter(r=>r.judgment==='CAN USE').reduce((s,r)=>s+r.qty,0);
+  const totalQ=sfQ+venQ+ctcQ+okQ;
+  const dn=$id('donutTotal');if(dn)dn.textContent=totalQ.toLocaleString();
+  const dCtx=$id('donutChart');
+  if(dCtx) charts.donut=new Chart(dCtx,{
+    type:'doughnut',
+    data:{
+      labels:['SF Fault','Vendor','CTC','Can Use'],
+      datasets:[{
+        data:[sfQ,venQ,ctcQ,okQ],
+        backgroundColor:['#f97316','#ef4444','#3b82f6','#10b981'],
+        hoverBackgroundColor:['#fb923c','#f87171','#60a5fa','#34d399'],
+        borderWidth:2.5,borderColor:'rgba(15,23,42,.7)',hoverOffset:8
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
+      plugins:{
+        legend:{display:true,position:'bottom',labels:{
+          color:'rgba(255,255,255,.6)',font:{size:8,weight:'bold'},
+          boxWidth:7,padding:6,usePointStyle:true,pointStyleWidth:6
+        }},
+        datalabels:{display:false},tooltip:{...tooltip,callbacks:{label:ctx=>{
+          const v=ctx.parsed;const t=totalQ||1;
+          return ' '+v.toLocaleString()+' ('+(t>0?((v/t)*100).toFixed(1):'0')+'%)';
+        }}}
+      },
+      animation:{animateRotate:true,animateScale:true,duration:1000,easing:'easeOutQuart'}
+    }
+  });
+
+  /* ── Top Lines — horizontal bar ── */
+  const lineMap={};
+  data.forEach(r=>{if(r.line)lineMap[r.line]=(lineMap[r.line]||0)+r.qty;});
+  const topLines=Object.entries(lineMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const rCtx=$id('radarChart');
+  if(rCtx&&topLines.length) charts.radar=new Chart(rCtx,{
+    type:'bar',
+    data:{
+      labels:topLines.map(l=>l[0]),
+      datasets:[{
+        label:'Qty',data:topLines.map(l=>l[1]),
+        backgroundColor:ctx=>{
+          const g=ctx.chart.ctx.createLinearGradient(ctx.chart.width||300,0,0,0);
+          g.addColorStop(0,'rgba(249,115,22,.9)');
+          g.addColorStop(1,'rgba(249,115,22,.35)');
+          return g;
+        },
+        hoverBackgroundColor:'rgba(249,115,22,1)',
+        borderRadius:6,barThickness:16
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      indexAxis:'y',
+      layout:{padding:{right:44}},
+      scales:{
+        x:{display:false,grid:{display:false},border:{display:false}},
+        y:{
+          grid:{display:false},border:{display:false},
+          ticks:{color:'#64748b',font:{size:10,weight:'bold'},padding:4}
         }
+      },
+      plugins:{
+        legend:{display:false},
+        datalabels:{
+          anchor:'end',align:'end',
+          color:'#94a3b8',font:{size:9,weight:'bold',family:'Orbitron'},
+          formatter:v=>v.toLocaleString(),clip:false
+        },
+        tooltip
+      },
+      animation:{duration:900,easing:'easeOutQuart'}
+    }
+  });
+  else if(rCtx){
+    // No line data — show shift bars as fallback
+    const sm={'A':0,'B':0,'C':0};
+    data.forEach(r=>{const k=r.shift?.replace('SHIFT ','');if(sm[k]!==undefined)sm[k]+=r.qty;});
+    charts.radar=new Chart(rCtx,{type:'bar',
+      data:{labels:['SHIFT A','SHIFT B','SHIFT C'],
+        datasets:[{data:Object.values(sm),
+          backgroundColor:['rgba(249,115,22,.85)','rgba(59,130,246,.85)','rgba(16,185,129,.85)'],
+          borderRadius:12,barPercentage:.6
+        }]},
+      options:{responsive:true,maintainAspectRatio:false,
+        scales:{x:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:11,weight:'bold',family:'Orbitron'}}},y:{display:false,grid:{display:false}}},
+        plugins:{legend:{display:false},datalabels:{anchor:'end',align:'top',color:'#94a3b8',font:{size:10,weight:'bold',family:'Orbitron'},formatter:v=>v>0?v.toLocaleString():''},tooltip},
+        animation:{duration:900,easing:'easeOutBounce'}
+      }
+    });
+  }
+}
 
-        async function login() {
-            const name = document.getElementById('loginName').value.trim().toUpperCase();
-            const pass = document.getElementById('loginPass').value;
-            const btn = document.getElementById('loginBtn');
+function clamp(min,max){return Math.min(max,Math.max(min,Math.round(window.innerWidth/100)));}
 
-            if(!name) return shakeElement("#loginCard");
-            if(pass !== "1234") return showToast("WRONG ACCESS KEY!");
-          
-            btn.innerText = "LOADING DATA...";
-            btn.disabled = true;
+function renderRankings(data){
+  const totalQty=data.reduce((s,r)=>s+r.qty,0)||1;
+  const getTop=(key,n=8)=>{ const m={}; data.forEach(r=>{if(r[key])m[r[key]]=(m[r[key]]||0)+r.qty;}); return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,n); };
+  const draw=(id,items,color,accentColor)=>{
+    const maxV=items[0]?.[1]||1;
+    const el=$id(id); if(!el)return;
+    el.innerHTML=items.map(([k,v],i)=>{
+      const pct=Math.round((v/totalQty)*100);
+      const barW=Math.round((v/maxV)*100);
+      const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+      return `
+      <div class="bar-wrap" title="${k}: ${v.toLocaleString()} (${pct}%)">
+        <div class="bar-lbl">
+          <span class="bar-k">${rank} ${k}</span>
+          <div class="flex items-center gap-1.5">
+            <span class="orbitron" style="font-size:.62rem;color:${accentColor};font-weight:900">${pct}%</span>
+            <span class="orbitron" style="font-size:.6rem;color:#94a3b8">${v.toLocaleString()}</span>
+          </div>
+        </div>
+        <div class="bar-bg">
+          <div class="bar-fill" style="width:0%;background:${color}" data-w="${barW}"></div>
+        </div>
+      </div>`}).join('');
+    requestAnimationFrame(()=>{
+      el.querySelectorAll('.bar-fill').forEach((b,i)=>{
+        setTimeout(()=>{ b.style.width=b.dataset.w+'%'; }, i*55+80);
+      });
+    });
+  };
+  draw('rankSuppliers',getTop('supplier'),'linear-gradient(90deg,#f97316,#fbbf24)','#f97316');
+  draw('rankDefects',  getTop('defect'),  'linear-gradient(90deg,#ef4444,#f87171)','#ef4444');
+  draw('rankParts',    getTop('partNo'),  'linear-gradient(90deg,#3b82f6,#60a5fa)','#3b82f6');
+}
 
-            currentUser = name;
-            sessionStorage.setItem('currentUser', currentUser);
-            document.getElementById('currentUserDisp').innerText = currentUser;
+/* ══ IMPORT / EXPORT ══ */
+function importExcel(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+    const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+    const pd=v=>{if(!v)return '';if(v instanceof Date)return new Date(v.getTime()-(v.getTimezoneOffset()*60000)).toISOString().split('T')[0];if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;}return String(v);};
+    const items=json.map(r=>({
+      id:Date.now()+Math.random(),date:pd(r.date||r.Date||r.DATE),
+      shift:r.shift||r.Shift||'SHIFT A',inspector:currentUser,
+      ref:String(r.ref||r.Reference||''),line:String(r.line||r.Line||''),
+      supplier:String(r.supplier||r.Supplier||''),partNo:String(r.partNo||r.PartNo||''),
+      partName:String(r.partName||r.PartName||''),qty:parseInt(r.qty||r.Qty||0),
+      defect:String(r.defect||r.Defect||''),remark:String(r.remark||r.Remark||''),
+      judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase()
+    }));
+    records=[...records,...items];
+    saveAndRefresh();toast('📥 Imported '+items.length+' records');input.value='';
+  };
+  reader.readAsArrayBuffer(file);
+}
+function exportToExcel(){
+  const d=getMyRecords();if(!d.length)return toast('⚠️ No data to export');
+  const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Records');
+  XLSX.writeFile(wb,'SQE_'+currentUser+'_'+Date.now()+'.xlsx');
+}
 
-            await fetchInitialData(name);
-
-            const tl = gsap.timeline();
-            tl.to("#loginCard", { scale: 0.9, opacity: 0, duration: 0.3, ease: "power2.in" });
-            tl.to("#loginOverlay", { opacity: 0, duration: 0.8, onComplete: () => {
-                document.getElementById('loginOverlay').style.display = 'none';
-                refreshAll();
-                applyAutoScale();
-            }});
-            tl.to("#app-scaler", { opacity: 1, duration: 1, ease: "power2.out" }, "-=0.4");
-        }
-
-        function startTime() { setInterval(() => { const now = new Date(); document.getElementById('liveClock').innerText = now.toLocaleDateString('en-GB') + ' | ' + now.toLocaleTimeString('en-GB'); }, 1000); }
-        function openJobProject() { window.location.href = "job_project.html"; }
-
-        function handleJudgmentChange(val) {
-            const sel = document.getElementById('judgmentSelect');
-            const btn = document.getElementById('submitBtn');
-            const colors = { 'SF': '#f97316', 'VENDOR FAULT': '#ef4444', 'CTC': '#3b82f6', 'CAN USE': '#10b981' };
-            const targetColor = colors[val] || '#1e293b';
-            sel.style.borderColor = targetColor;
-            sel.style.color = targetColor;
-            if (btn) {
-                btn.style.backgroundColor = targetColor;
-                btn.style.borderColor = targetColor;
-                btn.style.boxShadow = `0 10px 25px -5px ${targetColor}66`;
-            }
-        }
-
-        document.getElementById('claimForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const currentRef = document.getElementById('refNo').value.trim();
-            const isDuplicate = getMyRecords().some(r => r.ref === currentRef);
-            if(isDuplicate) { shakeElement("#refNo"); showToast("DUPLICATE REFERENCE NO!"); return; }
-
-            records.push({
-                id: Date.now(),
-                date: document.getElementById('inputDate').value,
-                shift: document.getElementById('shift').value,
-                inspector: currentUser,
-                ref: currentRef,
-                line: document.getElementById('lineNo').value,
-                supplier: document.getElementById('supplier').value,
-                partNo: document.getElementById('partNo').value,
-                partName: document.getElementById('partOn').value,
-                qty: parseInt(document.getElementById('qty').value) || 0,
-                defect: document.getElementById('defectName').value,
-                remark: document.getElementById('remark').value,
-                judgment: document.getElementById('judgmentSelect').value
-            });
-            saveAndRefresh();
-            e.target.reset();
-            handleJudgmentChange('');
-            document.getElementById('inputDate').valueAsDate = new Date();
-            showToast("✅SAVE DATAสำเร็จ");
-        });
-
-        function cloneRecord(id) {
-            const record = records.find(r => r.id === id);
-            if (record) {
-                document.getElementById('lineNo').value = record.line;
-                document.getElementById('refNo').value = record.ref + "_COPY";
-                document.getElementById('supplier').value = record.supplier;
-                document.getElementById('partNo').value = record.partNo;
-                document.getElementById('partOn').value = record.partName;
-                document.getElementById('qty').value = record.qty;
-                document.getElementById('defectName').value = record.defect;
-                document.getElementById('remark').value = record.remark || '';
-                document.getElementById('judgmentSelect').value = record.judgment;
-                handleJudgmentChange(record.judgment);
-                showToast("RECORD CLONED");
-            }
-        }
-
-        function del(id) {
-            if(confirm("Confirm deletion?")) {
-                records = records.filter(r => r.id !== id);
-                saveAndRefresh();
-            }
-        }
-
-        function clearAllData() {
-            if(confirm("⚠️ ลบข้อมูลทั้งหมดของคุณในเครื่องนี้? (ข้อมูลบน Cloud จะไม่หาย)")) {
-                const others = records.filter(r => r.inspector !== currentUser);
-                records = others;
-                saveAndRefresh();
-                showToast("LOCAL DATA CLEARED");
-            }
-        }
-
-        function importExcel(input) {
-            const file = input.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-              
-                const parseExcelDate = (val) => {
-                    if (!val) return "";
-                    if (val instanceof Date) {
-                        const d = val;
-                        return new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-                    }
-                    return val;
-                };
-
-                const newItems = json.map(r => ({
-                    id: Date.now() + Math.random(),
-                    date: parseExcelDate(r.date || r.Date || r.DATE) || new Date().toISOString().split('T')[0],
-                    shift: r.shift || r.Shift || "SHIFT A",
-                    inspector: currentUser,
-                    ref: String(r.ref || r.Reference || ""),
-                    line: String(r.line || r.Line || ""),
-                    supplier: String(r.supplier || r.Supplier || ""),
-                    partNo: String(r.partNo || r.PartNo || ""),
-                    partName: String(r.partName || r.PartName || ""),
-                    qty: parseInt(r.qty || r.Qty || 0),
-                    defect: String(r.defect || r.Defect || ""),
-                    remark: String(r.remark || r.Remark || ""),
-                    judgment: String(r.judgment || "SF").toUpperCase().includes("OK") ? "CAN USE" : String(r.judgment || "SF").toUpperCase()
-                }));
-                records = [...records, ...newItems];
-                saveAndRefresh();
-                showToast(`IMPORTED ${newItems.length} ITEMS`);
-                input.value = "";
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function exportToExcel() {
-            const myData = getMyRecords();
-            if(!myData.length) return showToast("NO DATA TO EXPORT");
-            const ws = XLSX.utils.json_to_sheet(myData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Records");
-            XLSX.writeFile(wb, `SQE_REPORT_${currentUser}_${new Date().getTime()}.xlsx`);
-        }
-
-        function animateNumber(id, target) {
-            const el = document.getElementById(id); if (!el) return;
-            const currentVal = parseInt(el.innerText.replace(/,/g, '')) || 0;
-            const obj = { val: currentVal };
-            gsap.to(obj, { val: target, duration: 1, onUpdate: () => el.innerText = Math.floor(obj.val).toLocaleString() });
-        }
-
-        function setFilter(type) {
-            filterType = type;
-            const btns = ['ALL', 'SF', 'VENDOR', 'CTC', 'CANUSE'];
-            btns.forEach(b => {
-                const el = document.getElementById(`btn-${b}`);
-                if(b === (type === 'CAN USE' ? 'CANUSE' : (type === 'VENDOR FAULT' ? 'VENDOR' : type))) {
-                    el.className = "btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl bg-orange-500 text-white";
-                } else {
-                    el.className = "btn-luxury text-[10px] font-black px-5 py-2.5 rounded-xl text-slate-400";
-                }
-            });
-            renderTable();
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            tbody.innerHTML = '';
-            const myData = getMyRecords();
-            const filtered = myData.slice().reverse().filter(r => (filterType === 'ALL' || r.judgment === filterType) && Object.values(r).some(v => String(v).toLowerCase().includes(search)));
-            filtered.forEach((r, idx) => {
-                const tr = document.createElement('tr');
-                tr.className = "group hover:bg-white/60 border-l-4 border-transparent hover:border-orange-500";
-                const isSynced = syncedRefs.includes(r.ref);
-                const cloudIcon = isSynced ? 'text-emerald-500' : 'text-slate-200';
-                const sm = { 'SF': { dot: 'bg-orange-500', glow: '#f97316', text: 'text-orange-600 bg-orange-50' }, 'VENDOR FAULT': { dot: 'bg-red-500', glow: '#ef4444', text: 'text-red-600 bg-red-50' }, 'CTC': { dot: 'bg-blue-500', glow: '#3b82f6', text: 'text-blue-600 bg-blue-50' }, 'CAN USE': { dot: 'bg-emerald-500', glow: '#10b981', text: 'text-emerald-600 bg-emerald-50' } };
-                const s = sm[r.judgment] || sm['SF'];
-                tr.innerHTML = `
-                    <td class="pl-8 py-5 font-bold text-[11px] text-slate-400">${r.date}</td>
-                    <td class="text-[11px] font-black text-slate-700">${r.shift}<br><span class="text-slate-400 font-bold">L: ${r.line}</span></td>
-                    <td class="text-[11px] font-black text-slate-400 flex items-center gap-2"><span class="${cloudIcon}">●</span>#${r.ref}</td>
-                    <td><div class="text-[11px] font-black text-slate-800 uppercase">${r.supplier}</div><div class="text-[10px] text-slate-500 font-bold">${r.partNo} / ${r.partName}</div></td>
-                    <td class="text-center text-lg font-black orbitron italic text-slate-700">${r.qty.toLocaleString()}</td>
-                    <td><div class="text-[11px] font-bold text-slate-600 uppercase">${r.defect}</div></td>
-                    <td class="text-[10px] text-slate-400 font-medium max-w-[150px] truncate">${r.remark || '-'}</td>
-                    <td class="text-center"><span class="px-4 py-2 rounded-full text-[9px] font-black uppercase border ${s.text} inline-flex items-center gap-2"><span class="w-2 h-2 rounded-full ${s.dot} status-glow" style="--color-glow: ${s.glow}"></span>${r.judgment}</span></td>
-                    <td class="pr-8 text-right whitespace-nowrap">
-                        <button onclick="cloneRecord(${r.id})" class="opacity-0 group-hover:opacity-100 text-blue-500 mr-3 text-sm">📑</button>
-                        <button onclick="del(${r.id})" class="opacity-0 group-hover:opacity-100 text-red-400">✕</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-                setTimeout(() => tr.classList.add('visible'), idx * 5);
-            });
-        }
-
-        function updateMemoryLists() {
-            const myData = getMyRecords();
-            const setList = (id, key) => {
-                const list = [...new Set(myData.map(r => r[key]))].filter(Boolean);
-                document.getElementById(id).innerHTML = list.map(v => `<option value="${v}">`).join('');
-            };
-            setList('refList', 'ref'); setList('lineList', 'line'); setList('supList', 'supplier');
-            setList('ptList', 'partNo'); setList('lotList', 'partName'); setList('defectList', 'defect');
-            setList('inspectorList', 'inspector');
-        }
-
-        function openDashboard() {
-            document.getElementById('dashboardModal').style.display = 'flex';
-            document.getElementById('dashUser').innerText = currentUser;
-            const myData = getMyRecords();
-            const vendors = [...new Set(myData.map(r => r.supplier))].filter(Boolean).sort();
-            document.getElementById('dashVendor').innerHTML = '<option value="ALL">ALL VENDORS</option>' + vendors.map(v => `<option value="${v}">${v}</option>`).join('');
-            resetDashFilters();
-            applyAutoScale();
-        }
-
-        function closeDashboard() { document.getElementById('dashboardModal').style.display = 'none'; }
-        function resetDashFilters() {
-            document.getElementById('dashStart').value = "";
-            document.getElementById('dashEnd').value = "";
-            document.getElementById('dashVendor').value = "ALL";
-            refreshDashboardData();
-        }
-
-        function refreshDashboardData() {
-            const start = document.getElementById('dashStart').value;
-            const end = document.getElementById('dashEnd').value;
-            const ven = document.getElementById('dashVendor').value;
-            let data = getMyRecords();
-            if(start) data = data.filter(r => r.date >= start);
-            if(end) data = data.filter(r => r.date <= end);
-            if(ven !== "ALL") data = data.filter(r => r.supplier === ven);
-          
-            const stats = { SF:0, VEN:0, CTC:0, OK:0, tQ:0, sfL:0, venL:0, ctcL:0, okL:0, tL:data.length };
-            data.forEach(r => {
-                stats.tQ += r.qty;
-                if(r.judgment === 'SF') { stats.SF += r.qty; stats.sfL++; }
-                else if(r.judgment === 'VENDOR FAULT') { stats.VEN += r.qty; stats.venL++; }
-                else if(r.judgment === 'CTC') { stats.CTC += r.qty; stats.ctcL++; }
-                else if(r.judgment === 'CAN USE') { stats.OK += r.qty; stats.okL++; }
-            });
-
-            animateNumber('dash-total-qty', stats.tQ);
-            document.getElementById('dash-total-lot').innerText = stats.tL.toLocaleString();
-          
-            const updateSub = (pre, q, l, tq, tl) => {
-                animateNumber(`dash-${pre}-qty`, q);
-                document.getElementById(`dash-${pre}-lot`).innerText = l;
-                document.getElementById(`dash-${pre}-pct`).innerText = tq > 0 ? Math.round((q/tq)*100)+'%' : '0%';
-            };
-            updateSub('sf', stats.SF, stats.sfL, stats.tQ, stats.tL);
-            updateSub('ven', stats.VEN, stats.venL, stats.tQ, stats.tL);
-            updateSub('ctc', stats.CTC, stats.ctcL, stats.tQ, stats.tL);
-            updateSub('ok', stats.OK, stats.okL, stats.tQ, stats.tL);
-
-            renderCharts(data);
-            renderRankings(data);
-        }
-
-        function renderRankings(data) {
-            const getTop = (key, limit=10) => {
-                const map = {};
-                data.forEach(r => map[r[key]] = (map[r[key]] || 0) + r.qty);
-                return Object.entries(map).sort((a,b) => b[1]-a[1]).slice(0, limit);
-            };
-
-            const draw = (id, items, color) => {
-                const max = items[0]?.[1] || 1;
-                document.getElementById(id).innerHTML = items.map(([k, v]) => `
-                    <div class="bar-container" title="${k}: ${v.toLocaleString()}">
-                        <div class="bar-label"><span>${k}</span><span class="bar-val">${v.toLocaleString()}</span></div>
-                        <div class="bar-bg"><div class="bar-fill" style="width:${(v/max)*100}%; background:${color}" data-pct="${Math.round((v/max)*100)}%"></div></div>
-                    </div>
-                `).join('');
-            };
-
-            draw('top-suppliers-qty', getTop('supplier'), 'var(--luxury-orange)');
-            draw('top-defects-qty', getTop('defect'), 'var(--luxury-red)');
-            draw('top-parts-qty', getTop('partNo'), 'var(--luxury-blue)');
-        }
-
-        function renderCharts(data) {
-            if(charts.trend) charts.trend.destroy();
-            if(charts.radar) charts.radar.destroy();
-
-            // Monthly Trend Logic
-            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const trendData = new Array(12).fill(0);
-            data.forEach(r => {
-                const m = new Date(r.date).getMonth();
-                trendData[m] += r.qty;
-            });
-
-            charts.trend = new Chart(document.getElementById('monthlyTrendChart'), {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [{
-                        label: 'Total Qty',
-                        data: trendData,
-                        borderColor: '#f97316',
-                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
-                        fill: true, tension: 0.4, borderWidth: 4, pointRadius: 4
-                    }]
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, datalabels: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { display: false } } ,
-                              x: { beginAtZero: true, grid: { display: false}}}
-                }
-            });
-
-            // Top Lines Radar
-            const lineMap = {};
-            data.forEach(r => lineMap[r.line] = (lineMap[r.line] || 0) + r.qty);
-            const topLines = Object.entries(lineMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
-
-            charts.radar = new Chart(document.getElementById('topLinesRadarChart'), {
-                type: 'radar',
-                data: {
-                    labels: topLines.map(l => l[0]),
-                    datasets: [{
-                        data: topLines.map(l => l[1]),
-                        backgroundColor: 'rgba(249, 115, 22, 0.2)',
-                        borderColor: '#f97316',
-                        borderWidth: 2, pointBackgroundColor: '#f97316'
-                    }]
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.1)' } } },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-        function refreshAll() {
-            renderTable();
-            updateMemoryLists();
-            const data = getMyRecords();
-            let tQ=0, sf=0, ven=0, ctc=0, ok=0, sfL=0, venL=0, ctcL=0, okL=0;
-            data.forEach(r => {
-                tQ += r.qty;
-                if(r.judgment === 'SF') { sf += r.qty; sfL++; }
-                else if(r.judgment === 'VENDOR FAULT') { ven += r.qty; venL++; }
-                else if(r.judgment === 'CTC') { ctc += r.qty; ctcL++; }
-                else if(r.judgment === 'CAN USE') { ok += r.qty; okL++; }
-            });
-
-            animateNumber('masterQty', tQ);
-            document.getElementById('masterLot').innerText = data.length;
-            
-            const up = (id, q, l, pctId, total) => {
-                animateNumber(id, q);
-                document.getElementById('lot'+id.replace('qty','')).innerText = l;
-                document.getElementById(pctId).innerText = total > 0 ? Math.round((q/total)*100)+'%' : '0%';
-            };
-            up('qtySF', sf, sfL, 'pctSF', tQ);
-            up('qtyVendor', ven, venL, 'pctVendor', tQ);
-            up('qtyCTC', ctc, ctcL, 'pctCTC', tQ);
-            up('qtyCanUse', ok, okL, 'pctCanUse', tQ);
-        }
-
-    </script>
+/* ══ JOB PROJECT — fix viewport on navigate back ══ */
+function openJobProject(){
+  // Save scroll/state, then navigate
+  window.location.href='job_project.html';
+}
+</script>
 </body>
 </html>
