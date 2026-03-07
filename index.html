@@ -1588,25 +1588,22 @@ function openDashboard(){
 
   $id('dashUser').textContent=currentUser;
 
-  // Populate vendor filter (fast, cheap)
+  // Vendor filter
   const vendors=[...new Set(getMyRecords().map(r=>r.supplier))].filter(Boolean).sort();
   $id('dashVendor').innerHTML='<option value="ALL">ALL VENDORS</option>'+
     vendors.map(v=>`<option value="${v}">${v}</option>`).join('');
 
-  // ① Animate entrance — backdrop + panel
-  const tl=gsap.timeline({
-    onComplete:()=>{
-      // ② After animation: compute + render — browser is idle between frames
-      _lastDashHash='__none__'; // force full render on open
-      _refreshDashRAF=null;
-      refreshDash();
-    }
-  });
-  tl.to(modal,{opacity:1,duration:.22,ease:'power2.out'});
-  tl.fromTo('.glass-dash',
-    {opacity:0,y:20,scale:.975},
-    {opacity:1,y:0,scale:1,duration:.3,ease:'back.out(1.5)'},
-    '-=.12'
+  // ① Render data IMMEDIATELY — before animation even starts
+  _lastDashHash='__none__';
+  _refreshDashRAF=null;
+  _doRefreshDash();
+
+  // ② Animate entrance CONCURRENTLY (data already rendering behind it)
+  gsap.to(modal,{opacity:1,duration:.2,ease:'power2.out'});
+  gsap.fromTo('.glass-dash',
+    {opacity:0,y:14,scale:.98},
+    {opacity:1,y:0,scale:1,duration:.26,ease:'back.out(1.3)'},
+    '-=.1'
   );
 }
 
@@ -1721,8 +1718,10 @@ function _doRefreshDash(){
     padding:10,cornerRadius:8,borderColor:'rgba(249,115,22,.25)',borderWidth:1
   };
 
-  // Chart 1: Trend line — immediate
+  // ── Build all 3 charts in ONE requestAnimationFrame — zero stagger ──
   requestAnimationFrame(()=>{
+
+    // Chart 1: Trend line
     const tCtx=$id('trendChart');
     if(tCtx&&!charts.trend) charts.trend=new Chart(tCtx,{
       type:'line',
@@ -1731,10 +1730,10 @@ function _doRefreshDash(){
         borderColor:'#f97316',borderWidth:2.5,tension:.42,fill:true,
         backgroundColor:ctx=>{
           const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||180);
-          g.addColorStop(0,'rgba(249,115,22,.16)');g.addColorStop(1,'rgba(249,115,22,.0)');return g;
+          g.addColorStop(0,'rgba(249,115,22,.15)');g.addColorStop(1,'rgba(249,115,22,.0)');return g;
         },
-        pointRadius:3.5,pointBackgroundColor:'#fff',pointBorderColor:'#f97316',pointBorderWidth:2,
-        pointHoverRadius:6,pointHoverBorderWidth:2.5
+        pointRadius:3,pointBackgroundColor:'#fff',pointBorderColor:'#f97316',pointBorderWidth:2,
+        pointHoverRadius:5,pointHoverBorderWidth:2
       }]},
       options:{responsive:true,maintainAspectRatio:false,
         devicePixelRatio:window.devicePixelRatio||1,
@@ -1743,80 +1742,77 @@ function _doRefreshDash(){
           x:{grid:{display:false},border:{display:false},ticks:{font:{size:9,weight:'bold'},color:'#94a3b8',maxRotation:0}},
           y:{grid:{display:false},border:{display:false},ticks:{display:false}}
         },
-        animation:{duration:480,easing:'easeOutCubic'},
-        transitions:{active:{animation:{duration:200}}}
+        animation:{duration:320,easing:'easeOutQuad'},
+        transitions:{active:{animation:{duration:120}}}
       }
     });
 
-    // Chart 2: Donut — 60ms after trend
-    setTimeout(()=>{
-      const sfQ=sf,venQ=ven2,ctcQ=ctc,okQ=ok,totalQ=tQ;
-      const dn=$id('donutTotal');if(dn)dn.textContent=totalQ.toLocaleString();
-      const dCtx=$id('donutChart');
-      if(dCtx&&!charts.donut) charts.donut=new Chart(dCtx,{
-        type:'doughnut',
-        data:{
-          labels:['SF','Vendor','CTC','OK'],
-          datasets:[{
-            data:[sfQ,venQ,ctcQ,okQ],
-            backgroundColor:['#f97316','#ef4444','#3b82f6','#10b981'],
-            hoverBackgroundColor:['#fb923c','#f87171','#60a5fa','#34d399'],
-            borderWidth:2,borderColor:'rgba(15,23,42,.7)',hoverOffset:6
-          }]
+    // Chart 2: Donut — same RAF tick
+    const sfQ=sf,venQ=ven2,ctcQ=ctc,okQ=ok,totalQ=tQ;
+    const dn=$id('donutTotal');if(dn)dn.textContent=totalQ.toLocaleString();
+    const dCtx=$id('donutChart');
+    if(dCtx&&!charts.donut) charts.donut=new Chart(dCtx,{
+      type:'doughnut',
+      data:{
+        labels:['SF','Vendor','CTC','OK'],
+        datasets:[{
+          data:[sfQ,venQ,ctcQ,okQ],
+          backgroundColor:['#f97316','#ef4444','#3b82f6','#10b981'],
+          hoverBackgroundColor:['#fb923c','#f87171','#60a5fa','#34d399'],
+          borderWidth:2,borderColor:'rgba(15,23,42,.7)',hoverOffset:5
+        }]
+      },
+      options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
+        devicePixelRatio:window.devicePixelRatio||1,
+        plugins:{
+          legend:{display:true,position:'bottom',labels:{
+            color:'rgba(255,255,255,.6)',font:{size:8,weight:'bold'},
+            boxWidth:7,padding:6,usePointStyle:true,pointStyleWidth:6
+          }},
+          datalabels:{display:false},
+          tooltip:{...tooltip,callbacks:{label:ctx=>{
+            const v=ctx.parsed,t=totalQ||1;
+            return ' '+v.toLocaleString()+' ('+(t>0?((v/t)*100).toFixed(1):'0')+'%)';
+          }}}
         },
-        options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
-          devicePixelRatio:window.devicePixelRatio||1,
-          plugins:{
-            legend:{display:true,position:'bottom',labels:{
-              color:'rgba(255,255,255,.6)',font:{size:8,weight:'bold'},
-              boxWidth:7,padding:6,usePointStyle:true,pointStyleWidth:6
-            }},
-            datalabels:{display:false},
-            tooltip:{...tooltip,callbacks:{label:ctx=>{
-              const v=ctx.parsed,t=totalQ||1;
-              return ' '+v.toLocaleString()+' ('+(t>0?((v/t)*100).toFixed(1):'0')+'%)';
-            }}}
-          },
-          animation:{animateRotate:true,animateScale:false,duration:500,easing:'easeOutCubic'},
-          transitions:{active:{animation:{duration:180}}}
-        }
-      });
-    },60);
+        animation:{animateRotate:true,animateScale:false,duration:350,easing:'easeOutQuad'},
+        transitions:{active:{animation:{duration:120}}}
+      }
+    });
 
-    // Chart 3: Top Lines bar — 120ms after trend
-    setTimeout(()=>{
-      const topLines=Object.entries(lineMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
-      const rCtx=$id('radarChart');
-      if(rCtx&&!charts.radar){
-        if(topLines.length){
-          charts.radar=new Chart(rCtx,{
-            type:'bar',
-            data:{
-              labels:topLines.map(l=>l[0]),
-              datasets:[{
-                label:'Qty',data:topLines.map(l=>l[1]),
-                backgroundColor:'rgba(249,115,22,.75)',
-                hoverBackgroundColor:'rgba(249,115,22,1)',
-                borderRadius:5,barThickness:14
-              }]
+    // Chart 3: Top Lines bar — same RAF tick
+    const topLines=Object.entries(lineMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const rCtx=$id('radarChart');
+    if(rCtx&&!charts.radar){
+      if(topLines.length){
+        charts.radar=new Chart(rCtx,{
+          type:'bar',
+          data:{
+            labels:topLines.map(l=>l[0]),
+            datasets:[{
+              label:'Qty',data:topLines.map(l=>l[1]),
+              backgroundColor:'rgba(249,115,22,.75)',
+              hoverBackgroundColor:'rgba(249,115,22,1)',
+              borderRadius:5,barThickness:14
+            }]
+          },
+          options:{
+            responsive:true,maintainAspectRatio:false,indexAxis:'y',
+            devicePixelRatio:window.devicePixelRatio||1,
+            layout:{padding:{right:48}},
+            scales:{
+              x:{display:false,grid:{display:false},border:{display:false}},
+              y:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:10,weight:'bold'},padding:4}}
             },
-            options:{
-              responsive:true,maintainAspectRatio:false,indexAxis:'y',
-              devicePixelRatio:window.devicePixelRatio||1,
-              layout:{padding:{right:48}},
-              scales:{
-                x:{display:false,grid:{display:false},border:{display:false}},
-                y:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:10,weight:'bold'},padding:4}}
-              },
-              plugins:{
-                legend:{display:false},
-                datalabels:{anchor:'end',align:'end',color:'#94a3b8',font:{size:9,weight:'bold',family:'Orbitron'},formatter:v=>v.toLocaleString(),clip:false},
-                tooltip
-              },
-              animation:{duration:480,easing:'easeOutCubic'},
-              transitions:{active:{animation:{duration:150}}}
-            }
-          });
+            plugins:{
+              legend:{display:false},
+              datalabels:{anchor:'end',align:'end',color:'#94a3b8',font:{size:9,weight:'bold',family:'Orbitron'},formatter:v=>v.toLocaleString(),clip:false},
+              tooltip
+            },
+            animation:{duration:320,easing:'easeOutQuad'},
+            transitions:{active:{animation:{duration:120}}}
+          }
+        });
         }else{
           // Fallback: shift bars
           const sv=Object.entries(shiftMap).sort((a,b)=>b[1]-a[1]);
@@ -1834,11 +1830,8 @@ function _doRefreshDash(){
         }
       }
 
-      // ── ④ Rankings — deferred after charts paint ─────────
-      const cb=()=>_renderRankingsFast(data,tQ,supplierMap,defectMap,partMap);
-      if('requestIdleCallback' in window){requestIdleCallback(cb,{timeout:400});}
-      else{setTimeout(cb,60);}
-    },120);
+      // ── ④ Rankings — same frame, no deferral ─────────
+      _renderRankingsFast(data,tQ,supplierMap,defectMap,partMap);
   });
 }
 
@@ -1870,13 +1863,9 @@ function _renderRankingsFast(data,totalQty,supplierMap,defectMap,partMap){
       </div>`;
     });
     el.innerHTML=h;
-    // Animate bars — batch RAF, no setTimeout per bar
+    // Animate bars — all instant in single RAF
     requestAnimationFrame(()=>{
-      const fills=el.querySelectorAll('.bar-fill');
-      fills.forEach((b,i)=>{
-        if(i<4){b.style.width=b.dataset.w+'%';} // top 4 instant
-        else setTimeout(()=>b.style.width=b.dataset.w+'%',(i-4)*40);
-      });
+      el.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%');
     });
   };
   draw('rankSuppliers',toTop(supplierMap,8),'linear-gradient(90deg,#f97316,#fbbf24)','#f97316');
