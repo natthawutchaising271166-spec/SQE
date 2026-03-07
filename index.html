@@ -1573,247 +1573,315 @@ function refreshAll(){
   });
 }
 
-/* ══ DASHBOARD ══ */
+/* ══════════════════════════════════════════
+   DASHBOARD — PIPELINE OPEN (zero lag)
+   1. show modal instantly (display:flex)
+   2. animate entrance (GSAP)
+   3. after animation: render KPIs + charts + rankings
+═══════════════════════════════════════════ */
+let _lastDashHash='__none__'; // cache key to skip redundant chart rebuild
+
 function openDashboard(){
-  $id('dashboardModal').style.display='flex';
+  const modal=$id('dashboardModal');
+  modal.style.display='flex';
+  modal.style.opacity='0';
+
   $id('dashUser').textContent=currentUser;
+
+  // Populate vendor filter (fast, cheap)
   const vendors=[...new Set(getMyRecords().map(r=>r.supplier))].filter(Boolean).sort();
-  $id('dashVendor').innerHTML='<option value="ALL">ALL VENDORS</option>'+vendors.map(v=>`<option value="${v}">${v}</option>`).join('');
-  resetDashFilters();
-  // Entrance: backdrop fade + content stagger via CSS animation-delay
-  gsap.fromTo('#dashboardModal',{opacity:0},{opacity:1,duration:.3,ease:'power2.out'});
-  gsap.fromTo('.glass-dash',{opacity:0,y:16},{opacity:1,y:0,duration:.38,ease:'back.out(1.4)',delay:.05});
+  $id('dashVendor').innerHTML='<option value="ALL">ALL VENDORS</option>'+
+    vendors.map(v=>`<option value="${v}">${v}</option>`).join('');
+
+  // ① Animate entrance — backdrop + panel
+  const tl=gsap.timeline({
+    onComplete:()=>{
+      // ② After animation: compute + render — browser is idle between frames
+      _lastDashHash='__none__'; // force full render on open
+      _refreshDashRAF=null;
+      refreshDash();
+    }
+  });
+  tl.to(modal,{opacity:1,duration:.22,ease:'power2.out'});
+  tl.fromTo('.glass-dash',
+    {opacity:0,y:20,scale:.975},
+    {opacity:1,y:0,scale:1,duration:.3,ease:'back.out(1.5)'},
+    '-=.12'
+  );
 }
+
 function closeDashboard(){
-  gsap.to('.glass-dash',{opacity:0,y:10,duration:.18,ease:'power2.in',onComplete:()=>{
-    $id('dashboardModal').style.display='none';
-    gsap.set(['.glass-dash','#dashboardModal'],{clearProps:'all'});
-  }});
+  gsap.to('.glass-dash',{opacity:0,y:8,scale:.98,duration:.17,ease:'power2.in',
+    onComplete:()=>{
+      $id('dashboardModal').style.display='none';
+      gsap.set(['.glass-dash','#dashboardModal'],{clearProps:'all'});
+      // Destroy charts to free GPU memory
+      ['trend','donut','radar'].forEach(k=>{if(charts[k]){charts[k].destroy();charts[k]=null;}});
+      _lastDashHash='__none__';
+    }
+  });
 }
+
 function resetDashFilters(){
   $id('dashStart').value='';$id('dashEnd').value='';$id('dashVendor').value='ALL';
+  _lastDashHash='__none__';
   refreshDash();
 }
+
+let _refreshDashRAF=null;
 function refreshDash(){
-  const start=$id('dashStart').value,end=$id('dashEnd').value,ven=$id('dashVendor').value;
-  let data=getMyRecords();
-  if(start)data=data.filter(r=>r.date>=start);
-  if(end)  data=data.filter(r=>r.date<=end);
-  if(ven!=='ALL')data=data.filter(r=>r.supplier===ven);
-
-  let tQ=0,sf=0,ven2=0,ctc=0,ok=0,sfL=0,venL=0,ctcL=0,okL=0;
-  data.forEach(r=>{tQ+=r.qty;
-    if(r.judgment==='SF')           {sf+=r.qty;sfL++;}
-    else if(r.judgment==='VENDOR FAULT'){ven2+=r.qty;venL++;}
-    else if(r.judgment==='CTC')     {ctc+=r.qty;ctcL++;}
-    else if(r.judgment==='CAN USE') {ok+=r.qty;okL++;}
+  // Debounce rapid filter changes
+  if(_refreshDashRAF)cancelAnimationFrame(_refreshDashRAF);
+  _refreshDashRAF=requestAnimationFrame(()=>{
+    _refreshDashRAF=null;
+    _doRefreshDash();
   });
-  animNum('dTotalQty',tQ);$id('dTotalLot').textContent=data.length;
-  const pct=(v,t)=>t>0?Math.round((v/t)*100)+'%':'0%';
-  const upd=(pre,qty,lot,p)=>{animNum('d'+pre+'qty',qty);$id('d'+pre+'lot').textContent=lot;$id('d'+pre+'pct').textContent=p;};
-  upd('SF',sf,sfL,pct(sf,tQ));upd('VEN',ven2,venL,pct(ven2,tQ));
-  upd('CTC',ctc,ctcL,pct(ctc,tQ));upd('OK',ok,okL,pct(ok,tQ));
-  /* Insight stats */
-  const rejQ=sf+ven2+ctc;
-  const rejRateEl=$id('dRejRate');if(rejRateEl)rejRateEl.textContent=tQ>0?Math.round((rejQ/tQ)*100)+'%':'0%';
-  const shiftMap={};data.forEach(r=>{shiftMap[r.shift]=(shiftMap[r.shift]||0)+r.qty;});
-  const topShift=Object.entries(shiftMap).sort((a,b)=>b[1]-a[1])[0];
-  const topShiftEl=$id('dTopShift');if(topShiftEl)topShiftEl.textContent=topShift?topShift[0].replace('SHIFT ','S'):'—';
-  const avgEl=$id('dAvgQty');if(avgEl)avgEl.textContent=data.length>0?Math.round(tQ/data.length).toLocaleString():'0';
-  const days=new Set(data.map(r=>r.date)).size;
-  const daysEl=$id('dActiveDays');if(daysEl)daysEl.textContent=days;
-
-  if(data.length>1){
-    const cnt=new Array(12).fill(0);
-    data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m))cnt[m]+=r.qty;});
-    const peak=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][cnt.indexOf(Math.max(...cnt))];
-    const top=sf>=ven2&&sf>=ctc?'SF FAULT':ven2>=ctc?'VENDOR FAULT':'CTC FAULT';
-    $id('monthlyInsight').innerHTML='Peak: <b>'+peak+'</b> · Main: <span style="color:#ef4444;font-weight:900">'+top+'</span>';
-  }else{$id('monthlyInsight').textContent='—';}
-
-  renderDashCharts(data);
-  renderRankings(data);
 }
 
-function renderDashCharts(data){
-  // Destroy existing
+function _doRefreshDash(){
+  const start=$id('dashStart').value,end=$id('dashEnd').value,ven=$id('dashVendor').value;
+
+  // ── Single-pass data compute ──────────────────────────────
+  const raw=getMyRecords();
+  const data=[];
+  for(let i=0;i<raw.length;i++){
+    const r=raw[i];
+    if(start&&r.date<start)continue;
+    if(end  &&r.date>end)  continue;
+    if(ven!=='ALL'&&r.supplier!==ven)continue;
+    data.push(r);
+  }
+
+  // One loop — compute everything
+  let tQ=0,sf=0,ven2=0,ctc=0,ok=0,sfL=0,venL=0,ctcL=0,okL=0;
+  const byMonth=new Array(12).fill(0);
+  const shiftMap={},lineMap={},supplierMap={},defectMap={},partMap={};
+  const dateSet=new Set();
+
+  for(let i=0;i<data.length;i++){
+    const r=data[i];
+    tQ+=r.qty;
+    if(r.judgment==='SF')               {sf+=r.qty;sfL++;}
+    else if(r.judgment==='VENDOR FAULT'){ven2+=r.qty;venL++;}
+    else if(r.judgment==='CTC')         {ctc+=r.qty;ctcL++;}
+    else if(r.judgment==='CAN USE')     {ok+=r.qty;okL++;}
+    // month (parse yyyy-mm-dd directly — avoid new Date() overhead)
+    if(r.date&&r.date.length>=7){const m=parseInt(r.date.slice(5,7),10)-1;if(m>=0&&m<12)byMonth[m]+=r.qty;}
+    if(r.shift)shiftMap[r.shift]=(shiftMap[r.shift]||0)+r.qty;
+    if(r.line) lineMap[r.line] =(lineMap[r.line] ||0)+r.qty;
+    if(r.supplier)supplierMap[r.supplier]=(supplierMap[r.supplier]||0)+r.qty;
+    if(r.defect)  defectMap[r.defect]    =(defectMap[r.defect]    ||0)+r.qty;
+    if(r.partNo)  partMap[r.partNo]      =(partMap[r.partNo]      ||0)+r.qty;
+    if(r.date)dateSet.add(r.date);
+  }
+
+  // Hash — skip chart rebuild if data didn't change
+  const dashHash=start+'|'+end+'|'+ven+'|'+tQ+'|'+sf+'|'+ven2+'|'+ctc+'|'+ok+'|'+data.length;
+
+  // ── ① KPI numbers — instant, no Chart.js ─────────────────
+  $id('dTotalLot').textContent=data.length;
+  const pct=(v,t)=>t>0?Math.round((v/t)*100)+'%':'0%';
+  const upd=(pre,qty,lot,p)=>{
+    const qEl=$id('d'+pre+'qty'),lEl=$id('d'+pre+'lot'),pEl=$id('d'+pre+'pct');
+    if(qEl){const obj={v:parseInt(qEl.textContent.replace(/[^0-9]/g,''))||0};gsap.to(obj,{v:qty,duration:.55,ease:'power2.out',onUpdate:()=>qEl.textContent=Math.floor(obj.v).toLocaleString()});}
+    if(lEl)lEl.textContent=lot;
+    if(pEl)pEl.textContent=p;
+  };
+  // Total
+  const tEl=$id('dTotalQty');
+  if(tEl){const obj={v:parseInt(tEl.textContent.replace(/[^0-9]/g,''))||0};gsap.to(obj,{v:tQ,duration:.55,ease:'power2.out',onUpdate:()=>tEl.textContent=Math.floor(obj.v).toLocaleString()});}
+  upd('SF',sf,sfL,pct(sf,tQ));upd('VEN',ven2,venL,pct(ven2,tQ));
+  upd('CTC',ctc,ctcL,pct(ctc,tQ));upd('OK',ok,okL,pct(ok,tQ));
+
+  // ── ② Insight stats ──────────────────────────────────────
+  const rejQ=sf+ven2+ctc;
+  const rEl=$id('dRejRate');if(rEl)rEl.textContent=tQ>0?Math.round((rejQ/tQ)*100)+'%':'0%';
+  const topShift=Object.entries(shiftMap).sort((a,b)=>b[1]-a[1])[0];
+  const tsEl=$id('dTopShift');if(tsEl)tsEl.textContent=topShift?topShift[0].replace('SHIFT ','S'):'—';
+  const avgEl=$id('dAvgQty');if(avgEl)avgEl.textContent=data.length>0?Math.round(tQ/data.length).toLocaleString():'0';
+  const daysEl=$id('dActiveDays');if(daysEl)daysEl.textContent=dateSet.size;
+
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if(data.length>1){
+    const peak=mo[byMonth.indexOf(Math.max(...byMonth))];
+    const top=sf>=ven2&&sf>=ctc?'SF FAULT':ven2>=ctc?'VENDOR FAULT':'CTC FAULT';
+    $id('monthlyInsight').innerHTML='Peak: <b>'+peak+'</b> · <span style="color:#ef4444;font-weight:900">'+top+'</span>';
+  }else{$id('monthlyInsight').textContent='—';}
+
+  // ── ③ Charts — staggered, only when data changed ─────────
+  if(dashHash===_lastDashHash)return; // nothing changed — skip heavy rebuild
+  _lastDashHash=dashHash;
+
+  // Destroy old charts
   ['trend','donut','radar'].forEach(k=>{if(charts[k]){charts[k].destroy();charts[k]=null;}});
 
-  const noGrid={display:false};
-  const noTick=color=>({grid:noGrid,ticks:{font:{size:10,weight:'bold'},color:color||'#94a3b8'}});
   const tooltip={
     enabled:true,backgroundColor:'rgba(6,10,20,.92)',
     titleFont:{family:'Orbitron',size:11,weight:'900'},bodyFont:{family:'Inter',size:10,weight:'bold'},
     padding:10,cornerRadius:8,borderColor:'rgba(249,115,22,.25)',borderWidth:1
   };
 
-  /* ── Monthly Trend (line) ── */
-  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const byMonth=new Array(12).fill(0);
-  data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m))byMonth[m]+=r.qty;});
-  const peakIdx=byMonth.indexOf(Math.max(...byMonth));
-  if(data.length>1){
-    const sfQ=data.filter(r=>r.judgment==='SF').reduce((s,r)=>s+r.qty,0);
-    const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
-    const ctcQ=data.filter(r=>r.judgment==='CTC').reduce((s,r)=>s+r.qty,0);
-    const top=sfQ>=venQ&&sfQ>=ctcQ?'SF':venQ>=ctcQ?'VENDOR':'CTC';
-    $id('monthlyInsight').innerHTML='Peak: <b>'+mo[peakIdx]+'</b> · <span style="color:#ef4444;font-weight:900">'+top+' dominant</span>';
-  } else $id('monthlyInsight').textContent='—';
-
-  const tCtx=$id('trendChart');
-  if(tCtx) charts.trend=new Chart(tCtx,{
-    type:'line',
-    data:{labels:mo,datasets:[{
-      label:'Qty',data:byMonth,
-      borderColor:'#f97316',borderWidth:3,tension:.42,fill:true,
-      backgroundColor:ctx=>{
-        const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||200);
-        g.addColorStop(0,'rgba(249,115,22,.18)');g.addColorStop(1,'rgba(249,115,22,.01)');return g;
-      },
-      pointRadius:4,pointBackgroundColor:'#fff',pointBorderColor:'#f97316',pointBorderWidth:2.5,
-      pointHoverRadius:7,pointHoverBorderWidth:3
-    }]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},datalabels:{display:false},tooltip},
-      scales:{
-        x:{grid:{display:false},border:{display:false},ticks:{font:{size:10,weight:'bold'},color:'#94a3b8'}},
-        y:{grid:{display:false},border:{display:false},ticks:{display:false}}
-      },
-      animation:{duration:900,easing:'easeOutQuart'}
-    }
-  });
-
-  /* ── Fault Mix Donut ── */
-  const sfQ=data.filter(r=>r.judgment==='SF').reduce((s,r)=>s+r.qty,0);
-  const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
-  const ctcQ=data.filter(r=>r.judgment==='CTC').reduce((s,r)=>s+r.qty,0);
-  const okQ=data.filter(r=>r.judgment==='CAN USE').reduce((s,r)=>s+r.qty,0);
-  const totalQ=sfQ+venQ+ctcQ+okQ;
-  const dn=$id('donutTotal');if(dn)dn.textContent=totalQ.toLocaleString();
-  const dCtx=$id('donutChart');
-  if(dCtx) charts.donut=new Chart(dCtx,{
-    type:'doughnut',
-    data:{
-      labels:['SF Fault','Vendor','CTC','Can Use'],
-      datasets:[{
-        data:[sfQ,venQ,ctcQ,okQ],
-        backgroundColor:['#f97316','#ef4444','#3b82f6','#10b981'],
-        hoverBackgroundColor:['#fb923c','#f87171','#60a5fa','#34d399'],
-        borderWidth:2.5,borderColor:'rgba(15,23,42,.7)',hoverOffset:8
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
-      plugins:{
-        legend:{display:true,position:'bottom',labels:{
-          color:'rgba(255,255,255,.6)',font:{size:8,weight:'bold'},
-          boxWidth:7,padding:6,usePointStyle:true,pointStyleWidth:6
-        }},
-        datalabels:{display:false},tooltip:{...tooltip,callbacks:{label:ctx=>{
-          const v=ctx.parsed;const t=totalQ||1;
-          return ' '+v.toLocaleString()+' ('+(t>0?((v/t)*100).toFixed(1):'0')+'%)';
-        }}}
-      },
-      animation:{animateRotate:true,animateScale:true,duration:1000,easing:'easeOutQuart'}
-    }
-  });
-
-  /* ── Top Lines — horizontal bar ── */
-  const lineMap={};
-  data.forEach(r=>{if(r.line)lineMap[r.line]=(lineMap[r.line]||0)+r.qty;});
-  const topLines=Object.entries(lineMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const rCtx=$id('radarChart');
-  if(rCtx&&topLines.length) charts.radar=new Chart(rCtx,{
-    type:'bar',
-    data:{
-      labels:topLines.map(l=>l[0]),
-      datasets:[{
-        label:'Qty',data:topLines.map(l=>l[1]),
+  // Chart 1: Trend line — immediate
+  requestAnimationFrame(()=>{
+    const tCtx=$id('trendChart');
+    if(tCtx&&!charts.trend) charts.trend=new Chart(tCtx,{
+      type:'line',
+      data:{labels:mo,datasets:[{
+        label:'Qty',data:byMonth,
+        borderColor:'#f97316',borderWidth:2.5,tension:.42,fill:true,
         backgroundColor:ctx=>{
-          const g=ctx.chart.ctx.createLinearGradient(ctx.chart.width||300,0,0,0);
-          g.addColorStop(0,'rgba(249,115,22,.9)');
-          g.addColorStop(1,'rgba(249,115,22,.35)');
-          return g;
+          const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||180);
+          g.addColorStop(0,'rgba(249,115,22,.16)');g.addColorStop(1,'rgba(249,115,22,.0)');return g;
         },
-        hoverBackgroundColor:'rgba(249,115,22,1)',
-        borderRadius:6,barThickness:16
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      indexAxis:'y',
-      layout:{padding:{right:44}},
-      scales:{
-        x:{display:false,grid:{display:false},border:{display:false}},
-        y:{
-          grid:{display:false},border:{display:false},
-          ticks:{color:'#64748b',font:{size:10,weight:'bold'},padding:4}
-        }
-      },
-      plugins:{
-        legend:{display:false},
-        datalabels:{
-          anchor:'end',align:'end',
-          color:'#94a3b8',font:{size:9,weight:'bold',family:'Orbitron'},
-          formatter:v=>v.toLocaleString(),clip:false
-        },
-        tooltip
-      },
-      animation:{duration:900,easing:'easeOutQuart'}
-    }
-  });
-  else if(rCtx){
-    // No line data — show shift bars as fallback
-    const sm={'A':0,'B':0,'C':0};
-    data.forEach(r=>{const k=r.shift?.replace('SHIFT ','');if(sm[k]!==undefined)sm[k]+=r.qty;});
-    charts.radar=new Chart(rCtx,{type:'bar',
-      data:{labels:['SHIFT A','SHIFT B','SHIFT C'],
-        datasets:[{data:Object.values(sm),
-          backgroundColor:['rgba(249,115,22,.85)','rgba(59,130,246,.85)','rgba(16,185,129,.85)'],
-          borderRadius:12,barPercentage:.6
-        }]},
+        pointRadius:3.5,pointBackgroundColor:'#fff',pointBorderColor:'#f97316',pointBorderWidth:2,
+        pointHoverRadius:6,pointHoverBorderWidth:2.5
+      }]},
       options:{responsive:true,maintainAspectRatio:false,
-        scales:{x:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:11,weight:'bold',family:'Orbitron'}}},y:{display:false,grid:{display:false}}},
-        plugins:{legend:{display:false},datalabels:{anchor:'end',align:'top',color:'#94a3b8',font:{size:10,weight:'bold',family:'Orbitron'},formatter:v=>v>0?v.toLocaleString():''},tooltip},
-        animation:{duration:900,easing:'easeOutBounce'}
+        devicePixelRatio:window.devicePixelRatio||1,
+        plugins:{legend:{display:false},datalabels:{display:false},tooltip},
+        scales:{
+          x:{grid:{display:false},border:{display:false},ticks:{font:{size:9,weight:'bold'},color:'#94a3b8',maxRotation:0}},
+          y:{grid:{display:false},border:{display:false},ticks:{display:false}}
+        },
+        animation:{duration:480,easing:'easeOutCubic'},
+        transitions:{active:{animation:{duration:200}}}
       }
     });
-  }
+
+    // Chart 2: Donut — 60ms after trend
+    setTimeout(()=>{
+      const sfQ=sf,venQ=ven2,ctcQ=ctc,okQ=ok,totalQ=tQ;
+      const dn=$id('donutTotal');if(dn)dn.textContent=totalQ.toLocaleString();
+      const dCtx=$id('donutChart');
+      if(dCtx&&!charts.donut) charts.donut=new Chart(dCtx,{
+        type:'doughnut',
+        data:{
+          labels:['SF','Vendor','CTC','OK'],
+          datasets:[{
+            data:[sfQ,venQ,ctcQ,okQ],
+            backgroundColor:['#f97316','#ef4444','#3b82f6','#10b981'],
+            hoverBackgroundColor:['#fb923c','#f87171','#60a5fa','#34d399'],
+            borderWidth:2,borderColor:'rgba(15,23,42,.7)',hoverOffset:6
+          }]
+        },
+        options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
+          devicePixelRatio:window.devicePixelRatio||1,
+          plugins:{
+            legend:{display:true,position:'bottom',labels:{
+              color:'rgba(255,255,255,.6)',font:{size:8,weight:'bold'},
+              boxWidth:7,padding:6,usePointStyle:true,pointStyleWidth:6
+            }},
+            datalabels:{display:false},
+            tooltip:{...tooltip,callbacks:{label:ctx=>{
+              const v=ctx.parsed,t=totalQ||1;
+              return ' '+v.toLocaleString()+' ('+(t>0?((v/t)*100).toFixed(1):'0')+'%)';
+            }}}
+          },
+          animation:{animateRotate:true,animateScale:false,duration:500,easing:'easeOutCubic'},
+          transitions:{active:{animation:{duration:180}}}
+        }
+      });
+    },60);
+
+    // Chart 3: Top Lines bar — 120ms after trend
+    setTimeout(()=>{
+      const topLines=Object.entries(lineMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+      const rCtx=$id('radarChart');
+      if(rCtx&&!charts.radar){
+        if(topLines.length){
+          charts.radar=new Chart(rCtx,{
+            type:'bar',
+            data:{
+              labels:topLines.map(l=>l[0]),
+              datasets:[{
+                label:'Qty',data:topLines.map(l=>l[1]),
+                backgroundColor:'rgba(249,115,22,.75)',
+                hoverBackgroundColor:'rgba(249,115,22,1)',
+                borderRadius:5,barThickness:14
+              }]
+            },
+            options:{
+              responsive:true,maintainAspectRatio:false,indexAxis:'y',
+              devicePixelRatio:window.devicePixelRatio||1,
+              layout:{padding:{right:48}},
+              scales:{
+                x:{display:false,grid:{display:false},border:{display:false}},
+                y:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:10,weight:'bold'},padding:4}}
+              },
+              plugins:{
+                legend:{display:false},
+                datalabels:{anchor:'end',align:'end',color:'#94a3b8',font:{size:9,weight:'bold',family:'Orbitron'},formatter:v=>v.toLocaleString(),clip:false},
+                tooltip
+              },
+              animation:{duration:480,easing:'easeOutCubic'},
+              transitions:{active:{animation:{duration:150}}}
+            }
+          });
+        }else{
+          // Fallback: shift bars
+          const sv=Object.entries(shiftMap).sort((a,b)=>b[1]-a[1]);
+          charts.radar=new Chart(rCtx,{type:'bar',
+            data:{labels:sv.map(x=>x[0]),datasets:[{data:sv.map(x=>x[1]),
+              backgroundColor:['rgba(249,115,22,.8)','rgba(59,130,246,.8)','rgba(16,185,129,.8)'],
+              borderRadius:10,barPercentage:.55}]},
+            options:{responsive:true,maintainAspectRatio:false,
+              devicePixelRatio:window.devicePixelRatio||1,
+              scales:{x:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:11,weight:'bold',family:'Orbitron'}}},y:{display:false,grid:{display:false}}},
+              plugins:{legend:{display:false},datalabels:{anchor:'end',align:'top',color:'#94a3b8',font:{size:10,weight:'bold',family:'Orbitron'},formatter:v=>v>0?v.toLocaleString():''},tooltip},
+              animation:{duration:480,easing:'easeOutCubic'}
+            }
+          });
+        }
+      }
+
+      // ── ④ Rankings — deferred after charts paint ─────────
+      const cb=()=>_renderRankingsFast(data,tQ,supplierMap,defectMap,partMap);
+      if('requestIdleCallback' in window){requestIdleCallback(cb,{timeout:400});}
+      else{setTimeout(cb,60);}
+    },120);
+  });
 }
 
+// renderDashCharts is now inlined inside _doRefreshDash
 function clamp(min,max){return Math.min(max,Math.max(min,Math.round(window.innerWidth/100)));}
 
-function renderRankings(data){
-  const totalQty=data.reduce((s,r)=>s+r.qty,0)||1;
-  const getTop=(key,n=8)=>{ const m={}; data.forEach(r=>{if(r[key])m[r[key]]=(m[r[key]]||0)+r.qty;}); return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,n); };
-  const draw=(id,items,color,accentColor)=>{
+/* ── Rankings — receives pre-computed maps for zero re-scan ── */
+function _renderRankingsFast(data,totalQty,supplierMap,defectMap,partMap){
+  totalQty=totalQty||1;
+  const toTop=(map,n)=>Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,n);
+  const draw=(id,items,color,accent)=>{
     const maxV=items[0]?.[1]||1;
-    const el=$id(id); if(!el)return;
-    el.innerHTML=items.map(([k,v],i)=>{
+    const el=$id(id);if(!el)return;
+    // Build HTML string — faster than createElement in loop
+    let h='';
+    items.forEach(([k,v],i)=>{
       const pct=Math.round((v/totalQty)*100);
-      const barW=Math.round((v/maxV)*100);
-      const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
-      return `
-      <div class="bar-wrap" title="${k}: ${v.toLocaleString()} (${pct}%)">
+      const bw=Math.round((v/maxV)*100);
+      const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+      h+=`<div class="bar-wrap" title="${k}: ${v.toLocaleString()} (${pct}%)">
         <div class="bar-lbl">
-          <span class="bar-k">${rank} ${k}</span>
-          <div class="flex items-center gap-1.5">
-            <span class="orbitron" style="font-size:.62rem;color:${accentColor};font-weight:900">${pct}%</span>
-            <span class="orbitron" style="font-size:.6rem;color:#94a3b8">${v.toLocaleString()}</span>
+          <span class="bar-k">${medal} ${k}</span>
+          <div style="display:flex;align-items:center;gap:5px">
+            <span class="orbitron" style="font-size:.62rem;color:${accent};font-weight:900">${pct}%</span>
+            <span class="orbitron" style="font-size:.58rem;color:#94a3b8">${v.toLocaleString()}</span>
           </div>
         </div>
-        <div class="bar-bg">
-          <div class="bar-fill" style="width:0%;background:${color}" data-w="${barW}"></div>
-        </div>
-      </div>`}).join('');
+        <div class="bar-bg"><div class="bar-fill" style="width:0%;background:${color}" data-w="${bw}"></div></div>
+      </div>`;
+    });
+    el.innerHTML=h;
+    // Animate bars — batch RAF, no setTimeout per bar
     requestAnimationFrame(()=>{
-      el.querySelectorAll('.bar-fill').forEach((b,i)=>{
-        setTimeout(()=>{ b.style.width=b.dataset.w+'%'; }, i*55+80);
+      const fills=el.querySelectorAll('.bar-fill');
+      fills.forEach((b,i)=>{
+        if(i<4){b.style.width=b.dataset.w+'%';} // top 4 instant
+        else setTimeout(()=>b.style.width=b.dataset.w+'%',(i-4)*40);
       });
     });
   };
-  draw('rankSuppliers',getTop('supplier'),'linear-gradient(90deg,#f97316,#fbbf24)','#f97316');
-  draw('rankDefects',  getTop('defect'),  'linear-gradient(90deg,#ef4444,#f87171)','#ef4444');
-  draw('rankParts',    getTop('partNo'),  'linear-gradient(90deg,#3b82f6,#60a5fa)','#3b82f6');
+  draw('rankSuppliers',toTop(supplierMap,8),'linear-gradient(90deg,#f97316,#fbbf24)','#f97316');
+  draw('rankDefects',  toTop(defectMap,8),  'linear-gradient(90deg,#ef4444,#f87171)','#ef4444');
+  draw('rankParts',    toTop(partMap,8),    'linear-gradient(90deg,#3b82f6,#60a5fa)','#3b82f6');
 }
 
 /* ══ IMPORT / EXPORT ══ */
