@@ -46,21 +46,10 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:99px}
 ::-webkit-scrollbar-thumb:hover{background:var(--txt4)}
 
-/* ════ LOADING OVERLAY ════ */
-#loadingOverlay{
-  position:fixed;inset:0;z-index:9999;
-  background:rgba(13,27,42,.88);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
-  backdrop-filter:blur(8px);
-  transition:opacity .5s ease, visibility .5s ease;
-}
+/* LOADING */
+#loadingOverlay{position:fixed;inset:0;z-index:9999;background:rgba(13,27,42,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;backdrop-filter:blur(8px);transition:opacity .5s ease,visibility .5s ease;}
 #loadingOverlay.hidden{opacity:0;visibility:hidden;pointer-events:none;}
-.lo-spinner{
-  width:56px;height:56px;border-radius:50%;
-  border:4px solid rgba(255,107,0,.15);
-  border-top-color:#FF6B00;
-  animation:spin .9s linear infinite;
-}
+.lo-spinner{width:56px;height:56px;border-radius:50%;border:4px solid rgba(255,107,0,.15);border-top-color:#FF6B00;animation:spin .9s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .lo-logo{font-size:2.2rem;animation:lo-pulse 1.8s ease-in-out infinite;}
 @keyframes lo-pulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px rgba(255,107,0,.4))}50%{transform:scale(1.12);filter:drop-shadow(0 0 18px rgba(255,107,0,.7))}}
@@ -69,29 +58,14 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 .lo-bar-wrap{width:220px;height:4px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;}
 .lo-bar{height:100%;background:var(--sunset);border-radius:99px;width:0%;transition:width .4s ease;}
 
-/* ════ SYNC STATUS BADGE ════ */
-#syncStatus{
-  display:none;position:fixed;top:72px;right:20px;z-index:3000;
-  background:var(--navy);border:1px solid rgba(255,107,0,.3);
-  padding:8px 16px;border-radius:12px;
-  color:#fff;font-size:.72rem;font-weight:600;
-  box-shadow:0 8px 28px rgba(13,27,42,.32);
-  animation:slideInRight .35s cubic-bezier(.34,1.56,.64,1);
-}
+/* SYNC */
+#syncStatus{display:none;position:fixed;top:72px;right:20px;z-index:3000;background:var(--navy);border:1px solid rgba(255,107,0,.3);padding:8px 16px;border-radius:12px;color:#fff;font-size:.72rem;font-weight:600;box-shadow:0 8px 28px rgba(13,27,42,.32);animation:slideInRight .35s cubic-bezier(.34,1.56,.64,1);}
 @keyframes slideInRight{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
 .ss-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;animation:pulse-ss 1.4s infinite;}
 @keyframes pulse-ss{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ════ SIDEBAR ════ */
-.sidebar{
-  width:var(--sidebar-w);flex-shrink:0;background:#fff;
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  height:100dvh;overflow:hidden;
-  box-shadow:2px 0 20px rgba(13,27,42,.06);
-  position:relative;z-index:200;
-  transition:width .3s ease,transform .3s ease;
-}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;height:100dvh;overflow:hidden;box-shadow:2px 0 20px rgba(13,27,42,.06);position:relative;z-index:200;transition:width .3s ease,transform .3s ease;}
 .sidebar::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--sunset);z-index:1;}
 .sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:180px;background:linear-gradient(180deg,rgba(255,107,0,.05) 0%,transparent 100%);pointer-events:none;}
 .sb-brand{padding:20px 20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);position:relative;z-index:2;}
@@ -129,7 +103,7 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(13,27,42,.45);z-index:190;opacity:0;transition:opacity .3s;}
 .sb-overlay.active{opacity:1;}
 
-/* ════ MAIN SHELL ════ */
+/* MAIN */
 .main-wrap{flex:1;display:flex;flex-direction:column;min-width:0;height:100dvh;overflow:hidden;}
 .topbar{height:var(--topbar-h);background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0;box-shadow:0 1px 10px rgba(13,27,42,.05);}
 .topbar-dot{width:9px;height:9px;border-radius:50%;background:var(--sunset);box-shadow:0 0 0 3px var(--or-soft),0 0 12px var(--or-glow);animation:dot-pulse 3s infinite;flex-shrink:0;}
@@ -138,7 +112,7 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 #dash-timestamp{font-size:.63rem;color:var(--txt4);white-space:nowrap}
 .main-container{flex:1;overflow-y:auto;padding:var(--main-pad);}
 
-/* ════ PAGES ════ */
+/* PAGES */
 .page{display:none;flex-direction:column;gap:14px}
 .page.active{display:flex}
 .page.active>*{animation:slideUp .36s cubic-bezier(.22,.68,0,1.15) both}
@@ -220,12 +194,7 @@ input::placeholder{color:var(--txt4)}
 .btn-save{background:var(--sunset);border:none;padding:9px 17px;border-radius:var(--r-xs);color:#fff;font-weight:700;cursor:pointer;font-family:'Prompt',sans-serif;font-size:.75rem;white-space:nowrap;box-shadow:0 4px 13px var(--or-glow);transition:all .28s cubic-bezier(.34,1.56,.64,1)}
 .btn-save:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 10px 26px rgba(255,107,0,.46)}
 .btn-save:active{transform:scale(.95)}
-.btn-del{
-  background:none;border:none;cursor:pointer;
-  opacity:.3;padding:4px 8px;border-radius:var(--r-xs);
-  transition:all .22s cubic-bezier(.34,1.56,.64,1);
-  font-size:.82rem;color:var(--red);
-}
+.btn-del{background:none;border:none;cursor:pointer;opacity:.3;padding:4px 8px;border-radius:var(--r-xs);transition:all .22s cubic-bezier(.34,1.56,.64,1);font-size:.82rem;color:var(--red);}
 .btn-del:hover{opacity:1;background:var(--red-l);transform:scale(1.18);box-shadow:0 2px 10px rgba(220,38,38,.2)}
 .btn-del:active{transform:scale(.9)}
 .form-support{display:grid;grid-template-columns:var(--form-support-cols);gap:8px;background:#fff;border:1px solid var(--border);}
@@ -250,54 +219,358 @@ tbody tr:last-child td{border-bottom:none}
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(72px);padding:10px 26px;border-radius:13px;background:var(--navy);border:1px solid rgba(255,107,0,.26);color:#fff;box-shadow:0 20px 48px rgba(13,27,42,.26);z-index:9999;font-weight:500;font-size:.8rem;transition:transform .38s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;}
 #toast.show{transform:translateX(-50%) translateY(0)}
 
-/* ════ SKILL MATRIX REDESIGN ════ */
+/* SKILL MATRIX */
 .skill-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0;}
-.skill-kpi{
-  background:var(--white);border-radius:var(--r);
-  padding:12px 14px;border:1px solid var(--border);
-  box-shadow:var(--card-shadow);text-align:center;
-  position:relative;overflow:hidden;
-  transition:all .3s cubic-bezier(.34,1.56,.64,1);
-}
+.skill-kpi{background:var(--white);border-radius:var(--r);padding:12px 14px;border:1px solid var(--border);box-shadow:var(--card-shadow);text-align:center;position:relative;overflow:hidden;transition:all .3s cubic-bezier(.34,1.56,.64,1);}
 .skill-kpi:hover{transform:translateY(-3px);box-shadow:var(--card-hover)}
 .skill-kpi-val{font-size:1.6rem;font-weight:800;line-height:1.1;margin-bottom:2px}
 .skill-kpi-lbl{font-size:.56rem;color:var(--txt4);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
-
-/* skill level badge */
 .level-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:.65rem;font-weight:700;}
 .level-expert{background:linear-gradient(135deg,#FF6B00,#E85500);color:#fff;box-shadow:0 3px 10px rgba(255,107,0,.35)}
 .level-adv{background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;box-shadow:0 3px 10px rgba(37,99,235,.3)}
 .level-dev{background:linear-gradient(135deg,#059669,#047857);color:#fff;box-shadow:0 3px 10px rgba(5,150,105,.3)}
 .level-basic{background:var(--bg3);color:var(--txt3)}
-
-/* skill bar item (horizontal) */
 .skbar-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bg2);}
 .skbar-item:last-child{border-bottom:none}
 .skbar-name{font-size:.74rem;font-weight:600;min-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt2)}
 .skbar-track{flex:1;height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;position:relative;}
 .skbar-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.22,.68,0,1.2);}
 .skbar-val{font-size:.72rem;font-weight:800;min-width:38px;text-align:right;color:var(--or)}
-
-/* comparison chart tabs */
 .chart-tabs{display:flex;gap:6px;margin-bottom:12px;}
 .chart-tab{padding:5px 12px;border-radius:8px;font-size:.65rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);color:var(--txt3);transition:all .2s;}
 .chart-tab.active{background:var(--sunset);border-color:transparent;color:#fff;box-shadow:0 3px 10px var(--or-glow)}
 .chart-tab:hover:not(.active){border-color:var(--or);color:var(--or)}
 
-/* polar area custom */
-.polar-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
-.polar-leg-item{display:flex;align-items:center;gap:5px;font-size:.62rem;color:var(--txt3);}
-.polar-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+/* ═══════════════════════════════════════════
+   SPECIAL JOBS — POWER BI STYLE
+═══════════════════════════════════════════ */
 
-/* skill competency meter */
-.comp-meter{position:relative;display:inline-block;width:120px;height:120px;}
-.comp-meter svg{transform:rotate(-90deg);}
-.comp-meter-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-
-/* ════ RESPONSIVE ════ */
-@media(max-width:1280px){
-  :root{--sidebar-w:240px;--main-pad:18px 20px 36px;--font-title:1.3rem;--font-kpi:1.7rem;--chart-master-h:200px;--chart-h:180px;}
+/* Header banner */
+.sp-header-band{
+  background:var(--navy);
+  border-radius:var(--r-xl);
+  padding:22px 26px;
+  position:relative;overflow:hidden;
+  border:1px solid rgba(255,255,255,.04);
+  box-shadow:0 12px 40px rgba(13,27,42,.28);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
 }
+.sp-header-band::before{
+  content:'';position:absolute;
+  top:-80px;right:-80px;
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(255,107,0,.12) 0%,transparent 65%);
+  pointer-events:none;
+}
+.sp-header-band::after{
+  content:'';position:absolute;
+  bottom:-60px;left:30%;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(37,99,235,.08) 0%,transparent 65%);
+  pointer-events:none;
+}
+.sp-band-title{
+  font-size:1.35rem;font-weight:900;color:#fff;letter-spacing:-.02em;line-height:1.15;position:relative;z-index:1;
+}
+.sp-band-sub{font-size:.7rem;color:rgba(255,255,255,.32);font-weight:300;margin-top:3px;letter-spacing:.04em;}
+.sp-band-actions{display:flex;align-items:center;gap:10px;position:relative;z-index:1;}
+.sp-live-badge{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);
+  padding:5px 12px;border-radius:99px;
+  font-size:.62rem;font-weight:700;color:#4ADE80;letter-spacing:.07em;
+}
+.sp-live-dot{width:6px;height:6px;background:#22C55E;border-radius:50%;animation:pulse-g 2s infinite;}
+
+/* KPI grid Power BI */
+.sp-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.sp-kpi-card{
+  background:#fff;border-radius:var(--r-lg);
+  padding:18px 16px 15px;
+  border:1px solid var(--border);
+  box-shadow:var(--card-shadow);
+  position:relative;overflow:hidden;
+  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+  cursor:default;
+}
+.sp-kpi-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:4px;border-radius:var(--r-lg) 0 0 var(--r-lg);
+}
+.sp-kpi-card:hover{
+  transform:translateY(-6px) scale(1.015);
+  box-shadow:0 20px 48px rgba(13,27,42,.12);
+}
+.sp-kpi-card:hover .sp-kpi-num{letter-spacing:-.04em;}
+.sp-kpi-ico{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.05rem;margin-bottom:11px;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+.sp-kpi-card:hover .sp-kpi-ico{transform:scale(1.2) rotate(-8deg);}
+.sp-kpi-num{
+  font-size:2.2rem;font-weight:900;line-height:1;
+  letter-spacing:-.03em;margin-bottom:3px;
+  transition:letter-spacing .3s;
+}
+.sp-kpi-lbl{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);}
+.sp-kpi-delta{
+  display:inline-flex;align-items:center;gap:3px;
+  margin-top:6px;font-size:.62rem;font-weight:700;
+  padding:2px 7px;border-radius:99px;
+}
+.sp-kpi-delta.up{background:#DCFCE7;color:#15803D;}
+.sp-kpi-delta.neutral{background:var(--bg3);color:var(--txt3);}
+
+/* Chart row */
+.sp-chart-row{display:grid;grid-template-columns:1.15fr 0.85fr;gap:13px;}
+
+/* Power BI chart card */
+.sp-chart-card{
+  background:#fff;border-radius:var(--r-lg);
+  padding:18px 18px 14px;
+  border:1px solid var(--border);
+  box-shadow:var(--card-shadow);
+  position:relative;overflow:hidden;
+  transition:box-shadow .26s,transform .26s;
+}
+.sp-chart-card:hover{box-shadow:var(--card-hover);transform:translateY(-2px);}
+.sp-chart-title{
+  font-size:.65rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.12em;
+  color:var(--txt3);margin-bottom:2px;
+}
+.sp-chart-sub{font-size:.6rem;color:var(--txt4);margin-bottom:14px;}
+
+/* Assignor bar chart (custom HTML bars) */
+.sp-hbar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 0;
+  animation:fadeSlideIn .4s ease both;
+}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.sp-hbar-rank{
+  font-size:.7rem;font-weight:900;color:var(--txt4);
+  min-width:20px;text-align:center;
+}
+.sp-hbar-name{
+  font-size:.74rem;font-weight:700;color:var(--txt2);
+  min-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sp-hbar-track{
+  flex:1;height:10px;background:var(--bg2);border-radius:99px;
+  overflow:hidden;position:relative;
+}
+.sp-hbar-fill{
+  height:100%;border-radius:99px;
+  transition:width 1.1s cubic-bezier(.22,.68,0,1.2);
+  position:relative;
+}
+.sp-hbar-fill::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.2) 50%,transparent 100%);
+  animation:shim-bar 2s infinite;
+}
+@keyframes shim-bar{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+.sp-hbar-val{
+  font-size:.7rem;font-weight:900;
+  min-width:28px;text-align:right;
+}
+
+/* Donut card */
+.sp-donut-wrap{position:relative;display:flex;align-items:center;justify-content:center;height:160px;}
+.sp-donut-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;pointer-events:none;
+}
+.sp-donut-num{font-size:1.8rem;font-weight:900;line-height:1;}
+.sp-donut-lbl{font-size:.55rem;color:var(--txt4);text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
+
+/* Pulse legend */
+.sp-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.sp-leg-item{
+  display:flex;align-items:center;gap:5px;
+  font-size:.63rem;color:var(--txt3);font-weight:600;
+  padding:3px 9px;border-radius:99px;background:var(--bg);
+  border:1px solid var(--border);
+  transition:all .2s;cursor:default;
+}
+.sp-leg-item:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.06);}
+.sp-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ADD FORM Power BI style */
+.sp-form-card{
+  background:#fff;border-radius:var(--r-lg);
+  border:1px solid var(--border);
+  box-shadow:var(--card-shadow);
+  overflow:hidden;
+  transition:box-shadow .26s,transform .26s;
+}
+.sp-form-card:hover{box-shadow:var(--card-hover);}
+.sp-form-header{
+  background:var(--navy);padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sp-form-htitle{
+  font-size:.72rem;font-weight:800;color:#fff;
+  text-transform:uppercase;letter-spacing:.12em;
+  display:flex;align-items:center;gap:8px;
+}
+.sp-form-badge{
+  background:rgba(255,107,0,.2);border:1px solid rgba(255,107,0,.3);
+  padding:2px 9px;border-radius:99px;font-size:.58rem;
+  font-weight:700;color:var(--or2);letter-spacing:.08em;
+}
+.sp-form-body{padding:16px 18px;display:grid;grid-template-columns:1fr 140px 1fr 1.2fr auto;gap:10px;align-items:end;}
+.sp-field{display:flex;flex-direction:column;gap:5px;}
+.sp-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);}
+.sp-input{
+  background:var(--bg);border:1.5px solid var(--border2);
+  padding:9px 11px;border-radius:var(--r-xs);
+  font-family:'Prompt',sans-serif;font-size:.79rem;
+  color:var(--txt);outline:none;
+  transition:all .2s;
+}
+.sp-input:focus{border-color:var(--or);box-shadow:0 0 0 3px var(--or-soft);background:#fff;transform:scale(1.01);}
+.sp-input::placeholder{color:var(--txt4);}
+.sp-submit-btn{
+  background:var(--sunset);border:none;
+  padding:10px 20px;border-radius:var(--r-xs);
+  color:#fff;font-weight:800;cursor:pointer;
+  font-family:'Prompt',sans-serif;font-size:.75rem;
+  white-space:nowrap;letter-spacing:.06em;
+  box-shadow:0 4px 16px var(--or-glow);
+  transition:all .32s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:6px;
+}
+.sp-submit-btn:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 12px 32px rgba(255,107,0,.46);}
+.sp-submit-btn:active{transform:scale(.94);}
+.sp-submit-btn .btn-spark{font-size:.9rem;transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+.sp-submit-btn:hover .btn-spark{transform:rotate(20deg) scale(1.3);}
+
+/* DATA TABLE Power BI style */
+.sp-table-card{
+  background:#fff;border-radius:var(--r-lg);
+  border:1px solid var(--border);
+  box-shadow:var(--card-shadow);
+  overflow:hidden;
+  transition:box-shadow .26s;
+}
+.sp-table-card:hover{box-shadow:var(--card-hover);}
+.sp-table-header{
+  background:var(--bg);
+  padding:12px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.sp-table-title{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);}
+.sp-table-count{
+  background:var(--navy);color:#fff;
+  font-size:.6rem;font-weight:700;
+  padding:2px 9px;border-radius:99px;
+}
+.sp-tbl{width:100%;border-collapse:collapse;min-width:600px;}
+.sp-tbl thead th{
+  padding:10px 14px;
+  text-align:left;background:var(--bg);
+  font-size:.58rem;font-weight:800;color:var(--txt3);
+  text-transform:uppercase;letter-spacing:.1em;
+  border-bottom:2px solid var(--bg3);
+  position:sticky;top:0;z-index:5;
+  white-space:nowrap;
+}
+.sp-tbl tbody tr{
+  transition:background .15s,transform .15s;
+  border-bottom:1px solid var(--bg2);
+}
+.sp-tbl tbody tr:last-child{border-bottom:none}
+.sp-tbl tbody tr:hover td{background:#FFF8F2;}
+.sp-tbl tbody tr.sp-row-new{animation:rowPop .6s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes rowPop{from{opacity:0;transform:translateY(-10px) scale(.98);background:#FFF3E8;}to{opacity:1;transform:translateY(0) scale(1);background:transparent;}}
+.sp-tbl tbody td{padding:10px 14px;font-size:.78rem;color:var(--txt2);}
+
+/* Row number badge */
+.sp-row-num{
+  width:24px;height:24px;border-radius:7px;
+  background:var(--bg3);color:var(--txt3);
+  font-size:.62rem;font-weight:800;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+/* Status badge pill */
+.sp-status{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:99px;
+  font-size:.62rem;font-weight:700;
+  white-space:nowrap;
+}
+.sp-status-done{background:#DCFCE7;color:#15803D;}
+.sp-status-wip{background:var(--amber-l);color:#B45309;}
+.sp-status-pending{background:var(--blue-l);color:#1D4ED8;}
+/* Date pill */
+.sp-date-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:6px;
+  background:var(--bg2);color:var(--txt3);
+  font-size:.64rem;font-weight:600;
+}
+/* Assignor tag */
+.sp-assignor-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:7px;
+  font-size:.64rem;font-weight:700;
+  border:1px solid var(--border);
+}
+/* Result preview */
+.sp-result-txt{
+  font-size:.74rem;color:var(--txt2);
+  max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+/* Del btn */
+.sp-del-btn{
+  width:28px;height:28px;border:none;border-radius:8px;
+  background:none;cursor:pointer;color:var(--red);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+  opacity:.28;
+}
+.sp-del-btn:hover{opacity:1;background:var(--red-l);transform:scale(1.22);box-shadow:0 4px 12px rgba(220,38,38,.18);}
+
+/* Monthly timeline bars */
+.sp-timeline{display:flex;flex-direction:column;gap:6px;}
+.sp-tl-row{display:flex;align-items:center;gap:8px;}
+.sp-tl-mo{font-size:.61rem;font-weight:700;color:var(--txt4);min-width:30px;text-align:right;}
+.sp-tl-track{flex:1;height:9px;background:var(--bg2);border-radius:99px;overflow:hidden;}
+.sp-tl-fill{height:100%;border-radius:99px;transition:width 1.3s cubic-bezier(.22,.68,0,1.2);}
+.sp-tl-num{font-size:.62rem;font-weight:800;min-width:18px;text-align:right;}
+
+/* Scrollable table wrap */
+.sp-tbl-scroll{max-height:340px;overflow-y:auto;overflow-x:auto;}
+
+/* Empty state */
+.sp-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 20px;gap:10px;color:var(--txt4);
+}
+.sp-empty-icon{font-size:2.4rem;opacity:.35;animation:float-empty 3s ease-in-out infinite;}
+@keyframes float-empty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.sp-empty-txt{font-size:.78rem;font-weight:500;}
+
+/* Responsive */
+@media(max-width:1100px){
+  .sp-kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .sp-chart-row{grid-template-columns:1fr;}
+  .sp-form-body{grid-template-columns:1fr 1fr;}
+  .sp-form-body .sp-submit-btn{grid-column:1/-1;justify-content:center;}
+}
+@media(max-width:600px){
+  .sp-kpi-grid{grid-template-columns:1fr 1fr;}
+  .sp-form-body{grid-template-columns:1fr;}
+}
+
+/* ════ RESPONSIVE (global) ════ */
+@media(max-width:1280px){:root{--sidebar-w:240px;--main-pad:18px 20px 36px;--font-title:1.3rem;--font-kpi:1.7rem;--chart-master-h:200px;--chart-h:180px;}}
 @media(max-width:1100px){
   :root{--sidebar-w:220px;--kpi-cols:2;--stat-cols:2;--g4-cols:2;--g2r-cols:1fr;--form-support-cols:1fr 1fr;--font-kpi:1.6rem;--chart-master-h:195px;}
   .form-support,.form-5s,.form-skill,.form-special{grid-template-columns:1fr 1fr;}
@@ -366,7 +639,7 @@ tbody tr:last-child td{border-bottom:none}
 </head>
 <body>
 
-<!-- ════ LOADING OVERLAY ════ -->
+<!-- LOADING -->
 <div id="loadingOverlay">
   <div class="lo-logo">🌅</div>
   <div class="lo-spinner"></div>
@@ -375,13 +648,11 @@ tbody tr:last-child td{border-bottom:none}
   <div class="lo-bar-wrap"><div class="lo-bar" id="loBar"></div></div>
 </div>
 
-<!-- ════ SYNC STATUS BADGE ════ -->
 <div id="syncStatus"></div>
-
 <div id="toast">✨ บันทึกแล้ว</div>
 <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
 
-<!-- ─────── SIDEBAR ─────── -->
+<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sb-brand">
     <div class="sb-logo">🌅</div>
@@ -409,7 +680,7 @@ tbody tr:last-child td{border-bottom:none}
   </div>
 </aside>
 
-<!-- ─────── MAIN ─────── -->
+<!-- MAIN -->
 <div class="main-wrap">
   <div class="topbar">
     <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="เมนู">☰</button>
@@ -419,7 +690,7 @@ tbody tr:last-child td{border-bottom:none}
   </div>
   <main class="main-container">
 
-  <!-- ══ OVERVIEW ══ -->
+  <!-- OVERVIEW -->
   <div id="master-dash" class="page active">
     <div class="ph">
       <div>
@@ -466,7 +737,7 @@ tbody tr:last-child td{border-bottom:none}
     </div>
   </div>
 
-  <!-- ══ DAILY ══ -->
+  <!-- DAILY -->
   <div id="daily" class="page">
     <div class="ph">
       <div><div class="eyebrow">Overview · 2026</div><h1 class="main-title">Executive <span class="title-grad">Dashboard</span></h1></div>
@@ -516,7 +787,7 @@ tbody tr:last-child td{border-bottom:none}
     </div>
   </div>
 
-  <!-- ══ SUPPORT ══ -->
+  <!-- SUPPORT -->
   <div id="support" class="page">
     <div><div class="eyebrow">Production Floor</div><h1 class="main-title">Support <span class="title-grad">Production Line</span></h1></div>
     <div class="kpi-strip">
@@ -557,7 +828,7 @@ tbody tr:last-child td{border-bottom:none}
     </div>
   </div>
 
-  <!-- ══ 5S ══ -->
+  <!-- 5S -->
   <div id="5s" class="page">
     <div class="ph">
       <div><div class="eyebrow">Quality</div><h1 class="main-title">5S Excellence <span class="title-grad">System</span></h1></div>
@@ -586,9 +857,8 @@ tbody tr:last-child td{border-bottom:none}
     </div>
   </div>
 
-  <!-- ══ SKILL MATRIX (REDESIGNED) ══ -->
+  <!-- SKILL MATRIX -->
   <div id="multi" class="page">
-    <!-- Header -->
     <div class="ph">
       <div><div class="eyebrow">Competency</div><h1 class="main-title">Professional <span class="title-grad">Skill Matrix</span></h1></div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -597,28 +867,12 @@ tbody tr:last-child td{border-bottom:none}
           onmouseover="this.style.transform='scale(1.07) translateY(-1px)'" onmouseout="this.style.transform='scale(1)'" onclick="clearAllSkills()">🗑 ล้างทั้งหมด</button>
       </div>
     </div>
-
-    <!-- Skill KPI Strip -->
     <div class="skill-kpi-strip">
-      <div class="skill-kpi" style="border-top:3px solid var(--or);">
-        <div class="skill-kpi-val" id="sk-avg" style="color:var(--or);">0%</div>
-        <div class="skill-kpi-lbl">Average Score</div>
-      </div>
-      <div class="skill-kpi" style="border-top:3px solid var(--blue);">
-        <div class="skill-kpi-val" id="sk-count" style="color:var(--blue);">0</div>
-        <div class="skill-kpi-lbl">Total Skills</div>
-      </div>
-      <div class="skill-kpi" style="border-top:3px solid var(--green);">
-        <div class="skill-kpi-val" id="sk-top" style="color:var(--green);font-size:1rem;">—</div>
-        <div class="skill-kpi-lbl">Top Skill</div>
-      </div>
-      <div class="skill-kpi" style="border-top:3px solid var(--violet);">
-        <div class="skill-kpi-val" id="sk-weak" style="color:var(--violet);font-size:1rem;">—</div>
-        <div class="skill-kpi-lbl">Needs Improvement</div>
-      </div>
+      <div class="skill-kpi" style="border-top:3px solid var(--or);"><div class="skill-kpi-val" id="sk-avg" style="color:var(--or);">0%</div><div class="skill-kpi-lbl">Average Score</div></div>
+      <div class="skill-kpi" style="border-top:3px solid var(--blue);"><div class="skill-kpi-val" id="sk-count" style="color:var(--blue);">0</div><div class="skill-kpi-lbl">Total Skills</div></div>
+      <div class="skill-kpi" style="border-top:3px solid var(--green);"><div class="skill-kpi-val" id="sk-top" style="color:var(--green);font-size:1rem;">—</div><div class="skill-kpi-lbl">Top Skill</div></div>
+      <div class="skill-kpi" style="border-top:3px solid var(--violet);"><div class="skill-kpi-val" id="sk-weak" style="color:var(--violet);font-size:1rem;">—</div><div class="skill-kpi-lbl">Needs Improvement</div></div>
     </div>
-
-    <!-- Add Form -->
     <div class="card">
       <div class="card-hd">🚀 เพิ่ม / อัปเดตทักษะ</div>
       <div class="form-row form-skill">
@@ -627,10 +881,7 @@ tbody tr:last-child td{border-bottom:none}
         <button class="btn-save" onclick="addSkill()">อัปเดต</button>
       </div>
     </div>
-
-    <!-- Charts Grid (3-col: Radar | Bar | Polar) -->
     <div style="display:grid;grid-template-columns:1fr 1.1fr 0.9fr;gap:13px;" id="skillChartGrid">
-      <!-- Radar -->
       <div class="card" style="min-height:340px;display:flex;flex-direction:column;">
         <div class="card-hd">📡 Radar Overview</div>
         <div style="flex:1;min-height:260px;position:relative;">
@@ -640,21 +891,15 @@ tbody tr:last-child td{border-bottom:none}
           </div>
         </div>
       </div>
-
-      <!-- Horizontal Bar Chart -->
       <div class="card" style="min-height:340px;display:flex;flex-direction:column;">
         <div class="card-hd">📊 Skill Bar Comparison</div>
         <div id="skillBarList" style="flex:1;overflow-y:auto;padding-right:4px;"></div>
       </div>
-
-      <!-- Polar + Score -->
       <div style="display:flex;flex-direction:column;gap:13px;">
-        <!-- Overall Score -->
         <div class="score-big" style="padding:16px 12px;">
           <div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.16em;color:var(--or);font-weight:700;margin-bottom:8px;">Overall Score</div>
           <div class="hero-num" id="avgSkill" style="font-size:2.8rem;">0%</div>
           <div id="skillAnalysis" style="font-size:.72rem;color:var(--txt3);margin-top:6px;">บันทึกทักษะเพื่อประเมินผล</div>
-          <!-- Circular progress -->
           <div style="margin-top:12px;position:relative;display:inline-block;">
             <svg width="80" height="80" viewBox="0 0 80 80">
               <circle cx="40" cy="40" r="32" fill="none" stroke="var(--bg3)" stroke-width="7"/>
@@ -664,7 +909,6 @@ tbody tr:last-child td{border-bottom:none}
             </svg>
           </div>
         </div>
-        <!-- Polar Chart -->
         <div class="card" style="flex:1;min-height:180px;display:flex;flex-direction:column;">
           <div class="card-hd">🎯 Polar Distribution</div>
           <div style="flex:1;min-height:140px;position:relative;">
@@ -674,8 +918,6 @@ tbody tr:last-child td{border-bottom:none}
         </div>
       </div>
     </div>
-
-    <!-- Skill List Full Width -->
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
         <div class="card-hd" style="margin:0;flex:1;">📝 Skill Inventory — All Skills</div>
@@ -687,49 +929,161 @@ tbody tr:last-child td{border-bottom:none}
       </div>
       <div id="skillListFull" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;max-height:320px;overflow-y:auto;"></div>
     </div>
-
-    <!-- Comparison Charts Row -->
     <div class="g2">
-      <!-- Grouped comparison -->
-      <div class="card">
-        <div class="card-hd">📈 Level Distribution</div>
-        <div style="height:var(--chart-h);"><canvas id="skillLevelChart"></canvas></div>
-      </div>
-      <!-- Radar + compare -->
-      <div class="card">
-        <div class="card-hd">🏆 Top vs Average Analysis</div>
-        <div style="height:var(--chart-h);"><canvas id="skillCompareChart"></canvas></div>
-      </div>
+      <div class="card"><div class="card-hd">📈 Level Distribution</div><div style="height:var(--chart-h);"><canvas id="skillLevelChart"></canvas></div></div>
+      <div class="card"><div class="card-hd">🏆 Top vs Average Analysis</div><div style="height:var(--chart-h);"><canvas id="skillCompareChart"></canvas></div></div>
     </div>
   </div>
 
-  <!-- ══ SPECIAL ══ -->
+  <!-- ══════════════════════════════════════
+       SPECIAL JOBS — POWER BI REDESIGN
+  ══════════════════════════════════════ -->
   <div id="special" class="page">
-    <div><div class="eyebrow">Assignments</div><h1 class="main-title">Special <span class="title-grad">Jobs</span></h1></div>
-    <div class="card">
-      <div class="card-hd">➕ บันทึกงานพิเศษ</div>
-      <div class="form-row form-special">
-        <input type="text" id="specJob" placeholder="ชื่องาน / โครงการ">
-        <input type="text" id="specBy" placeholder="ผู้สั่งงาน">
-        <input type="text" id="specResult" placeholder="ผลลัพธ์">
-        <button class="btn-save" onclick="addSpecial()">บันทึก</button>
+
+    <!-- Header Band -->
+    <div class="sp-header-band">
+      <div style="position:relative;z-index:1;">
+        <div style="font-size:.6rem;font-weight:700;letter-spacing:.2em;color:var(--or2);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+          <span style="display:inline-block;width:18px;height:2px;background:var(--or2);border-radius:99px;"></span>
+          Assignments · 2026
+        </div>
+        <div class="sp-band-title">Special <span style="background:var(--sunset);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Jobs Dashboard</span></div>
+        <div class="sp-band-sub">Project tracking · Performance analytics · Real-time sync</div>
+      </div>
+      <div class="sp-band-actions">
+        <div class="sp-live-badge"><span class="sp-live-dot"></span>LIVE</div>
+        <div id="sp-total-badge" style="background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.25);padding:6px 16px;border-radius:12px;font-size:.8rem;font-weight:800;color:var(--or2);">0 Projects</div>
       </div>
     </div>
-    <div class="card" style="padding:0;overflow:hidden;">
-      <div class="tbl-scroll"><table><thead><tr><th style="padding-left:16px;">Project</th><th>Assignor</th><th>Result</th><th style="text-align:center;">Action</th></tr></thead><tbody id="specialTableBody"></tbody></table></div>
+
+    <!-- KPI Cards -->
+    <div class="sp-kpi-grid">
+      <!-- Total Projects -->
+      <div class="sp-kpi-card" style="--kc:#FF6B00;">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--sunset);border-radius:var(--r-lg) 0 0 var(--r-lg);"></div>
+        <div class="sp-kpi-ico" style="background:var(--or-soft);">⭐</div>
+        <div class="sp-kpi-num" id="sp-kpi-total" style="color:var(--or);">0</div>
+        <div class="sp-kpi-lbl">Total Projects</div>
+        <div class="sp-kpi-delta neutral" id="sp-kpi-total-delta">All time</div>
+      </div>
+      <!-- This Month -->
+      <div class="sp-kpi-card">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue);border-radius:var(--r-lg) 0 0 var(--r-lg);"></div>
+        <div class="sp-kpi-ico" style="background:var(--blue-l);">📅</div>
+        <div class="sp-kpi-num" id="sp-kpi-month" style="color:var(--blue);">0</div>
+        <div class="sp-kpi-lbl">This Month</div>
+        <div class="sp-kpi-delta neutral" id="sp-kpi-month-lbl">—</div>
+      </div>
+      <!-- Top Assignor -->
+      <div class="sp-kpi-card">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--violet);border-radius:var(--r-lg) 0 0 var(--r-lg);"></div>
+        <div class="sp-kpi-ico" style="background:var(--violet-l);">🏆</div>
+        <div class="sp-kpi-num" id="sp-kpi-top-by" style="color:var(--violet);font-size:1.1rem;margin-top:4px;">—</div>
+        <div class="sp-kpi-lbl">Top Assignor</div>
+        <div class="sp-kpi-delta neutral" id="sp-kpi-top-by-n">0 jobs</div>
+      </div>
+      <!-- Completion Rate -->
+      <div class="sp-kpi-card">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--green);border-radius:var(--r-lg) 0 0 var(--r-lg);"></div>
+        <div class="sp-kpi-ico" style="background:var(--green-l);">✅</div>
+        <div class="sp-kpi-num" id="sp-kpi-rate" style="color:var(--green);">0%</div>
+        <div class="sp-kpi-lbl">Result Rate</div>
+        <div class="sp-kpi-delta up" id="sp-kpi-rate-n">entries with result</div>
+      </div>
     </div>
-  </div>
+
+    <!-- Charts Row -->
+    <div class="sp-chart-row">
+      <!-- Assignor Horizontal Bar -->
+      <div class="sp-chart-card">
+        <div class="sp-chart-title">📊 Projects by Assignor</div>
+        <div class="sp-chart-sub">Volume ranking — all entries</div>
+        <div id="sp-assignor-bars"></div>
+        <div style="height:var(--chart-h);display:none;"><canvas id="spTrendChart"></canvas></div>
+      </div>
+      <!-- Monthly Donut + Timeline -->
+      <div style="display:flex;flex-direction:column;gap:13px;">
+        <div class="sp-chart-card" style="flex:1;">
+          <div class="sp-chart-title">📆 Monthly Volume</div>
+          <div class="sp-chart-sub">Projects recorded per month</div>
+          <div id="sp-monthly-timeline"></div>
+        </div>
+        <div class="sp-chart-card">
+          <div class="sp-chart-title">🥧 Result Breakdown</div>
+          <div class="sp-chart-sub">With / without result</div>
+          <div style="height:160px;position:relative;"><canvas id="spResultChart"></canvas></div>
+          <div class="sp-legend" id="sp-result-legend"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD FORM -->
+    <div class="sp-form-card">
+      <div class="sp-form-header">
+        <div class="sp-form-htitle">
+          <span style="font-size:1.1rem;">✨</span>
+          New Project Entry
+        </div>
+        <div class="sp-form-badge">QUICK ADD</div>
+      </div>
+      <div class="sp-form-body">
+        <div class="sp-field">
+          <label class="sp-label">Project / Job Name</label>
+          <input class="sp-input" type="text" id="specJob" placeholder="ชื่องาน / โครงการ">
+        </div>
+        <div class="sp-field">
+          <label class="sp-label">Date</label>
+          <input class="sp-input" type="date" id="specDate">
+        </div>
+        <div class="sp-field">
+          <label class="sp-label">Assigned By</label>
+          <input class="sp-input" type="text" id="specBy" placeholder="ผู้สั่งงาน">
+        </div>
+        <div class="sp-field">
+          <label class="sp-label">Result / Output</label>
+          <input class="sp-input" type="text" id="specResult" placeholder="ผลลัพธ์">
+        </div>
+        <button class="sp-submit-btn" onclick="addSpecial()">
+          <span class="btn-spark">⚡</span>
+          บันทึก
+        </button>
+      </div>
+    </div>
+
+    <!-- DATA TABLE -->
+    <div class="sp-table-card">
+      <div class="sp-table-header">
+        <div class="sp-table-title">📋 Project Registry — All Entries</div>
+        <div class="sp-table-count" id="sp-table-count">0 records</div>
+      </div>
+      <div class="sp-tbl-scroll">
+        <table class="sp-tbl">
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th>Project / Job</th>
+              <th>Date</th>
+              <th>Assigned By</th>
+              <th>Result</th>
+              <th style="text-align:center;width:52px;">Del</th>
+            </tr>
+          </thead>
+          <tbody id="specialTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /special -->
 
   </main>
 </div>
 
 <script>
-/* ─── sidebar toggle ─── */
+/* sidebar */
 function toggleSidebar(){const sb=document.getElementById('sidebar'),ov=document.getElementById('sbOverlay');sb.classList.toggle('open');ov.classList.toggle('active');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('active');}
 document.querySelectorAll('.menu-item').forEach(m=>{m.addEventListener('click',()=>{if(window.innerWidth<=900)closeSidebar();});});
 
-/* ─── chart defaults ─── */
 Chart.defaults.font.family="'Prompt', sans-serif";
 Chart.defaults.font.size=11;
 Chart.defaults.animation.duration=900;
@@ -742,281 +1096,111 @@ Chart.defaults.plugins.tooltip.cornerRadius=10;
 Chart.defaults.plugins.tooltip.borderColor='rgba(255,107,0,.3)';
 Chart.defaults.plugins.tooltip.borderWidth=1;
 
-/* ─── core ─── */
 const currentUser=sessionStorage.getItem('currentUser')||'Master Operator';
 document.getElementById('displayUserName').innerHTML=currentUser+' <span class="online-dot"></span>';
 const STORAGE_KEY=`w_data_${currentUser}`;
 const GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycby2-I9KJnfgBCpgF9juLVY2Grmp2EBsayaEkfrago3XLYgaYU9XRNUJLE7nFaTBn9CQ/exec";
 
 let db=JSON.parse(localStorage.getItem(STORAGE_KEY))||{daily:[],s5:[],skills:[],special:[],support:[],_lastModified:0};
-let skillChart=null,masterChart=null,doughnutChart=null,supStatusChart=null,supTrendChart=null,attendChart=null,s5Chart=null,skillLvChart=null,skillCmpChart=null,skillPolarChart=null;
+let skillChart=null,masterChart=null,doughnutChart=null,supStatusChart=null,supTrendChart=null,attendChart=null,s5Chart=null,skillLvChart=null,skillCmpChart=null,skillPolarChart=null,spResultChart=null,spTrendChartInst=null;
 let currentSkillSort='val';
 let pushTimer=null;
 
 const COLORS=['#FF6B00','#2563EB','#7C3AED','#059669','#DC2626','#D97706','#0891B2','#DB2777','#0D9488','#65A30D','#4F46E5','#EA580C'];
 
-/* ═══════════════════════════════════
-   LOADING OVERLAY HELPERS
-═══════════════════════════════════ */
-function setLoading(text,sub='',pct=0){
-  const lo=document.getElementById('loadingOverlay');
-  const lt=document.getElementById('loText'),ls=document.getElementById('loSub');
-  const lb=document.getElementById('loBar');
-  lo.classList.remove('hidden');
-  if(lt)lt.textContent=text;
-  if(ls)ls.textContent=sub||'WAP Pearl & Sunset 2026';
-  if(lb)lb.style.width=pct+'%';
-}
+/* LOADING */
+function setLoading(text,sub='',pct=0){const lo=document.getElementById('loadingOverlay'),lt=document.getElementById('loText'),ls=document.getElementById('loSub'),lb=document.getElementById('loBar');lo.classList.remove('hidden');if(lt)lt.textContent=text;if(ls)ls.textContent=sub||'WAP Pearl & Sunset 2026';if(lb)lb.style.width=pct+'%';}
 function setLoadingPct(pct){const lb=document.getElementById('loBar');if(lb)lb.style.width=pct+'%';}
-function hideLoading(){
-  const lo=document.getElementById('loadingOverlay');
-  lo.classList.add('hidden');
-}
+function hideLoading(){document.getElementById('loadingOverlay').classList.add('hidden');}
 
-/* ═══════════════════════════════════
-   SYNC STATUS BADGE
-═══════════════════════════════════ */
+/* SYNC STATUS */
 let syncStatusTimer=null;
-function showSyncStatus(msg,color='#22C55E'){
-  const el=document.getElementById('syncStatus');
-  el.innerHTML=`<span class="ss-dot" style="background:${color};"></span>${msg}`;
-  el.style.display='block';
-  clearTimeout(syncStatusTimer);
-  syncStatusTimer=setTimeout(()=>{el.style.display='none';},4000);
-}
+function showSyncStatus(msg,color='#22C55E'){const el=document.getElementById('syncStatus');el.innerHTML=`<span class="ss-dot" style="background:${color};"></span>${msg}`;el.style.display='block';clearTimeout(syncStatusTimer);syncStatusTimer=setTimeout(()=>{el.style.display='none';},4000);}
 
-/* ═══════════════════════════════════
-   CLOUD OPERATIONS
-═══════════════════════════════════ */
+/* CLOUD */
 function getDataLen(o){return Object.values(o).reduce((a,c)=>a+(Array.isArray(c)?c.length:0),0);}
-
-/* Push local → Google Sheets (debounced 800ms) */
-function schedulePush(){
-  clearTimeout(pushTimer);
-  pushTimer=setTimeout(()=>pushToCloud(),800);
-}
-
+function schedulePush(){clearTimeout(pushTimer);pushTimer=setTimeout(()=>pushToCloud(),800);}
 async function pushToCloud(){
-  db._lastModified=Date.now();
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
-  try{
-    await fetch(GOOGLE_SCRIPT_URL,{
-      method:'POST',mode:'no-cors',cache:'no-cache',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({user:currentUser,data:db})
-    });
-    showSyncStatus('☁️ บันทึกขึ้น Cloud แล้ว','#22C55E');
-  }catch(e){
-    showSyncStatus('⚠️ Cloud push ล้มเหลว','#F59E0B');
-    console.warn('push failed:',e);
-  }
+  db._lastModified=Date.now();localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
+  try{await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:currentUser,data:db})});showSyncStatus('☁️ บันทึกขึ้น Cloud แล้ว','#22C55E');}
+  catch(e){showSyncStatus('⚠️ Cloud push ล้มเหลว','#F59E0B');}
 }
-
-/* Pull Google Sheets → local */
 async function pullFromCloud(silent=false){
-  try{
-    const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
-    const r=await res.json();
-    if(r.status==='success'&&r.data){
-      const cloud=r.data;
-      const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;
-      const cloudLen=getDataLen(cloud),localLen=getDataLen(db);
-      if(cloudMod>localMod||cloudLen>localLen){
-        db=cloud;
-        localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
-        return true; // updated
-      }
-    }
-  }catch(e){console.warn('pull failed:',e);}
-  return false;
+  try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();
+  if(r.status==='success'&&r.data){const cloud=r.data;const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);
+  if(cloudMod>localMod||cloudLen>localLen){db=cloud;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));return true;}}}catch(e){}return false;
 }
 
-/* ─── Initial Load ─── */
 window.addEventListener('load',async()=>{
-  // Show overlay
-  setLoading('กำลังเชื่อมต่อ Cloud...','โปรดรอสักครู่',10);
-  setBtnLoading(true,'⏳ โหลด...');
-
+  setLoading('กำลังเชื่อมต่อ Cloud...','โปรดรอสักครู่',10);setBtnLoading(true,'⏳ โหลด...');
   const localExists=getDataLen(db)>0;
-
   try{
-    setLoadingPct(30);
-    const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
-    setLoadingPct(60);
-    const r=await res.json();
-
-    if(r.status==='success'&&r.data){
-      const cloud=r.data;
-      const cloudLen=getDataLen(cloud),localLen=getDataLen(db);
-      // Use cloud if it has more or newer data
-      if(cloudLen>localLen||(cloud._lastModified||0)>(db._lastModified||0)){
-        db=cloud;
-        localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
-        setLoading('กำลังแสดงข้อมูล...','อัปเดตจาก Cloud สำเร็จ',80);
-        // Render first, THEN hide overlay and toast
-        refreshAllPages();
-        setLoadingPct(100);
-        await sleep(400);
-        setText('dash-timestamp','อัปเดต: '+new Date().toLocaleString('th-TH'));
-        hideLoading();
-        toast('✅ โหลดข้อมูลล่าสุดจาก Cloud');
-      } else {
-        // local is same/newer
-        setLoadingPct(80);
-        refreshAllPages();
-        setLoadingPct(100);
-        await sleep(300);
-        hideLoading();
-        if(!localExists)toast('📂 ใช้ข้อมูลในเครื่อง');
-      }
-    } else {
-      setLoadingPct(80);
-      refreshAllPages();
-      setLoadingPct(100);
-      await sleep(300);
-      hideLoading();
-      if(!localExists)toast('⚠️ ยังไม่มีข้อมูล — เริ่มบันทึกได้เลย');
-    }
-  }catch(e){
-    console.warn(e);
-    setLoading('ออฟไลน์ — ใช้ข้อมูลในเครื่อง','เครือข่ายไม่เสถียร',90);
-    refreshAllPages();
-    await sleep(500);
-    hideLoading();
-    toast('⚠️ ออฟไลน์ — ใช้ข้อมูลในเครื่อง');
-  }finally{
-    setBtnLoading(false);
-    startPolling();
-  }
+    setLoadingPct(30);const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);setLoadingPct(60);const r=await res.json();
+    if(r.status==='success'&&r.data){const cloud=r.data;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);
+    if(cloudLen>localLen||(cloud._lastModified||0)>(db._lastModified||0)){db=cloud;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));setLoading('กำลังแสดงข้อมูล...','อัปเดตจาก Cloud สำเร็จ',80);refreshAllPages();setLoadingPct(100);await sleep(400);setText('dash-timestamp','อัปเดต: '+new Date().toLocaleString('th-TH'));hideLoading();toast('✅ โหลดข้อมูลล่าสุดจาก Cloud');}
+    else{setLoadingPct(80);refreshAllPages();setLoadingPct(100);await sleep(300);hideLoading();if(!localExists)toast('📂 ใช้ข้อมูลในเครื่อง');}}
+    else{setLoadingPct(80);refreshAllPages();setLoadingPct(100);await sleep(300);hideLoading();if(!localExists)toast('⚠️ ยังไม่มีข้อมูล — เริ่มบันทึกได้เลย');}
+  }catch(e){setLoading('ออฟไลน์ — ใช้ข้อมูลในเครื่อง','เครือข่ายไม่เสถียร',90);refreshAllPages();await sleep(500);hideLoading();toast('⚠️ ออฟไลน์ — ใช้ข้อมูลในเครื่อง');}
+  finally{setBtnLoading(false);startPolling();}
 });
-
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
-/* ─── Manual SYNC ─── */
 async function syncWithGoogleSheets(){
   if(document.getElementById('syncBtn').classList.contains('loading'))return;
-  setBtnLoading(true,'⏳ SYNCING...');
-  showSyncStatus('🔄 กำลัง Sync...','#F59E0B');
-  try{
-    const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
-    const r=await res.json();
-    if(r.status==='success'&&r.data){
-      const cloud=r.data;
-      const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;
-      const cloudLen=getDataLen(cloud),localLen=getDataLen(db);
-      if(cloudMod>localMod||cloudLen>localLen){
-        // Cloud is newer — pull
-        db=cloud;
-        localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
-        refreshAllPages();
-        showSyncStatus('✅ ดึงข้อมูลจาก Cloud แล้ว','#22C55E');
-        toast('✅ Sync: โหลดข้อมูลจาก Cloud');
-      } else {
-        // Local is newer — push
-        await pushToCloud();
-        showSyncStatus('☁️ อัปโหลดขึ้น Cloud แล้ว','#22C55E');
-        toast('✅ Sync: อัปโหลดข้อมูลขึ้น Cloud');
-      }
-      setText('dash-timestamp','Sync: '+new Date().toLocaleString('th-TH'));
-    }
-  }catch(e){
-    showSyncStatus('❌ Sync ล้มเหลว','#DC2626');
-    toast('❌ Sync ล้มเหลว: '+e.message);
-  }finally{setBtnLoading(false);}
+  setBtnLoading(true,'⏳ SYNCING...');showSyncStatus('🔄 กำลัง Sync...','#F59E0B');
+  try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();
+  if(r.status==='success'&&r.data){const cloud=r.data;const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);
+  if(cloudMod>localMod||cloudLen>localLen){db=cloud;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));refreshAllPages();showSyncStatus('✅ ดึงข้อมูลจาก Cloud แล้ว','#22C55E');toast('✅ Sync: โหลดข้อมูลจาก Cloud');}
+  else{await pushToCloud();showSyncStatus('☁️ อัปโหลดขึ้น Cloud แล้ว','#22C55E');toast('✅ Sync: อัปโหลดข้อมูลขึ้น Cloud');}
+  setText('dash-timestamp','Sync: '+new Date().toLocaleString('th-TH'));}}
+  catch(e){showSyncStatus('❌ Sync ล้มเหลว','#DC2626');toast('❌ Sync ล้มเหลว: '+e.message);}
+  finally{setBtnLoading(false);}
 }
-
-/* ─── Auto Polling (30s) ─── */
-function startPolling(){
-  setInterval(async()=>{
-    const updated=await pullFromCloud(true);
-    if(updated){
-      refreshAllPages();
-      showSyncStatus('🔔 อัปเดตจากอุปกรณ์อื่น','#60A5FA');
-      setText('dash-timestamp','Real-time: '+new Date().toLocaleString('th-TH'));
-    }
-  },30000);
-}
-
+function startPolling(){setInterval(async()=>{const updated=await pullFromCloud(true);if(updated){refreshAllPages();showSyncStatus('🔔 อัปเดตจากอุปกรณ์อื่น','#60A5FA');setText('dash-timestamp','Real-time: '+new Date().toLocaleString('th-TH'));}},30000);}
 function setBtnLoading(on,txt='🔄 SYNC CLOUD'){const b=document.getElementById('syncBtn');b.classList.toggle('loading',on);b.innerText=txt;b.disabled=on;}
 
-/* ─── Save (local + schedule push) ─── */
 function save(){
-  db._lastModified=Date.now();
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
-  runAIAnalytics();
-  if(isActive('master-dash'))refreshMasterDashboard();
-  schedulePush(); // auto-push to cloud after every mutation
+  db._lastModified=Date.now();localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
+  runAIAnalytics();if(isActive('master-dash'))refreshMasterDashboard();schedulePush();
 }
-
 function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
 function isActive(id){return document.getElementById(id)?.classList.contains('active');}
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 function setWidth(id,p){const e=document.getElementById(id);if(e)e.style.width=p+'%';}
 
 const PAGE_TITLES={'master-dash':'Performance Overview','daily':'Executive Dashboard','support':'Support Production','5s':'5S Excellence System','multi':'Skill Matrix','special':'Special Jobs'};
-
 function nav(id,el){
   document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));el.classList.add('active');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');
   setText('topbar-title',PAGE_TITLES[id]||'');renderPage(id);
 }
 function renderPage(id){
-  if(id==='master-dash')refreshMasterDashboard();
-  if(id==='daily')refreshDashboard();
-  if(id==='5s')refresh5S();
-  if(id==='multi')refreshSkills();
-  if(id==='special')refreshSpecial();
-  if(id==='support')refreshSupport();
+  if(id==='master-dash')refreshMasterDashboard();if(id==='daily')refreshDashboard();
+  if(id==='5s')refresh5S();if(id==='multi')refreshSkills();
+  if(id==='special')refreshSpecial();if(id==='support')refreshSupport();
 }
-function refreshAllPages(){
-  refreshMasterDashboard();refreshDashboard();refresh5S();refreshSkills();refreshSpecial();refreshSupport();runAIAnalytics();
-}
+function refreshAllPages(){refreshMasterDashboard();refreshDashboard();refresh5S();refreshSkills();refreshSpecial();refreshSupport();runAIAnalytics();}
 
-/* ─── group helpers ─── */
-function buildGroupData(){
-  const map={};
-  db.support.forEach(s=>{const p=(s.part||'(ไม่ระบุ)').trim();if(!map[p])map[p]={total:0,RP:0,VF:0,RECORDS:0};map[p].total++;if(s.report==='RP')map[p].RP++;else if(s.report==='VF')map[p].VF++;else if(s.report==='RECORDS')map[p].RECORDS++;});
-  return Object.entries(map).sort((a,b)=>b[1].total-a[1].total);
-}
-function renderGroupBars(elId,limit=10){
-  const el=document.getElementById(elId);if(!el)return;const sorted=buildGroupData().slice(0,limit);
-  if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}
-  const max=sorted[0][1].total;
-  el.innerHTML=sorted.map(([n,d],i)=>`<div class="gb-row"><div class="gb-rank">${i+1}</div><div class="gb-name" title="${n}">${n}</div><div class="gb-track"><div class="gb-fill" style="width:${(d.total/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div><span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${d.total}</span></div>`).join('');
-}
-function renderGroupByStatus(elId){
-  const el=document.getElementById(elId);if(!el)return;const sorted=buildGroupData().slice(0,8);
-  if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}
-  el.innerHTML=sorted.map(([n,d])=>{const t=d.total||1;return`<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:.72rem;font-weight:600;color:var(--txt2);">${n}</span><span style="font-size:.63rem;color:var(--txt4);">${d.total}</span></div><div style="height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;display:flex;">${d.RP?`<div style="width:${(d.RP/t)*100}%;background:#DC2626;"></div>`:''} ${d.VF?`<div style="width:${(d.VF/t)*100}%;background:#2563EB;"></div>`:''} ${d.RECORDS?`<div style="width:${(d.RECORDS/t)*100}%;background:#D97706;"></div>`:''}</div><div style="display:flex;gap:8px;margin-top:3px;">${d.RP?`<span style="font-size:.58rem;color:#DC2626;font-weight:700;">RP:${d.RP}</span>`:''} ${d.VF?`<span style="font-size:.58rem;color:#2563EB;font-weight:700;">VF:${d.VF}</span>`:''} ${d.RECORDS?`<span style="font-size:.58rem;color:#D97706;font-weight:700;">REC:${d.RECORDS}</span>`:''}</div></div>`;}).join('');
-}
-function renderGroupFullTable(tbodyId){
-  const el=document.getElementById(tbodyId);if(!el)return;const sorted=buildGroupData();const total=db.support.length||1;
-  if(!sorted.length){el.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--txt4);padding:18px;">ยังไม่มีข้อมูล</td></tr>`;return;}
-  el.innerHTML=sorted.map(([n,d],i)=>`<tr><td style="padding-left:14px;color:var(--txt4);font-weight:700;">${i+1}</td><td style="font-weight:600;">${n}</td><td style="font-weight:800;">${d.total}</td><td><span class="badge badge-rp">${d.RP||0}</span></td><td><span class="badge badge-vf">${d.VF||0}</span></td><td><span class="badge badge-rec">${d.RECORDS||0}</span></td><td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;min-width:55px;"><div style="width:${(d.total/total)*100}%;height:100%;background:${COLORS[i%COLORS.length]};border-radius:99px;"></div></div><span style="font-size:.64rem;font-weight:700;color:var(--txt3);">${Math.round((d.total/total)*100)}%</span></div></td></tr>`).join('');
-}
+/* GROUP HELPERS */
+function buildGroupData(){const map={};db.support.forEach(s=>{const p=(s.part||'(ไม่ระบุ)').trim();if(!map[p])map[p]={total:0,RP:0,VF:0,RECORDS:0};map[p].total++;if(s.report==='RP')map[p].RP++;else if(s.report==='VF')map[p].VF++;else if(s.report==='RECORDS')map[p].RECORDS++;});return Object.entries(map).sort((a,b)=>b[1].total-a[1].total);}
+function renderGroupBars(elId,limit=10){const el=document.getElementById(elId);if(!el)return;const sorted=buildGroupData().slice(0,limit);if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}const max=sorted[0][1].total;el.innerHTML=sorted.map(([n,d],i)=>`<div class="gb-row"><div class="gb-rank">${i+1}</div><div class="gb-name" title="${n}">${n}</div><div class="gb-track"><div class="gb-fill" style="width:${(d.total/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div><span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${d.total}</span></div>`).join('');}
+function renderGroupByStatus(elId){const el=document.getElementById(elId);if(!el)return;const sorted=buildGroupData().slice(0,8);if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}el.innerHTML=sorted.map(([n,d])=>{const t=d.total||1;return`<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:.72rem;font-weight:600;color:var(--txt2);">${n}</span><span style="font-size:.63rem;color:var(--txt4);">${d.total}</span></div><div style="height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;display:flex;">${d.RP?`<div style="width:${(d.RP/t)*100}%;background:#DC2626;"></div>`:''} ${d.VF?`<div style="width:${(d.VF/t)*100}%;background:#2563EB;"></div>`:''} ${d.RECORDS?`<div style="width:${(d.RECORDS/t)*100}%;background:#D97706;"></div>`:''}</div><div style="display:flex;gap:8px;margin-top:3px;">${d.RP?`<span style="font-size:.58rem;color:#DC2626;font-weight:700;">RP:${d.RP}</span>`:''} ${d.VF?`<span style="font-size:.58rem;color:#2563EB;font-weight:700;">VF:${d.VF}</span>`:''} ${d.RECORDS?`<span style="font-size:.58rem;color:#D97706;font-weight:700;">REC:${d.RECORDS}</span>`:''}</div></div>`;}).join('');}
+function renderGroupFullTable(tbodyId){const el=document.getElementById(tbodyId);if(!el)return;const sorted=buildGroupData();const total=db.support.length||1;if(!sorted.length){el.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--txt4);padding:18px;">ยังไม่มีข้อมูล</td></tr>`;return;}el.innerHTML=sorted.map(([n,d],i)=>`<tr><td style="padding-left:14px;color:var(--txt4);font-weight:700;">${i+1}</td><td style="font-weight:600;">${n}</td><td style="font-weight:800;">${d.total}</td><td><span class="badge badge-rp">${d.RP||0}</span></td><td><span class="badge badge-vf">${d.VF||0}</span></td><td><span class="badge badge-rec">${d.RECORDS||0}</span></td><td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;min-width:55px;"><div style="width:${(d.total/total)*100}%;height:100%;background:${COLORS[i%COLORS.length]};border-radius:99px;"></div></div><span style="font-size:.64rem;font-weight:700;color:var(--txt3);">${Math.round((d.total/total)*100)}%</span></div></td></tr>`).join('');}
 
-/* ─── master dashboard ─── */
+/* MASTER DASHBOARD */
 function refreshMasterDashboard(){
   const rp=db.support.filter(s=>s.report==='RP').length,vf=db.support.filter(s=>s.report==='VF').length,rec=db.support.filter(s=>s.report==='RECORDS').length;
-  const lv=db.daily.filter(d=>d.type==='leave').length;
-  const avg=db.skills.length?Math.round(db.skills.reduce((s,c)=>s+(c.value||0),0)/db.skills.length):0;
-  const aMap={};db.s5.forEach(s=>{if(s.area)aMap[s.area]=(aMap[s.area]||0)+(s.count||0);});
-  const tArea=Object.entries(aMap).sort((a,b)=>b[1]-a[1])[0];
+  const lv=db.daily.filter(d=>d.type==='leave').length;const avg=db.skills.length?Math.round(db.skills.reduce((s,c)=>s+(c.value||0),0)/db.skills.length):0;
+  const aMap={};db.s5.forEach(s=>{if(s.area)aMap[s.area]=(aMap[s.area]||0)+(s.count||0);});const tArea=Object.entries(aMap).sort((a,b)=>b[1]-a[1])[0];
   setText('dash-support-count',db.support.length);setText('dash-5s-count',db.s5.reduce((s,c)=>s+(c.count||0),0));
   setText('dash-special-count',db.special.length);setText('dash-avg-skill',avg+'%');setText('dash-avg-skill2',avg+'%');
-  setText('kpi-rp-vf',`RP: ${rp} · VF: ${vf}`);setText('kpi-5s-area',tArea?`Hot: ${tArea[0]}`:'Hot area: —');
-  setText('kpi-skill-count',`${db.skills.length} ทักษะ`);
+  setText('kpi-rp-vf',`RP: ${rp} · VF: ${vf}`);setText('kpi-5s-area',tArea?`Hot: ${tArea[0]}`:'Hot area: —');setText('kpi-skill-count',`${db.skills.length} ทักษะ`);
   setText('dash-rp-val',rp);setText('dash-vf-val',vf);setText('dash-rp-val2',rp);setText('dash-vf-val2',vf);
-  setText('dash-off-val',lv);setText('dash-skill-count2',db.skills.length);
-  setWidth('dash-skill-bar',avg);
-  const ins=document.getElementById('dash-insight');
-  if(ins){if(avg>70&&db.special.length>2)ins.textContent='🌟 ยอดเยี่ยม: ทักษะสูง + งานพิเศษดี';else if(db.support.length>10)ins.textContent='⚠️ Support บ่อย — ตรวจ Part ที่มีปัญหาซ้ำ';else ins.textContent='💡 บันทึกทักษะและงานพิเศษให้ครบเพื่อ AI วิเคราะห์แม่นขึ้น';}
+  setText('dash-off-val',lv);setText('dash-skill-count2',db.skills.length);setWidth('dash-skill-bar',avg);
+  const ins=document.getElementById('dash-insight');if(ins){if(avg>70&&db.special.length>2)ins.textContent='🌟 ยอดเยี่ยม: ทักษะสูง + งานพิเศษดี';else if(db.support.length>10)ins.textContent='⚠️ Support บ่อย — ตรวจ Part ที่มีปัญหาซ้ำ';else ins.textContent='💡 บันทึกทักษะและงานพิเศษให้ครบเพื่อ AI วิเคราะห์แม่นขึ้น';}
   buildMasterChart();renderGroupBars('group-analysis-bars',8);buildDoughnut(rp,vf,rec,'statusDoughnut');
-  const ov=document.getElementById('group-full-overview');
-  if(ov){const sorted=buildGroupData();const total=db.support.length||1;if(!sorted.length){ov.innerHTML='';return;}
-  ov.innerHTML=`<div class="a-title" style="margin-bottom:8px;">Full Group Table (${sorted.length} กลุ่ม)</div><div class="tbl-wrap"><table><thead><tr><th>#</th><th>Group Part</th><th>Total</th><th>RP</th><th>VF</th><th>REC</th><th>% Share</th></tr></thead><tbody>${sorted.map(([n,d],i)=>`<tr><td style="padding-left:14px;color:var(--txt4);font-weight:700;">${i+1}</td><td style="font-weight:600;">${n}</td><td style="font-weight:800;">${d.total}</td><td><span class="badge badge-rp">${d.RP||0}</span></td><td><span class="badge badge-vf">${d.VF||0}</span></td><td><span class="badge badge-rec">${d.RECORDS||0}</span></td><td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;min-width:55px;"><div style="width:${(d.total/total)*100}%;height:100%;background:${COLORS[i%COLORS.length]};border-radius:99px;"></div></div><span style="font-size:.64rem;font-weight:700;color:var(--txt3);">${Math.round((d.total/total)*100)}%</span></div></td></tr>`).join('')}</tbody></table></div>`;}
+  const ov=document.getElementById('group-full-overview');if(ov){const sorted=buildGroupData();const total=db.support.length||1;if(!sorted.length){ov.innerHTML='';return;}ov.innerHTML=`<div class="a-title" style="margin-bottom:8px;">Full Group Table (${sorted.length} กลุ่ม)</div><div class="tbl-wrap"><table><thead><tr><th>#</th><th>Group Part</th><th>Total</th><th>RP</th><th>VF</th><th>REC</th><th>% Share</th></tr></thead><tbody>${sorted.map(([n,d],i)=>`<tr><td style="padding-left:14px;color:var(--txt4);font-weight:700;">${i+1}</td><td style="font-weight:600;">${n}</td><td style="font-weight:800;">${d.total}</td><td><span class="badge badge-rp">${d.RP||0}</span></td><td><span class="badge badge-vf">${d.VF||0}</span></td><td><span class="badge badge-rec">${d.RECORDS||0}</span></td><td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;min-width:55px;"><div style="width:${(d.total/total)*100}%;height:100%;background:${COLORS[i%COLORS.length]};border-radius:99px;"></div></div><span style="font-size:.64rem;font-weight:700;color:var(--txt3);">${Math.round((d.total/total)*100)}%</span></div></td></tr>`).join('')}</tbody></table></div>`;}
 }
-
 function buildMasterChart(){
   const canvas=document.getElementById('masterWorkChart');if(!canvas)return;if(masterChart)masterChart.destroy();
   const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -1026,14 +1210,8 @@ function buildMasterChart(){
   const c=canvas.getContext('2d'),h=canvas.parentElement?.clientHeight||215;
   const gO=c.createLinearGradient(0,0,0,h);gO.addColorStop(0,'rgba(255,107,0,.5)');gO.addColorStop(.5,'rgba(255,107,0,.1)');gO.addColorStop(1,'rgba(255,107,0,0)');
   const gB=c.createLinearGradient(0,0,0,h);gB.addColorStop(0,'rgba(37,99,235,.5)');gB.addColorStop(.5,'rgba(37,99,235,.1)');gB.addColorStop(1,'rgba(37,99,235,0)');
-  masterChart=new Chart(c,{type:'line',data:{labels:mo,datasets:[
-    {label:'Support',data:sD,borderColor:'#FF6B00',backgroundColor:gO,tension:.45,fill:true,pointBackgroundColor:'#FF6B00',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5},
-    {label:'5S',data:s5D,borderColor:'#2563EB',backgroundColor:gB,tension:.45,fill:true,pointBackgroundColor:'#2563EB',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5}
-  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:18,font:{size:11}}}},
-    scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{display:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1}}}}});
+  masterChart=new Chart(c,{type:'line',data:{labels:mo,datasets:[{label:'Support',data:sD,borderColor:'#FF6B00',backgroundColor:gO,tension:.45,fill:true,pointBackgroundColor:'#FF6B00',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5},{label:'5S',data:s5D,borderColor:'#2563EB',backgroundColor:gB,tension:.45,fill:true,pointBackgroundColor:'#2563EB',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:18,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{display:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1}}}}});
 }
-
 function buildDoughnut(rp,vf,rec,cid){
   const ctx=document.getElementById(cid);if(!ctx)return;
   if(cid==='statusDoughnut'&&doughnutChart)doughnutChart.destroy();
@@ -1043,7 +1221,7 @@ function buildDoughnut(rp,vf,rec,cid){
   if(cid==='statusDoughnut')doughnutChart=ch;else supStatusChart=ch;
 }
 
-/* ─── AI ─── */
+/* AI */
 function runAIAnalytics(){
   const avg=db.skills.length?db.skills.reduce((s,c)=>s+(c.value||0),0)/db.skills.length:0;
   const sc=Math.round(Math.min(Math.max((avg*.4)+(db.special.length*5)+(db.support.length*2),10),100));
@@ -1051,17 +1229,15 @@ function runAIAnalytics(){
   const i=document.getElementById('aiInsight');if(i)i.textContent=sc>80?'🌟 High Performer: ยอดเยี่ยมมาก!':sc>50?'📈 Growing: กำลังพัฒนาดี':'⚙️ Operational: บันทึกต่อเนื่องเพื่อวิเคราะห์';
 }
 
-/* ─── daily ─── */
+/* DAILY */
 function refreshDashboard(){
   const fv=(document.getElementById('monthFilter')||{}).value||'all';
   let fil=fv==='all'?db.daily:db.daily.filter(d=>new Date(d.date).getMonth()===parseInt(fv));
   const lv=fil.filter(d=>d.type==='leave').length,hv=fil.filter(d=>d.type==='holiday').length;
   const wd=250,off=lv+hv,pct=Math.round(((wd-off)/wd)*100);
   setText('st-work',wd-off);setText('st-leave',lv);setText('st-holiday',hv);setText('st-percent',pct+'%');
-  const tb=document.getElementById('dailyTableBody');
-  if(tb)tb.innerHTML=[...db.daily].reverse().map((d,i)=>`<tr><td>${d.date}</td><td><span class="badge ${d.type==='leave'?'badge-lv':'badge-hol'}">${d.type==='leave'?'ลางาน':'วันหยุด'}</span></td><td style="text-align:center;"><button class="btn-del" onclick="delDaily(${db.daily.length-1-i})" title="ลบ">🗑</button></td></tr>`).join('');
-  buildAttendChart();
-  const tip=document.getElementById('dailyTip');if(tip)tip.textContent=lv>5?'⚠️ วันลาสะสมมาก ควรวางแผนใหม่':pct>90?'🌟 สถิติการมาทำงานยอดเยี่ยม!':'💪 รักษาความสม่ำเสมอต่อไปนะครับ!';
+  const tb=document.getElementById('dailyTableBody');if(tb)tb.innerHTML=[...db.daily].reverse().map((d,i)=>`<tr><td>${d.date}</td><td><span class="badge ${d.type==='leave'?'badge-lv':'badge-hol'}">${d.type==='leave'?'ลางาน':'วันหยุด'}</span></td><td style="text-align:center;"><button class="btn-del" onclick="delDaily(${db.daily.length-1-i})" title="ลบ">🗑</button></td></tr>`).join('');
+  buildAttendChart();const tip=document.getElementById('dailyTip');if(tip)tip.textContent=lv>5?'⚠️ วันลาสะสมมาก ควรวางแผนใหม่':pct>90?'🌟 สถิติการมาทำงานยอดเยี่ยม!':'💪 รักษาความสม่ำเสมอต่อไปนะครับ!';
   runAIAnalytics();
 }
 function buildAttendChart(){
@@ -1073,15 +1249,11 @@ function buildAttendChart(){
 }
 function addDaily(){
   const d=document.getElementById('dailyDate').value,t=document.getElementById('dailyType').value;
-  if(!d)return toast('❌ เลือกวันที่ก่อน');
-  db.daily.push({date:d,type:t});save();toast('📅 บันทึกแล้ว');refreshDashboard();
+  if(!d)return toast('❌ เลือกวันที่ก่อน');db.daily.push({date:d,type:t});save();toast('📅 บันทึกแล้ว');refreshDashboard();
 }
-function delDaily(i){
-  if(!confirm('ยืนยันการลบรายการนี้?'))return;
-  db.daily.splice(i,1);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refreshDashboard();
-}
+function delDaily(i){if(!confirm('ยืนยันการลบรายการนี้?'))return;db.daily.splice(i,1);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refreshDashboard();}
 
-/* ─── support ─── */
+/* SUPPORT */
 function refreshSupport(){
   const tb=document.getElementById('supportTableBody');if(!tb)return;
   const rp=db.support.filter(s=>s.report==='RP').length,vf=db.support.filter(s=>s.report==='VF').length,rec=db.support.filter(s=>s.report==='RECORDS').length;
@@ -1101,33 +1273,22 @@ function addSupport(){
   const prob=document.getElementById('supProblem').value,act=document.getElementById('supAction').value,part=document.getElementById('supPart').value,rep=document.getElementById('supReport').value,di=document.getElementById('supDate').value;
   if(!prob)return toast('❌ กรอกรายละเอียดปัญหา');
   const d=di?new Date(di):new Date();const ds=d.toLocaleDateString('th-TH',{day:'2-digit',month:'2-digit',year:'numeric'});const ts=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});const month=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  db.support.push({problem:prob,action:act,part,report:rep,datetime:`${ds} ${ts}`,month});
-  save();toast('🛠️ บันทึก Support แล้ว');
-  ['supProblem','supPart','supDate'].forEach(id=>document.getElementById(id).value='');
-  refreshSupport();if(isActive('master-dash'))refreshMasterDashboard();
+  db.support.push({problem:prob,action:act,part,report:rep,datetime:`${ds} ${ts}`,month});save();toast('🛠️ บันทึก Support แล้ว');
+  ['supProblem','supPart','supDate'].forEach(id=>document.getElementById(id).value='');refreshSupport();if(isActive('master-dash'))refreshMasterDashboard();
 }
-function delSupport(i){
-  if(!confirm('ยืนยันการลบ Support รายการนี้?'))return;
-  db.support.splice(i,1);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refreshSupport();
-}
+function delSupport(i){if(!confirm('ยืนยันการลบ Support รายการนี้?'))return;db.support.splice(i,1);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refreshSupport();}
 
-/* ─── 5S ─── */
+/* 5S */
 function refresh5S(){
-  const fm=(document.getElementById('filter5sMonth')||{}).value||'';
-  const tb=document.getElementById('s5TableBody');if(!tb)return;
-  setText('s5-total-year',db.s5.reduce((s,c)=>s+(c.count||0),0));
-  const mf=db.s5.filter(s=>s.month===fm);setText('s5-total-month',mf.reduce((s,c)=>s+(c.count||0),0));
+  const fm=(document.getElementById('filter5sMonth')||{}).value||'';const tb=document.getElementById('s5TableBody');if(!tb)return;
+  setText('s5-total-year',db.s5.reduce((s,c)=>s+(c.count||0),0));const mf=db.s5.filter(s=>s.month===fm);setText('s5-total-month',mf.reduce((s,c)=>s+(c.count||0),0));
   const oM={},aM={};db.s5.forEach(s=>{if(s.owner)oM[s.owner]=(oM[s.owner]||0)+(s.count||0);if(s.area)aM[s.area]=(aM[s.area]||0)+(s.count||0);});
   const to=Object.entries(oM).sort((a,b)=>b[1]-a[1])[0];const ta=Object.entries(aM).sort((a,b)=>b[1]-a[1])[0];
   setText('top-owners',to?to[0]:'—');setText('top-areas',ta?ta[0]:'—');
   tb.innerHTML=mf.map(s=>`<tr><td>${s.area||'-'}</td><td>${s.count||0}</td><td>${s.detail||'-'}</td><td>${s.owner||'-'}</td><td style="text-align:center;"><button class="btn-del" onclick="del5S('${s.id}')" title="ลบ">🗑</button></td></tr>`).join('');
   build5SChart();build5SAreaBars(aM);
 }
-function build5SAreaBars(aM){
-  const el=document.getElementById('s5-area-bars');if(!el)return;const sorted=Object.entries(aM).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}
-  const max=sorted[0][1];el.innerHTML=sorted.map(([n,c],i)=>`<div class="gb-row"><div class="gb-rank">${i+1}</div><div class="gb-name">${n}</div><div class="gb-track"><div class="gb-fill" style="width:${(c/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div><span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${c}</span></div>`).join('');
-}
+function build5SAreaBars(aM){const el=document.getElementById('s5-area-bars');if(!el)return;const sorted=Object.entries(aM).sort((a,b)=>b[1]-a[1]).slice(0,8);if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}const max=sorted[0][1];el.innerHTML=sorted.map(([n,c],i)=>`<div class="gb-row"><div class="gb-rank">${i+1}</div><div class="gb-name">${n}</div><div class="gb-track"><div class="gb-fill" style="width:${(c/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div><span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${c}</span></div>`).join('');}
 function build5SChart(){
   const ctx=document.getElementById('s5TrendChart');if(!ctx)return;if(s5Chart)s5Chart.destroy();
   const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -1138,172 +1299,223 @@ function build5SChart(){
 }
 function add5S(){
   const area=document.getElementById('s5Area').value,count=parseInt(document.getElementById('s5Count').value)||0,detail=document.getElementById('s5Detail').value,owner=document.getElementById('s5Owner').value,month=document.getElementById('filter5sMonth').value;
-  if(!area)return toast('❌ ระบุพื้นที่');
-  db.s5.push({id:Date.now().toString(),area,count,detail,owner,month});
-  save();toast('🧹 บันทึก 5S แล้ว');
+  if(!area)return toast('❌ ระบุพื้นที่');db.s5.push({id:Date.now().toString(),area,count,detail,owner,month});save();toast('🧹 บันทึก 5S แล้ว');
   ['s5Area','s5Count','s5Detail','s5Owner'].forEach(id=>document.getElementById(id).value='');refresh5S();
 }
-function del5S(id){
-  if(!confirm('ยืนยันการลบ 5S รายการนี้?'))return;
-  db.s5=db.s5.filter(s=>s.id!==id);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refresh5S();
-}
+function del5S(id){if(!confirm('ยืนยันการลบ 5S รายการนี้?'))return;db.s5=db.s5.filter(s=>s.id!==id);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refresh5S();}
 
-/* ═══════════════════════════════════
-   SKILL MATRIX — REDESIGNED
-═══════════════════════════════════ */
-function getLevelInfo(avg){
-  if(avg>=80)return{label:'🏆 Expert',cls:'level-expert'};
-  if(avg>=60)return{label:'🚀 Advanced',cls:'level-adv'};
-  if(avg>=40)return{label:'📘 Developing',cls:'level-dev'};
-  return{label:'⚙️ Basic',cls:'level-basic'};
-}
-function getSkillColor(val){
-  if(val>=80)return'#FF6B00';if(val>=60)return'#2563EB';if(val>=40)return'#059669';return'#94A3B8';
-}
-
-function sortSkills(by){
-  currentSkillSort=by;
-  ['sortVal','sortName'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    el.style.background=id===(by==='val'?'sortVal':'sortName')?'var(--sunset)':'var(--bg)';
-    el.style.color=id===(by==='val'?'sortVal':'sortName')?'#fff':'var(--txt3)';
-  });
-  refreshSkills();
-}
-
+/* SKILL MATRIX */
+function getLevelInfo(avg){if(avg>=80)return{label:'🏆 Expert',cls:'level-expert'};if(avg>=60)return{label:'🚀 Advanced',cls:'level-adv'};if(avg>=40)return{label:'📘 Developing',cls:'level-dev'};return{label:'⚙️ Basic',cls:'level-basic'};}
+function getSkillColor(val){if(val>=80)return'#FF6B00';if(val>=60)return'#2563EB';if(val>=40)return'#059669';return'#94A3B8';}
+function sortSkills(by){currentSkillSort=by;['sortVal','sortName'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.style.background=id===(by==='val'?'sortVal':'sortName')?'var(--sunset)':'var(--bg)';el.style.color=id===(by==='val'?'sortVal':'sortName')?'#fff':'var(--txt3)';});refreshSkills();}
 function refreshSkills(){
   if(!isActive('multi'))return;
-  let sorted=[...db.skills];
-  if(currentSkillSort==='val')sorted.sort((a,b)=>b.value-a.value);
-  else sorted.sort((a,b)=>a.name.localeCompare(b.name,'th'));
-
+  let sorted=[...db.skills];if(currentSkillSort==='val')sorted.sort((a,b)=>b.value-a.value);else sorted.sort((a,b)=>a.name.localeCompare(b.name,'th'));
   const avg=db.skills.length?Math.round(db.skills.reduce((s,c)=>s+(c.value||0),0)/db.skills.length):0;
-  const topSkill=db.skills.length?[...db.skills].sort((a,b)=>b.value-a.value)[0]:null;
-  const weakSkill=db.skills.length>1?[...db.skills].sort((a,b)=>a.value-b.value)[0]:null;
-  const lvInfo=getLevelInfo(avg);
-
-  // KPI strip
-  setText('sk-avg',avg+'%');
-  setText('sk-count',db.skills.length);
-  setText('sk-top',topSkill?`${topSkill.name} (${topSkill.value}%)`:'—');
-  setText('sk-weak',weakSkill?`${weakSkill.name} (${weakSkill.value}%)`:'—');
-
-  // Level badge
-  const lb=document.getElementById('skillLevelBadge');
-  if(lb){lb.textContent=lvInfo.label;lb.className='level-badge '+lvInfo.cls;}
-
-  // Overall score
-  setText('avgSkill',avg+'%');
-  const sa=document.getElementById('skillAnalysis');
-  if(sa){const l=getLevelInfo(avg);sa.textContent=l.label.replace(/^[^ ]+ /,'');}
-
-  // Circular progress
-  const circle=document.getElementById('scoreCircle');
-  if(circle){const circ=2*Math.PI*32;circle.style.strokeDashoffset=circ-(circ*avg/100);}
-
-  // Horizontal bar list
-  const barList=document.getElementById('skillBarList');
-  if(barList){
-    if(!db.skills.length){barList.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:20px;text-align:center;">เพิ่มทักษะเพื่อดูกราฟ</div>';}
-    else{barList.innerHTML=sorted.map((s,i)=>`<div class="skbar-item"><div class="skbar-name" title="${s.name}">${s.name}</div><div class="skbar-track"><div class="skbar-fill" style="width:${s.value}%;background:linear-gradient(90deg,${getSkillColor(s.value)},${getSkillColor(s.value)}cc);"></div></div><div class="skbar-val">${s.value}%</div><button class="skill-del" style="position:static;width:18px;height:18px;flex-shrink:0;" onclick="delSkill('${s.name}')">✕</button></div>`).join('');}
-  }
-
-  // Full skill list grid
-  const listFull=document.getElementById('skillListFull');
-  if(listFull){
-    if(!db.skills.length){listFull.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:12px;grid-column:1/-1;">ยังไม่มีทักษะ — กรอกด้านบนแล้วกด อัปเดต</div>';}
-    else{listFull.innerHTML=sorted.map(s=>`<div class="skill-row" style="margin:0;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding-right:26px;"><span style="font-weight:600;font-size:.78rem;color:var(--txt2);">${s.name}</span><span style="font-weight:800;font-size:.8rem;color:${getSkillColor(s.value)};">${s.value}%</span></div><div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-bottom:5px;"><div style="width:${s.value}%;height:100%;background:${getSkillColor(s.value)};border-radius:99px;transition:width 1s;"></div></div><div style="font-size:.58rem;color:var(--txt4);">${getLevelInfo(s.value).label}</div><button class="skill-del" onclick="delSkill('${s.name}')">✕</button></div>`).join('');}
-  }
-
-  updateSkillCharts(sorted,avg);
-  runAIAnalytics();
+  const topSkill=db.skills.length?[...db.skills].sort((a,b)=>b.value-a.value)[0]:null;const weakSkill=db.skills.length>1?[...db.skills].sort((a,b)=>a.value-b.value)[0]:null;const lvInfo=getLevelInfo(avg);
+  setText('sk-avg',avg+'%');setText('sk-count',db.skills.length);setText('sk-top',topSkill?`${topSkill.name} (${topSkill.value}%)`:'—');setText('sk-weak',weakSkill?`${weakSkill.name} (${weakSkill.value}%)`:'—');
+  const lb=document.getElementById('skillLevelBadge');if(lb){lb.textContent=lvInfo.label;lb.className='level-badge '+lvInfo.cls;}
+  setText('avgSkill',avg+'%');const sa=document.getElementById('skillAnalysis');if(sa){const l=getLevelInfo(avg);sa.textContent=l.label.replace(/^[^ ]+ /,'');}
+  const circle=document.getElementById('scoreCircle');if(circle){const circ=2*Math.PI*32;circle.style.strokeDashoffset=circ-(circ*avg/100);}
+  const barList=document.getElementById('skillBarList');if(barList){if(!db.skills.length){barList.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:20px;text-align:center;">เพิ่มทักษะเพื่อดูกราฟ</div>';}else{barList.innerHTML=sorted.map((s,i)=>`<div class="skbar-item"><div class="skbar-name" title="${s.name}">${s.name}</div><div class="skbar-track"><div class="skbar-fill" style="width:${s.value}%;background:linear-gradient(90deg,${getSkillColor(s.value)},${getSkillColor(s.value)}cc);"></div></div><div class="skbar-val">${s.value}%</div><button class="skill-del" style="position:static;width:18px;height:18px;flex-shrink:0;" onclick="delSkill('${s.name}')">✕</button></div>`).join('');}}
+  const listFull=document.getElementById('skillListFull');if(listFull){if(!db.skills.length){listFull.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:12px;grid-column:1/-1;">ยังไม่มีทักษะ — กรอกด้านบนแล้วกด อัปเดต</div>';}else{listFull.innerHTML=sorted.map(s=>`<div class="skill-row" style="margin:0;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding-right:26px;"><span style="font-weight:600;font-size:.78rem;color:var(--txt2);">${s.name}</span><span style="font-weight:800;font-size:.8rem;color:${getSkillColor(s.value)};">${s.value}%</span></div><div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-bottom:5px;"><div style="width:${s.value}%;height:100%;background:${getSkillColor(s.value)};border-radius:99px;transition:width 1s;"></div></div><div style="font-size:.58rem;color:var(--txt4);">${getLevelInfo(s.value).label}</div><button class="skill-del" onclick="delSkill('${s.name}')">✕</button></div>`).join('');}}
+  updateSkillCharts(sorted,avg);runAIAnalytics();
 }
-
 function updateSkillCharts(sorted,avg){
-  const radarEmpty=document.getElementById('skillRadarEmpty');
-  const polarEmpty=document.getElementById('skillPolarEmpty');
-
-  // Radar
-  const cv=document.getElementById('skillRadarChart');
-  if(cv){if(skillChart)skillChart.destroy();skillChart=null;}
-  if(sorted.length>=3&&cv){
-    if(radarEmpty)radarEmpty.style.display='none';
-    skillChart=new Chart(cv.getContext('2d'),{type:'radar',data:{labels:sorted.map(s=>s.name.length>8?s.name.slice(0,8)+'…':s.name),datasets:[{data:sorted.map(s=>s.value),backgroundColor:'rgba(255,107,0,.12)',borderColor:'#FF6B00',pointBackgroundColor:sorted.map(s=>getSkillColor(s.value)),pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,borderWidth:2.5,label:'ทักษะ'}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{suggestedMin:0,suggestedMax:100,ticks:{display:false,stepSize:25},grid:{color:'rgba(0,0,0,.06)'},angleLines:{color:'rgba(0,0,0,.06)'},pointLabels:{font:{size:10},color:'#334155'}}},plugins:{legend:{display:false}}}});
-  }else if(radarEmpty)radarEmpty.style.display='flex';
-
-  // Polar
-  const pv=document.getElementById('skillPolarChart');
-  if(pv){if(skillPolarChart)skillPolarChart.destroy();skillPolarChart=null;}
-  if(sorted.length>=2&&pv){
-    if(polarEmpty)polarEmpty.style.display='none';
-    skillPolarChart=new Chart(pv.getContext('2d'),{type:'polarArea',data:{labels:sorted.map(s=>s.name),datasets:[{data:sorted.map(s=>s.value),backgroundColor:sorted.map((_,i)=>COLORS[i%COLORS.length]+'99'),borderColor:sorted.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{ticks:{display:false},grid:{color:'rgba(0,0,0,.05)'}}},plugins:{legend:{display:false}}}});
-  }else if(polarEmpty)polarEmpty.style.display='flex';
-
-  // Level distribution (bar)
-  const lv=document.getElementById('skillLevelChart');
-  if(lv){if(skillLvChart)skillLvChart.destroy();skillLvChart=null;
-    const expert=sorted.filter(s=>s.value>=80).length;
-    const adv=sorted.filter(s=>s.value>=60&&s.value<80).length;
-    const dev=sorted.filter(s=>s.value>=40&&s.value<60).length;
-    const basic=sorted.filter(s=>s.value<40).length;
-    skillLvChart=new Chart(lv.getContext('2d'),{type:'doughnut',data:{labels:['Expert (80+)','Advanced (60-79)','Developing (40-59)','Basic (<40)'],datasets:[{data:[expert,adv,dev,basic],backgroundColor:['#FF6B00','#2563EB','#059669','#94A3B8'],borderWidth:4,borderColor:'#fff',hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:14,font:{size:11}}}}}});
-  }
-
-  // Compare: top5 vs avg bar
-  const cc=document.getElementById('skillCompareChart');
-  if(cc){if(skillCmpChart)skillCmpChart.destroy();skillCmpChart=null;
-    const top5=sorted.slice(0,Math.min(6,sorted.length));
-    if(top5.length){
-      skillCmpChart=new Chart(cc.getContext('2d'),{type:'bar',data:{labels:top5.map(s=>s.name.length>10?s.name.slice(0,10)+'…':s.name),datasets:[{label:'Score',data:top5.map(s=>s.value),backgroundColor:top5.map(s=>getSkillColor(s.value)+'cc'),borderColor:top5.map(s=>getSkillColor(s.value)),borderWidth:2,borderRadius:8,borderSkipped:false},{label:'Average',data:top5.map(()=>avg),type:'line',borderColor:'rgba(255,107,0,.6)',borderDash:[5,4],borderWidth:2,pointRadius:0,fill:false,tension:0}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:14,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{color:'rgba(0,0,0,.04)'},border:{display:false},min:0,max:100,ticks:{font:{size:10},color:'#94A3B8',stepSize:20}}}}});
-    }
-  }
+  const radarEmpty=document.getElementById('skillRadarEmpty');const polarEmpty=document.getElementById('skillPolarEmpty');
+  const cv=document.getElementById('skillRadarChart');if(cv){if(skillChart)skillChart.destroy();skillChart=null;}
+  if(sorted.length>=3&&cv){if(radarEmpty)radarEmpty.style.display='none';skillChart=new Chart(cv.getContext('2d'),{type:'radar',data:{labels:sorted.map(s=>s.name.length>8?s.name.slice(0,8)+'…':s.name),datasets:[{data:sorted.map(s=>s.value),backgroundColor:'rgba(255,107,0,.12)',borderColor:'#FF6B00',pointBackgroundColor:sorted.map(s=>getSkillColor(s.value)),pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,borderWidth:2.5,label:'ทักษะ'}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{suggestedMin:0,suggestedMax:100,ticks:{display:false,stepSize:25},grid:{color:'rgba(0,0,0,.06)'},angleLines:{color:'rgba(0,0,0,.06)'},pointLabels:{font:{size:10},color:'#334155'}}},plugins:{legend:{display:false}}}});}else if(radarEmpty)radarEmpty.style.display='flex';
+  const pv=document.getElementById('skillPolarChart');if(pv){if(skillPolarChart)skillPolarChart.destroy();skillPolarChart=null;}
+  if(sorted.length>=2&&pv){if(polarEmpty)polarEmpty.style.display='none';skillPolarChart=new Chart(pv.getContext('2d'),{type:'polarArea',data:{labels:sorted.map(s=>s.name),datasets:[{data:sorted.map(s=>s.value),backgroundColor:sorted.map((_,i)=>COLORS[i%COLORS.length]+'99'),borderColor:sorted.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{ticks:{display:false},grid:{color:'rgba(0,0,0,.05)'}}},plugins:{legend:{display:false}}}});}else if(polarEmpty)polarEmpty.style.display='flex';
+  const lv=document.getElementById('skillLevelChart');if(lv){if(skillLvChart)skillLvChart.destroy();skillLvChart=null;const expert=sorted.filter(s=>s.value>=80).length;const adv=sorted.filter(s=>s.value>=60&&s.value<80).length;const dev=sorted.filter(s=>s.value>=40&&s.value<60).length;const basic=sorted.filter(s=>s.value<40).length;skillLvChart=new Chart(lv.getContext('2d'),{type:'doughnut',data:{labels:['Expert (80+)','Advanced (60-79)','Developing (40-59)','Basic (<40)'],datasets:[{data:[expert,adv,dev,basic],backgroundColor:['#FF6B00','#2563EB','#059669','#94A3B8'],borderWidth:4,borderColor:'#fff',hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:14,font:{size:11}}}}}});}
+  const cc=document.getElementById('skillCompareChart');if(cc){if(skillCmpChart)skillCmpChart.destroy();skillCmpChart=null;const top5=sorted.slice(0,Math.min(6,sorted.length));if(top5.length){skillCmpChart=new Chart(cc.getContext('2d'),{type:'bar',data:{labels:top5.map(s=>s.name.length>10?s.name.slice(0,10)+'…':s.name),datasets:[{label:'Score',data:top5.map(s=>s.value),backgroundColor:top5.map(s=>getSkillColor(s.value)+'cc'),borderColor:top5.map(s=>getSkillColor(s.value)),borderWidth:2,borderRadius:8,borderSkipped:false},{label:'Average',data:top5.map(()=>avg),type:'line',borderColor:'rgba(255,107,0,.6)',borderDash:[5,4],borderWidth:2,pointRadius:0,fill:false,tension:0}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:14,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{color:'rgba(0,0,0,.04)'},border:{display:false},min:0,max:100,ticks:{font:{size:10},color:'#94A3B8',stepSize:20}}}}});}}
 }
-
 function addSkill(){
-  const n=document.getElementById('skillName'),v=document.getElementById('skillValue');
-  const val=parseInt(v.value);if(!n.value||isNaN(val))return toast('❌ กรอกชื่อและคะแนน');
-  if(val<0||val>100)return toast('❌ คะแนน 0–100 เท่านั้น');
-  const idx=db.skills.findIndex(s=>s.name===n.value);
-  if(idx>-1)db.skills[idx].value=val;else db.skills.push({name:n.value,value:val});
+  const n=document.getElementById('skillName'),v=document.getElementById('skillValue');const val=parseInt(v.value);if(!n.value||isNaN(val))return toast('❌ กรอกชื่อและคะแนน');if(val<0||val>100)return toast('❌ คะแนน 0–100 เท่านั้น');
+  const idx=db.skills.findIndex(s=>s.name===n.value);if(idx>-1)db.skills[idx].value=val;else db.skills.push({name:n.value,value:val});
   save();toast('📈 อัปเดต Skill Matrix');n.value='';v.value='';refreshSkills();
 }
-function delSkill(name){
-  if(!confirm(`ลบทักษะ "${name}"?`))return;
-  db.skills=db.skills.filter(s=>s.name!==name);save();toast('🗑 ลบทักษะแล้ว — กำลัง Sync...');refreshSkills();
+function delSkill(name){if(!confirm(`ลบทักษะ "${name}"?`))return;db.skills=db.skills.filter(s=>s.name!==name);save();toast('🗑 ลบทักษะแล้ว — กำลัง Sync...');refreshSkills();}
+function clearAllSkills(){if(!confirm('ล้างทักษะทั้งหมด?'))return;db.skills=[];save();toast('🗑 ล้างทักษะทั้งหมด');refreshSkills();}
+
+/* ═══════════════════════════════════
+   SPECIAL JOBS — POWER BI
+═══════════════════════════════════ */
+
+/* Animated counter */
+function animateCount(el, from, to, dur=700){
+  if(!el)return;const start=performance.now();
+  const isFloat=String(to).includes('.');
+  const step=ts=>{const p=Math.min((ts-start)/dur,1);const v=from+(to-from)*easeOut(p);
+    el.textContent=isFloat?v.toFixed(1):Math.round(v);if(p<1)requestAnimationFrame(step);};
+  requestAnimationFrame(step);
 }
-function clearAllSkills(){
-  if(!confirm('ล้างทักษะทั้งหมด?'))return;
-  db.skills=[];save();toast('🗑 ล้างทักษะทั้งหมด');refreshSkills();
+function easeOut(t){return 1-Math.pow(1-t,3);}
+
+/* Derive status from result text */
+function deriveStatus(result){
+  if(!result||result.trim()==='')return{cls:'sp-status-pending',txt:'Pending'};
+  const r=result.toLowerCase();
+  if(r.includes('เสร็จ')||r.includes('done')||r.includes('complete')||r.includes('สำเร็จ')||r.includes('ok')||r.includes('ผ่าน'))return{cls:'sp-status-done',txt:'Done'};
+  if(r.includes('กำลัง')||r.includes('wip')||r.includes('progress')||r.includes('ดำเนิน'))return{cls:'sp-status-wip',txt:'In Progress'};
+  return{cls:'sp-status-done',txt:'Done'};
 }
 
-/* ─── special ─── */
+/* Assignor color map */
+const assignorColors=['#FF6B00','#2563EB','#7C3AED','#059669','#DC2626','#0891B2','#D97706','#DB2777'];
+const _colorMap={};let _colorIdx=0;
+function getAssignorColor(name){if(!name)return'#94A3B8';if(!_colorMap[name]){_colorMap[name]=assignorColors[_colorIdx%assignorColors.length];_colorIdx++;}_return=_colorMap[name];return _colorMap[name];}
+
 function refreshSpecial(){
   const tb=document.getElementById('specialTableBody');if(!tb)return;
-  tb.innerHTML=[...db.special].reverse().map((s,i)=>`<tr><td style="padding-left:16px;">${s.job||'-'}</td><td>${s.by||'-'}</td><td>${s.result||'-'}</td><td style="text-align:center;"><button class="btn-del" onclick="delSpecial(${db.special.length-1-i})" title="ลบ">🗑</button></td></tr>`).join('');
-  setText('dash-special-count',db.special.length);
+  const total=db.special.length;
+  const now=new Date();const thisMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const monthEntries=db.special.filter(s=>s.date&&s.date.slice(0,7)===thisMonth).length;
+  const withResult=db.special.filter(s=>s.result&&s.result.trim()).length;
+  const rate=total>0?Math.round((withResult/total)*100):0;
+
+  // Assignor map
+  const assignorMap={};db.special.forEach(s=>{const k=s.by||'(ไม่ระบุ)';assignorMap[k]=(assignorMap[k]||0)+1;});
+  const sortedAssignors=Object.entries(assignorMap).sort((a,b)=>b[1]-a[1]);
+  const topAssignor=sortedAssignors[0];
+
+  // Update KPI with animation
+  const kpiTotal=document.getElementById('sp-kpi-total');
+  const kpiMonth=document.getElementById('sp-kpi-month');
+  const kpiRate=document.getElementById('sp-kpi-rate');
+  if(kpiTotal)animateCount(kpiTotal,0,total);
+  if(kpiMonth)animateCount(kpiMonth,0,monthEntries);
+  if(kpiRate)setTimeout(()=>{if(kpiRate)kpiRate.textContent=rate+'%';},200);
+  setText('sp-kpi-total-delta',`All ${total} jobs`);
+  setText('sp-kpi-month-lbl',now.toLocaleDateString('th-TH',{month:'long',year:'numeric'}));
+  setText('sp-kpi-top-by',topAssignor?topAssignor[0]:'—');
+  setText('sp-kpi-top-by-n',topAssignor?`${topAssignor[1]} jobs`:'0 jobs');
+  setText('sp-total-badge',`${total} Projects`);
+  setText('sp-table-count',`${total} records`);
+  setText('dash-special-count',total);
+
+  // Assignor bars (custom HTML)
+  renderAssignorBars(sortedAssignors);
+
+  // Monthly timeline
+  renderMonthlyTimeline();
+
+  // Result donut chart
+  buildResultChart(withResult, total-withResult);
+
+  // Table rows
+  if(!total){
+    tb.innerHTML=`<tr><td colspan="6"><div class="sp-empty"><div class="sp-empty-icon">⭐</div><div class="sp-empty-txt">ยังไม่มีงานพิเศษ — กรอกแบบฟอร์มด้านบน</div></div></td></tr>`;
+    return;
+  }
+  const rows=[...db.special].reverse();
+  tb.innerHTML=rows.map((s,i)=>{
+    const idx=db.special.length-1-i;
+    const st=deriveStatus(s.result);
+    const aColor=getAssignorColor(s.by);
+    const dateStr=s.date?formatDisplayDate(s.date):'—';
+    return `<tr class="sp-row-new" style="animation-delay:${i*0.04}s">
+      <td><div class="sp-row-num">${db.special.length-i}</div></td>
+      <td><div style="font-weight:700;font-size:.8rem;color:var(--txt);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.job||'-'}">${s.job||'-'}</div></td>
+      <td><div class="sp-date-pill">📅 ${dateStr}</div></td>
+      <td><div class="sp-assignor-tag" style="color:${aColor};background:${aColor}15;border-color:${aColor}30;"><span style="width:7px;height:7px;border-radius:50%;background:${aColor};flex-shrink:0;"></span>${s.by||'—'}</div></td>
+      <td><div style="display:flex;align-items:center;gap:7px;"><div class="sp-status ${st.cls}">${st.txt}</div><div class="sp-result-txt" title="${s.result||''}">${s.result||'—'}</div></div></td>
+      <td style="text-align:center;"><button class="sp-del-btn" onclick="delSpecial(${idx})" title="ลบ">🗑</button></td>
+    </tr>`;
+  }).join('');
 }
+
+function formatDisplayDate(d){
+  if(!d)return'—';try{const dt=new Date(d);return dt.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit'});}catch{return d;}
+}
+
+function renderAssignorBars(sorted){
+  const el=document.getElementById('sp-assignor-bars');if(!el)return;
+  if(!sorted.length){el.innerHTML='<div class="sp-empty" style="padding:20px 0;"><div class="sp-empty-icon" style="font-size:1.8rem;">👤</div><div class="sp-empty-txt">ยังไม่มีข้อมูล Assignor</div></div>';return;}
+  const max=sorted[0][1];
+  el.innerHTML=sorted.slice(0,10).map(([name,count],i)=>{
+    const color=getAssignorColor(name);
+    return`<div class="sp-hbar-item" style="animation-delay:${i*0.06}s">
+      <div class="sp-hbar-rank">${i+1}</div>
+      <div class="sp-hbar-name" title="${name}">${name}</div>
+      <div class="sp-hbar-track">
+        <div class="sp-hbar-fill" style="width:${(count/max)*100}%;background:linear-gradient(90deg,${color},${color}cc);"></div>
+      </div>
+      <div class="sp-hbar-val" style="color:${color};">${count}</div>
+    </div>`;
+  }).join('');
+  // Trigger animation after brief delay
+  setTimeout(()=>{el.querySelectorAll('.sp-hbar-fill').forEach(f=>{const w=f.style.width;f.style.width='0%';setTimeout(()=>{f.style.width=w;},50);});},80);
+}
+
+function renderMonthlyTimeline(){
+  const el=document.getElementById('sp-monthly-timeline');if(!el)return;
+  const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const counts=Array(12).fill(0);
+  db.special.forEach(s=>{if(s.date){const m=new Date(s.date).getMonth();if(!isNaN(m))counts[m]++;}});
+  const max=Math.max(...counts)||1;
+  const TLCOLORS=['#FF6B00','#2563EB','#7C3AED','#059669','#DC2626','#0891B2','#D97706','#DB2777','#0D9488','#65A30D','#4F46E5','#EA580C'];
+  el.innerHTML=`<div class="sp-timeline">${counts.map((c,i)=>`
+    <div class="sp-tl-row">
+      <div class="sp-tl-mo">${mo[i]}</div>
+      <div class="sp-tl-track"><div class="sp-tl-fill" data-w="${(c/max)*100}" style="width:0%;background:${TLCOLORS[i]};"></div></div>
+      <div class="sp-tl-num" style="color:${c>0?TLCOLORS[i]:'var(--txt4)'};">${c||''}</div>
+    </div>`).join('')}</div>`;
+  // Animate bars
+  setTimeout(()=>{el.querySelectorAll('.sp-tl-fill').forEach(f=>{f.style.width=f.dataset.w+'%';});},120);
+}
+
+function buildResultChart(withR, withoutR){
+  const ctx=document.getElementById('spResultChart');if(!ctx)return;if(spResultChart)spResultChart.destroy();
+  const total=withR+withoutR;if(!total){const leg=document.getElementById('sp-result-legend');if(leg)leg.innerHTML='';return;}
+  spResultChart=new Chart(ctx.getContext('2d'),{
+    type:'doughnut',
+    data:{
+      labels:['มีผลลัพธ์','รอผลลัพธ์'],
+      datasets:[{data:[withR,withoutR],backgroundColor:['#059669','#E2E8F0'],borderWidth:3,borderColor:'#fff',hoverOffset:10}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/total*100)}%)`}}}}
+  });
+  const leg=document.getElementById('sp-result-legend');
+  if(leg)leg.innerHTML=`
+    <div class="sp-leg-item"><div class="sp-leg-dot" style="background:#059669;"></div>มีผลลัพธ์: ${withR}</div>
+    <div class="sp-leg-item"><div class="sp-leg-dot" style="background:#CBD5E1;"></div>รอผล: ${withoutR}</div>
+  `;
+}
+
 function addSpecial(){
-  const job=document.getElementById('specJob').value,by=document.getElementById('specBy').value,result=document.getElementById('specResult').value;
+  const job=document.getElementById('specJob').value,
+        date=document.getElementById('specDate').value,
+        by=document.getElementById('specBy').value,
+        result=document.getElementById('specResult').value;
   if(!job)return toast('❌ กรอกชื่องาน');
-  db.special.push({job,by,result});save();toast('⭐ บันทึกงานพิเศษ');
-  ['specJob','specBy','specResult'].forEach(id=>document.getElementById(id).value='');refreshSpecial();
+  db.special.push({job,date,by,result,id:Date.now().toString()});
+  save();toast('⭐ บันทึกงานพิเศษแล้ว!');
+  ['specJob','specDate','specBy','specResult'].forEach(id=>document.getElementById(id).value='');
+  refreshSpecial();
+  // Spark animation on submit button
+  const btn=document.querySelector('.sp-submit-btn .btn-spark');
+  if(btn){btn.style.transform='rotate(360deg) scale(1.6)';setTimeout(()=>{btn.style.transform='';},500);}
 }
+
 function delSpecial(i){
   if(!confirm('ยืนยันการลบงานพิเศษนี้?'))return;
   db.special.splice(i,1);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refreshSpecial();
 }
 
-/* ─── Skill Matrix responsive grid ─── */
+/* Skill grid responsive */
 function adjustSkillGrid(){
-  const grid=document.getElementById('skillChartGrid');
-  if(!grid)return;
+  const grid=document.getElementById('skillChartGrid');if(!grid)return;
   if(window.innerWidth<900){grid.style.gridTemplateColumns='1fr';}
   else if(window.innerWidth<1200){grid.style.gridTemplateColumns='1fr 1fr';}
   else{grid.style.gridTemplateColumns='1fr 1.1fr 0.9fr';}
 }
 window.addEventListener('resize',adjustSkillGrid);
 adjustSkillGrid();
+
+/* Set today's date as default for special form */
+(function(){const sd=document.getElementById('specDate');if(sd)sd.value=new Date().toISOString().split('T')[0];})();
 </script>
 </body>
 </html>
