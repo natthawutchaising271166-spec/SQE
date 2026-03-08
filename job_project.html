@@ -29,16 +29,22 @@
   --main-pad:20px 24px 40px;
   --kpi-cols:4;--stat-cols:4;--g4-cols:4;--g2-cols:2;
   --g2r-cols:1.55fr 1fr;
+  --form-support-cols:120px 1fr 1.2fr 1fr 1fr auto;
+  --form-5s-cols:1fr 80px 1.2fr 1fr auto;
+  --form-skill-cols:1fr 150px auto;
+  --form-special-cols:1fr 1fr 1.5fr auto;
   --chart-master-h:215px;--chart-h:195px;
   --font-title:1.4rem;--font-kpi:1.85rem;--font-stat:1.55rem;
   --font-mini:1.7rem;--font-hero:3.2rem;
 }
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);display:flex;height:100dvh;-webkit-font-smoothing:antialiased;}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--txt4)}
 
 /* LOADING */
 #loadingOverlay{position:fixed;inset:0;z-index:9999;background:rgba(13,27,42,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;backdrop-filter:blur(8px);transition:opacity .5s ease,visibility .5s ease;}
@@ -58,38 +64,6 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 .ss-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;animation:pulse-ss 1.4s infinite;}
 @keyframes pulse-ss{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ══════════════════ DATE FILTER ══════════════════ */
-.dft-bar{
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-  background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);
-  padding:8px 14px;box-shadow:var(--card-shadow);
-  transition:box-shadow .2s;
-}
-.dft-bar:hover{box-shadow:var(--card-hover);}
-.dft-label{font-size:.56rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--txt4);white-space:nowrap;}
-.dft-presets{display:flex;gap:4px;flex-wrap:wrap;}
-.dft-btn{
-  padding:5px 11px;border-radius:8px;font-size:.64rem;font-weight:700;
-  cursor:pointer;border:1.5px solid var(--border);background:var(--bg);
-  color:var(--txt3);transition:all .22s cubic-bezier(.34,1.56,.64,1);
-  font-family:'Prompt',sans-serif;white-space:nowrap;
-}
-.dft-btn:hover{border-color:var(--or);color:var(--or);transform:translateY(-1px);}
-.dft-btn.active{background:var(--sunset);border-color:transparent;color:#fff;box-shadow:0 3px 10px var(--or-glow);}
-.dft-divider{width:1px;height:22px;background:var(--border);flex-shrink:0;}
-.dft-selects{display:flex;gap:6px;align-items:center;}
-.dft-sel{
-  background:var(--bg);border:1.5px solid var(--border2);
-  padding:5px 9px;border-radius:8px;font-family:'Prompt',sans-serif;
-  font-size:.68rem;color:var(--txt2);outline:none;cursor:pointer;
-  transition:all .18s;
-}
-.dft-sel:focus{border-color:var(--or);box-shadow:0 0 0 3px var(--or-soft);}
-
-/* PAGE HEADER with filter */
-.ph{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;}
-.ph-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-
 /* SIDEBAR */
 .sidebar{width:var(--sidebar-w);flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;height:100dvh;overflow:hidden;box-shadow:2px 0 20px rgba(13,27,42,.06);position:relative;z-index:200;transition:width .3s ease,transform .3s ease;}
 .sidebar::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--sunset);z-index:1;}
@@ -101,7 +75,7 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 .sb-ver{color:var(--txt4);font-size:.58rem;font-weight:400;margin-top:1px}
 .user-mini{padding:18px 20px 16px;border-bottom:1px solid var(--border);text-align:center;}
 .user-ava{width:54px;height:54px;border-radius:15px;margin:0 auto 9px;background:linear-gradient(135deg,var(--or-mid),var(--or-soft));border:2px solid rgba(255,107,0,.22);display:flex;align-items:center;justify-content:center;font-size:1.55rem;box-shadow:0 4px 14px rgba(255,107,0,.14);transition:all .3s cubic-bezier(.34,1.56,.64,1);cursor:pointer;}
-.user-ava:hover{transform:scale(1.09) rotate(4deg);}
+.user-ava:hover{transform:scale(1.09) rotate(4deg);box-shadow:0 8px 26px rgba(255,107,0,.28)}
 .user-name{color:var(--txt);font-size:.84rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px}
 .user-role{color:var(--txt4);font-size:.61rem;font-weight:400;margin-top:2px}
 .online-dot{width:7px;height:7px;background:#22C55E;border-radius:50%;flex-shrink:0;animation:pulse-g 2.2s infinite}
@@ -110,8 +84,9 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 .menu-item{display:flex;align-items:center;gap:10px;padding:10px 15px;margin:1px 8px;border-radius:11px;cursor:pointer;color:var(--txt3);font-weight:500;font-size:.81rem;transition:all .22s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;}
 .menu-item::after{content:'';position:absolute;inset:0;opacity:0;background:linear-gradient(90deg,var(--or-soft),transparent);transition:opacity .2s}
 .menu-item:hover{background:var(--bg);color:var(--txt2);transform:translateX(4px)}
-.menu-item.active{background:linear-gradient(90deg,rgba(255,107,0,.1),rgba(255,107,0,.02));color:var(--or);font-weight:700;box-shadow:inset 3px 0 0 var(--or);}
+.menu-item.active{background:linear-gradient(90deg,rgba(255,107,0,.1),rgba(255,107,0,.02));color:var(--or);font-weight:700;box-shadow:inset 3px 0 0 var(--or);transform:translateX(0)}
 .menu-item.active::after{opacity:1}
+.menu-item.active .menu-icon{transform:scale(1.12)}
 .menu-icon{font-size:.95rem;width:21px;text-align:center;flex-shrink:0;transition:transform .22s cubic-bezier(.34,1.56,.64,1)}
 .sb-footer{flex-shrink:0;padding:12px 12px max(16px,env(safe-area-inset-bottom,16px));border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;background:#fff;}
 .sb-nav{flex:1;overflow-y:auto;overflow-x:hidden;}
@@ -122,7 +97,9 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 .sb-btn-sync:hover{box-shadow:0 10px 28px rgba(255,107,0,.48)}
 .sb-btn-sync.loading{opacity:.55;cursor:not-allowed;transform:none!important}
 .sb-btn-home{background:var(--bg2);color:var(--txt3);border:1px solid var(--border)}
+.sb-btn-home:hover{background:var(--bg3);color:var(--txt2)}
 .hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px;border-radius:10px;color:var(--txt2);font-size:1.3rem;line-height:1;align-items:center;justify-content:center;transition:all .2s;}
+.hamburger:hover{background:var(--bg2);}
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(13,27,42,.45);z-index:190;opacity:0;transition:opacity .3s;}
 .sb-overlay.active{opacity:1;}
 
@@ -147,6 +124,7 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 .page.active>*:nth-child(6){animation-delay:.21s}
 @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
+.ph{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px}
 .eyebrow{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--or);margin-bottom:3px;display:flex;align-items:center;gap:6px}
 .eyebrow::before{content:'';width:16px;height:2px;background:var(--sunset);border-radius:99px}
 .main-title{font-size:var(--font-title);font-weight:800;color:var(--txt);line-height:1.15}
@@ -161,6 +139,7 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 @keyframes shim{0%{left:-100%}100%{left:100%}}
 .score-big{background:var(--white);border-radius:var(--r-xl);padding:18px;border:1px solid var(--border);box-shadow:var(--card-shadow);text-align:center;position:relative;overflow:hidden;transition:all .28s;}
 .score-big::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--sunset)}
+.score-big:hover{box-shadow:var(--glow-shadow);transform:translateY(-3px)}
 .kpi-strip{display:grid;grid-template-columns:repeat(var(--kpi-cols),1fr);gap:11px}
 .kpi{background:var(--white);border-radius:var(--r-lg);padding:15px 14px 13px;border:1px solid var(--border);box-shadow:var(--card-shadow);position:relative;overflow:hidden;transition:all .32s cubic-bezier(.34,1.56,.64,1);cursor:default;}
 .kpi-top{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r-lg) var(--r-lg) 0 0}
@@ -177,20 +156,25 @@ body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--txt);displ
 .sv{font-size:var(--font-stat);font-weight:800;line-height:1.1}
 .sl{font-size:.58rem;color:var(--txt4);text-transform:uppercase;letter-spacing:.08em;margin-top:3px;font-weight:600}
 .stat-highlight{background:var(--sunset)!important;border-color:transparent!important;box-shadow:var(--glow-shadow)!important}
+.stat-highlight:hover{transform:translateY(-5px) scale(1.03)!important;box-shadow:0 18px 44px rgba(255,107,0,.42)!important}
 .stat-highlight .sv,.stat-highlight .sl{color:#fff!important}
 .prog-track{height:6px;background:rgba(255,255,255,.1);border-radius:99px;overflow:visible}
 .prog-fill{height:100%;border-radius:99px;background:var(--sunset);width:0;transition:width 1.5s cubic-bezier(.22,.68,0,1.2);position:relative;overflow:visible}
 .prog-fill::after{content:'';position:absolute;right:-2px;top:50%;transform:translateY(-50%);width:12px;height:12px;background:var(--or2);border-radius:50%;border:2.5px solid rgba(255,255,255,.25);box-shadow:0 2px 9px var(--or-glow)}
 .prog-light{background:var(--bg2)!important}
+.prog-light .prog-fill::after{border-color:#fff!important}
 .hero-num{font-size:var(--font-hero);font-weight:900;letter-spacing:-.04em;line-height:1;background:var(--sunset);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;transition:transform .28s cubic-bezier(.34,1.56,.64,1);}
+.hero-num:hover{transform:scale(1.06)}
 .g4{display:grid;grid-template-columns:repeat(var(--g4-cols),1fr);gap:11px}
 .mini-stat{background:var(--navy);border-radius:var(--r-lg);padding:13px 11px;text-align:center;border:1px solid rgba(255,255,255,.04);box-shadow:var(--card-shadow);position:relative;overflow:hidden;transition:all .3s cubic-bezier(.34,1.56,.64,1);cursor:default;}
 .mini-stat:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(13,27,42,.22)}
+.mini-stat:hover .ms-val{transform:scale(1.08)}
 .ms-lbl{font-size:.57rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;font-weight:500}
 .ms-val{font-size:var(--font-mini);font-weight:800;line-height:1.1;transition:transform .2s}
 .gb-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bg2);transition:all .2s}
 .gb-row:last-child{border-bottom:none}
 .gb-row:hover{padding-left:5px}
+.gb-row:hover .gb-fill{filter:brightness(1.12) saturate(1.15)}
 .gb-rank{font-size:.58rem;font-weight:800;color:var(--txt4);min-width:14px;text-align:right}
 .gb-name{font-size:.72rem;font-weight:600;min-width:84px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt2)}
 .gb-track{flex:1;height:6px;background:var(--bg2);border-radius:99px;overflow:hidden}
@@ -209,8 +193,14 @@ input:focus,select:focus{border-color:var(--or);box-shadow:0 0 0 3px var(--or-so
 input::placeholder{color:var(--txt4)}
 .btn-save{background:var(--sunset);border:none;padding:9px 17px;border-radius:var(--r-xs);color:#fff;font-weight:700;cursor:pointer;font-family:'Prompt',sans-serif;font-size:.75rem;white-space:nowrap;box-shadow:0 4px 13px var(--or-glow);transition:all .28s cubic-bezier(.34,1.56,.64,1)}
 .btn-save:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 10px 26px rgba(255,107,0,.46)}
+.btn-save:active{transform:scale(.95)}
 .btn-del{background:none;border:none;cursor:pointer;opacity:.3;padding:4px 8px;border-radius:var(--r-xs);transition:all .22s cubic-bezier(.34,1.56,.64,1);font-size:.82rem;color:var(--red);}
-.btn-del:hover{opacity:1;background:var(--red-l);transform:scale(1.18);}
+.btn-del:hover{opacity:1;background:var(--red-l);transform:scale(1.18);box-shadow:0 2px 10px rgba(220,38,38,.2)}
+.btn-del:active{transform:scale(.9)}
+.form-support{display:grid;grid-template-columns:var(--form-support-cols);gap:8px;background:#fff;border:1px solid var(--border);}
+.form-5s{display:grid;grid-template-columns:var(--form-5s-cols);gap:8px;background:#fff;border:1px solid var(--border);}
+.form-skill{display:grid;grid-template-columns:var(--form-skill-cols);gap:10px;background:#fff;border:1px solid var(--border);}
+.form-special{display:grid;grid-template-columns:var(--form-special-cols);gap:10px;background:#fff;border:1px solid var(--border);}
 .tbl-wrap{overflow:hidden;border-radius:var(--r);border:1px solid var(--border);margin-top:9px}
 .tbl-scroll{max-height:300px;overflow-y:auto;overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:520px}
@@ -219,6 +209,10 @@ tbody td{padding:8px 12px;font-size:.79rem;border-bottom:1px solid var(--bg2);co
 tbody tr{transition:background .12s}
 tbody tr:hover td{background:#FFF8F2}
 tbody tr:last-child td{border-bottom:none}
+.skill-row{background:var(--bg);border-radius:var(--r);padding:9px 11px;margin-bottom:5px;border:1.5px solid var(--border);position:relative;transition:all .27s cubic-bezier(.34,1.56,.64,1)}
+.skill-row:hover{border-color:var(--or);background:#FFF8F2;transform:translateX(4px);box-shadow:0 3px 14px var(--or-soft)}
+.skill-del{position:absolute;top:8px;right:8px;border:none;background:var(--red-l);color:var(--red);width:19px;height:19px;border-radius:4px;cursor:pointer;font-size:.59rem;display:flex;align-items:center;justify-content:center;transition:all .22s cubic-bezier(.34,1.56,.64,1)}
+.skill-del:hover{transform:scale(1.24);background:var(--red);color:#fff}
 .g2{display:grid;grid-template-columns:repeat(var(--g2-cols),1fr);gap:13px}
 .g2r{display:grid;grid-template-columns:var(--g2r-cols);gap:13px}
 .a-title{font-size:.61rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);margin-bottom:9px}
@@ -233,222 +227,419 @@ tbody tr:last-child td{border-bottom:none}
 .skill-kpi-lbl{font-size:.56rem;color:var(--txt4);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
 .level-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:.65rem;font-weight:700;}
 .level-expert{background:linear-gradient(135deg,#FF6B00,#E85500);color:#fff;box-shadow:0 3px 10px rgba(255,107,0,.35)}
-.level-adv{background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;}
-.level-dev{background:linear-gradient(135deg,#059669,#047857);color:#fff;}
+.level-adv{background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;box-shadow:0 3px 10px rgba(37,99,235,.3)}
+.level-dev{background:linear-gradient(135deg,#059669,#047857);color:#fff;box-shadow:0 3px 10px rgba(5,150,105,.3)}
 .level-basic{background:var(--bg3);color:var(--txt3)}
 .skbar-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bg2);}
 .skbar-item:last-child{border-bottom:none}
 .skbar-name{font-size:.74rem;font-weight:600;min-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt2)}
-.skbar-track{flex:1;height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;}
+.skbar-track{flex:1;height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;position:relative;}
 .skbar-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.22,.68,0,1.2);}
 .skbar-val{font-size:.72rem;font-weight:800;min-width:38px;text-align:right;color:var(--or)}
-.skill-row{background:var(--bg);border-radius:var(--r);padding:9px 11px;margin-bottom:5px;border:1.5px solid var(--border);position:relative;transition:all .27s cubic-bezier(.34,1.56,.64,1)}
-.skill-row:hover{border-color:var(--or);background:#FFF8F2;transform:translateX(4px);}
-.skill-del{position:absolute;top:8px;right:8px;border:none;background:var(--red-l);color:var(--red);width:19px;height:19px;border-radius:4px;cursor:pointer;font-size:.59rem;display:flex;align-items:center;justify-content:center;transition:all .22s}
-.skill-del:hover{transform:scale(1.24);background:var(--red);color:#fff}
+.chart-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.chart-tab{padding:5px 12px;border-radius:8px;font-size:.65rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);color:var(--txt3);transition:all .2s;}
+.chart-tab.active{background:var(--sunset);border-color:transparent;color:#fff;box-shadow:0 3px 10px var(--or-glow)}
+.chart-tab:hover:not(.active){border-color:var(--or);color:var(--or)}
 
-/* ══════════════════════════════
-   SUPPORT — NEW POWER BI STYLE
-══════════════════════════════ */
-.sup-hero-band{
-  background:var(--navy);border-radius:var(--r-xl);padding:22px 26px;
-  position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.04);
-  box-shadow:0 12px 40px rgba(13,27,42,.28);
-}
-.sup-hero-band::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;background:radial-gradient(circle,rgba(255,107,0,.14) 0%,transparent 65%);pointer-events:none;}
-.sup-hero-band::after{content:'';position:absolute;bottom:-60px;left:20%;width:220px;height:220px;background:radial-gradient(circle,rgba(37,99,235,.08) 0%,transparent 65%);pointer-events:none;}
+/* ═══════════════════════════════════════════
+   SPECIAL JOBS — POWER BI STYLE
+═══════════════════════════════════════════ */
 
-/* NG Rate big card */
-.ng-rate-card{
-  background:linear-gradient(135deg,#1a0a00,#2d1200);
-  border-radius:var(--r-xl);padding:20px;border:1px solid rgba(255,107,0,.2);
-  box-shadow:0 8px 28px rgba(255,107,0,.12);text-align:center;
-  position:relative;overflow:hidden;transition:all .3s;
-}
-.ng-rate-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(255,107,0,.22);}
-.ng-rate-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,107,0,.12),transparent 60%);}
-.ng-rate-num{font-size:3rem;font-weight:900;letter-spacing:-.04em;line-height:1;background:linear-gradient(135deg,#FFB067,#FF6B00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.ng-rate-lbl{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,107,0,.5);margin-top:4px;}
-.ng-rate-sub{font-size:.68rem;color:rgba(255,255,255,.25);margin-top:8px;font-weight:300;}
-
-/* Line performance cards */
-.line-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
-.line-card{
-  background:#fff;border-radius:var(--r-lg);padding:14px 12px;
-  border:1px solid var(--border);box-shadow:var(--card-shadow);
-  transition:all .32s cubic-bezier(.34,1.56,.64,1);cursor:default;
-  position:relative;overflow:hidden;
-}
-.line-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-.line-card:hover{transform:translateY(-5px) scale(1.025);box-shadow:0 14px 32px rgba(0,0,0,.1);}
-.line-card-name{font-size:.62rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.line-card-ng{font-size:1.6rem;font-weight:900;line-height:1;}
-.line-card-detail{font-size:.58rem;color:var(--txt4);margin-top:4px;}
-.line-card-bar{height:4px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-top:8px;}
-.line-card-bar-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.22,.68,0,1.2);}
-
-/* Form grid for support */
-.sup-form-grid{
-  display:grid;
-  grid-template-columns:100px 120px 1fr 1fr 120px 90px 80px 80px 80px auto;
-  gap:8px;align-items:end;
-  background:#fff;border:1px solid var(--border);
-  border-radius:var(--r);padding:12px 14px;
-}
-.sup-field{display:flex;flex-direction:column;gap:4px;}
-.sup-label{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--txt3);}
-.sup-input{background:var(--bg);border:1.5px solid var(--border2);padding:8px 10px;border-radius:var(--r-xs);font-family:'Prompt',sans-serif;font-size:.76rem;color:var(--txt);outline:none;transition:all .2s;width:100%;}
-.sup-input:focus{border-color:var(--or);box-shadow:0 0 0 3px var(--or-soft);background:#fff;}
-.sup-input::placeholder{color:var(--txt4);}
-
-/* NG badge */
-.ng-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:.62rem;font-weight:700;}
-.ng-badge-ok{background:#DCFCE7;color:#15803D;}
-.ng-badge-ng{background:var(--red-l);color:#B91C1C;}
-
-/* ══════════════════════════════
-   SPECIAL JOBS — POWER BI
-══════════════════════════════ */
+/* Header banner */
 .sp-header-band{
-  background:var(--navy);border-radius:var(--r-xl);padding:22px 26px;
-  position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.04);
+  background:var(--navy);
+  border-radius:var(--r-xl);
+  padding:22px 26px;
+  position:relative;overflow:hidden;
+  border:1px solid rgba(255,255,255,.04);
   box-shadow:0 12px 40px rgba(13,27,42,.28);
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
 }
-.sp-header-band::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(255,107,0,.12) 0%,transparent 65%);pointer-events:none;}
-.sp-band-title{font-size:1.35rem;font-weight:900;color:#fff;letter-spacing:-.02em;line-height:1.15;position:relative;z-index:1;}
+.sp-header-band::before{
+  content:'';position:absolute;
+  top:-80px;right:-80px;
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(255,107,0,.12) 0%,transparent 65%);
+  pointer-events:none;
+}
+.sp-header-band::after{
+  content:'';position:absolute;
+  bottom:-60px;left:30%;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(37,99,235,.08) 0%,transparent 65%);
+  pointer-events:none;
+}
+.sp-band-title{
+  font-size:1.35rem;font-weight:900;color:#fff;letter-spacing:-.02em;line-height:1.15;position:relative;z-index:1;
+}
 .sp-band-sub{font-size:.7rem;color:rgba(255,255,255,.32);font-weight:300;margin-top:3px;letter-spacing:.04em;}
 .sp-band-actions{display:flex;align-items:center;gap:10px;position:relative;z-index:1;}
-.sp-live-badge{display:flex;align-items:center;gap:6px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);padding:5px 12px;border-radius:99px;font-size:.62rem;font-weight:700;color:#4ADE80;letter-spacing:.07em;}
+.sp-live-badge{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);
+  padding:5px 12px;border-radius:99px;
+  font-size:.62rem;font-weight:700;color:#4ADE80;letter-spacing:.07em;
+}
 .sp-live-dot{width:6px;height:6px;background:#22C55E;border-radius:50%;animation:pulse-g 2s infinite;}
 
+/* KPI grid Power BI */
 .sp-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-.sp-kpi-card{background:#fff;border-radius:var(--r-lg);padding:18px 16px 15px;border:1px solid var(--border);box-shadow:var(--card-shadow);position:relative;overflow:hidden;transition:all .35s cubic-bezier(.34,1.56,.64,1);cursor:default;}
-.sp-kpi-card:hover{transform:translateY(-6px) scale(1.015);box-shadow:0 20px 48px rgba(13,27,42,.12);}
-.sp-kpi-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;margin-bottom:11px;transition:transform .35s cubic-bezier(.34,1.56,.64,1);}
+.sp-kpi-card{
+  background:#fff;border-radius:var(--r-lg);
+  padding:18px 16px 15px;
+  border:1px solid var(--border);
+  box-shadow:var(--card-shadow);
+  position:relative;overflow:hidden;
+  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+  cursor:default;
+}
+.sp-kpi-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:4px;border-radius:var(--r-lg) 0 0 var(--r-lg);
+}
+.sp-kpi-card:hover{
+  transform:translateY(-6px) scale(1.015);
+  box-shadow:0 20px 48px rgba(13,27,42,.12);
+}
+.sp-kpi-card:hover .sp-kpi-num{letter-spacing:-.04em;}
+.sp-kpi-ico{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.05rem;margin-bottom:11px;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+}
 .sp-kpi-card:hover .sp-kpi-ico{transform:scale(1.2) rotate(-8deg);}
-.sp-kpi-num{font-size:2.2rem;font-weight:900;line-height:1;letter-spacing:-.03em;margin-bottom:3px;}
+.sp-kpi-num{
+  font-size:2.2rem;font-weight:900;line-height:1;
+  letter-spacing:-.03em;margin-bottom:3px;
+  transition:letter-spacing .3s;
+}
 .sp-kpi-lbl{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);}
-.sp-kpi-delta{display:inline-flex;align-items:center;gap:3px;margin-top:6px;font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:99px;}
+.sp-kpi-delta{
+  display:inline-flex;align-items:center;gap:3px;
+  margin-top:6px;font-size:.62rem;font-weight:700;
+  padding:2px 7px;border-radius:99px;
+}
 .sp-kpi-delta.up{background:#DCFCE7;color:#15803D;}
 .sp-kpi-delta.neutral{background:var(--bg3);color:var(--txt3);}
 
+/* Chart row */
 .sp-chart-row{display:grid;grid-template-columns:1.15fr 0.85fr;gap:13px;}
-.sp-chart-card{background:#fff;border-radius:var(--r-lg);padding:18px 18px 14px;border:1px solid var(--border);box-shadow:var(--card-shadow);position:relative;overflow:hidden;transition:box-shadow .26s,transform .26s;}
-.sp-chart-card:hover{box-shadow:var(--card-hover);transform:translateY(-2px);}
-.sp-chart-title{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);margin-bottom:2px;}
-.sp-chart-sub{font-size:.6rem;color:var(--txt4);margin-bottom:14px;}
-.sp-hbar-item{display:flex;align-items:center;gap:10px;padding:6px 0;animation:fadeSlideIn .4s ease both;}
-@keyframes fadeSlideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-.sp-hbar-rank{font-size:.7rem;font-weight:900;color:var(--txt4);min-width:20px;text-align:center;}
-.sp-hbar-name{font-size:.74rem;font-weight:700;color:var(--txt2);min-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sp-hbar-track{flex:1;height:10px;background:var(--bg2);border-radius:99px;overflow:hidden;}
-.sp-hbar-fill{height:100%;border-radius:99px;transition:width 1.1s cubic-bezier(.22,.68,0,1.2);}
-.sp-hbar-val{font-size:.7rem;font-weight:900;min-width:28px;text-align:right;}
 
-.sp-form-card{background:#fff;border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--card-shadow);overflow:hidden;transition:box-shadow .26s;}
-.sp-form-header{background:var(--navy);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
-.sp-form-htitle{font-size:.72rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:8px;}
-.sp-form-badge{background:rgba(255,107,0,.2);border:1px solid rgba(255,107,0,.3);padding:2px 9px;border-radius:99px;font-size:.58rem;font-weight:700;color:var(--or2);letter-spacing:.08em;}
-/* New form body — 4 fields + button */
-.sp-form-body{padding:16px 18px;display:grid;grid-template-columns:110px 1fr 1.1fr 1.3fr auto;gap:10px;align-items:end;}
+/* Power BI chart card */
+.sp-chart-card{
+  background:#fff;border-radius:var(--r-lg);
+  padding:18px 18px 14px;
+  border:1px solid var(--border);
+  box-shadow:var(--card-shadow);
+  position:relative;overflow:hidden;
+  transition:box-shadow .26s,transform .26s;
+}
+.sp-chart-card:hover{box-shadow:var(--card-hover);transform:translateY(-2px);}
+.sp-chart-title{
+  font-size:.65rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.12em;
+  color:var(--txt3);margin-bottom:2px;
+}
+.sp-chart-sub{font-size:.6rem;color:var(--txt4);margin-bottom:14px;}
+
+/* Assignor bar chart (custom HTML bars) */
+.sp-hbar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 0;
+  animation:fadeSlideIn .4s ease both;
+}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.sp-hbar-rank{
+  font-size:.7rem;font-weight:900;color:var(--txt4);
+  min-width:20px;text-align:center;
+}
+.sp-hbar-name{
+  font-size:.74rem;font-weight:700;color:var(--txt2);
+  min-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sp-hbar-track{
+  flex:1;height:10px;background:var(--bg2);border-radius:99px;
+  overflow:hidden;position:relative;
+}
+.sp-hbar-fill{
+  height:100%;border-radius:99px;
+  transition:width 1.1s cubic-bezier(.22,.68,0,1.2);
+  position:relative;
+}
+.sp-hbar-fill::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.2) 50%,transparent 100%);
+  animation:shim-bar 2s infinite;
+}
+@keyframes shim-bar{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+.sp-hbar-val{
+  font-size:.7rem;font-weight:900;
+  min-width:28px;text-align:right;
+}
+
+/* Donut card */
+.sp-donut-wrap{position:relative;display:flex;align-items:center;justify-content:center;height:160px;}
+.sp-donut-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;pointer-events:none;
+}
+.sp-donut-num{font-size:1.8rem;font-weight:900;line-height:1;}
+.sp-donut-lbl{font-size:.55rem;color:var(--txt4);text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
+
+/* Pulse legend */
+.sp-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.sp-leg-item{
+  display:flex;align-items:center;gap:5px;
+  font-size:.63rem;color:var(--txt3);font-weight:600;
+  padding:3px 9px;border-radius:99px;background:var(--bg);
+  border:1px solid var(--border);
+  transition:all .2s;cursor:default;
+}
+.sp-leg-item:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.06);}
+.sp-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ADD FORM Power BI style */
+.sp-form-card{
+  background:#fff;border-radius:var(--r-lg);
+  border:1px solid var(--border);
+  box-shadow:var(--card-shadow);
+  overflow:hidden;
+  transition:box-shadow .26s,transform .26s;
+}
+.sp-form-card:hover{box-shadow:var(--card-hover);}
+.sp-form-header{
+  background:var(--navy);padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sp-form-htitle{
+  font-size:.72rem;font-weight:800;color:#fff;
+  text-transform:uppercase;letter-spacing:.12em;
+  display:flex;align-items:center;gap:8px;
+}
+.sp-form-badge{
+  background:rgba(255,107,0,.2);border:1px solid rgba(255,107,0,.3);
+  padding:2px 9px;border-radius:99px;font-size:.58rem;
+  font-weight:700;color:var(--or2);letter-spacing:.08em;
+}
+.sp-form-body{padding:16px 18px;display:grid;grid-template-columns:1fr 140px 1fr 1.2fr auto;gap:10px;align-items:end;}
 .sp-field{display:flex;flex-direction:column;gap:5px;}
 .sp-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);}
-.sp-input{background:var(--bg);border:1.5px solid var(--border2);padding:9px 11px;border-radius:var(--r-xs);font-family:'Prompt',sans-serif;font-size:.79rem;color:var(--txt);outline:none;transition:all .2s;}
-.sp-input:focus{border-color:var(--or);box-shadow:0 0 0 3px var(--or-soft);background:#fff;}
+.sp-input{
+  background:var(--bg);border:1.5px solid var(--border2);
+  padding:9px 11px;border-radius:var(--r-xs);
+  font-family:'Prompt',sans-serif;font-size:.79rem;
+  color:var(--txt);outline:none;
+  transition:all .2s;
+}
+.sp-input:focus{border-color:var(--or);box-shadow:0 0 0 3px var(--or-soft);background:#fff;transform:scale(1.01);}
 .sp-input::placeholder{color:var(--txt4);}
-.sp-submit-btn{background:var(--sunset);border:none;padding:10px 20px;border-radius:var(--r-xs);color:#fff;font-weight:800;cursor:pointer;font-family:'Prompt',sans-serif;font-size:.75rem;white-space:nowrap;letter-spacing:.06em;box-shadow:0 4px 16px var(--or-glow);transition:all .32s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:6px;}
+.sp-submit-btn{
+  background:var(--sunset);border:none;
+  padding:10px 20px;border-radius:var(--r-xs);
+  color:#fff;font-weight:800;cursor:pointer;
+  font-family:'Prompt',sans-serif;font-size:.75rem;
+  white-space:nowrap;letter-spacing:.06em;
+  box-shadow:0 4px 16px var(--or-glow);
+  transition:all .32s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:6px;
+}
 .sp-submit-btn:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 12px 32px rgba(255,107,0,.46);}
+.sp-submit-btn:active{transform:scale(.94);}
 .sp-submit-btn .btn-spark{font-size:.9rem;transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
 .sp-submit-btn:hover .btn-spark{transform:rotate(20deg) scale(1.3);}
 
-.sp-table-card{background:#fff;border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--card-shadow);overflow:hidden;transition:box-shadow .26s;}
-.sp-table-header{background:var(--bg);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+/* DATA TABLE Power BI style */
+.sp-table-card{
+  background:#fff;border-radius:var(--r-lg);
+  border:1px solid var(--border);
+  box-shadow:var(--card-shadow);
+  overflow:hidden;
+  transition:box-shadow .26s;
+}
+.sp-table-card:hover{box-shadow:var(--card-hover);}
+.sp-table-header{
+  background:var(--bg);
+  padding:12px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
 .sp-table-title{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);}
-.sp-table-count{background:var(--navy);color:#fff;font-size:.6rem;font-weight:700;padding:2px 9px;border-radius:99px;}
-.sp-tbl{width:100%;border-collapse:collapse;min-width:500px;}
-.sp-tbl thead th{padding:10px 14px;text-align:left;background:var(--bg);font-size:.58rem;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid var(--bg3);position:sticky;top:0;z-index:5;white-space:nowrap;}
-.sp-tbl tbody tr{transition:background .15s;border-bottom:1px solid var(--bg2);}
+.sp-table-count{
+  background:var(--navy);color:#fff;
+  font-size:.6rem;font-weight:700;
+  padding:2px 9px;border-radius:99px;
+}
+.sp-tbl{width:100%;border-collapse:collapse;min-width:600px;}
+.sp-tbl thead th{
+  padding:10px 14px;
+  text-align:left;background:var(--bg);
+  font-size:.58rem;font-weight:800;color:var(--txt3);
+  text-transform:uppercase;letter-spacing:.1em;
+  border-bottom:2px solid var(--bg3);
+  position:sticky;top:0;z-index:5;
+  white-space:nowrap;
+}
+.sp-tbl tbody tr{
+  transition:background .15s,transform .15s;
+  border-bottom:1px solid var(--bg2);
+}
 .sp-tbl tbody tr:last-child{border-bottom:none}
 .sp-tbl tbody tr:hover td{background:#FFF8F2;}
 .sp-tbl tbody tr.sp-row-new{animation:rowPop .6s cubic-bezier(.34,1.56,.64,1) both;}
-@keyframes rowPop{from{opacity:0;transform:translateY(-10px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes rowPop{from{opacity:0;transform:translateY(-10px) scale(.98);background:#FFF3E8;}to{opacity:1;transform:translateY(0) scale(1);background:transparent;}}
 .sp-tbl tbody td{padding:10px 14px;font-size:.78rem;color:var(--txt2);}
-.sp-row-num{width:24px;height:24px;border-radius:7px;background:var(--bg3);color:var(--txt3);font-size:.62rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;}
-.sp-status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:.62rem;font-weight:700;white-space:nowrap;}
+
+/* Row number badge */
+.sp-row-num{
+  width:24px;height:24px;border-radius:7px;
+  background:var(--bg3);color:var(--txt3);
+  font-size:.62rem;font-weight:800;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+/* Status badge pill */
+.sp-status{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:99px;
+  font-size:.62rem;font-weight:700;
+  white-space:nowrap;
+}
 .sp-status-done{background:#DCFCE7;color:#15803D;}
 .sp-status-wip{background:var(--amber-l);color:#B45309;}
 .sp-status-pending{background:var(--blue-l);color:#1D4ED8;}
-.sp-date-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;background:var(--bg2);color:var(--txt3);font-size:.64rem;font-weight:600;}
-.sp-assignor-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:8px;font-size:.66rem;font-weight:700;border:1px solid;}
-.sp-result-txt{font-size:.74rem;color:var(--txt2);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sp-del-btn{width:28px;height:28px;border:none;border-radius:8px;background:none;cursor:pointer;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .25s cubic-bezier(.34,1.56,.64,1);opacity:.28;}
-.sp-del-btn:hover{opacity:1;background:var(--red-l);transform:scale(1.22);}
+/* Date pill */
+.sp-date-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:6px;
+  background:var(--bg2);color:var(--txt3);
+  font-size:.64rem;font-weight:600;
+}
+/* Assignor tag */
+.sp-assignor-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:7px;
+  font-size:.64rem;font-weight:700;
+  border:1px solid var(--border);
+}
+/* Result preview */
+.sp-result-txt{
+  font-size:.74rem;color:var(--txt2);
+  max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+/* Del btn */
+.sp-del-btn{
+  width:28px;height:28px;border:none;border-radius:8px;
+  background:none;cursor:pointer;color:var(--red);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+  opacity:.28;
+}
+.sp-del-btn:hover{opacity:1;background:var(--red-l);transform:scale(1.22);box-shadow:0 4px 12px rgba(220,38,38,.18);}
 
+/* Monthly timeline bars */
 .sp-timeline{display:flex;flex-direction:column;gap:6px;}
 .sp-tl-row{display:flex;align-items:center;gap:8px;}
 .sp-tl-mo{font-size:.61rem;font-weight:700;color:var(--txt4);min-width:30px;text-align:right;}
 .sp-tl-track{flex:1;height:9px;background:var(--bg2);border-radius:99px;overflow:hidden;}
 .sp-tl-fill{height:100%;border-radius:99px;transition:width 1.3s cubic-bezier(.22,.68,0,1.2);}
 .sp-tl-num{font-size:.62rem;font-weight:800;min-width:18px;text-align:right;}
-.sp-tbl-scroll{max-height:360px;overflow-y:auto;overflow-x:auto;}
-.sp-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:10px;color:var(--txt4);}
+
+/* Scrollable table wrap */
+.sp-tbl-scroll{max-height:340px;overflow-y:auto;overflow-x:auto;}
+
+/* Empty state */
+.sp-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 20px;gap:10px;color:var(--txt4);
+}
 .sp-empty-icon{font-size:2.4rem;opacity:.35;animation:float-empty 3s ease-in-out infinite;}
 @keyframes float-empty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .sp-empty-txt{font-size:.78rem;font-weight:500;}
-.sp-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
-.sp-leg-item{display:flex;align-items:center;gap:5px;font-size:.63rem;color:var(--txt3);font-weight:600;padding:3px 9px;border-radius:99px;background:var(--bg);border:1px solid var(--border);transition:all .2s;cursor:default;}
-.sp-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
-/* RESPONSIVE */
-@media(max-width:1280px){:root{--sidebar-w:240px;--main-pad:18px 20px 36px;--font-title:1.3rem;--font-kpi:1.7rem;--chart-master-h:200px;--chart-h:180px;}}
+/* Responsive */
 @media(max-width:1100px){
-  :root{--sidebar-w:220px;--kpi-cols:2;--stat-cols:2;--g4-cols:2;--g2r-cols:1fr;--font-kpi:1.6rem;}
   .sp-kpi-grid{grid-template-columns:repeat(2,1fr);}
   .sp-chart-row{grid-template-columns:1fr;}
   .sp-form-body{grid-template-columns:1fr 1fr;}
   .sp-form-body .sp-submit-btn{grid-column:1/-1;justify-content:center;}
-  .sup-form-grid{grid-template-columns:1fr 1fr 1fr;}
-  .sup-form-grid .btn-save{grid-column:1/-1;}
+}
+@media(max-width:600px){
+  .sp-kpi-grid{grid-template-columns:1fr 1fr;}
+  .sp-form-body{grid-template-columns:1fr;}
+}
+
+/* ════ RESPONSIVE (global) ════ */
+@media(max-width:1280px){:root{--sidebar-w:240px;--main-pad:18px 20px 36px;--font-title:1.3rem;--font-kpi:1.7rem;--chart-master-h:200px;--chart-h:180px;}}
+@media(max-width:1100px){
+  :root{--sidebar-w:220px;--kpi-cols:2;--stat-cols:2;--g4-cols:2;--g2r-cols:1fr;--form-support-cols:1fr 1fr;--font-kpi:1.6rem;--chart-master-h:195px;}
+  .form-support,.form-5s,.form-skill,.form-special{grid-template-columns:1fr 1fr;}
+  .form-support .btn-save,.form-5s .btn-save,.form-skill .btn-save,.form-special .btn-save{grid-column:1/-1;}
   .skill-kpi-strip{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:1024px){
-  :root{--sidebar-w:64px;--main-pad:16px 18px 32px;--g2-cols:2;--g2r-cols:1fr;--kpi-cols:2;--stat-cols:2;--g4-cols:2;}
+  :root{--sidebar-w:64px;--main-pad:16px 18px 32px;--g2-cols:2;--g2r-cols:1fr;--kpi-cols:2;--stat-cols:2;--g4-cols:2;--font-title:1.25rem;--font-kpi:1.55rem;--font-stat:1.4rem;--font-mini:1.5rem;--chart-master-h:190px;--chart-h:175px;}
   .sidebar{width:var(--sidebar-w);overflow:hidden;}
   .sb-name,.sb-ver,.user-mini,.sb-section,.menu-label,.sb-footer{display:none;}
   .sb-brand{padding:14px 10px;justify-content:center;}
   .sb-logo{width:38px;height:38px;font-size:1rem;}
   .menu-item{padding:12px;margin:2px 6px;justify-content:center;border-radius:10px;}
+  .menu-item:hover{transform:none;padding-left:12px;}
   .menu-icon{width:auto;font-size:1.1rem;}
   .hamburger{display:flex;}
+  .skill-kpi-strip{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:900px){
-  :root{--g2-cols:1;--g2r-cols:1fr;--kpi-cols:2;--stat-cols:2;--g4-cols:2;--main-pad:14px 14px 30px;}
-  .sidebar{position:fixed;top:0;left:0;bottom:0;width:265px;height:100dvh;overflow:hidden;transform:translateX(-100%);transition:transform .32s;z-index:200;}
+  :root{--font-title:1.15rem;--font-kpi:1.45rem;--font-stat:1.3rem;--font-mini:1.4rem;--font-hero:2.4rem;--kpi-cols:2;--stat-cols:2;--g4-cols:2;--g2-cols:1;--g2r-cols:1fr;--chart-master-h:175px;--chart-h:165px;--main-pad:14px 14px 30px;}
+  body{overflow:hidden;height:100dvh;}
+  .main-wrap{height:100dvh;overflow:hidden;}
+  .main-container{overflow-y:auto;}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:265px;height:100dvh;overflow:hidden;transform:translateX(-100%);transition:transform .32s cubic-bezier(.22,.68,0,1.08);z-index:200;}
   .sidebar.open{transform:translateX(0);}
   .sb-overlay{display:block;}
   .sb-name,.sb-ver,.user-mini,.sb-section,.menu-label{display:unset;}
   .sb-footer{display:flex;padding-bottom:max(16px,env(safe-area-inset-bottom,16px));}
   .sb-brand{padding:20px 20px 16px;justify-content:flex-start;}
+  .sb-logo{width:42px;height:42px;font-size:1.15rem;}
   .menu-item{padding:10px 15px;margin:1px 8px;justify-content:flex-start;}
+  .menu-icon{font-size:.95rem;}
   .hamburger{display:flex;}
-  .dft-bar{gap:6px;}
-  .sp-kpi-grid{grid-template-columns:1fr 1fr;}
-  .sp-form-body{grid-template-columns:1fr;}
-  .sp-form-body .sp-submit-btn{justify-content:center;}
+  .topbar{padding:0 14px;gap:8px;}
+  .skill-kpi-strip{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:600px){
-  :root{--kpi-cols:2;--stat-cols:2;--g4-cols:2;--g2-cols:1;--font-title:1.05rem;--font-kpi:1.35rem;--main-pad:10px 10px 28px;}
+  :root{--kpi-cols:2;--stat-cols:2;--g4-cols:2;--g2-cols:1;--g2r-cols:1fr;--font-title:1.05rem;--font-kpi:1.35rem;--font-stat:1.2rem;--font-mini:1.3rem;--font-hero:2rem;--chart-master-h:160px;--chart-h:150px;--main-pad:10px 10px 28px;}
   .card{padding:12px 13px;}
+  .ai-banner{padding:14px 15px;}
   .kpi{padding:12px 11px 10px;}
-  .dft-presets{display:none;}
-  .sup-form-grid{grid-template-columns:1fr 1fr;}
-  .sp-kpi-grid{grid-template-columns:1fr 1fr;}
+  .kpi-icon{width:30px;height:30px;font-size:.8rem;margin-bottom:6px;}
+  .stat-c{padding:10px 8px;}
+  .mini-stat{padding:10px 8px;}
+  .main-title{font-size:var(--font-title);}
+  .hero-num{font-size:var(--font-hero);}
+  .page{gap:10px;}
+  .topbar-title{font-size:.8rem;}
+  #dash-timestamp{display:none;}
+  .gb-name{min-width:60px;font-size:.66rem;}
+  .form-support,.form-5s,.form-skill,.form-special,.form-row{display:flex;flex-direction:column;align-items:stretch;}
+  .form-row.form-daily{flex-direction:row;flex-wrap:wrap;}
+  .btn-save{width:100%;}
+  input,select{width:100%;}
+  .tbl-scroll{max-height:260px;}
+  .prog-fill::after{width:9px;height:9px;}
+  .skill-kpi-strip{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:380px){
+  :root{--kpi-cols:2;--main-pad:8px 8px 24px;--font-kpi:1.2rem;--font-stat:1.1rem;--chart-h:140px;--chart-master-h:148px;}
+  .eyebrow{font-size:.5rem;}
+  .card-hd{font-size:.56rem;}
+  .kpi-lbl,.sl,.ms-lbl{font-size:.52rem;}
 }
 </style>
 </head>
 <body>
 
+<!-- LOADING -->
 <div id="loadingOverlay">
   <div class="lo-logo">🌅</div>
   <div class="lo-spinner"></div>
@@ -492,71 +683,29 @@ tbody tr:last-child td{border-bottom:none}
 <!-- MAIN -->
 <div class="main-wrap">
   <div class="topbar">
-    <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">☰</button>
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="เมนู">☰</button>
     <div class="topbar-dot"></div>
     <div class="topbar-title" id="topbar-title">Performance Overview</div>
     <div id="dash-timestamp">—</div>
   </div>
   <main class="main-container">
 
-  <!-- ═══════════════════════════════════
-       OVERVIEW / MASTER DASHBOARD
-  ═══════════════════════════════════ -->
+  <!-- OVERVIEW -->
   <div id="master-dash" class="page active">
     <div class="ph">
       <div>
         <div class="eyebrow">Real-time Analytics · 2026</div>
         <h1 class="main-title"><span class="title-grad">Performance Overview</span></h1>
       </div>
-      <div class="ph-right" id="dft-master-wrap"></div>
     </div>
-
-    <!-- Support Hero Section -->
-    <div class="sup-hero-band">
-      <div class="shimmer"></div>
-      <div style="position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
-        <div>
-          <div style="font-size:.58rem;font-weight:700;letter-spacing:.18em;color:var(--or2);text-transform:uppercase;margin-bottom:8px;">🛠️ Support Production — Focus Area</div>
-          <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
-            <div class="hero-num" id="dash-sup-ng" style="font-size:3.5rem;">0</div>
-            <div>
-              <div style="font-size:.72rem;color:rgba(255,255,255,.5);font-weight:300;">Total NG Units</div>
-              <div style="font-size:.64rem;color:rgba(255,107,0,.6);margin-top:2px;">จากงานทั้งหมด <span id="dash-sup-total-orders" style="color:var(--or2);font-weight:700;">0</span> ออเดอร์</div>
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(220,38,38,.25);border-radius:var(--r);padding:12px 18px;text-align:center;min-width:90px;">
-            <div id="dash-sup-ng-rate" style="font-size:1.8rem;font-weight:900;color:#F87171;">0%</div>
-            <div style="font-size:.55rem;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;">NG Rate</div>
-          </div>
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(5,150,105,.25);border-radius:var(--r);padding:12px 18px;text-align:center;min-width:90px;">
-            <div id="dash-sup-ok-rate" style="font-size:1.8rem;font-weight:900;color:#4ADE80;">0%</div>
-            <div style="font-size:.55rem;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;">OK Rate</div>
-          </div>
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(37,99,235,.25);border-radius:var(--r);padding:12px 18px;text-align:center;min-width:90px;">
-            <div id="dash-sup-cases" style="font-size:1.8rem;font-weight:900;color:#60A5FA;">0</div>
-            <div style="font-size:.55rem;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;">Cases</div>
-          </div>
-        </div>
-      </div>
-      <div style="position:relative;z-index:1;margin-top:14px;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.58rem;color:rgba(255,255,255,.28);">OK Progress</span><span id="dash-ok-label" style="font-size:.58rem;color:rgba(255,107,0,.6);font-weight:700;">0 OK / 0 Total</span></div>
-        <div class="prog-track"><div id="dash-ok-bar" class="prog-fill"></div></div>
-      </div>
-    </div>
-
-    <!-- KPI Strip -->
     <div class="kpi-strip">
-      <div class="kpi"><div class="kpi-top" style="background:var(--red);"></div><div class="kpi-icon" style="background:var(--red-l);">❌</div><div class="kpi-lbl">Total NG</div><div class="kpi-val" id="dash-kpi-ng" style="color:var(--red);">0</div><div class="kpi-hint" id="kpi-ng-rate">Rate: 0%</div></div>
-      <div class="kpi"><div class="kpi-top" style="background:var(--green);"></div><div class="kpi-icon" style="background:var(--green-l);">✅</div><div class="kpi-lbl">Total OK</div><div class="kpi-val" id="dash-kpi-ok" style="color:var(--green);">0</div><div class="kpi-hint" id="kpi-ok-rate">Rate: 0%</div></div>
+      <div class="kpi"><div class="kpi-top" style="background:var(--blue);"></div><div class="kpi-icon" style="background:var(--blue-l);">🛠️</div><div class="kpi-lbl">Total Support</div><div class="kpi-val" id="dash-support-count" style="color:var(--blue);">0</div><div class="kpi-hint" id="kpi-rp-vf">RP: 0 · VF: 0</div></div>
+      <div class="kpi"><div class="kpi-top" style="background:var(--sunset);"></div><div class="kpi-icon" style="background:var(--or-soft);">🧹</div><div class="kpi-lbl">5S Points</div><div class="kpi-val" id="dash-5s-count" style="color:var(--or);">0</div><div class="kpi-hint" id="kpi-5s-area">Hot area: —</div></div>
       <div class="kpi"><div class="kpi-top" style="background:var(--violet);"></div><div class="kpi-icon" style="background:var(--violet-l);">⭐</div><div class="kpi-lbl">Special Projects</div><div class="kpi-val" id="dash-special-count" style="color:var(--violet);">0</div><div class="kpi-hint">Active assignments</div></div>
-      <div class="kpi"><div class="kpi-top" style="background:var(--blue);"></div><div class="kpi-icon" style="background:var(--blue-l);">📈</div><div class="kpi-lbl">Avg. Skill</div><div class="kpi-val" id="dash-avg-skill" style="color:var(--blue);">0%</div><div class="kpi-hint" id="kpi-skill-count">0 ทักษะ</div></div>
+      <div class="kpi"><div class="kpi-top" style="background:var(--green);"></div><div class="kpi-icon" style="background:var(--green-l);">📈</div><div class="kpi-lbl">Avg. Skill</div><div class="kpi-val" id="dash-avg-skill" style="color:var(--green);">0%</div><div class="kpi-hint" id="kpi-skill-count">0 ทักษะ</div></div>
     </div>
-
-    <!-- Charts Row -->
     <div class="g2r">
-      <div class="card"><div class="card-hd">📊 Monthly Support Trend — NG & Cases</div><div style="height:var(--chart-master-h);"><canvas id="masterWorkChart"></canvas></div></div>
+      <div class="card"><div class="card-hd">📊 Monthly Activity Trend</div><div style="height:var(--chart-master-h);"><canvas id="masterWorkChart"></canvas></div></div>
       <div class="ai-banner">
         <div class="shimmer"></div>
         <div style="font-size:.58rem;font-weight:700;letter-spacing:.16em;color:var(--or2);text-transform:uppercase;margin-bottom:12px;">🤖 AI Performance Index</div>
@@ -572,20 +721,14 @@ tbody tr:last-child td{border-bottom:none}
         </div>
       </div>
     </div>
-
-    <!-- Production Lines & Group Analysis -->
-    <div class="g2">
-      <div class="card">
-        <div class="card-hd">🏭 Production Line — NG Analysis</div>
-        <div id="dash-line-cards" class="line-cards"></div>
+    <div class="card">
+      <div class="card-hd">🔬 Group Part Analysis — Support Production</div>
+      <div class="g2">
+        <div><div class="a-title">Top Problem Groups</div><div id="group-analysis-bars"></div></div>
+        <div><div class="a-title">Report Status Breakdown</div><div style="height:190px;"><canvas id="statusDoughnut"></canvas></div></div>
       </div>
-      <div class="card">
-        <div class="card-hd">🔬 Top Problem Groups</div>
-        <div id="group-analysis-bars"></div>
-      </div>
+      <div id="group-full-overview" style="margin-top:14px;"></div>
     </div>
-
-    <!-- Bottom Mini Stats -->
     <div class="g4">
       <div class="mini-stat"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);border-radius:var(--r-lg) var(--r-lg) 0 0;"></div><div class="ms-lbl">RP Cases</div><div class="ms-val" id="dash-rp-val2" style="color:#F87171;">0</div></div>
       <div class="mini-stat"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue);border-radius:var(--r-lg) var(--r-lg) 0 0;"></div><div class="ms-lbl">VF Cases</div><div class="ms-val" id="dash-vf-val2" style="color:#60A5FA;">0</div></div>
@@ -594,13 +737,19 @@ tbody tr:last-child td{border-bottom:none}
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════
-       DAILY REPORT
-  ═══════════════════════════════════ -->
+  <!-- DAILY -->
   <div id="daily" class="page">
     <div class="ph">
       <div><div class="eyebrow">Overview · 2026</div><h1 class="main-title">Executive <span class="title-grad">Dashboard</span></h1></div>
-      <div class="ph-right" id="dft-daily-wrap"></div>
+      <select id="monthFilter" onchange="refreshDashboard()">
+        <option value="all">📊 สะสมทั้งปี 2026</option>
+        <option value="0">มกราคม</option><option value="1">กุมภาพันธ์</option>
+        <option value="2">มีนาคม</option><option value="3">เมษายน</option>
+        <option value="4">พฤษภาคม</option><option value="5">มิถุนายน</option>
+        <option value="6">กรกฎาคม</option><option value="7">สิงหาคม</option>
+        <option value="8">กันยายน</option><option value="9">ตุลาคม</option>
+        <option value="10">พฤศจิกายน</option><option value="11">ธันวาคม</option>
+      </select>
     </div>
     <div class="ai-banner">
       <div class="shimmer"></div>
@@ -621,7 +770,7 @@ tbody tr:last-child td{border-bottom:none}
     <div class="g2">
       <div class="card">
         <div class="card-hd">🕒 บันทึกวันหยุด / ลา</div>
-        <div class="form-row" style="flex-wrap:wrap;gap:8px;">
+        <div class="form-row form-daily" style="flex-wrap:wrap;">
           <input type="date" id="dailyDate" style="flex:1;min-width:120px;">
           <select id="dailyType" style="flex:1;min-width:130px;"><option value="leave">ลางาน</option><option value="holiday">วันหยุด</option></select>
           <button class="btn-save" onclick="addDaily()">บันทึก</button>
@@ -638,113 +787,52 @@ tbody tr:last-child td{border-bottom:none}
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════
-       SUPPORT PRODUCTION — REDESIGNED
-  ═══════════════════════════════════ -->
+  <!-- SUPPORT -->
   <div id="support" class="page">
-    <div class="ph">
-      <div><div class="eyebrow">Production Floor</div><h1 class="main-title">Support <span class="title-grad">Production Line</span></h1></div>
-      <div class="ph-right" id="dft-support-wrap"></div>
+    <div><div class="eyebrow">Production Floor</div><h1 class="main-title">Support <span class="title-grad">Production Line</span></h1></div>
+    <div class="kpi-strip">
+      <div class="kpi" style="background:var(--navy);border-color:rgba(255,255,255,.05);"><div class="kpi-top" style="background:linear-gradient(90deg,var(--blue),var(--violet));"></div><div class="kpi-icon" style="background:rgba(255,255,255,.07);">🛠️</div><div class="kpi-lbl" style="color:rgba(255,255,255,.38);">Total Support</div><div class="kpi-val" id="sum-total" style="color:#fff;">0</div></div>
+      <div class="kpi"><div class="kpi-top" style="background:var(--red);"></div><div class="kpi-icon" style="background:var(--red-l);">🔴</div><div class="kpi-lbl">RP Cases</div><div class="kpi-val" id="sum-rp" style="color:var(--red);">0</div></div>
+      <div class="kpi"><div class="kpi-top" style="background:var(--blue);"></div><div class="kpi-icon" style="background:var(--blue-l);">🔵</div><div class="kpi-lbl">VF Cases</div><div class="kpi-val" id="sum-vf" style="color:var(--blue);">0</div></div>
+      <div class="kpi"><div class="kpi-top" style="background:var(--amber);"></div><div class="kpi-icon" style="background:var(--amber-l);">📋</div><div class="kpi-lbl">Records</div><div class="kpi-val" id="sum-records" style="color:var(--amber);">0</div></div>
     </div>
-
-    <!-- KPI Strip — 5 cards -->
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:11px;" class="sup-kpi-strip">
-      <div class="kpi" style="background:var(--navy);border-color:rgba(255,255,255,.05);">
-        <div class="kpi-top" style="background:linear-gradient(90deg,var(--or),var(--or3));"></div>
-        <div class="kpi-icon" style="background:rgba(255,107,0,.15);">📦</div>
-        <div class="kpi-lbl" style="color:rgba(255,255,255,.38);">Total Orders</div>
-        <div class="kpi-val" id="sup-kpi-orders" style="color:var(--or2);">0</div>
-        <div class="kpi-hint" style="color:rgba(255,255,255,.2);">ออเดอร์ทั้งหมด</div>
+    <div class="card">
+      <div class="card-hd">📦 Complete Group Part Analysis</div>
+      <div class="g2" style="margin-bottom:16px;">
+        <div><div class="a-title">Ranking — Top Groups by Volume</div><div id="support-group-bars"></div></div>
+        <div><div class="a-title">Status Breakdown per Group</div><div id="support-group-by-status"></div></div>
       </div>
-      <div class="kpi"><div class="kpi-top" style="background:var(--green);"></div><div class="kpi-icon" style="background:var(--green-l);">✅</div><div class="kpi-lbl">Total OK</div><div class="kpi-val" id="sup-kpi-ok" style="color:var(--green);">0</div><div class="kpi-hint" id="sup-ok-rate">Rate: 0%</div></div>
-      <div class="kpi"><div class="kpi-top" style="background:var(--red);"></div><div class="kpi-icon" style="background:var(--red-l);">❌</div><div class="kpi-lbl">Total NG</div><div class="kpi-val" id="sup-kpi-ng" style="color:var(--red);">0</div><div class="kpi-hint" id="sup-ng-rate">Rate: 0%</div></div>
-      <div class="kpi"><div class="kpi-top" style="background:var(--blue);"></div><div class="kpi-icon" style="background:var(--blue-l);">🛠️</div><div class="kpi-lbl">Cases (RP+VF)</div><div class="kpi-val" id="sup-kpi-cases" style="color:var(--blue);">0</div><div class="kpi-hint" id="sup-rp-vf-hint">RP:0 · VF:0</div></div>
-      <div class="kpi"><div class="kpi-top" style="background:var(--amber);"></div><div class="kpi-icon" style="background:var(--amber-l);">🏭</div><div class="kpi-lbl">Lines Active</div><div class="kpi-val" id="sup-kpi-lines" style="color:var(--amber);">0</div><div class="kpi-hint">Production Lines</div></div>
+      <div class="a-title">All Groups — Full Breakdown Table</div>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Group Part</th><th>Total</th><th>RP</th><th>VF</th><th>Records</th><th>% Share</th></tr></thead><tbody id="group-full-tbody"></tbody></table></div>
     </div>
-
-    <!-- NG Rate Feature Card + Line Cards -->
     <div class="g2">
-      <div class="ng-rate-card">
-        <div style="position:relative;z-index:1;">
-          <div style="font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:rgba(255,107,0,.5);margin-bottom:8px;">Overall NG Rate</div>
-          <div class="ng-rate-num" id="sup-ng-rate-big">0.0%</div>
-          <div class="ng-rate-lbl">NG DEFECT RATE</div>
-          <div class="ng-rate-sub" id="sup-ng-detail">NG 0 จาก 0 ชิ้นทั้งหมด</div>
-          <div style="margin-top:18px;height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:visible;"><div id="sup-ng-prog" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#FF6B00,#E85500);width:0%;transition:width 1.5s cubic-bezier(.22,.68,0,1.2);"></div></div>
-          <div style="display:flex;justify-content:space-between;margin-top:10px;">
-            <div><div id="sup-ng-ok-count" style="font-size:1.4rem;font-weight:800;color:#4ADE80;">0</div><div style="font-size:.55rem;color:rgba(255,255,255,.22);text-transform:uppercase;letter-spacing:.08em;">OK Units</div></div>
-            <div style="text-align:right;"><div id="sup-ng-ng-count" style="font-size:1.4rem;font-weight:800;color:#F87171;">0</div><div style="font-size:.55rem;color:rgba(255,255,255,.22);text-transform:uppercase;letter-spacing:.08em;">NG Units</div></div>
-          </div>
-        </div>
-      </div>
-      <div class="card" style="padding:16px;">
-        <div class="card-hd">🏭 Production Line Performance</div>
-        <div id="sup-line-cards" class="line-cards"></div>
+      <div class="card"><div class="card-hd">🥧 Report Status Chart</div><div style="height:var(--chart-h);"><canvas id="supportStatusChart"></canvas></div></div>
+      <div class="card"><div class="card-hd">📈 Support Trend by Month</div><div style="height:var(--chart-h);"><canvas id="supportTrendChart"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">📥 บันทึก Support</div>
+      <div class="form-row form-support">
+        <input type="date" id="supDate">
+        <input type="text" id="supProblem" placeholder="รายละเอียดปัญหา">
+        <select id="supAction"><option value="Repair">Rework: ซ่อมแซม/คัด</option><option value="Replace">Replace: ส่งกลับ</option></select>
+        <input type="text" id="supPart" placeholder="Group Part">
+        <select id="supReport"><option value="VF">VF Report</option><option value="RP">RP Report</option><option value="RECORDS">RECORDS</option></select>
+        <button class="btn-save" onclick="addSupport()">บันทึก</button>
       </div>
     </div>
-
-    <!-- Charts Row -->
-    <div class="g2">
-      <div class="card"><div class="card-hd">📈 NG Trend by Month</div><div style="height:var(--chart-h);"><canvas id="supNgTrendChart"></canvas></div></div>
-      <div class="card">
-        <div class="card-hd">🔬 Top Problem Groups (NG Count)</div>
-        <div id="support-group-bars" style="max-height:172px;overflow-y:auto;"></div>
-      </div>
-    </div>
-
-    <!-- Status Chart + Line Comparison -->
-    <div class="g2">
-      <div class="card"><div class="card-hd">🥧 Report Status (RP/VF/Records)</div><div style="height:var(--chart-h);"><canvas id="supportStatusChart"></canvas></div></div>
-      <div class="card"><div class="card-hd">📊 NG by Production Line</div><div style="height:var(--chart-h);"><canvas id="supLineChart"></canvas></div></div>
-    </div>
-
-    <!-- ADD FORM -->
     <div class="card" style="padding:0;overflow:hidden;">
-      <div style="background:var(--navy);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:.7rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:8px;">➕ บันทึก Support Production</div>
-        <div style="background:rgba(255,107,0,.2);border:1px solid rgba(255,107,0,.3);padding:2px 9px;border-radius:99px;font-size:.58rem;font-weight:700;color:var(--or2);">QUICK ADD</div>
-      </div>
-      <div class="sup-form-grid" style="border:none;border-radius:0;margin:0;">
-        <div class="sup-field"><label class="sup-label">วันที่</label><input class="sup-input" type="date" id="supDate"></div>
-        <div class="sup-field"><label class="sup-label">Production Line</label><input class="sup-input" type="text" id="supLine" placeholder="เช่น Line A, Line B"></div>
-        <div class="sup-field"><label class="sup-label">รายละเอียดปัญหา</label><input class="sup-input" type="text" id="supProblem" placeholder="อธิบายปัญหาที่พบ"></div>
-        <div class="sup-field"><label class="sup-label">วิธีการแก้ไข</label><select class="sup-input" id="supAction"><option value="Repair">Rework: ซ่อมแซม/คัด</option><option value="Replace">Replace: ส่งกลับ</option><option value="Scrap">Scrap: ทิ้ง</option><option value="Rework">Rework: ทำใหม่</option></select></div>
-        <div class="sup-field"><label class="sup-label">Group Part</label><input class="sup-input" type="text" id="supPart" placeholder="Group Part"></div>
-        <div class="sup-field"><label class="sup-label">Status</label><select class="sup-input" id="supReport"><option value="VF">VF Report</option><option value="RP">RP Report</option><option value="RECORDS">RECORDS</option></select></div>
-        <div class="sup-field"><label class="sup-label">Order Qty</label><input class="sup-input" type="number" id="supOrderQty" placeholder="0" min="0"></div>
-        <div class="sup-field"><label class="sup-label">OK Qty</label><input class="sup-input" type="number" id="supOkQty" placeholder="0" min="0"></div>
-        <div class="sup-field"><label class="sup-label">NG Qty</label><input class="sup-input" type="number" id="supNgQty" placeholder="0" min="0"></div>
-        <div style="display:flex;align-items:flex-end;"><button class="btn-save" style="width:100%;height:36px;" onclick="addSupport()">บันทึก</button></div>
-      </div>
-    </div>
-
-    <!-- Data Table -->
-    <div class="card" style="padding:0;overflow:hidden;">
-      <div style="background:var(--bg);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-        <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);">📋 All Records</div>
-        <div id="sup-table-count" style="background:var(--navy);color:#fff;font-size:.6rem;font-weight:700;padding:2px 9px;border-radius:99px;">0 records</div>
-      </div>
-      <div style="max-height:380px;overflow-y:auto;overflow-x:auto;">
-        <table style="min-width:900px;">
-          <thead><tr>
-            <th>#</th><th>วันที่</th><th>Line</th><th>ปัญหา</th><th>วิธีแก้ไข</th>
-            <th>Group Part</th><th>Status</th>
-            <th style="text-align:right;">Orders</th><th style="text-align:right;color:#059669;">OK</th><th style="text-align:right;color:#DC2626;">NG</th>
-            <th style="text-align:center;">Del</th>
-          </tr></thead>
-          <tbody id="supportTableBody"></tbody>
-        </table>
+      <div class="tbl-scroll">
+        <table><thead><tr><th style="padding-left:16px;">วัน/เวลา</th><th>รายละเอียด</th><th>การแก้ไข</th><th>Group Part</th><th>Status</th><th style="text-align:center;">จัดการ</th></tr></thead>
+        <tbody id="supportTableBody"></tbody></table>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════
-       5S SYSTEM
-  ═══════════════════════════════════ -->
+  <!-- 5S -->
   <div id="5s" class="page">
     <div class="ph">
       <div><div class="eyebrow">Quality</div><h1 class="main-title">5S Excellence <span class="title-grad">System</span></h1></div>
-      <div class="ph-right" id="dft-5s-wrap"></div>
+      <input type="month" id="filter5sMonth" value="2026-03" onchange="refresh5S()">
     </div>
     <div class="kpi-strip">
       <div class="kpi"><div class="kpi-top" style="background:var(--sunset);"></div><div class="kpi-icon" style="background:var(--or-soft);">📅</div><div class="kpi-lbl">สะสมทั้งปี</div><div class="kpi-val" id="s5-total-year" style="color:var(--or);">0</div></div>
@@ -758,27 +846,25 @@ tbody tr:last-child td{border-bottom:none}
     </div>
     <div class="card">
       <div class="card-hd">➕ บันทึก 5S Finding</div>
-      <div class="form-row" style="flex-wrap:wrap;gap:8px;">
-        <input type="text" id="s5Area" placeholder="พื้นที่" style="flex:1;min-width:100px;">
-        <input type="number" id="s5Count" placeholder="จำนวน" style="flex:0 0 80px;">
-        <input type="text" id="s5Detail" placeholder="รายละเอียด" style="flex:2;min-width:120px;">
-        <input type="text" id="s5Owner" placeholder="ผู้ตรวจ" style="flex:1;min-width:80px;">
-        <input type="month" id="s5Month" value="2026-03" style="flex:0 0 130px;">
+      <div class="form-row form-5s">
+        <input type="text" id="s5Area" placeholder="พื้นที่">
+        <input type="number" id="s5Count" placeholder="จำนวน">
+        <input type="text" id="s5Detail" placeholder="รายละเอียด">
+        <input type="text" id="s5Owner" placeholder="ผู้ตรวจ">
         <button class="btn-save" onclick="add5S()">บันทึก</button>
       </div>
-      <div class="tbl-wrap"><table><thead><tr><th>พื้นที่</th><th>จำนวน</th><th>รายละเอียด</th><th>ผู้ตรวจ</th><th>เดือน</th><th style="text-align:center;">จัดการ</th></tr></thead><tbody id="s5TableBody"></tbody></table></div>
+      <div class="tbl-wrap"><table><thead><tr><th>พื้นที่</th><th>จำนวน</th><th>รายละเอียด</th><th>ผู้ตรวจ</th><th style="text-align:center;">จัดการ</th></tr></thead><tbody id="s5TableBody"></tbody></table></div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════
-       SKILL MATRIX
-  ═══════════════════════════════════ -->
+  <!-- SKILL MATRIX -->
   <div id="multi" class="page">
     <div class="ph">
       <div><div class="eyebrow">Competency</div><h1 class="main-title">Professional <span class="title-grad">Skill Matrix</span></h1></div>
-      <div class="ph-right">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <div id="skillLevelBadge" class="level-badge level-basic">—</div>
-        <button style="background:var(--red-l);border:1px solid #FECACA;padding:9px 14px;border-radius:var(--r);color:var(--red);font-weight:700;cursor:pointer;font-family:'Prompt';font-size:.75rem;transition:all .28s;" onclick="clearAllSkills()">🗑 ล้างทั้งหมด</button>
+        <button style="background:var(--red-l);border:1px solid #FECACA;padding:9px 14px;border-radius:var(--r);color:var(--red);font-weight:700;cursor:pointer;font-family:'Prompt';font-size:.75rem;transition:all .28s;"
+          onmouseover="this.style.transform='scale(1.07) translateY(-1px)'" onmouseout="this.style.transform='scale(1)'" onclick="clearAllSkills()">🗑 ล้างทั้งหมด</button>
       </div>
     </div>
     <div class="skill-kpi-strip">
@@ -789,9 +875,9 @@ tbody tr:last-child td{border-bottom:none}
     </div>
     <div class="card">
       <div class="card-hd">🚀 เพิ่ม / อัปเดตทักษะ</div>
-      <div class="form-row" style="flex-wrap:wrap;gap:8px;">
-        <input type="text" id="skillName" placeholder="ชื่อทักษะ (เช่น Machine Setup)" style="flex:2;min-width:160px;">
-        <input type="number" id="skillValue" placeholder="Level 0–100" min="0" max="100" style="flex:1;min-width:100px;">
+      <div class="form-row form-skill">
+        <input type="text" id="skillName" placeholder="ชื่อทักษะ (เช่น Machine Setup)">
+        <input type="number" id="skillValue" placeholder="Level 0–100" min="0" max="100">
         <button class="btn-save" onclick="addSkill()">อัปเดต</button>
       </div>
     </div>
@@ -800,7 +886,9 @@ tbody tr:last-child td{border-bottom:none}
         <div class="card-hd">📡 Radar Overview</div>
         <div style="flex:1;min-height:260px;position:relative;">
           <canvas id="skillRadarChart"></canvas>
-          <div id="skillRadarEmpty" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--txt4);font-size:.76rem;flex-direction:column;gap:8px;"><span style="font-size:2rem;">📊</span><span>เพิ่มทักษะอย่างน้อย 3 รายการ</span></div>
+          <div id="skillRadarEmpty" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--txt4);font-size:.76rem;flex-direction:column;gap:8px;">
+            <span style="font-size:2rem;">📊</span><span>เพิ่มทักษะอย่างน้อย 3 รายการ</span>
+          </div>
         </div>
       </div>
       <div class="card" style="min-height:340px;display:flex;flex-direction:column;">
@@ -815,7 +903,9 @@ tbody tr:last-child td{border-bottom:none}
           <div style="margin-top:12px;position:relative;display:inline-block;">
             <svg width="80" height="80" viewBox="0 0 80 80">
               <circle cx="40" cy="40" r="32" fill="none" stroke="var(--bg3)" stroke-width="7"/>
-              <circle id="scoreCircle" cx="40" cy="40" r="32" fill="none" stroke="#FF6B00" stroke-width="7" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" style="transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 1.4s cubic-bezier(.22,.68,0,1.2)"/>
+              <circle id="scoreCircle" cx="40" cy="40" r="32" fill="none" stroke="#FF6B00" stroke-width="7"
+                stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201"
+                style="transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 1.4s cubic-bezier(.22,.68,0,1.2)"/>
             </svg>
           </div>
         </div>
@@ -830,8 +920,8 @@ tbody tr:last-child td{border-bottom:none}
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-        <div class="card-hd" style="margin:0;flex:1;">📝 Skill Inventory</div>
-        <div style="display:flex;gap:6px;">
+        <div class="card-hd" style="margin:0;flex:1;">📝 Skill Inventory — All Skills</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="categoryFilterWrap">
           <span style="font-size:.62rem;color:var(--txt4);">Sort:</span>
           <button onclick="sortSkills('val')" id="sortVal" style="font-size:.62rem;padding:3px 9px;border-radius:6px;border:1px solid var(--border);cursor:pointer;background:var(--sunset);color:#fff;font-family:'Prompt';">↓ Score</button>
           <button onclick="sortSkills('name')" id="sortName" style="font-size:.62rem;padding:3px 9px;border-radius:6px;border:1px solid var(--border);cursor:pointer;background:var(--bg);color:var(--txt3);font-family:'Prompt';">A-Z</button>
@@ -845,16 +935,17 @@ tbody tr:last-child td{border-bottom:none}
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════
-       SPECIAL JOBS — REDESIGNED
-  ═══════════════════════════════════ -->
+  <!-- ══════════════════════════════════════
+       SPECIAL JOBS — POWER BI REDESIGN
+  ══════════════════════════════════════ -->
   <div id="special" class="page">
 
     <!-- Header Band -->
     <div class="sp-header-band">
       <div style="position:relative;z-index:1;">
         <div style="font-size:.6rem;font-weight:700;letter-spacing:.2em;color:var(--or2);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-          <span style="display:inline-block;width:18px;height:2px;background:var(--or2);border-radius:99px;"></span>Assignments · 2026
+          <span style="display:inline-block;width:18px;height:2px;background:var(--or2);border-radius:99px;"></span>
+          Assignments · 2026
         </div>
         <div class="sp-band-title">Special <span style="background:var(--sunset);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Jobs Dashboard</span></div>
         <div class="sp-band-sub">Project tracking · Performance analytics · Real-time sync</div>
@@ -862,19 +953,20 @@ tbody tr:last-child td{border-bottom:none}
       <div class="sp-band-actions">
         <div class="sp-live-badge"><span class="sp-live-dot"></span>LIVE</div>
         <div id="sp-total-badge" style="background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.25);padding:6px 16px;border-radius:12px;font-size:.8rem;font-weight:800;color:var(--or2);">0 Projects</div>
-        <div id="dft-special-wrap" style="position:relative;z-index:1;"></div>
       </div>
     </div>
 
     <!-- KPI Cards -->
     <div class="sp-kpi-grid">
-      <div class="sp-kpi-card">
+      <!-- Total Projects -->
+      <div class="sp-kpi-card" style="--kc:#FF6B00;">
         <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--sunset);border-radius:var(--r-lg) 0 0 var(--r-lg);"></div>
         <div class="sp-kpi-ico" style="background:var(--or-soft);">⭐</div>
         <div class="sp-kpi-num" id="sp-kpi-total" style="color:var(--or);">0</div>
         <div class="sp-kpi-lbl">Total Projects</div>
         <div class="sp-kpi-delta neutral" id="sp-kpi-total-delta">All time</div>
       </div>
+      <!-- This Month -->
       <div class="sp-kpi-card">
         <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue);border-radius:var(--r-lg) 0 0 var(--r-lg);"></div>
         <div class="sp-kpi-ico" style="background:var(--blue-l);">📅</div>
@@ -882,6 +974,7 @@ tbody tr:last-child td{border-bottom:none}
         <div class="sp-kpi-lbl">This Month</div>
         <div class="sp-kpi-delta neutral" id="sp-kpi-month-lbl">—</div>
       </div>
+      <!-- Top Assignor -->
       <div class="sp-kpi-card">
         <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--violet);border-radius:var(--r-lg) 0 0 var(--r-lg);"></div>
         <div class="sp-kpi-ico" style="background:var(--violet-l);">🏆</div>
@@ -889,6 +982,7 @@ tbody tr:last-child td{border-bottom:none}
         <div class="sp-kpi-lbl">Top Assignor</div>
         <div class="sp-kpi-delta neutral" id="sp-kpi-top-by-n">0 jobs</div>
       </div>
+      <!-- Completion Rate -->
       <div class="sp-kpi-card">
         <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--green);border-radius:var(--r-lg) 0 0 var(--r-lg);"></div>
         <div class="sp-kpi-ico" style="background:var(--green-l);">✅</div>
@@ -900,11 +994,14 @@ tbody tr:last-child td{border-bottom:none}
 
     <!-- Charts Row -->
     <div class="sp-chart-row">
+      <!-- Assignor Horizontal Bar -->
       <div class="sp-chart-card">
         <div class="sp-chart-title">📊 Projects by Assignor</div>
         <div class="sp-chart-sub">Volume ranking — all entries</div>
         <div id="sp-assignor-bars"></div>
+        <div style="height:var(--chart-h);display:none;"><canvas id="spTrendChart"></canvas></div>
       </div>
+      <!-- Monthly Donut + Timeline -->
       <div style="display:flex;flex-direction:column;gap:13px;">
         <div class="sp-chart-card" style="flex:1;">
           <div class="sp-chart-title">📆 Monthly Volume</div>
@@ -920,31 +1017,35 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- ADD FORM — Date first, then Job, Assigned By, Result -->
+    <!-- ADD FORM -->
     <div class="sp-form-card">
       <div class="sp-form-header">
-        <div class="sp-form-htitle"><span style="font-size:1.1rem;">✨</span>New Project Entry</div>
+        <div class="sp-form-htitle">
+          <span style="font-size:1.1rem;">✨</span>
+          New Project Entry
+        </div>
         <div class="sp-form-badge">QUICK ADD</div>
       </div>
       <div class="sp-form-body">
         <div class="sp-field">
-          <label class="sp-label">Date</label>
-          <input class="sp-input" type="date" id="specDate">
+          <label class="sp-label">Project / Job Name</label>
+          <input class="sp-input" type="text" id="specJob" placeholder="ชื่องาน / โครงการ">
         </div>
         <div class="sp-field">
-          <label class="sp-label">Job Name</label>
-          <input class="sp-input" type="text" id="specJob" placeholder="ชื่องาน / โครงการ">
+          <label class="sp-label">Date</label>
+          <input class="sp-input" type="date" id="specDate">
         </div>
         <div class="sp-field">
           <label class="sp-label">Assigned By</label>
           <input class="sp-input" type="text" id="specBy" placeholder="ผู้สั่งงาน">
         </div>
         <div class="sp-field">
-          <label class="sp-label">Result</label>
-          <input class="sp-input" type="text" id="specResult" placeholder="ผลลัพธ์ / Output">
+          <label class="sp-label">Result / Output</label>
+          <input class="sp-input" type="text" id="specResult" placeholder="ผลลัพธ์">
         </div>
         <button class="sp-submit-btn" onclick="addSpecial()">
-          <span class="btn-spark">⚡</span>บันทึก
+          <span class="btn-spark">⚡</span>
+          บันทึก
         </button>
       </div>
     </div>
@@ -952,20 +1053,21 @@ tbody tr:last-child td{border-bottom:none}
     <!-- DATA TABLE -->
     <div class="sp-table-card">
       <div class="sp-table-header">
-        <div class="sp-table-title">📋 Project Registry</div>
+        <div class="sp-table-title">📋 Project Registry — All Entries</div>
         <div class="sp-table-count" id="sp-table-count">0 records</div>
       </div>
       <div class="sp-tbl-scroll">
         <table class="sp-tbl">
-          <thead><tr>
-            <th style="width:40px;">#</th>
-            <th style="width:110px;">Date</th>
-            <th>Job / Project</th>
-            <th>Assigned By</th>
-            <th>Status</th>
-            <th>Result</th>
-            <th style="text-align:center;width:52px;">Del</th>
-          </tr></thead>
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th>Project / Job</th>
+              <th>Date</th>
+              <th>Assigned By</th>
+              <th>Result</th>
+              <th style="text-align:center;width:52px;">Del</th>
+            </tr>
+          </thead>
           <tbody id="specialTableBody"></tbody>
         </table>
       </div>
@@ -977,12 +1079,10 @@ tbody tr:last-child td{border-bottom:none}
 </div>
 
 <script>
-/* ══════════════════════════════════════════
-   SIDEBAR / NAV
-══════════════════════════════════════════ */
+/* sidebar */
 function toggleSidebar(){const sb=document.getElementById('sidebar'),ov=document.getElementById('sbOverlay');sb.classList.toggle('open');ov.classList.toggle('active');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('active');}
-document.querySelectorAll('.menu-item').forEach(m=>m.addEventListener('click',()=>{if(window.innerWidth<=900)closeSidebar();}));
+document.querySelectorAll('.menu-item').forEach(m=>{m.addEventListener('click',()=>{if(window.innerWidth<=900)closeSidebar();});});
 
 Chart.defaults.font.family="'Prompt', sans-serif";
 Chart.defaults.font.size=11;
@@ -1002,163 +1102,22 @@ const STORAGE_KEY=`w_data_${currentUser}`;
 const GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycby2-I9KJnfgBCpgF9juLVY2Grmp2EBsayaEkfrago3XLYgaYU9XRNUJLE7nFaTBn9CQ/exec";
 
 let db=JSON.parse(localStorage.getItem(STORAGE_KEY))||{daily:[],s5:[],skills:[],special:[],support:[],_lastModified:0};
-let charts={master:null,doughnut:null,supStatus:null,supNgTrend:null,supLine:null,attend:null,s5:null,skillRadar:null,skillLv:null,skillCmp:null,skillPolar:null,spResult:null};
+let skillChart=null,masterChart=null,doughnutChart=null,supStatusChart=null,supTrendChart=null,attendChart=null,s5Chart=null,skillLvChart=null,skillCmpChart=null,skillPolarChart=null,spResultChart=null,spTrendChartInst=null;
 let currentSkillSort='val';
 let pushTimer=null;
 
 const COLORS=['#FF6B00','#2563EB','#7C3AED','#059669','#DC2626','#D97706','#0891B2','#DB2777','#0D9488','#65A30D','#4F46E5','#EA580C'];
-const MO_TH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
-/* ══════════════════════════════════════════
-   DATE FILTER SYSTEM
-══════════════════════════════════════════ */
-// filter state for each page
-const dftState = {
-  'master': {preset:'all', year:'all', month:'all', day:'all'},
-  'daily':  {preset:'all', year:'all', month:'all', day:'all'},
-  'support':{preset:'all', year:'all', month:'all', day:'all'},
-  '5s':     {preset:'all', year:'all', month:'all', day:'all'},
-  'special':{preset:'all', year:'all', month:'all', day:'all'},
-};
-
-function buildDftBar(pageKey, containerId, onChangeFn) {
-  const el = document.getElementById(containerId);
-  if(!el) return;
-  const now = new Date();
-  const curY = now.getFullYear();
-  // Years: 2020 to curY+3
-  let yOpts = '<option value="all">ทุกปี</option>';
-  for(let y=2020; y<=curY+3; y++) yOpts += `<option value="${y}">${y}</option>`;
-  // Months
-  let mOpts = '<option value="all">ทุกเดือน</option>';
-  const mNames=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-  mNames.forEach((m,i)=>{ mOpts+=`<option value="${i}">${m}</option>`; });
-  // Days
-  let dOpts = '<option value="all">ทุกวัน</option>';
-  for(let d=1;d<=31;d++) dOpts+=`<option value="${d}">${d}</option>`;
-  // Weeks
-  let wOpts='<option value="all">ทุกสัปดาห์</option>';
-  for(let w=1;w<=53;w++) wOpts+=`<option value="${w}">สัปดาห์ที่ ${w}</option>`;
-
-  el.innerHTML=`
-    <div class="dft-bar">
-      <span class="dft-label">📆 ช่วงเวลา:</span>
-      <div class="dft-presets">
-        <button class="dft-btn active" onclick="dftPreset('${pageKey}','all',this)">ทั้งหมด</button>
-        <button class="dft-btn" onclick="dftPreset('${pageKey}','today',this)">วันนี้</button>
-        <button class="dft-btn" onclick="dftPreset('${pageKey}','week',this)">สัปดาห์นี้</button>
-        <button class="dft-btn" onclick="dftPreset('${pageKey}','month',this)">เดือนนี้</button>
-        <button class="dft-btn" onclick="dftPreset('${pageKey}','year',this)">ปีนี้</button>
-      </div>
-      <div class="dft-divider"></div>
-      <div class="dft-selects">
-        <select class="dft-sel" id="dft-y-${pageKey}" onchange="dftCustom('${pageKey}')">${yOpts}</select>
-        <select class="dft-sel" id="dft-m-${pageKey}" onchange="dftCustom('${pageKey}')">${mOpts}</select>
-        <select class="dft-sel" id="dft-d-${pageKey}" onchange="dftCustom('${pageKey}')">${dOpts}</select>
-        <select class="dft-sel" id="dft-w-${pageKey}" onchange="dftCustomW('${pageKey}')">${wOpts}</select>
-      </div>
-    </div>`;
-}
-
-function dftPreset(pageKey, preset, btnEl) {
-  // Update button states
-  const bar = btnEl.closest('.dft-bar');
-  bar.querySelectorAll('.dft-btn').forEach(b=>b.classList.remove('active'));
-  btnEl.classList.add('active');
-  // Reset selectors
-  ['y','m','d','w'].forEach(k=>{
-    const sel=document.getElementById(`dft-${k}-${pageKey}`);
-    if(sel) sel.value='all';
-  });
-  dftState[pageKey] = {preset, year:'all', month:'all', day:'all', week:'all'};
-  triggerPageRefresh(pageKey);
-}
-
-function dftCustom(pageKey) {
-  const y = document.getElementById(`dft-y-${pageKey}`)?.value||'all';
-  const m = document.getElementById(`dft-m-${pageKey}`)?.value||'all';
-  const d = document.getElementById(`dft-d-${pageKey}`)?.value||'all';
-  dftState[pageKey] = {preset:'custom', year:y, month:m, day:d, week:'all'};
-  // Deactivate preset buttons
-  const bar = document.getElementById(`dft-y-${pageKey}`)?.closest('.dft-bar');
-  if(bar) bar.querySelectorAll('.dft-btn').forEach(b=>b.classList.remove('active'));
-  triggerPageRefresh(pageKey);
-}
-
-function dftCustomW(pageKey) {
-  const w = document.getElementById(`dft-w-${pageKey}`)?.value||'all';
-  dftState[pageKey] = {...dftState[pageKey], preset:'custom-week', week:w};
-  const bar = document.getElementById(`dft-w-${pageKey}`)?.closest('.dft-bar');
-  if(bar) bar.querySelectorAll('.dft-btn').forEach(b=>b.classList.remove('active'));
-  triggerPageRefresh(pageKey);
-}
-
-function triggerPageRefresh(pageKey) {
-  const map = {'master':'master-dash','daily':'daily','support':'support','5s':'5s','special':'special'};
-  const pid = map[pageKey];
-  if(!pid) return;
-  renderPage(pid);
-}
-
-// Get ISO week number
-function getWeekNum(d) {
-  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const dayNum = date.getUTCDay()||7;
-  date.setUTCDate(date.getUTCDate()+4-dayNum);
-  const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
-  return Math.ceil((((date-yearStart)/86400000)+1)/7);
-}
-
-function filterByDft(dataArr, pageKey, dateField='date') {
-  const state = dftState[pageKey]||{preset:'all'};
-  const now = new Date();
-  return dataArr.filter(item => {
-    const raw = item[dateField]||item.month||'';
-    if(!raw) return state.preset==='all';
-    // Parse date
-    let dt;
-    if(/^\d{4}-\d{2}-\d{2}/.test(raw)) dt=new Date(raw);
-    else if(/^\d{4}-\d{2}$/.test(raw)) dt=new Date(raw+'-01');
-    else return true;
-    if(isNaN(dt)) return true;
-
-    const {preset,year,month,day,week} = state;
-    if(preset==='all') return true;
-    if(preset==='today') {
-      return dt.getFullYear()===now.getFullYear()&&dt.getMonth()===now.getMonth()&&dt.getDate()===now.getDate();
-    }
-    if(preset==='week') {
-      return getWeekNum(dt)===getWeekNum(now)&&dt.getFullYear()===now.getFullYear();
-    }
-    if(preset==='month') {
-      return dt.getFullYear()===now.getFullYear()&&dt.getMonth()===now.getMonth();
-    }
-    if(preset==='year') {
-      return dt.getFullYear()===now.getFullYear();
-    }
-    if(preset==='custom') {
-      if(year!=='all'&&dt.getFullYear()!==parseInt(year)) return false;
-      if(month!=='all'&&dt.getMonth()!==parseInt(month)) return false;
-      if(day!=='all'&&dt.getDate()!==parseInt(day)) return false;
-      return true;
-    }
-    if(preset==='custom-week') {
-      if(year!=='all'&&dt.getFullYear()!==parseInt(year)) return false;
-      if(week!=='all'&&getWeekNum(dt)!==parseInt(week)) return false;
-      return true;
-    }
-    return true;
-  });
-}
-
-/* ══════════════════════════════════════════
-   LOADING / CLOUD
-══════════════════════════════════════════ */
-function setLoading(t,s,p){const lo=document.getElementById('loadingOverlay');lo.classList.remove('hidden');setText('loText',t);if(s)setText('loSub',s);setLoadingPct(p||0);}
-function setLoadingPct(p){const lb=document.getElementById('loBar');if(lb)lb.style.width=p+'%';}
+/* LOADING */
+function setLoading(text,sub='',pct=0){const lo=document.getElementById('loadingOverlay'),lt=document.getElementById('loText'),ls=document.getElementById('loSub'),lb=document.getElementById('loBar');lo.classList.remove('hidden');if(lt)lt.textContent=text;if(ls)ls.textContent=sub||'WAP Pearl & Sunset 2026';if(lb)lb.style.width=pct+'%';}
+function setLoadingPct(pct){const lb=document.getElementById('loBar');if(lb)lb.style.width=pct+'%';}
 function hideLoading(){document.getElementById('loadingOverlay').classList.add('hidden');}
+
+/* SYNC STATUS */
 let syncStatusTimer=null;
-function showSyncStatus(msg,color='#22C55E'){const el=document.getElementById('syncStatus');el.innerHTML=`<span class="ss-dot" style="background:${color};"></span>${msg}`;el.style.display='block';clearTimeout(syncStatusTimer);syncStatusTimer=setTimeout(()=>el.style.display='none',4000);}
+function showSyncStatus(msg,color='#22C55E'){const el=document.getElementById('syncStatus');el.innerHTML=`<span class="ss-dot" style="background:${color};"></span>${msg}`;el.style.display='block';clearTimeout(syncStatusTimer);syncStatusTimer=setTimeout(()=>{el.style.display='none';},4000);}
+
+/* CLOUD */
 function getDataLen(o){return Object.values(o).reduce((a,c)=>a+(Array.isArray(c)?c.length:0),0);}
 function schedulePush(){clearTimeout(pushTimer);pushTimer=setTimeout(()=>pushToCloud(),800);}
 async function pushToCloud(){
@@ -1168,43 +1127,42 @@ async function pushToCloud(){
 }
 async function pullFromCloud(silent=false){
   try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();
-  if(r.status==='success'&&r.data){const cloud=r.data;if((cloud._lastModified||0)>(db._lastModified||0)||getDataLen(cloud)>getDataLen(db)){db=cloud;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));return true;}}}catch(e){}return false;
+  if(r.status==='success'&&r.data){const cloud=r.data;const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);
+  if(cloudMod>localMod||cloudLen>localLen){db=cloud;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));return true;}}}catch(e){}return false;
 }
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
 window.addEventListener('load',async()=>{
-  // Build date filters for all pages
-  buildDftBar('master','dft-master-wrap');
-  buildDftBar('daily','dft-daily-wrap');
-  buildDftBar('support','dft-support-wrap');
-  buildDftBar('5s','dft-5s-wrap');
-  buildDftBar('special','dft-special-wrap');
-
   setLoading('กำลังเชื่อมต่อ Cloud...','โปรดรอสักครู่',10);setBtnLoading(true,'⏳ โหลด...');
+  const localExists=getDataLen(db)>0;
   try{
     setLoadingPct(30);const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);setLoadingPct(60);const r=await res.json();
-    if(r.status==='success'&&r.data){const cloud=r.data;
-    if(getDataLen(cloud)>getDataLen(db)||(cloud._lastModified||0)>(db._lastModified||0)){db=cloud;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));setLoading('กำลังแสดงข้อมูล...','อัปเดตจาก Cloud สำเร็จ',80);refreshAllPages();setLoadingPct(100);await sleep(400);setText('dash-timestamp','อัปเดต: '+new Date().toLocaleString('th-TH'));hideLoading();toast('✅ โหลดข้อมูลล่าสุดจาก Cloud');}
-    else{setLoadingPct(80);refreshAllPages();setLoadingPct(100);await sleep(300);hideLoading();}}
-    else{setLoadingPct(80);refreshAllPages();setLoadingPct(100);await sleep(300);hideLoading();}
-  }catch(e){setLoading('ออฟไลน์','เครือข่ายไม่เสถียร',90);refreshAllPages();await sleep(500);hideLoading();toast('⚠️ ออฟไลน์ — ใช้ข้อมูลในเครื่อง');}
+    if(r.status==='success'&&r.data){const cloud=r.data;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);
+    if(cloudLen>localLen||(cloud._lastModified||0)>(db._lastModified||0)){db=cloud;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));setLoading('กำลังแสดงข้อมูล...','อัปเดตจาก Cloud สำเร็จ',80);refreshAllPages();setLoadingPct(100);await sleep(400);setText('dash-timestamp','อัปเดต: '+new Date().toLocaleString('th-TH'));hideLoading();toast('✅ โหลดข้อมูลล่าสุดจาก Cloud');}
+    else{setLoadingPct(80);refreshAllPages();setLoadingPct(100);await sleep(300);hideLoading();if(!localExists)toast('📂 ใช้ข้อมูลในเครื่อง');}}
+    else{setLoadingPct(80);refreshAllPages();setLoadingPct(100);await sleep(300);hideLoading();if(!localExists)toast('⚠️ ยังไม่มีข้อมูล — เริ่มบันทึกได้เลย');}
+  }catch(e){setLoading('ออฟไลน์ — ใช้ข้อมูลในเครื่อง','เครือข่ายไม่เสถียร',90);refreshAllPages();await sleep(500);hideLoading();toast('⚠️ ออฟไลน์ — ใช้ข้อมูลในเครื่อง');}
   finally{setBtnLoading(false);startPolling();}
 });
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
 async function syncWithGoogleSheets(){
   if(document.getElementById('syncBtn').classList.contains('loading'))return;
   setBtnLoading(true,'⏳ SYNCING...');showSyncStatus('🔄 กำลัง Sync...','#F59E0B');
   try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();
-  if(r.status==='success'&&r.data){const cloud=r.data;
-  if((cloud._lastModified||0)>(db._lastModified||0)||getDataLen(cloud)>getDataLen(db)){db=cloud;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));refreshAllPages();showSyncStatus('✅ ดึงข้อมูลจาก Cloud แล้ว','#22C55E');toast('✅ Sync: โหลดจาก Cloud');}
-  else{await pushToCloud();toast('✅ Sync: อัปโหลดขึ้น Cloud');}
+  if(r.status==='success'&&r.data){const cloud=r.data;const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);
+  if(cloudMod>localMod||cloudLen>localLen){db=cloud;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));refreshAllPages();showSyncStatus('✅ ดึงข้อมูลจาก Cloud แล้ว','#22C55E');toast('✅ Sync: โหลดข้อมูลจาก Cloud');}
+  else{await pushToCloud();showSyncStatus('☁️ อัปโหลดขึ้น Cloud แล้ว','#22C55E');toast('✅ Sync: อัปโหลดข้อมูลขึ้น Cloud');}
   setText('dash-timestamp','Sync: '+new Date().toLocaleString('th-TH'));}}
-  catch(e){showSyncStatus('❌ Sync ล้มเหลว','#DC2626');toast('❌ Sync ล้มเหลว');}
+  catch(e){showSyncStatus('❌ Sync ล้มเหลว','#DC2626');toast('❌ Sync ล้มเหลว: '+e.message);}
   finally{setBtnLoading(false);}
 }
 function startPolling(){setInterval(async()=>{const updated=await pullFromCloud(true);if(updated){refreshAllPages();showSyncStatus('🔔 อัปเดตจากอุปกรณ์อื่น','#60A5FA');setText('dash-timestamp','Real-time: '+new Date().toLocaleString('th-TH'));}},30000);}
 function setBtnLoading(on,txt='🔄 SYNC CLOUD'){const b=document.getElementById('syncBtn');b.classList.toggle('loading',on);b.innerText=txt;b.disabled=on;}
-function save(){db._lastModified=Date.now();localStorage.setItem(STORAGE_KEY,JSON.stringify(db));runAIAnalytics();if(isActive('master-dash'))refreshMasterDashboard();schedulePush();}
+
+function save(){
+  db._lastModified=Date.now();localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
+  runAIAnalytics();if(isActive('master-dash'))refreshMasterDashboard();schedulePush();
+}
 function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
 function isActive(id){return document.getElementById(id)?.classList.contains('active');}
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
@@ -1217,328 +1175,136 @@ function nav(id,el){
   setText('topbar-title',PAGE_TITLES[id]||'');renderPage(id);
 }
 function renderPage(id){
-  if(id==='master-dash')refreshMasterDashboard();
-  if(id==='daily')refreshDashboard();
-  if(id==='5s')refresh5S();
-  if(id==='multi')refreshSkills();
-  if(id==='special')refreshSpecial();
-  if(id==='support')refreshSupport();
+  if(id==='master-dash')refreshMasterDashboard();if(id==='daily')refreshDashboard();
+  if(id==='5s')refresh5S();if(id==='multi')refreshSkills();
+  if(id==='special')refreshSpecial();if(id==='support')refreshSupport();
 }
 function refreshAllPages(){refreshMasterDashboard();refreshDashboard();refresh5S();refreshSkills();refreshSpecial();refreshSupport();runAIAnalytics();}
 
-/* ══════════════════════════════════════════
-   SUPPORT HELPERS
-══════════════════════════════════════════ */
-function getSupFiltered(){ return filterByDft(db.support, 'support', 'date'); }
+/* GROUP HELPERS */
+function buildGroupData(){const map={};db.support.forEach(s=>{const p=(s.part||'(ไม่ระบุ)').trim();if(!map[p])map[p]={total:0,RP:0,VF:0,RECORDS:0};map[p].total++;if(s.report==='RP')map[p].RP++;else if(s.report==='VF')map[p].VF++;else if(s.report==='RECORDS')map[p].RECORDS++;});return Object.entries(map).sort((a,b)=>b[1].total-a[1].total);}
+function renderGroupBars(elId,limit=10){const el=document.getElementById(elId);if(!el)return;const sorted=buildGroupData().slice(0,limit);if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}const max=sorted[0][1].total;el.innerHTML=sorted.map(([n,d],i)=>`<div class="gb-row"><div class="gb-rank">${i+1}</div><div class="gb-name" title="${n}">${n}</div><div class="gb-track"><div class="gb-fill" style="width:${(d.total/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div><span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${d.total}</span></div>`).join('');}
+function renderGroupByStatus(elId){const el=document.getElementById(elId);if(!el)return;const sorted=buildGroupData().slice(0,8);if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}el.innerHTML=sorted.map(([n,d])=>{const t=d.total||1;return`<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:.72rem;font-weight:600;color:var(--txt2);">${n}</span><span style="font-size:.63rem;color:var(--txt4);">${d.total}</span></div><div style="height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;display:flex;">${d.RP?`<div style="width:${(d.RP/t)*100}%;background:#DC2626;"></div>`:''} ${d.VF?`<div style="width:${(d.VF/t)*100}%;background:#2563EB;"></div>`:''} ${d.RECORDS?`<div style="width:${(d.RECORDS/t)*100}%;background:#D97706;"></div>`:''}</div><div style="display:flex;gap:8px;margin-top:3px;">${d.RP?`<span style="font-size:.58rem;color:#DC2626;font-weight:700;">RP:${d.RP}</span>`:''} ${d.VF?`<span style="font-size:.58rem;color:#2563EB;font-weight:700;">VF:${d.VF}</span>`:''} ${d.RECORDS?`<span style="font-size:.58rem;color:#D97706;font-weight:700;">REC:${d.RECORDS}</span>`:''}</div></div>`;}).join('');}
+function renderGroupFullTable(tbodyId){const el=document.getElementById(tbodyId);if(!el)return;const sorted=buildGroupData();const total=db.support.length||1;if(!sorted.length){el.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--txt4);padding:18px;">ยังไม่มีข้อมูล</td></tr>`;return;}el.innerHTML=sorted.map(([n,d],i)=>`<tr><td style="padding-left:14px;color:var(--txt4);font-weight:700;">${i+1}</td><td style="font-weight:600;">${n}</td><td style="font-weight:800;">${d.total}</td><td><span class="badge badge-rp">${d.RP||0}</span></td><td><span class="badge badge-vf">${d.VF||0}</span></td><td><span class="badge badge-rec">${d.RECORDS||0}</span></td><td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;min-width:55px;"><div style="width:${(d.total/total)*100}%;height:100%;background:${COLORS[i%COLORS.length]};border-radius:99px;"></div></div><span style="font-size:.64rem;font-weight:700;color:var(--txt3);">${Math.round((d.total/total)*100)}%</span></div></td></tr>`).join('');}
 
-function calcSupStats(data) {
-  const totalOrders = data.reduce((s,c)=>s+(parseInt(c.orderQty)||0),0);
-  const totalOk = data.reduce((s,c)=>s+(parseInt(c.okQty)||0),0);
-  const totalNg = data.reduce((s,c)=>s+(parseInt(c.ngQty)||0),0);
-  const rp = data.filter(s=>s.status==='RP'||s.report==='RP').length;
-  const vf = data.filter(s=>s.status==='VF'||s.report==='VF').length;
-  const rec = data.filter(s=>s.status==='RECORDS'||s.report==='RECORDS').length;
-  const ngRate = totalOrders>0 ? (totalNg/totalOrders*100).toFixed(1) : '0.0';
-  const okRate = totalOrders>0 ? (totalOk/totalOrders*100).toFixed(1) : '0.0';
-  // Line breakdown
-  const lineMap={};
-  data.forEach(s=>{
-    const l=(s.productionLine||s.line||'(ไม่ระบุ)').trim();
-    if(!lineMap[l])lineMap[l]={orders:0,ok:0,ng:0};
-    lineMap[l].orders+=(parseInt(s.orderQty)||0);
-    lineMap[l].ok+=(parseInt(s.okQty)||0);
-    lineMap[l].ng+=(parseInt(s.ngQty)||0);
-  });
-  // Group part
-  const groupMap={};
-  data.forEach(s=>{
-    const p=(s.part||'(ไม่ระบุ)').trim();
-    if(!groupMap[p])groupMap[p]={total:0,ng:0};
-    groupMap[p].total++;
-    groupMap[p].ng+=(parseInt(s.ngQty)||0);
-  });
-  return {totalOrders,totalOk,totalNg,rp,vf,rec,ngRate,okRate,lineMap,groupMap};
-}
-
-function buildGroupData(){
-  const map={};db.support.forEach(s=>{const p=(s.part||'(ไม่ระบุ)').trim();if(!map[p])map[p]={total:0,RP:0,VF:0,RECORDS:0,ng:0};map[p].total++;const st=s.status||s.report||'';if(st==='RP')map[p].RP++;else if(st==='VF')map[p].VF++;else if(st==='RECORDS')map[p].RECORDS++;map[p].ng+=(parseInt(s.ngQty)||0);});
-  return Object.entries(map).sort((a,b)=>b[1].ng-a[1].ng);
-}
-
-function renderGroupBars(elId,limit=10){
-  const el=document.getElementById(elId);if(!el)return;
-  const data=getSupFiltered();
-  const groupMap={};data.forEach(s=>{const p=(s.part||'(ไม่ระบุ)').trim();if(!groupMap[p])groupMap[p]=0;groupMap[p]+=(parseInt(s.ngQty)||0)||1;});
-  const sorted=Object.entries(groupMap).sort((a,b)=>b[1]-a[1]).slice(0,limit);
-  if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}
-  const max=sorted[0][1];
-  el.innerHTML=sorted.map(([n,c],i)=>`<div class="gb-row"><div class="gb-rank">${i+1}</div><div class="gb-name" title="${n}">${n}</div><div class="gb-track"><div class="gb-fill" style="width:${(c/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div><span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${c}</span></div>`).join('');
-}
-
-function renderLineCards(containerId, lineMap) {
-  const el=document.getElementById(containerId);if(!el)return;
-  const entries=Object.entries(lineMap).sort((a,b)=>b[1].ng-a[1].ng);
-  if(!entries.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}
-  const maxNg=Math.max(...entries.map(([,v])=>v.ng))||1;
-  const colorArr=['#DC2626','#2563EB','#7C3AED','#D97706','#059669','#0891B2','#DB2777','#0D9488'];
-  el.innerHTML=entries.slice(0,8).map(([name,d],i)=>{
-    const ngRate=d.orders>0?((d.ng/d.orders)*100).toFixed(1):'0.0';
-    const pct=(d.ng/maxNg)*100;
-    const c=colorArr[i%colorArr.length];
-    return`<div class="line-card"><div class="kpi-top" style="background:${c};"></div>
-      <div class="line-card-name">${name}</div>
-      <div class="line-card-ng" style="color:${c};">${d.ng}<span style="font-size:.7rem;font-weight:500;color:var(--txt4);"> NG</span></div>
-      <div class="line-card-detail">${d.ok} OK · Rate ${ngRate}%</div>
-      <div class="line-card-bar"><div class="line-card-bar-fill" style="width:${pct}%;background:${c};"></div></div>
-    </div>`;
-  }).join('');
-}
-
-/* ══════════════════════════════════════════
-   MASTER DASHBOARD
-══════════════════════════════════════════ */
+/* MASTER DASHBOARD */
 function refreshMasterDashboard(){
-  const fData = filterByDft(db.support,'master','date');
-  const stats = calcSupStats(fData);
-  const {totalOrders,totalOk,totalNg,rp,vf,rec,ngRate,okRate,lineMap} = stats;
-  const lv=db.daily.filter(d=>d.type==='leave').length;
-  const avg=db.skills.length?Math.round(db.skills.reduce((s,c)=>s+(c.value||0),0)/db.skills.length):0;
-
-  setText('dash-sup-ng',totalNg);
-  setText('dash-sup-total-orders',totalOrders);
-  setText('dash-sup-ng-rate',ngRate+'%');
-  setText('dash-sup-ok-rate',okRate+'%');
-  setText('dash-sup-cases',fData.length);
-  setText('dash-ok-label',`${totalOk} OK / ${totalOrders} Total`);
-  setWidth('dash-ok-bar', totalOrders>0?(totalOk/totalOrders*100).toFixed(1):0);
-
-  setText('dash-kpi-ng',totalNg);
-  setText('dash-kpi-ok',totalOk);
-  setText('kpi-ng-rate','Rate: '+ngRate+'%');
-  setText('kpi-ok-rate','Rate: '+okRate+'%');
-  setText('dash-special-count',db.special.length);
-  setText('dash-avg-skill',avg+'%');
-  setText('dash-avg-skill2',avg+'%');
-  setText('kpi-skill-count',`${db.skills.length} ทักษะ`);
-  setText('dash-rp-val',rp);setText('dash-vf-val',vf);
-  setText('dash-rp-val2',rp);setText('dash-vf-val2',vf);
-  setText('dash-off-val',lv);setText('dash-skill-count2',db.skills.length);
-  setWidth('dash-skill-bar',avg);
-
-  const ins=document.getElementById('dash-insight');
-  if(ins){if(parseFloat(ngRate)>10)ins.textContent='⚠️ NG Rate สูง — ควรตรวจสอบ Line ที่มีปัญหา';else if(avg>70)ins.textContent='🌟 Skill สูง + NG Rate ต่ำ — Performance ดีมาก';else ins.textContent='💡 บันทึกข้อมูลต่อเนื่องเพื่อ AI วิเคราะห์แม่นขึ้น';}
-
-  renderLineCards('dash-line-cards',lineMap);
-  renderGroupBars('group-analysis-bars',8);
-  buildMasterChart();
+  const rp=db.support.filter(s=>s.report==='RP').length,vf=db.support.filter(s=>s.report==='VF').length,rec=db.support.filter(s=>s.report==='RECORDS').length;
+  const lv=db.daily.filter(d=>d.type==='leave').length;const avg=db.skills.length?Math.round(db.skills.reduce((s,c)=>s+(c.value||0),0)/db.skills.length):0;
+  const aMap={};db.s5.forEach(s=>{if(s.area)aMap[s.area]=(aMap[s.area]||0)+(s.count||0);});const tArea=Object.entries(aMap).sort((a,b)=>b[1]-a[1])[0];
+  setText('dash-support-count',db.support.length);setText('dash-5s-count',db.s5.reduce((s,c)=>s+(c.count||0),0));
+  setText('dash-special-count',db.special.length);setText('dash-avg-skill',avg+'%');setText('dash-avg-skill2',avg+'%');
+  setText('kpi-rp-vf',`RP: ${rp} · VF: ${vf}`);setText('kpi-5s-area',tArea?`Hot: ${tArea[0]}`:'Hot area: —');setText('kpi-skill-count',`${db.skills.length} ทักษะ`);
+  setText('dash-rp-val',rp);setText('dash-vf-val',vf);setText('dash-rp-val2',rp);setText('dash-vf-val2',vf);
+  setText('dash-off-val',lv);setText('dash-skill-count2',db.skills.length);setWidth('dash-skill-bar',avg);
+  const ins=document.getElementById('dash-insight');if(ins){if(avg>70&&db.special.length>2)ins.textContent='🌟 ยอดเยี่ยม: ทักษะสูง + งานพิเศษดี';else if(db.support.length>10)ins.textContent='⚠️ Support บ่อย — ตรวจ Part ที่มีปัญหาซ้ำ';else ins.textContent='💡 บันทึกทักษะและงานพิเศษให้ครบเพื่อ AI วิเคราะห์แม่นขึ้น';}
+  buildMasterChart();renderGroupBars('group-analysis-bars',8);buildDoughnut(rp,vf,rec,'statusDoughnut');
+  const ov=document.getElementById('group-full-overview');if(ov){const sorted=buildGroupData();const total=db.support.length||1;if(!sorted.length){ov.innerHTML='';return;}ov.innerHTML=`<div class="a-title" style="margin-bottom:8px;">Full Group Table (${sorted.length} กลุ่ม)</div><div class="tbl-wrap"><table><thead><tr><th>#</th><th>Group Part</th><th>Total</th><th>RP</th><th>VF</th><th>REC</th><th>% Share</th></tr></thead><tbody>${sorted.map(([n,d],i)=>`<tr><td style="padding-left:14px;color:var(--txt4);font-weight:700;">${i+1}</td><td style="font-weight:600;">${n}</td><td style="font-weight:800;">${d.total}</td><td><span class="badge badge-rp">${d.RP||0}</span></td><td><span class="badge badge-vf">${d.VF||0}</span></td><td><span class="badge badge-rec">${d.RECORDS||0}</span></td><td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;min-width:55px;"><div style="width:${(d.total/total)*100}%;height:100%;background:${COLORS[i%COLORS.length]};border-radius:99px;"></div></div><span style="font-size:.64rem;font-weight:700;color:var(--txt3);">${Math.round((d.total/total)*100)}%</span></div></td></tr>`).join('')}</tbody></table></div>`;}
 }
-
 function buildMasterChart(){
-  const canvas=document.getElementById('masterWorkChart');if(!canvas)return;
-  if(charts.master)charts.master.destroy();
-  const ngD=Array(12).fill(0),caseD=Array(12).fill(0);
-  db.support.forEach(s=>{
-    const d=s.date?new Date(s.date):null;
-    if(d&&!isNaN(d)){const m=d.getMonth();ngD[m]+=(parseInt(s.ngQty)||0);caseD[m]++;}
-  });
+  const canvas=document.getElementById('masterWorkChart');if(!canvas)return;if(masterChart)masterChart.destroy();
+  const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const sD=Array(12).fill(0),s5D=Array(12).fill(0);
+  db.support.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12)sD[m]++;}else sD[new Date().getMonth()]++;});
+  db.s5.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12)s5D[m]+=(s.count||0);}});
   const c=canvas.getContext('2d'),h=canvas.parentElement?.clientHeight||215;
-  const gO=c.createLinearGradient(0,0,0,h);gO.addColorStop(0,'rgba(220,38,38,.5)');gO.addColorStop(1,'rgba(220,38,38,0)');
-  const gB=c.createLinearGradient(0,0,0,h);gB.addColorStop(0,'rgba(37,99,235,.5)');gB.addColorStop(1,'rgba(37,99,235,0)');
-  charts.master=new Chart(c,{type:'line',data:{labels:MO_TH,datasets:[
-    {label:'NG Units',data:ngD,borderColor:'#DC2626',backgroundColor:gO,tension:.45,fill:true,pointBackgroundColor:'#DC2626',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,borderWidth:2.5},
-    {label:'Cases',data:caseD,borderColor:'#2563EB',backgroundColor:gB,tension:.45,fill:true,pointBackgroundColor:'#2563EB',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,borderWidth:2.5}
-  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:18,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{display:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1}}}}});
+  const gO=c.createLinearGradient(0,0,0,h);gO.addColorStop(0,'rgba(255,107,0,.5)');gO.addColorStop(.5,'rgba(255,107,0,.1)');gO.addColorStop(1,'rgba(255,107,0,0)');
+  const gB=c.createLinearGradient(0,0,0,h);gB.addColorStop(0,'rgba(37,99,235,.5)');gB.addColorStop(.5,'rgba(37,99,235,.1)');gB.addColorStop(1,'rgba(37,99,235,0)');
+  masterChart=new Chart(c,{type:'line',data:{labels:mo,datasets:[{label:'Support',data:sD,borderColor:'#FF6B00',backgroundColor:gO,tension:.45,fill:true,pointBackgroundColor:'#FF6B00',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5},{label:'5S',data:s5D,borderColor:'#2563EB',backgroundColor:gB,tension:.45,fill:true,pointBackgroundColor:'#2563EB',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:18,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{display:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1}}}}});
+}
+function buildDoughnut(rp,vf,rec,cid){
+  const ctx=document.getElementById(cid);if(!ctx)return;
+  if(cid==='statusDoughnut'&&doughnutChart)doughnutChart.destroy();
+  if(cid==='supportStatusChart'&&supStatusChart)supStatusChart.destroy();
+  if(!rp&&!vf&&!rec)return;
+  const ch=new Chart(ctx.getContext('2d'),{type:'doughnut',data:{labels:['RP','VF','Records'],datasets:[{data:[rp,vf,rec],backgroundColor:['#DC2626','#2563EB','#D97706'],borderWidth:4,borderColor:'#fff',hoverOffset:14}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:16,font:{size:11}}}}}});
+  if(cid==='statusDoughnut')doughnutChart=ch;else supStatusChart=ch;
 }
 
-/* ══════════════════════════════════════════
-   AI ANALYTICS
-══════════════════════════════════════════ */
+/* AI */
 function runAIAnalytics(){
   const avg=db.skills.length?db.skills.reduce((s,c)=>s+(c.value||0),0)/db.skills.length:0;
-  const stats=calcSupStats(db.support);
-  const ngPenalty=Math.max(0,parseFloat(stats.ngRate)||0);
-  const sc=Math.round(Math.min(Math.max((avg*.4)+(db.special.length*4)+(db.support.length*1.5)-(ngPenalty*.8),5),100));
+  const sc=Math.round(Math.min(Math.max((avg*.4)+(db.special.length*5)+(db.support.length*2),10),100));
   setText('effScore',sc+'%');setWidth('effBar',sc);
   const i=document.getElementById('aiInsight');if(i)i.textContent=sc>80?'🌟 High Performer: ยอดเยี่ยมมาก!':sc>50?'📈 Growing: กำลังพัฒนาดี':'⚙️ Operational: บันทึกต่อเนื่องเพื่อวิเคราะห์';
 }
 
-/* ══════════════════════════════════════════
-   DAILY
-══════════════════════════════════════════ */
+/* DAILY */
 function refreshDashboard(){
-  const fDly = filterByDft(db.daily,'daily','date');
-  const lv=fDly.filter(d=>d.type==='leave').length,hv=fDly.filter(d=>d.type==='holiday').length;
+  const fv=(document.getElementById('monthFilter')||{}).value||'all';
+  let fil=fv==='all'?db.daily:db.daily.filter(d=>new Date(d.date).getMonth()===parseInt(fv));
+  const lv=fil.filter(d=>d.type==='leave').length,hv=fil.filter(d=>d.type==='holiday').length;
   const wd=250,off=lv+hv,pct=Math.round(((wd-off)/wd)*100);
   setText('st-work',wd-off);setText('st-leave',lv);setText('st-holiday',hv);setText('st-percent',pct+'%');
-  const tb=document.getElementById('dailyTableBody');
-  if(tb)tb.innerHTML=[...db.daily].reverse().map((d,i)=>`<tr><td>${d.date}</td><td><span class="badge ${d.type==='leave'?'badge-lv':'badge-hol'}">${d.type==='leave'?'ลางาน':'วันหยุด'}</span></td><td style="text-align:center;"><button class="btn-del" onclick="delDaily(${db.daily.length-1-i})">🗑</button></td></tr>`).join('');
-  buildAttendChart();
-  const tip=document.getElementById('dailyTip');if(tip)tip.textContent=lv>5?'⚠️ วันลาสะสมมาก ควรวางแผนใหม่':pct>90?'🌟 สถิติการมาทำงานยอดเยี่ยม!':'💪 รักษาความสม่ำเสมอต่อไปนะครับ!';
+  const tb=document.getElementById('dailyTableBody');if(tb)tb.innerHTML=[...db.daily].reverse().map((d,i)=>`<tr><td>${d.date}</td><td><span class="badge ${d.type==='leave'?'badge-lv':'badge-hol'}">${d.type==='leave'?'ลางาน':'วันหยุด'}</span></td><td style="text-align:center;"><button class="btn-del" onclick="delDaily(${db.daily.length-1-i})" title="ลบ">🗑</button></td></tr>`).join('');
+  buildAttendChart();const tip=document.getElementById('dailyTip');if(tip)tip.textContent=lv>5?'⚠️ วันลาสะสมมาก ควรวางแผนใหม่':pct>90?'🌟 สถิติการมาทำงานยอดเยี่ยม!':'💪 รักษาความสม่ำเสมอต่อไปนะครับ!';
   runAIAnalytics();
 }
 function buildAttendChart(){
-  const ctx=document.getElementById('attendanceChart');if(!ctx)return;if(charts.attend)charts.attend.destroy();
+  const ctx=document.getElementById('attendanceChart');if(!ctx)return;if(attendChart)attendChart.destroy();
+  const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   const lD=Array(12).fill(0),hD=Array(12).fill(0);
   db.daily.forEach(d=>{const m=new Date(d.date).getMonth();if(!isNaN(m)){if(d.type==='leave')lD[m]++;else hD[m]++;}});
-  charts.attend=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels:MO_TH,datasets:[{label:'ลางาน',data:lD,backgroundColor:'rgba(220,38,38,.78)',borderRadius:7,borderSkipped:false},{label:'วันหยุด',data:hD,backgroundColor:'rgba(37,99,235,.68)',borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:16,font:{size:11}}}},scales:{x:{stacked:true,grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{stacked:true,grid:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1},border:{display:false}}}}});
+  attendChart=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels:mo,datasets:[{label:'ลางาน',data:lD,backgroundColor:'rgba(220,38,38,.78)',borderRadius:7,borderSkipped:false},{label:'วันหยุด',data:hD,backgroundColor:'rgba(37,99,235,.68)',borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:16,font:{size:11}}}},scales:{x:{stacked:true,grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{stacked:true,grid:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1},border:{display:false}}}}});
 }
 function addDaily(){
   const d=document.getElementById('dailyDate').value,t=document.getElementById('dailyType').value;
   if(!d)return toast('❌ เลือกวันที่ก่อน');db.daily.push({date:d,type:t});save();toast('📅 บันทึกแล้ว');refreshDashboard();
 }
-function delDaily(i){if(!confirm('ยืนยันการลบ?'))return;db.daily.splice(i,1);save();toast('🗑 ลบแล้ว');refreshDashboard();}
+function delDaily(i){if(!confirm('ยืนยันการลบรายการนี้?'))return;db.daily.splice(i,1);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refreshDashboard();}
 
-/* ══════════════════════════════════════════
-   SUPPORT PRODUCTION — NEW
-══════════════════════════════════════════ */
+/* SUPPORT */
 function refreshSupport(){
-  const fData = getSupFiltered();
-  const stats = calcSupStats(fData);
-  const {totalOrders,totalOk,totalNg,rp,vf,rec,ngRate,okRate,lineMap} = stats;
-
-  // KPIs
-  setText('sup-kpi-orders',totalOrders);
-  setText('sup-kpi-ok',totalOk);setText('sup-kpi-ng',totalNg);
-  setText('sup-kpi-cases',rp+vf);
-  setText('sup-kpi-lines',Object.keys(lineMap).length);
-  setText('sup-ok-rate','Rate: '+okRate+'%');
-  setText('sup-ng-rate','Rate: '+ngRate+'%');
-  setText('sup-rp-vf-hint','RP:'+rp+' · VF:'+vf);
-
-  // NG Rate Feature Card
-  setText('sup-ng-rate-big',ngRate+'%');
-  setText('sup-ng-detail','NG '+totalNg+' จาก '+totalOrders+' ชิ้นทั้งหมด');
-  const ngProg=document.getElementById('sup-ng-prog');if(ngProg)ngProg.style.width=Math.min(parseFloat(ngRate),100)+'%';
-  setText('sup-ng-ok-count',totalOk);
-  setText('sup-ng-ng-count',totalNg);
-
-  // Line cards
-  renderLineCards('sup-line-cards',lineMap);
-
-  // Group bars
-  renderGroupBars('support-group-bars',10);
-
-  // Charts
-  buildSupStatusChart(rp,vf,rec);
-  buildSupNgTrendChart();
-  buildSupLineChart(lineMap);
-
-  // Table
-  setText('sup-table-count',`${fData.length} records`);
-  const tb=document.getElementById('supportTableBody');
-  if(!tb)return;
-  if(!fData.length){tb.innerHTML=`<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--txt4);">ยังไม่มีข้อมูล — กรอกแบบฟอร์มด้านบน</td></tr>`;return;}
-  const allRev=[...db.support].reverse();
-  tb.innerHTML=allRev.map((s,i)=>{
-    const idx=db.support.length-1-i;
-    const st=s.status||s.report||'VF';
-    const stCls=st==='RP'?'badge-rp':st==='VF'?'badge-vf':'badge-rec';
-    const ord=parseInt(s.orderQty)||0,ok=parseInt(s.okQty)||0,ng=parseInt(s.ngQty)||0;
-    const ngR=ord>0?((ng/ord)*100).toFixed(1):'—';
-    return`<tr>
-      <td style="padding-left:14px;color:var(--txt4);font-weight:700;">${db.support.length-i}</td>
-      <td><div class="sp-date-pill">${s.date||'-'}</div></td>
-      <td><span style="font-size:.72rem;font-weight:700;color:var(--blue);">${s.productionLine||s.line||'-'}</span></td>
-      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.problem||''}">${s.problem||'-'}</td>
-      <td style="font-size:.74rem;">${s.action||'-'}</td>
-      <td><b>${s.part||'-'}</b></td>
-      <td><span class="badge ${stCls}">${st}</span></td>
-      <td style="text-align:right;font-weight:700;">${ord||'-'}</td>
-      <td style="text-align:right;"><span class="ng-badge ng-badge-ok">${ok}</span></td>
-      <td style="text-align:right;"><span class="ng-badge ng-badge-ng">${ng} <span style="font-size:.55rem;opacity:.6;">${ngR!=='—'?'('+ngR+'%)':''}</span></span></td>
-      <td style="text-align:center;"><button class="btn-del" onclick="delSupport(${idx})">🗑</button></td>
-    </tr>`;
-  }).join('');
+  const tb=document.getElementById('supportTableBody');if(!tb)return;
+  const rp=db.support.filter(s=>s.report==='RP').length,vf=db.support.filter(s=>s.report==='VF').length,rec=db.support.filter(s=>s.report==='RECORDS').length;
+  setText('sum-total',db.support.length);setText('sum-rp',rp);setText('sum-vf',vf);setText('sum-records',rec);
+  tb.innerHTML=[...db.support].reverse().map((s,i)=>{const bc=s.report==='RP'?'badge-rp':s.report==='VF'?'badge-vf':'badge-rec';return`<tr><td style="padding-left:16px;">${s.datetime||'-'}</td><td>${s.problem||'-'}</td><td>${s.action||'-'}</td><td><b>${s.part||'-'}</b></td><td><span class="badge ${bc}">${s.report}</span></td><td style="text-align:center;"><button class="btn-del" onclick="delSupport(${db.support.length-1-i})" title="ลบ">🗑</button></td></tr>`;}).join('');
+  renderGroupBars('support-group-bars',12);renderGroupByStatus('support-group-by-status');renderGroupFullTable('group-full-tbody');
+  buildDoughnut(rp,vf,rec,'supportStatusChart');buildSupportTrend();
 }
-
-function buildSupStatusChart(rp,vf,rec){
-  const ctx=document.getElementById('supportStatusChart');if(!ctx)return;
-  if(charts.supStatus)charts.supStatus.destroy();
-  if(!rp&&!vf&&!rec){charts.supStatus=null;return;}
-  charts.supStatus=new Chart(ctx.getContext('2d'),{type:'doughnut',data:{labels:['RP','VF','Records'],datasets:[{data:[rp,vf,rec],backgroundColor:['#DC2626','#2563EB','#D97706'],borderWidth:4,borderColor:'#fff',hoverOffset:14}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:16,font:{size:11}}}}}});
+function buildSupportTrend(){
+  const ctx=document.getElementById('supportTrendChart');if(!ctx)return;if(supTrendChart)supTrendChart.destroy();
+  const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const rpD=Array(12).fill(0),vfD=Array(12).fill(0),recD=Array(12).fill(0);
+  db.support.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12){if(s.report==='RP')rpD[m]++;else if(s.report==='VF')vfD[m]++;else recD[m]++;}}});
+  supTrendChart=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels:mo,datasets:[{label:'RP',data:rpD,backgroundColor:'rgba(220,38,38,.8)',borderRadius:6,borderSkipped:false},{label:'VF',data:vfD,backgroundColor:'rgba(37,99,235,.8)',borderRadius:6,borderSkipped:false},{label:'Records',data:recD,backgroundColor:'rgba(217,119,6,.8)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:16,font:{size:11}}}},scales:{x:{stacked:true,grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{stacked:true,grid:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1},border:{display:false}}}}});
 }
-
-function buildSupNgTrendChart(){
-  const ctx=document.getElementById('supNgTrendChart');if(!ctx)return;
-  if(charts.supNgTrend)charts.supNgTrend.destroy();
-  const ngD=Array(12).fill(0),okD=Array(12).fill(0);
-  db.support.forEach(s=>{const d=s.date?new Date(s.date):null;if(d&&!isNaN(d)){const m=d.getMonth();ngD[m]+=(parseInt(s.ngQty)||0);okD[m]+=(parseInt(s.okQty)||0);}});
-  const c=ctx.getContext('2d'),h=ctx.parentElement?.clientHeight||195;
-  const gR=c.createLinearGradient(0,0,0,h);gR.addColorStop(0,'rgba(220,38,38,.45)');gR.addColorStop(1,'rgba(220,38,38,0)');
-  const gG=c.createLinearGradient(0,0,0,h);gG.addColorStop(0,'rgba(5,150,105,.35)');gG.addColorStop(1,'rgba(5,150,105,0)');
-  charts.supNgTrend=new Chart(c,{type:'line',data:{labels:MO_TH,datasets:[
-    {label:'NG',data:ngD,borderColor:'#DC2626',backgroundColor:gR,tension:.45,fill:true,pointBackgroundColor:'#DC2626',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,borderWidth:2.5},
-    {label:'OK',data:okD,borderColor:'#059669',backgroundColor:gG,tension:.45,fill:true,pointBackgroundColor:'#059669',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,borderWidth:2}
-  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:16,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{display:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1}}}}});
-}
-
-function buildSupLineChart(lineMap){
-  const ctx=document.getElementById('supLineChart');if(!ctx)return;
-  if(charts.supLine)charts.supLine.destroy();
-  const entries=Object.entries(lineMap).sort((a,b)=>b[1].ng-a[1].ng).slice(0,8);
-  if(!entries.length)return;
-  charts.supLine=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels:entries.map(([n])=>n),datasets:[
-    {label:'OK',data:entries.map(([,d])=>d.ok),backgroundColor:'rgba(5,150,105,.8)',borderRadius:6,borderSkipped:false},
-    {label:'NG',data:entries.map(([,d])=>d.ng),backgroundColor:'rgba(220,38,38,.8)',borderRadius:6,borderSkipped:false}
-  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:14,font:{size:11}}}},scales:{x:{stacked:true,grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{stacked:true,grid:{display:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1}}}}});
-}
-
 function addSupport(){
-  const date=document.getElementById('supDate').value;
-  const line=document.getElementById('supLine').value;
-  const prob=document.getElementById('supProblem').value;
-  const act=document.getElementById('supAction').value;
-  const part=document.getElementById('supPart').value;
-  const status=document.getElementById('supReport').value;
-  const orderQty=document.getElementById('supOrderQty').value;
-  const okQty=document.getElementById('supOkQty').value;
-  const ngQty=document.getElementById('supNgQty').value;
+  const prob=document.getElementById('supProblem').value,act=document.getElementById('supAction').value,part=document.getElementById('supPart').value,rep=document.getElementById('supReport').value,di=document.getElementById('supDate').value;
   if(!prob)return toast('❌ กรอกรายละเอียดปัญหา');
-  const d=date?new Date(date):new Date();
-  const month=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  const ds=d.toLocaleDateString('th-TH',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const ts=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-  db.support.push({date:date||new Date().toISOString().split('T')[0],productionLine:line,line,problem:prob,action:act,part,status,report:status,orderQty:parseInt(orderQty)||0,okQty:parseInt(okQty)||0,ngQty:parseInt(ngQty)||0,datetime:`${ds} ${ts}`,month});
-  save();toast('🛠️ บันทึก Support แล้ว');
-  ['supDate','supLine','supProblem','supPart','supOrderQty','supOkQty','supNgQty'].forEach(id=>document.getElementById(id).value='');
-  refreshSupport();if(isActive('master-dash'))refreshMasterDashboard();
+  const d=di?new Date(di):new Date();const ds=d.toLocaleDateString('th-TH',{day:'2-digit',month:'2-digit',year:'numeric'});const ts=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});const month=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  db.support.push({problem:prob,action:act,part,report:rep,datetime:`${ds} ${ts}`,month});save();toast('🛠️ บันทึก Support แล้ว');
+  ['supProblem','supPart','supDate'].forEach(id=>document.getElementById(id).value='');refreshSupport();if(isActive('master-dash'))refreshMasterDashboard();
 }
-function delSupport(i){if(!confirm('ยืนยันการลบ?'))return;db.support.splice(i,1);save();toast('🗑 ลบแล้ว');refreshSupport();}
+function delSupport(i){if(!confirm('ยืนยันการลบ Support รายการนี้?'))return;db.support.splice(i,1);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refreshSupport();}
 
-/* ══════════════════════════════════════════
-   5S
-══════════════════════════════════════════ */
+/* 5S */
 function refresh5S(){
-  const fm=(document.getElementById('s5Month')||{}).value||'';
-  const tb=document.getElementById('s5TableBody');if(!tb)return;
-  setText('s5-total-year',db.s5.reduce((s,c)=>s+(c.count||0),0));
-  const filtered5s = filterByDft(db.s5,'5s','month');
-  const mf=db.s5.filter(s=>s.month===fm);
-  setText('s5-total-month',filtered5s.reduce((s,c)=>s+(c.count||0),0));
+  const fm=(document.getElementById('filter5sMonth')||{}).value||'';const tb=document.getElementById('s5TableBody');if(!tb)return;
+  setText('s5-total-year',db.s5.reduce((s,c)=>s+(c.count||0),0));const mf=db.s5.filter(s=>s.month===fm);setText('s5-total-month',mf.reduce((s,c)=>s+(c.count||0),0));
   const oM={},aM={};db.s5.forEach(s=>{if(s.owner)oM[s.owner]=(oM[s.owner]||0)+(s.count||0);if(s.area)aM[s.area]=(aM[s.area]||0)+(s.count||0);});
   const to=Object.entries(oM).sort((a,b)=>b[1]-a[1])[0];const ta=Object.entries(aM).sort((a,b)=>b[1]-a[1])[0];
   setText('top-owners',to?to[0]:'—');setText('top-areas',ta?ta[0]:'—');
-  tb.innerHTML=mf.map(s=>`<tr><td>${s.area||'-'}</td><td>${s.count||0}</td><td>${s.detail||'-'}</td><td>${s.owner||'-'}</td><td>${s.month||'-'}</td><td style="text-align:center;"><button class="btn-del" onclick="del5S('${s.id}')">🗑</button></td></tr>`).join('');
+  tb.innerHTML=mf.map(s=>`<tr><td>${s.area||'-'}</td><td>${s.count||0}</td><td>${s.detail||'-'}</td><td>${s.owner||'-'}</td><td style="text-align:center;"><button class="btn-del" onclick="del5S('${s.id}')" title="ลบ">🗑</button></td></tr>`).join('');
   build5SChart();build5SAreaBars(aM);
 }
 function build5SAreaBars(aM){const el=document.getElementById('s5-area-bars');if(!el)return;const sorted=Object.entries(aM).sort((a,b)=>b[1]-a[1]).slice(0,8);if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}const max=sorted[0][1];el.innerHTML=sorted.map(([n,c],i)=>`<div class="gb-row"><div class="gb-rank">${i+1}</div><div class="gb-name">${n}</div><div class="gb-track"><div class="gb-fill" style="width:${(c/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div><span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${c}</span></div>`).join('');}
 function build5SChart(){
-  const ctx=document.getElementById('s5TrendChart');if(!ctx)return;if(charts.s5)charts.s5.destroy();
+  const ctx=document.getElementById('s5TrendChart');if(!ctx)return;if(s5Chart)s5Chart.destroy();
+  const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   const mD=Array(12).fill(0);db.s5.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12)mD[m]+=(s.count||0);}});
   const c=ctx.getContext('2d'),h=ctx.parentElement?.clientHeight||195;
-  const gO=c.createLinearGradient(0,0,0,h);gO.addColorStop(0,'rgba(255,107,0,.5)');gO.addColorStop(1,'rgba(255,107,0,0)');
-  charts.s5=new Chart(c,{type:'line',data:{labels:MO_TH,datasets:[{label:'5S Findings',data:mD,borderColor:'#FF6B00',backgroundColor:gO,tension:.45,fill:true,pointBackgroundColor:COLORS,pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1},border:{display:false}}}}});
+  const gO=c.createLinearGradient(0,0,0,h);gO.addColorStop(0,'rgba(255,107,0,.5)');gO.addColorStop(.5,'rgba(255,107,0,.1)');gO.addColorStop(1,'rgba(255,107,0,0)');
+  s5Chart=new Chart(c,{type:'line',data:{labels:mo,datasets:[{label:'5S Findings',data:mD,borderColor:'#FF6B00',backgroundColor:gO,tension:.45,fill:true,pointBackgroundColor:COLORS,pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94A3B8',stepSize:1},border:{display:false}}}}});
 }
 function add5S(){
-  const area=document.getElementById('s5Area').value,count=parseInt(document.getElementById('s5Count').value)||0,detail=document.getElementById('s5Detail').value,owner=document.getElementById('s5Owner').value,month=document.getElementById('s5Month').value;
+  const area=document.getElementById('s5Area').value,count=parseInt(document.getElementById('s5Count').value)||0,detail=document.getElementById('s5Detail').value,owner=document.getElementById('s5Owner').value,month=document.getElementById('filter5sMonth').value;
   if(!area)return toast('❌ ระบุพื้นที่');db.s5.push({id:Date.now().toString(),area,count,detail,owner,month});save();toast('🧹 บันทึก 5S แล้ว');
   ['s5Area','s5Count','s5Detail','s5Owner'].forEach(id=>document.getElementById(id).value='');refresh5S();
 }
-function del5S(id){if(!confirm('ยืนยันการลบ?'))return;db.s5=db.s5.filter(s=>s.id!==id);save();toast('🗑 ลบแล้ว');refresh5S();}
+function del5S(id){if(!confirm('ยืนยันการลบ 5S รายการนี้?'))return;db.s5=db.s5.filter(s=>s.id!==id);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refresh5S();}
 
-/* ══════════════════════════════════════════
-   SKILL MATRIX
-══════════════════════════════════════════ */
+/* SKILL MATRIX */
 function getLevelInfo(avg){if(avg>=80)return{label:'🏆 Expert',cls:'level-expert'};if(avg>=60)return{label:'🚀 Advanced',cls:'level-adv'};if(avg>=40)return{label:'📘 Developing',cls:'level-dev'};return{label:'⚙️ Basic',cls:'level-basic'};}
 function getSkillColor(val){if(val>=80)return'#FF6B00';if(val>=60)return'#2563EB';if(val>=40)return'#059669';return'#94A3B8';}
 function sortSkills(by){currentSkillSort=by;['sortVal','sortName'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.style.background=id===(by==='val'?'sortVal':'sortName')?'var(--sunset)':'var(--bg)';el.style.color=id===(by==='val'?'sortVal':'sortName')?'#fff':'var(--txt3)';});refreshSkills();}
@@ -1549,37 +1315,44 @@ function refreshSkills(){
   const topSkill=db.skills.length?[...db.skills].sort((a,b)=>b.value-a.value)[0]:null;const weakSkill=db.skills.length>1?[...db.skills].sort((a,b)=>a.value-b.value)[0]:null;const lvInfo=getLevelInfo(avg);
   setText('sk-avg',avg+'%');setText('sk-count',db.skills.length);setText('sk-top',topSkill?`${topSkill.name} (${topSkill.value}%)`:'—');setText('sk-weak',weakSkill?`${weakSkill.name} (${weakSkill.value}%)`:'—');
   const lb=document.getElementById('skillLevelBadge');if(lb){lb.textContent=lvInfo.label;lb.className='level-badge '+lvInfo.cls;}
-  setText('avgSkill',avg+'%');const sa=document.getElementById('skillAnalysis');if(sa){sa.textContent=getLevelInfo(avg).label.replace(/^[^ ]+ /,'');}
+  setText('avgSkill',avg+'%');const sa=document.getElementById('skillAnalysis');if(sa){const l=getLevelInfo(avg);sa.textContent=l.label.replace(/^[^ ]+ /,'');}
   const circle=document.getElementById('scoreCircle');if(circle){const circ=2*Math.PI*32;circle.style.strokeDashoffset=circ-(circ*avg/100);}
-  const barList=document.getElementById('skillBarList');
-  if(barList){if(!db.skills.length){barList.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:20px;text-align:center;">เพิ่มทักษะเพื่อดูกราฟ</div>';}else{barList.innerHTML=sorted.map(s=>`<div class="skbar-item"><div class="skbar-name">${s.name}</div><div class="skbar-track"><div class="skbar-fill" style="width:${s.value}%;background:${getSkillColor(s.value)};"></div></div><div class="skbar-val">${s.value}%</div><button class="skill-del" style="position:static;width:18px;height:18px;flex-shrink:0;" onclick="delSkill('${s.name}')">✕</button></div>`).join('');}}
-  const listFull=document.getElementById('skillListFull');
-  if(listFull){if(!db.skills.length){listFull.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:12px;grid-column:1/-1;">ยังไม่มีทักษะ</div>';}else{listFull.innerHTML=sorted.map(s=>`<div class="skill-row" style="margin:0;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding-right:26px;"><span style="font-weight:600;font-size:.78rem;">${s.name}</span><span style="font-weight:800;font-size:.8rem;color:${getSkillColor(s.value)};">${s.value}%</span></div><div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-bottom:5px;"><div style="width:${s.value}%;height:100%;background:${getSkillColor(s.value)};border-radius:99px;transition:width 1s;"></div></div><div style="font-size:.58rem;color:var(--txt4);">${getLevelInfo(s.value).label}</div><button class="skill-del" onclick="delSkill('${s.name}')">✕</button></div>`).join('');}}
+  const barList=document.getElementById('skillBarList');if(barList){if(!db.skills.length){barList.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:20px;text-align:center;">เพิ่มทักษะเพื่อดูกราฟ</div>';}else{barList.innerHTML=sorted.map((s,i)=>`<div class="skbar-item"><div class="skbar-name" title="${s.name}">${s.name}</div><div class="skbar-track"><div class="skbar-fill" style="width:${s.value}%;background:linear-gradient(90deg,${getSkillColor(s.value)},${getSkillColor(s.value)}cc);"></div></div><div class="skbar-val">${s.value}%</div><button class="skill-del" style="position:static;width:18px;height:18px;flex-shrink:0;" onclick="delSkill('${s.name}')">✕</button></div>`).join('');}}
+  const listFull=document.getElementById('skillListFull');if(listFull){if(!db.skills.length){listFull.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:12px;grid-column:1/-1;">ยังไม่มีทักษะ — กรอกด้านบนแล้วกด อัปเดต</div>';}else{listFull.innerHTML=sorted.map(s=>`<div class="skill-row" style="margin:0;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding-right:26px;"><span style="font-weight:600;font-size:.78rem;color:var(--txt2);">${s.name}</span><span style="font-weight:800;font-size:.8rem;color:${getSkillColor(s.value)};">${s.value}%</span></div><div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-bottom:5px;"><div style="width:${s.value}%;height:100%;background:${getSkillColor(s.value)};border-radius:99px;transition:width 1s;"></div></div><div style="font-size:.58rem;color:var(--txt4);">${getLevelInfo(s.value).label}</div><button class="skill-del" onclick="delSkill('${s.name}')">✕</button></div>`).join('');}}
   updateSkillCharts(sorted,avg);runAIAnalytics();
 }
 function updateSkillCharts(sorted,avg){
-  const re=document.getElementById('skillRadarEmpty'),pe=document.getElementById('skillPolarEmpty');
-  const cv=document.getElementById('skillRadarChart');if(cv){if(charts.skillRadar)charts.skillRadar.destroy();charts.skillRadar=null;}
-  if(sorted.length>=3&&cv){if(re)re.style.display='none';charts.skillRadar=new Chart(cv.getContext('2d'),{type:'radar',data:{labels:sorted.map(s=>s.name.length>8?s.name.slice(0,8)+'…':s.name),datasets:[{data:sorted.map(s=>s.value),backgroundColor:'rgba(255,107,0,.12)',borderColor:'#FF6B00',pointBackgroundColor:sorted.map(s=>getSkillColor(s.value)),pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,borderWidth:2.5,label:'ทักษะ'}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{suggestedMin:0,suggestedMax:100,ticks:{display:false,stepSize:25},grid:{color:'rgba(0,0,0,.06)'},angleLines:{color:'rgba(0,0,0,.06)'},pointLabels:{font:{size:10},color:'#334155'}}},plugins:{legend:{display:false}}}});}else if(re)re.style.display='flex';
-  const pv=document.getElementById('skillPolarChart');if(pv){if(charts.skillPolar)charts.skillPolar.destroy();charts.skillPolar=null;}
-  if(sorted.length>=2&&pv){if(pe)pe.style.display='none';charts.skillPolar=new Chart(pv.getContext('2d'),{type:'polarArea',data:{labels:sorted.map(s=>s.name),datasets:[{data:sorted.map(s=>s.value),backgroundColor:sorted.map((_,i)=>COLORS[i%COLORS.length]+'99'),borderColor:sorted.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{ticks:{display:false},grid:{color:'rgba(0,0,0,.05)'}}},plugins:{legend:{display:false}}}});}else if(pe)pe.style.display='flex';
-  const lv=document.getElementById('skillLevelChart');if(lv){if(charts.skillLv)charts.skillLv.destroy();charts.skillLv=null;const expert=sorted.filter(s=>s.value>=80).length,adv=sorted.filter(s=>s.value>=60&&s.value<80).length,dev=sorted.filter(s=>s.value>=40&&s.value<60).length,basic=sorted.filter(s=>s.value<40).length;charts.skillLv=new Chart(lv.getContext('2d'),{type:'doughnut',data:{labels:['Expert (80+)','Advanced (60-79)','Developing (40-59)','Basic (<40)'],datasets:[{data:[expert,adv,dev,basic],backgroundColor:['#FF6B00','#2563EB','#059669','#94A3B8'],borderWidth:4,borderColor:'#fff',hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:14,font:{size:11}}}}}});}
-  const cc=document.getElementById('skillCompareChart');if(cc){if(charts.skillCmp)charts.skillCmp.destroy();charts.skillCmp=null;const top5=sorted.slice(0,Math.min(6,sorted.length));if(top5.length){charts.skillCmp=new Chart(cc.getContext('2d'),{type:'bar',data:{labels:top5.map(s=>s.name.length>10?s.name.slice(0,10)+'…':s.name),datasets:[{label:'Score',data:top5.map(s=>s.value),backgroundColor:top5.map(s=>getSkillColor(s.value)+'cc'),borderColor:top5.map(s=>getSkillColor(s.value)),borderWidth:2,borderRadius:8,borderSkipped:false},{label:'Average',data:top5.map(()=>avg),type:'line',borderColor:'rgba(255,107,0,.6)',borderDash:[5,4],borderWidth:2,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:14,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{color:'rgba(0,0,0,.04)'},border:{display:false},min:0,max:100,ticks:{font:{size:10},color:'#94A3B8',stepSize:20}}}}});}}
+  const radarEmpty=document.getElementById('skillRadarEmpty');const polarEmpty=document.getElementById('skillPolarEmpty');
+  const cv=document.getElementById('skillRadarChart');if(cv){if(skillChart)skillChart.destroy();skillChart=null;}
+  if(sorted.length>=3&&cv){if(radarEmpty)radarEmpty.style.display='none';skillChart=new Chart(cv.getContext('2d'),{type:'radar',data:{labels:sorted.map(s=>s.name.length>8?s.name.slice(0,8)+'…':s.name),datasets:[{data:sorted.map(s=>s.value),backgroundColor:'rgba(255,107,0,.12)',borderColor:'#FF6B00',pointBackgroundColor:sorted.map(s=>getSkillColor(s.value)),pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,borderWidth:2.5,label:'ทักษะ'}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{suggestedMin:0,suggestedMax:100,ticks:{display:false,stepSize:25},grid:{color:'rgba(0,0,0,.06)'},angleLines:{color:'rgba(0,0,0,.06)'},pointLabels:{font:{size:10},color:'#334155'}}},plugins:{legend:{display:false}}}});}else if(radarEmpty)radarEmpty.style.display='flex';
+  const pv=document.getElementById('skillPolarChart');if(pv){if(skillPolarChart)skillPolarChart.destroy();skillPolarChart=null;}
+  if(sorted.length>=2&&pv){if(polarEmpty)polarEmpty.style.display='none';skillPolarChart=new Chart(pv.getContext('2d'),{type:'polarArea',data:{labels:sorted.map(s=>s.name),datasets:[{data:sorted.map(s=>s.value),backgroundColor:sorted.map((_,i)=>COLORS[i%COLORS.length]+'99'),borderColor:sorted.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{ticks:{display:false},grid:{color:'rgba(0,0,0,.05)'}}},plugins:{legend:{display:false}}}});}else if(polarEmpty)polarEmpty.style.display='flex';
+  const lv=document.getElementById('skillLevelChart');if(lv){if(skillLvChart)skillLvChart.destroy();skillLvChart=null;const expert=sorted.filter(s=>s.value>=80).length;const adv=sorted.filter(s=>s.value>=60&&s.value<80).length;const dev=sorted.filter(s=>s.value>=40&&s.value<60).length;const basic=sorted.filter(s=>s.value<40).length;skillLvChart=new Chart(lv.getContext('2d'),{type:'doughnut',data:{labels:['Expert (80+)','Advanced (60-79)','Developing (40-59)','Basic (<40)'],datasets:[{data:[expert,adv,dev,basic],backgroundColor:['#FF6B00','#2563EB','#059669','#94A3B8'],borderWidth:4,borderColor:'#fff',hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:14,font:{size:11}}}}}});}
+  const cc=document.getElementById('skillCompareChart');if(cc){if(skillCmpChart)skillCmpChart.destroy();skillCmpChart=null;const top5=sorted.slice(0,Math.min(6,sorted.length));if(top5.length){skillCmpChart=new Chart(cc.getContext('2d'),{type:'bar',data:{labels:top5.map(s=>s.name.length>10?s.name.slice(0,10)+'…':s.name),datasets:[{label:'Score',data:top5.map(s=>s.value),backgroundColor:top5.map(s=>getSkillColor(s.value)+'cc'),borderColor:top5.map(s=>getSkillColor(s.value)),borderWidth:2,borderRadius:8,borderSkipped:false},{label:'Average',data:top5.map(()=>avg),type:'line',borderColor:'rgba(255,107,0,.6)',borderDash:[5,4],borderWidth:2,pointRadius:0,fill:false,tension:0}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:14,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{color:'rgba(0,0,0,.04)'},border:{display:false},min:0,max:100,ticks:{font:{size:10},color:'#94A3B8',stepSize:20}}}}});}}
 }
 function addSkill(){
   const n=document.getElementById('skillName'),v=document.getElementById('skillValue');const val=parseInt(v.value);if(!n.value||isNaN(val))return toast('❌ กรอกชื่อและคะแนน');if(val<0||val>100)return toast('❌ คะแนน 0–100 เท่านั้น');
   const idx=db.skills.findIndex(s=>s.name===n.value);if(idx>-1)db.skills[idx].value=val;else db.skills.push({name:n.value,value:val});
   save();toast('📈 อัปเดต Skill Matrix');n.value='';v.value='';refreshSkills();
 }
-function delSkill(name){if(!confirm(`ลบทักษะ "${name}"?`))return;db.skills=db.skills.filter(s=>s.name!==name);save();toast('🗑 ลบทักษะแล้ว');refreshSkills();}
+function delSkill(name){if(!confirm(`ลบทักษะ "${name}"?`))return;db.skills=db.skills.filter(s=>s.name!==name);save();toast('🗑 ลบทักษะแล้ว — กำลัง Sync...');refreshSkills();}
 function clearAllSkills(){if(!confirm('ล้างทักษะทั้งหมด?'))return;db.skills=[];save();toast('🗑 ล้างทักษะทั้งหมด');refreshSkills();}
 
-/* ══════════════════════════════════════════
-   SPECIAL JOBS — REDESIGNED
-══════════════════════════════════════════ */
-function easeOut(t){return 1-Math.pow(1-t,3);}
-function animateCount(el,from,to,dur=700){if(!el)return;const start=performance.now();const step=ts=>{const p=Math.min((ts-start)/dur,1);const v=from+(to-from)*easeOut(p);el.textContent=Math.round(v);if(p<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
+/* ═══════════════════════════════════
+   SPECIAL JOBS — POWER BI
+═══════════════════════════════════ */
 
+/* Animated counter */
+function animateCount(el, from, to, dur=700){
+  if(!el)return;const start=performance.now();
+  const isFloat=String(to).includes('.');
+  const step=ts=>{const p=Math.min((ts-start)/dur,1);const v=from+(to-from)*easeOut(p);
+    el.textContent=isFloat?v.toFixed(1):Math.round(v);if(p<1)requestAnimationFrame(step);};
+  requestAnimationFrame(step);
+}
+function easeOut(t){return 1-Math.pow(1-t,3);}
+
+/* Derive status from result text */
 function deriveStatus(result){
   if(!result||result.trim()==='')return{cls:'sp-status-pending',txt:'Pending'};
   const r=result.toLowerCase();
@@ -1588,146 +1361,161 @@ function deriveStatus(result){
   return{cls:'sp-status-done',txt:'Done'};
 }
 
-// Assignor colors — vivid, clearly distinguishable
-const ASSIGNOR_PALETTES=[
-  {bg:'#FFF3E0',border:'#FF8C35',text:'#B45309',dot:'#FF6B00'},
-  {bg:'#EFF6FF',border:'#60A5FA',text:'#1D4ED8',dot:'#2563EB'},
-  {bg:'#F5F3FF',border:'#A78BFA',text:'#6D28D9',dot:'#7C3AED'},
-  {bg:'#ECFDF5',border:'#6EE7B7',text:'#047857',dot:'#059669'},
-  {bg:'#FEF2F2',border:'#FCA5A5',text:'#B91C1C',dot:'#DC2626'},
-  {bg:'#F0FDFA',border:'#5EEAD4',text:'#0F766E',dot:'#0D9488'},
-  {bg:'#FDF4FF',border:'#E879F9',text:'#86198F',dot:'#C026D3'},
-  {bg:'#FFFBEB',border:'#FCD34D',text:'#92400E',dot:'#D97706'},
-];
-const _assignorMap={};let _assignorIdx=0;
-function getAssignorPalette(name){if(!name)return{bg:'#F1F5F9',border:'#CBD5E1',text:'#64748B',dot:'#94A3B8'};if(!_assignorMap[name]){_assignorMap[name]=ASSIGNOR_PALETTES[_assignorIdx%ASSIGNOR_PALETTES.length];_assignorIdx++;}return _assignorMap[name];}
+/* Assignor color map */
+const assignorColors=['#FF6B00','#2563EB','#7C3AED','#059669','#DC2626','#0891B2','#D97706','#DB2777'];
+const _colorMap={};let _colorIdx=0;
+function getAssignorColor(name){if(!name)return'#94A3B8';if(!_colorMap[name]){_colorMap[name]=assignorColors[_colorIdx%assignorColors.length];_colorIdx++;}_return=_colorMap[name];return _colorMap[name];}
 
 function refreshSpecial(){
-  const fSpecial = filterByDft(db.special,'special','date');
-  const total=fSpecial.length,allTotal=db.special.length;
+  const tb=document.getElementById('specialTableBody');if(!tb)return;
+  const total=db.special.length;
   const now=new Date();const thisMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const monthEntries=fSpecial.filter(s=>s.date&&s.date.slice(0,7)===thisMonth).length;
-  const withResult=fSpecial.filter(s=>s.result&&s.result.trim()).length;
+  const monthEntries=db.special.filter(s=>s.date&&s.date.slice(0,7)===thisMonth).length;
+  const withResult=db.special.filter(s=>s.result&&s.result.trim()).length;
   const rate=total>0?Math.round((withResult/total)*100):0;
 
-  const assignorMap={};fSpecial.forEach(s=>{const k=s.by||'(ไม่ระบุ)';assignorMap[k]=(assignorMap[k]||0)+1;});
+  // Assignor map
+  const assignorMap={};db.special.forEach(s=>{const k=s.by||'(ไม่ระบุ)';assignorMap[k]=(assignorMap[k]||0)+1;});
   const sortedAssignors=Object.entries(assignorMap).sort((a,b)=>b[1]-a[1]);
   const topAssignor=sortedAssignors[0];
 
+  // Update KPI with animation
   const kpiTotal=document.getElementById('sp-kpi-total');
   const kpiMonth=document.getElementById('sp-kpi-month');
   const kpiRate=document.getElementById('sp-kpi-rate');
   if(kpiTotal)animateCount(kpiTotal,0,total);
   if(kpiMonth)animateCount(kpiMonth,0,monthEntries);
   if(kpiRate)setTimeout(()=>{if(kpiRate)kpiRate.textContent=rate+'%';},200);
-  setText('sp-kpi-total-delta',`All ${allTotal} jobs`);
+  setText('sp-kpi-total-delta',`All ${total} jobs`);
   setText('sp-kpi-month-lbl',now.toLocaleDateString('th-TH',{month:'long',year:'numeric'}));
   setText('sp-kpi-top-by',topAssignor?topAssignor[0]:'—');
   setText('sp-kpi-top-by-n',topAssignor?`${topAssignor[1]} jobs`:'0 jobs');
-  setText('sp-total-badge',`${allTotal} Projects`);
-  setText('sp-table-count',`${allTotal} records`);
-  setText('dash-special-count',allTotal);
+  setText('sp-total-badge',`${total} Projects`);
+  setText('sp-table-count',`${total} records`);
+  setText('dash-special-count',total);
 
+  // Assignor bars (custom HTML)
   renderAssignorBars(sortedAssignors);
-  renderMonthlyTimeline(fSpecial);
-  buildResultChart(withResult,total-withResult);
 
-  const tb=document.getElementById('specialTableBody');if(!tb)return;
-  if(!allTotal){tb.innerHTML=`<tr><td colspan="7"><div class="sp-empty"><div class="sp-empty-icon">⭐</div><div class="sp-empty-txt">ยังไม่มีงานพิเศษ</div></div></td></tr>`;return;}
+  // Monthly timeline
+  renderMonthlyTimeline();
+
+  // Result donut chart
+  buildResultChart(withResult, total-withResult);
+
+  // Table rows
+  if(!total){
+    tb.innerHTML=`<tr><td colspan="6"><div class="sp-empty"><div class="sp-empty-icon">⭐</div><div class="sp-empty-txt">ยังไม่มีงานพิเศษ — กรอกแบบฟอร์มด้านบน</div></div></td></tr>`;
+    return;
+  }
   const rows=[...db.special].reverse();
   tb.innerHTML=rows.map((s,i)=>{
     const idx=db.special.length-1-i;
     const st=deriveStatus(s.result);
-    const pal=getAssignorPalette(s.by);
+    const aColor=getAssignorColor(s.by);
     const dateStr=s.date?formatDisplayDate(s.date):'—';
-    return`<tr class="sp-row-new" style="animation-delay:${i*0.04}s">
+    return `<tr class="sp-row-new" style="animation-delay:${i*0.04}s">
       <td><div class="sp-row-num">${db.special.length-i}</div></td>
+      <td><div style="font-weight:700;font-size:.8rem;color:var(--txt);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.job||'-'}">${s.job||'-'}</div></td>
       <td><div class="sp-date-pill">📅 ${dateStr}</div></td>
-      <td><div style="font-weight:700;font-size:.8rem;color:var(--txt);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.job||'-'}">${s.job||'-'}</div></td>
-      <td><div class="sp-assignor-tag" style="color:${pal.text};background:${pal.bg};border-color:${pal.border};"><span style="width:8px;height:8px;border-radius:50%;background:${pal.dot};flex-shrink:0;"></span>${s.by||'—'}</div></td>
-      <td><div class="sp-status ${st.cls}">${st.txt}</div></td>
-      <td><div class="sp-result-txt" title="${s.result||''}">${s.result||'—'}</div></td>
-      <td style="text-align:center;"><button class="sp-del-btn" onclick="delSpecial(${idx})">🗑</button></td>
+      <td><div class="sp-assignor-tag" style="color:${aColor};background:${aColor}15;border-color:${aColor}30;"><span style="width:7px;height:7px;border-radius:50%;background:${aColor};flex-shrink:0;"></span>${s.by||'—'}</div></td>
+      <td><div style="display:flex;align-items:center;gap:7px;"><div class="sp-status ${st.cls}">${st.txt}</div><div class="sp-result-txt" title="${s.result||''}">${s.result||'—'}</div></div></td>
+      <td style="text-align:center;"><button class="sp-del-btn" onclick="delSpecial(${idx})" title="ลบ">🗑</button></td>
     </tr>`;
   }).join('');
 }
 
-function formatDisplayDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit'});}catch{return d;}}
+function formatDisplayDate(d){
+  if(!d)return'—';try{const dt=new Date(d);return dt.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit'});}catch{return d;}
+}
 
 function renderAssignorBars(sorted){
   const el=document.getElementById('sp-assignor-bars');if(!el)return;
-  if(!sorted.length){el.innerHTML='<div class="sp-empty" style="padding:20px 0;"><div class="sp-empty-icon" style="font-size:1.8rem;">👤</div><div class="sp-empty-txt">ยังไม่มีข้อมูล</div></div>';return;}
+  if(!sorted.length){el.innerHTML='<div class="sp-empty" style="padding:20px 0;"><div class="sp-empty-icon" style="font-size:1.8rem;">👤</div><div class="sp-empty-txt">ยังไม่มีข้อมูล Assignor</div></div>';return;}
   const max=sorted[0][1];
   el.innerHTML=sorted.slice(0,10).map(([name,count],i)=>{
-    const pal=getAssignorPalette(name);
+    const color=getAssignorColor(name);
     return`<div class="sp-hbar-item" style="animation-delay:${i*0.06}s">
-      <div style="width:8px;height:8px;border-radius:50%;background:${pal.dot};flex-shrink:0;"></div>
-      <div class="sp-hbar-name" title="${name}" style="color:${pal.text};">${name}</div>
-      <div class="sp-hbar-track"><div class="sp-hbar-fill" style="width:0%;background:linear-gradient(90deg,${pal.dot},${pal.dot}bb);" data-w="${(count/max)*100}"></div></div>
-      <div class="sp-hbar-val" style="color:${pal.dot};">${count}</div>
+      <div class="sp-hbar-rank">${i+1}</div>
+      <div class="sp-hbar-name" title="${name}">${name}</div>
+      <div class="sp-hbar-track">
+        <div class="sp-hbar-fill" style="width:${(count/max)*100}%;background:linear-gradient(90deg,${color},${color}cc);"></div>
+      </div>
+      <div class="sp-hbar-val" style="color:${color};">${count}</div>
     </div>`;
   }).join('');
-  setTimeout(()=>{el.querySelectorAll('.sp-hbar-fill').forEach(f=>{f.style.width=f.dataset.w+'%';});},80);
+  // Trigger animation after brief delay
+  setTimeout(()=>{el.querySelectorAll('.sp-hbar-fill').forEach(f=>{const w=f.style.width;f.style.width='0%';setTimeout(()=>{f.style.width=w;},50);});},80);
 }
 
-function renderMonthlyTimeline(data){
+function renderMonthlyTimeline(){
   const el=document.getElementById('sp-monthly-timeline');if(!el)return;
+  const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   const counts=Array(12).fill(0);
-  (data||db.special).forEach(s=>{if(s.date){const m=new Date(s.date).getMonth();if(!isNaN(m))counts[m]++;}});
+  db.special.forEach(s=>{if(s.date){const m=new Date(s.date).getMonth();if(!isNaN(m))counts[m]++;}});
   const max=Math.max(...counts)||1;
   const TLCOLORS=['#FF6B00','#2563EB','#7C3AED','#059669','#DC2626','#0891B2','#D97706','#DB2777','#0D9488','#65A30D','#4F46E5','#EA580C'];
   el.innerHTML=`<div class="sp-timeline">${counts.map((c,i)=>`
     <div class="sp-tl-row">
-      <div class="sp-tl-mo">${MO_TH[i]}</div>
+      <div class="sp-tl-mo">${mo[i]}</div>
       <div class="sp-tl-track"><div class="sp-tl-fill" data-w="${(c/max)*100}" style="width:0%;background:${TLCOLORS[i]};"></div></div>
       <div class="sp-tl-num" style="color:${c>0?TLCOLORS[i]:'var(--txt4)'};">${c||''}</div>
     </div>`).join('')}</div>`;
+  // Animate bars
   setTimeout(()=>{el.querySelectorAll('.sp-tl-fill').forEach(f=>{f.style.width=f.dataset.w+'%';});},120);
 }
 
-function buildResultChart(withR,withoutR){
-  const ctx=document.getElementById('spResultChart');if(!ctx)return;if(charts.spResult)charts.spResult.destroy();
-  const total=withR+withoutR;
-  if(!total){const leg=document.getElementById('sp-result-legend');if(leg)leg.innerHTML='';return;}
-  charts.spResult=new Chart(ctx.getContext('2d'),{type:'doughnut',data:{labels:['มีผลลัพธ์','รอผลลัพธ์'],datasets:[{data:[withR,withoutR],backgroundColor:['#059669','#E2E8F0'],borderWidth:3,borderColor:'#fff',hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/total*100)}%)`}}}}});
+function buildResultChart(withR, withoutR){
+  const ctx=document.getElementById('spResultChart');if(!ctx)return;if(spResultChart)spResultChart.destroy();
+  const total=withR+withoutR;if(!total){const leg=document.getElementById('sp-result-legend');if(leg)leg.innerHTML='';return;}
+  spResultChart=new Chart(ctx.getContext('2d'),{
+    type:'doughnut',
+    data:{
+      labels:['มีผลลัพธ์','รอผลลัพธ์'],
+      datasets:[{data:[withR,withoutR],backgroundColor:['#059669','#E2E8F0'],borderWidth:3,borderColor:'#fff',hoverOffset:10}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/total*100)}%)`}}}}
+  });
   const leg=document.getElementById('sp-result-legend');
-  if(leg)leg.innerHTML=`<div class="sp-leg-item"><div class="sp-leg-dot" style="background:#059669;"></div>มีผลลัพธ์: ${withR}</div><div class="sp-leg-item"><div class="sp-leg-dot" style="background:#CBD5E1;"></div>รอผล: ${withoutR}</div>`;
+  if(leg)leg.innerHTML=`
+    <div class="sp-leg-item"><div class="sp-leg-dot" style="background:#059669;"></div>มีผลลัพธ์: ${withR}</div>
+    <div class="sp-leg-item"><div class="sp-leg-dot" style="background:#CBD5E1;"></div>รอผล: ${withoutR}</div>
+  `;
 }
 
 function addSpecial(){
-  const date=document.getElementById('specDate').value,job=document.getElementById('specJob').value,by=document.getElementById('specBy').value,result=document.getElementById('specResult').value;
+  const job=document.getElementById('specJob').value,
+        date=document.getElementById('specDate').value,
+        by=document.getElementById('specBy').value,
+        result=document.getElementById('specResult').value;
   if(!job)return toast('❌ กรอกชื่องาน');
   db.special.push({job,date,by,result,id:Date.now().toString()});
   save();toast('⭐ บันทึกงานพิเศษแล้ว!');
   ['specJob','specDate','specBy','specResult'].forEach(id=>document.getElementById(id).value='');
   refreshSpecial();
+  // Spark animation on submit button
   const btn=document.querySelector('.sp-submit-btn .btn-spark');
   if(btn){btn.style.transform='rotate(360deg) scale(1.6)';setTimeout(()=>{btn.style.transform='';},500);}
 }
-function delSpecial(i){if(!confirm('ยืนยันการลบงานพิเศษนี้?'))return;db.special.splice(i,1);save();toast('🗑 ลบแล้ว');refreshSpecial();}
 
-/* Responsive skill grid */
+function delSpecial(i){
+  if(!confirm('ยืนยันการลบงานพิเศษนี้?'))return;
+  db.special.splice(i,1);save();toast('🗑 ลบแล้ว — กำลัง Sync...');refreshSpecial();
+}
+
+/* Skill grid responsive */
 function adjustSkillGrid(){
   const grid=document.getElementById('skillChartGrid');if(!grid)return;
-  if(window.innerWidth<900)grid.style.gridTemplateColumns='1fr';
-  else if(window.innerWidth<1200)grid.style.gridTemplateColumns='1fr 1fr';
-  else grid.style.gridTemplateColumns='1fr 1.1fr 0.9fr';
+  if(window.innerWidth<900){grid.style.gridTemplateColumns='1fr';}
+  else if(window.innerWidth<1200){grid.style.gridTemplateColumns='1fr 1fr';}
+  else{grid.style.gridTemplateColumns='1fr 1.1fr 0.9fr';}
 }
 window.addEventListener('resize',adjustSkillGrid);
 adjustSkillGrid();
 
-/* Support form grid responsive */
-function adjustSupForm(){
-  const f=document.getElementById('supFormGrid')||document.querySelector('.sup-form-grid');if(!f)return;
-  if(window.innerWidth<768)f.style.gridTemplateColumns='1fr 1fr 1fr';
-}
-window.addEventListener('resize',adjustSupForm);
-
-/* Set today's date defaults */
-(function(){
-  const sd=document.getElementById('specDate');if(sd)sd.value=new Date().toISOString().split('T')[0];
-  const supD=document.getElementById('supDate');if(supD)supD.value=new Date().toISOString().split('T')[0];
-})();
+/* Set today's date as default for special form */
+(function(){const sd=document.getElementById('specDate');if(sd)sd.value=new Date().toISOString().split('T')[0];})();
 </script>
 </body>
 </html>
