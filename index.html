@@ -749,7 +749,7 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 /* ══════════════════════════════════════════════════════════
    CONFIG  — เปลี่ยน GOOGLE_URL เป็น Web App URL ของคุณ
 ══════════════════════════════════════════════════════════ */
-const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbxGzHZ3n1JXG-dCzE7yfkoW1x3VW1tpZGoBaTHaEiZzNoezCDocQwhN7ufHFtgBJ2ScAw/exec';
+const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbyyLPBUxVWF20GQYiU1pU7cW7IgSRHiOWdM5zHB5-ozH3D2yoxVbmefI4RMIGBg6luRYg/exec';
 const STORAGE_KEY = 'qdit_v3_records';
 const SYNCED_KEY  = 'qdit_v3_synced';
 const REFS_KEY    = 'qdit_v3_allrefs';  // ★ cloud refs cache
@@ -774,32 +774,40 @@ function syncedAdd(ref)   { _syncedSet.add(String(ref)); }
 function syncedDelete(ref){ _syncedSet.delete(String(ref)); }
 function syncedReset(arr) { _syncedSet = new Set(arr.map(String)); }
 
-/* ── allCloudRefs: refs ทั้งหมดที่รู้จากฝั่ง cloud ─── */
-/* ★★★ ใช้ป้องกัน duplicate 100% ทั้งฝั่ง local+cloud ★★★ */
+/* ── allCloudRefs: composite key "INSPECTOR|ref" ────────
+   ★★★ ป้องกัน duplicate 100% ทั้งฝั่ง local+cloud ★★★
+   ★ composite key → reset per-inspector ได้ถูกต้อง 100% */
 let _allCloudRefs = new Set(safeJSON(REFS_KEY, []));
-function cloudRefAdd(ref)      { _allCloudRefs.add(String(ref)); }
-function cloudRefDelete(ref)   { _allCloudRefs.delete(String(ref)); }
-function cloudRefClear(insp)   {
-  // ลบเฉพาะ refs ของ inspector นั้น
-  const mine = records.filter(r=>r.inspector===insp).map(r=>String(r.ref));
-  mine.forEach(r=>_allCloudRefs.delete(r));
-}
+const _ck = (insp, ref) => `${insp||currentUser}|${String(ref)}`;
+
+function cloudRefAdd(ref, insp)    { _allCloudRefs.add(_ck(insp||currentUser, ref)); }
+function cloudRefDelete(ref, insp) { _allCloudRefs.delete(_ck(insp||currentUser, ref)); }
+function cloudRefHas(ref, insp)    { return _allCloudRefs.has(_ck(insp||currentUser, ref)); }
+
+/* เพิ่ม refs จาก rows (ใช้ inspector จาก row เอง) */
 function cloudRefSetFromRows(rows){
-  rows.forEach(r=>_allCloudRefs.add(String(r.ref)));
+  rows.forEach(r => _allCloudRefs.add(_ck(r.inspector, r.ref)));
 }
+
+/* ★ ล้าง refs ทั้งหมดของ inspector — prefix scan */
+function clearInspectorCloudRefs(inspector){
+  const prefix = inspector + '|';
+  for(const key of [..._allCloudRefs]){
+    if(key.startsWith(prefix)) _allCloudRefs.delete(key);
+  }
+}
+
 function saveAllCloudRefs(){
   localStorage.setItem(REFS_KEY, JSON.stringify([..._allCloudRefs]));
 }
 
-/* ── ตรวจ duplicate ทั้ง local + cloud ────────────── */
+/* ── ตรวจ duplicate ทั้ง local + cloud ─────────────── */
 function isDuplicate(ref){
   const r = String(ref).trim();
   if(!r) return false;
-  // เช็ค local ก่อน (เร็วที่สุด)
-  if(records.some(x => String(x.ref).trim() === r && x.inspector === currentUser)) return true;
-  // เช็ค cloud refs cache
-  if(_allCloudRefs.has(r)) return true;
-  return false;
+  // ★ ตรวจแค่ local records (source of truth) — cache _allCloudRefs อาจ stale
+  // ★ cloud-side ใช้ LockService ป้องกัน duplicate อีกชั้นอยู่แล้ว
+  return records.some(x => String(x.ref).trim() === r && x.inspector === currentUser);
 }
 
 Chart.register(ChartDataLabels);
@@ -974,16 +982,20 @@ async function fetchFromCloud(inspector, ms){
     let res;
     try      { res = await doFetch(ms); }
     catch(e) { res = await doFetch(Math.min(ms,4000)); }
-    if(!res.ok) return [];
+    if(!res.ok) return { ok:false, rows:[] };
     const text = await res.text();
-    let r; try{ r=JSON.parse(text); }catch(e){ return []; }
-    if(!r||r.status!=='success'||!Array.isArray(r.data)) return [];
+    let r; try{ r=JSON.parse(text); }catch(e){ return { ok:false, rows:[] }; }
+    if(!r||r.status!=='success'||!Array.isArray(r.data)) return { ok:false, rows:[] };
     const rows = r.data.map(d=>normalizeRow(d,inspector));
-    // ★ อัปเดต cloud refs cache ทุกครั้งที่ fetch สำเร็จ
+    /* ★★★ GROUND TRUTH: cloud ตอบสำเร็จ = รู้สถานะจริง
+       1. reset cloud refs ของ inspector นี้ก่อน (ล้าง stale)
+       2. เพิ่มเฉพาะที่ cloud มีจริง
+       → cloud ว่าง = refs ว่าง = เพิ่มใหม่ได้ทันที ★★★ */
+    clearInspectorCloudRefs(inspector);
     cloudRefSetFromRows(rows);
     saveAllCloudRefs();
-    return rows;
-  } catch(err){ return []; }
+    return { ok:true, rows };
+  } catch(err){ return { ok:false, rows:[] }; }
 }
 
 /* ── pushToCloud (insert) ── */
@@ -1042,9 +1054,8 @@ function mergeCloud(cloudRows){
     }
   });
   if(added) invalidateMyRecCache();
-  // อัปเดต synced set และ cloud refs
-  syncedReset(cloudRows.map(r=>r.ref));
-  cloudRefSetFromRows(cloudRows);
+  // อัปเดต synced set (cloudRefSetFromRows ทำใน fetchFromCloud แล้ว)
+  if(cloudRows.length) syncedReset(cloudRows.map(r=>r.ref));
   return added;
 }
 
@@ -1061,7 +1072,7 @@ function schedulePush(){
       await pushToCloud(unsync);
       unsync.forEach(r=>{
         syncedAdd(r.ref);
-        cloudRefAdd(r.ref);   // ★ เพิ่มใน cloud refs cache
+        cloudRefAdd(r.ref, currentUser);   // ★ เพิ่มใน cloud refs cache
       });
       saveLocal();
       showSyncBadge('☁️ Auto-synced','#10b981');
@@ -1079,8 +1090,9 @@ function startPolling(){
     _fetchInFlight = true;
     setSyncPulse('syncing','SYNCING…');
     try{
-      const cloud = await fetchFromCloud(currentUser, FETCH_TIMEOUT);
-      if(!cloud.length){ setSyncPulse('offline','OFFLINE'); return; }
+      const result = await fetchFromCloud(currentUser, FETCH_TIMEOUT);
+      if(!result.ok){ setSyncPulse('offline','OFFLINE'); return; }
+      const cloud = result.rows;
       const added = mergeCloud(cloud);
       if(added){
         saveLocal(); refreshAll();
@@ -1104,13 +1116,13 @@ async function syncToCloud(){
   _fetchInFlight=true;
   const unsync=getMyRecords().filter(r=>!syncedHas(r.ref));
   try{
-    const [cloud]=await Promise.all([
+    const [fetchResult]=await Promise.all([
       fetchFromCloud(currentUser,FETCH_TIMEOUT),
       unsync.length?pushToCloud(unsync):Promise.resolve(),
     ]);
-    if(unsync.length) unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref); });
+    if(unsync.length) unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, currentUser); });
     let pulled=0;
-    if(cloud.length){ pulled=mergeCloud(cloud); if(pulled)refreshAll(); }
+    if(fetchResult.ok&&fetchResult.rows.length){ pulled=mergeCloud(fetchResult.rows); if(pulled)refreshAll(); }
     saveLocal();
     toast(`✅ ↑${unsync.length} pushed  ↓${pulled} pulled`);
     setSyncPulse('live','LIVE SYNC');
@@ -1178,11 +1190,11 @@ async function login(){
   Promise.all([
     fetchFromCloud(name, FETCH_TIMEOUT),
     pendingPush.length?pushToCloud(pendingPush):Promise.resolve(),
-  ]).then(([cloud])=>{
+  ]).then(([fetchResult])=>{
     $id('loBar').style.width='100%'; setStep(3,'done');
-    if(pendingPush.length) pendingPush.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref); });
-    if(cloud.length>0){
-      const added=mergeCloud(cloud);
+    if(pendingPush.length) pendingPush.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, name); });
+    if(fetchResult.ok){
+      const added=fetchResult.rows.length?mergeCloud(fetchResult.rows):0;
       saveLocal();
       if(added){ refreshAll(); toast('✅ Cloud: +'+added+' รายการใหม่'); }
       setSyncPulse('live','LIVE SYNC');
@@ -1211,13 +1223,13 @@ window.addEventListener('load',async()=>{
     refreshAll();
     setSyncPulse('syncing','SYNCING…');
     const pendingPush=getMyRecords().filter(r=>!syncedHas(r.ref));
-    const [cloud]=await Promise.all([
+    const [fetchResult]=await Promise.all([
       fetchFromCloud(saved,FETCH_TIMEOUT),
       pendingPush.length?pushToCloud(pendingPush):Promise.resolve(),
-    ]).catch(()=>[[]]);
-    if(pendingPush.length) pendingPush.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref); });
-    if(cloud&&cloud.length>0){
-      const added=mergeCloud(cloud);
+    ]).catch(()=>[{ok:false,rows:[]}]);
+    if(pendingPush.length) pendingPush.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, saved); });
+    if(fetchResult&&fetchResult.ok){
+      const added=fetchResult.rows.length?mergeCloud(fetchResult.rows):0;
       saveLocal();
       if(added) refreshAll();
       setSyncPulse('live','LIVE SYNC');
@@ -1254,7 +1266,7 @@ async function logout(){
   if(unsync.length){
     toast('⏳ Syncing before logout…');
     await pushToCloud(unsync);
-    unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref); });
+    unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, currentUser); });
     saveLocalImmediate();
   }
   if(pollingTimer)clearInterval(pollingTimer);
@@ -1311,7 +1323,7 @@ $id('claimForm').addEventListener('submit',e=>{
   };
 
   // ★ เพิ่มใน cloud refs cache ทันที (ป้องกัน double-click / race condition)
-  cloudRefAdd(ref);
+  cloudRefAdd(ref, currentUser);
 
   records.push(newRow);
   saveAndRefresh();
@@ -1481,7 +1493,8 @@ $id('delConfirmBtn').addEventListener('click', ()=>{
   // ★ ลบ local และ cloud refs cache
   records = records.filter(x=>String(x.id)!==String(id));
   syncedDelete(ref);
-  cloudRefDelete(ref);   // ★ ลบออกจาก cloud refs cache
+  cloudRefDelete(ref, inspector);          // ลบจาก in-memory cache
+  localStorage.setItem(REFS_KEY, JSON.stringify([..._allCloudRefs])); // ★ force save ทันที
   invalidateMyRecCache();
   invalidateCache();
   _lastRenderHash='';
@@ -1517,13 +1530,22 @@ function clearAllData(){
 
   // ★ ลบเฉพาะ records ของ inspector นี้
   records=records.filter(r=>r.inspector!==inspector);
-  cloudRefClear(inspector);   // ★ ล้าง cloud refs ของ inspector นี้
+
+  // ★ ล้าง allCloudRefs ของ inspector นี้ทั้งหมดด้วย composite key
+  clearInspectorCloudRefs(inspector);
+
   syncedReset([]);
   invalidateMyRecCache();
   invalidateCache();
   _lastRenderHash='';
 
-  saveLocal();
+  // ★★★ บันทึกทันที ไม่ใช้ debounce ป้องกัน stale cache
+  clearInspectorCloudRefs(inspector);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  localStorage.setItem(SYNCED_KEY, JSON.stringify([]));
+  localStorage.removeItem(REFS_KEY);   // ★ ล้าง refs cache ทิ้งทั้งหมด
+  _allCloudRefs = new Set();           // ★ reset in-memory ด้วย
+
   refreshAll();
 
   // ★ cloud clear (fire-and-forget, ตรง inspector เท่านั้น)
@@ -1840,7 +1862,7 @@ function importExcel(input){
       judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase()
     })).filter(r=>!isDuplicate(r.ref));   // ★ กรอง duplicate
     if(!items.length){ toast('⚠️ ไม่มีข้อมูลใหม่ (ซ้ำทั้งหมด)'); input.value=''; return; }
-    items.forEach(r=>cloudRefAdd(r.ref));  // ★ เพิ่มใน cloud refs
+    items.forEach(r=>cloudRefAdd(r.ref, currentUser));  // ★ เพิ่มใน cloud refs
     records=[...records,...items];
     _lastRenderHash=''; saveAndRefresh();
     toast('📥 Imported '+items.length+' records'); input.value='';
