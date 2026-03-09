@@ -236,8 +236,6 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
   animation:bdgIn .35s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes bdgIn{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
-
-/* ── Delete confirm modal ── */
 #deleteModal{
   position:fixed;inset:0;z-index:20000;display:none;
   align-items:center;justify-content:center;
@@ -252,7 +250,6 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
   border:1.5px solid rgba(239,68,68,.15);
 }
 @keyframes delCardIn{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:none}}
-
 #dashboardModal{
   position:fixed;inset:0;display:none;
   align-items:stretch;justify-content:stretch;
@@ -425,7 +422,7 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
       SQE <span class="text-orange-500">support</span>
     </h2>
     <p class="text-[10px] font-bold text-slate-600 uppercase tracking-[.15em] mb-10" style="position:relative;z-index:2">
-      <span id="loSubtitle" class="text-slate-500">Security Terminal v3.0</span>
+      <span id="loSubtitle" class="text-slate-500">Security Terminal v3.1</span>
       <span class="ml-2 inline-flex items-center gap-1 text-emerald-500 text-[9px] font-black"><span class="sdot"></span>ONLINE</span>
     </p>
     <div id="loginForm" class="space-y-4" style="position:relative;z-index:2">
@@ -749,40 +746,68 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 <datalist id="inspectorList"></datalist>
 
 <script>
-/* ══ CONFIG ══ */
-const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbyyLPBUxVWF20GQYiU1pU7cW7IgSRHiOWdM5zHB5-ozH3D2yoxVbmefI4RMIGBg6luRYg/exec';
+/* ══════════════════════════════════════════════════════════
+   CONFIG  — เปลี่ยน GOOGLE_URL เป็น Web App URL ของคุณ
+══════════════════════════════════════════════════════════ */
+const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbxGzHZ3n1JXG-dCzE7yfkoW1x3VW1tpZGoBaTHaEiZzNoezCDocQwhN7ufHFtgBJ2ScAw/exec';
 const STORAGE_KEY = 'qdit_v3_records';
 const SYNCED_KEY  = 'qdit_v3_synced';
+const REFS_KEY    = 'qdit_v3_allrefs';  // ★ cloud refs cache
 
-const FETCH_TIMEOUT  = 5000;
-const PUSH_TIMEOUT   = 4000;
-const POLL_MS        = 8000;
-const PUSH_DEBOUNCE  = 400;
+/* ══ TIMING ══ */
+const FETCH_TIMEOUT  = 6000;
+const PUSH_TIMEOUT   = 5000;
+const POLL_MS        = 5000;   // ★ เร็วขึ้น
+const PUSH_DEBOUNCE  = 300;    // ★ เร็วขึ้น
 
+/* ══ STATE ══ */
 let records     = safeJSON(STORAGE_KEY, []);
 let currentUser = '';
 let filterType  = 'ALL';
 let charts      = {};
 let pushDebounce, pollingTimer;
 
-let _syncedSet  = new Set(safeJSON(SYNCED_KEY, []));
-const syncedRefs = {
-  includes : ref => _syncedSet.has(String(ref)),
-  push     : ref => _syncedSet.add(String(ref)),
-  filter   : fn  => {},
-  get size (){ return _syncedSet.size; },
-  toArray  : ()  => [..._syncedSet],
-};
-function syncedHas(ref){ return _syncedSet.has(String(ref)); }
-function syncedAdd(ref){ _syncedSet.add(String(ref)); }
+/* ── syncedSet: refs ที่ push cloud สำเร็จแล้ว ─────── */
+let _syncedSet = new Set(safeJSON(SYNCED_KEY, []));
+function syncedHas(ref)   { return _syncedSet.has(String(ref)); }
+function syncedAdd(ref)   { _syncedSet.add(String(ref)); }
 function syncedDelete(ref){ _syncedSet.delete(String(ref)); }
-function syncedReset(arr){ _syncedSet = new Set(arr.map(String)); }
+function syncedReset(arr) { _syncedSet = new Set(arr.map(String)); }
+
+/* ── allCloudRefs: refs ทั้งหมดที่รู้จากฝั่ง cloud ─── */
+/* ★★★ ใช้ป้องกัน duplicate 100% ทั้งฝั่ง local+cloud ★★★ */
+let _allCloudRefs = new Set(safeJSON(REFS_KEY, []));
+function cloudRefAdd(ref)      { _allCloudRefs.add(String(ref)); }
+function cloudRefDelete(ref)   { _allCloudRefs.delete(String(ref)); }
+function cloudRefClear(insp)   {
+  // ลบเฉพาะ refs ของ inspector นั้น
+  const mine = records.filter(r=>r.inspector===insp).map(r=>String(r.ref));
+  mine.forEach(r=>_allCloudRefs.delete(r));
+}
+function cloudRefSetFromRows(rows){
+  rows.forEach(r=>_allCloudRefs.add(String(r.ref)));
+}
+function saveAllCloudRefs(){
+  localStorage.setItem(REFS_KEY, JSON.stringify([..._allCloudRefs]));
+}
+
+/* ── ตรวจ duplicate ทั้ง local + cloud ────────────── */
+function isDuplicate(ref){
+  const r = String(ref).trim();
+  if(!r) return false;
+  // เช็ค local ก่อน (เร็วที่สุด)
+  if(records.some(x => String(x.ref).trim() === r && x.inspector === currentUser)) return true;
+  // เช็ค cloud refs cache
+  if(_allCloudRefs.has(r)) return true;
+  return false;
+}
 
 Chart.register(ChartDataLabels);
 
 function safeJSON(k,def){try{return JSON.parse(localStorage.getItem(k))||def;}catch(e){return def;}}
 const $id = id => document.getElementById(id);
 
+/* ── My records cache ── */
 let _myRecCache=null, _myRecUser='', _myRecLen=-1;
 function getMyRecords(){
   if(_myRecCache && _myRecUser===currentUser && _myRecLen===records.length) return _myRecCache;
@@ -793,17 +818,20 @@ function getMyRecords(){
 }
 function invalidateMyRecCache(){ _myRecCache=null; _myRecLen=-1; }
 
+/* ── Save local ── */
 let _saveTimer=null;
 function saveLocal(){
   localStorage.setItem(SYNCED_KEY, JSON.stringify([..._syncedSet]));
+  saveAllCloudRefs();
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(()=>{
     localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-  }, 80);
+  }, 60);
 }
 function saveLocalImmediate(){
   localStorage.setItem(SYNCED_KEY,  JSON.stringify([..._syncedSet]));
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  saveAllCloudRefs();
 }
 
 function saveAndRefresh(){
@@ -815,12 +843,12 @@ function saveAndRefresh(){
 }
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
+/* ── Toast ── */
 let toastT;
 function toast(msg){
   const el=$id('toast');el.textContent=msg;el.classList.add('show');
   clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),3200);
 }
-
 function showSyncBadge(msg,color){
   const b=$id('syncBadge');
   $id('syncBadgeText').textContent=msg;
@@ -828,17 +856,14 @@ function showSyncBadge(msg,color){
   b.style.display='block';clearTimeout(b._t);
   b._t=setTimeout(()=>b.style.display='none',4000);
 }
-
 function setSyncPulse(state,text){
   const el=$id('syncPulse');if(!el)return;
   el.className=`mt-2 inline-flex items-center gap-1 text-[.62rem] font-black uppercase tracking-[.08em] px-2 py-1 rounded-lg border transition-all ${
-    state==='syncing' ? 'bg-orange-500/10 border-orange-500/25 text-orange-400' :
-    state==='offline' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
-                        'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-  }`;
+    state==='syncing'?'bg-orange-500/10 border-orange-500/25 text-orange-400':
+    state==='offline'?'bg-red-500/10 border-red-500/20 text-red-400':
+                      'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'}`;
   $id('syncPulseText').textContent=text||'LIVE SYNC';
 }
-
 function shake(el){if(!el)return;gsap.fromTo(el,{x:-8},{x:8,repeat:5,yoyo:true,duration:.06,ease:'power1.inOut'});}
 
 document.addEventListener('click',e=>{
@@ -852,27 +877,21 @@ document.addEventListener('click',e=>{
 
 function updateFilterBtns(type){
   const map={'ALL':'btn-ALL','SF':'btn-SF','VENDOR FAULT':'btn-VENDOR','CTC':'btn-CTC','CAN USE':'btn-CANUSE'};
-  Object.values(map).forEach(id=>{
-    const el=$id(id);if(!el)return;
-    el.classList.remove('active-filter');
-  });
+  Object.values(map).forEach(id=>{const el=$id(id);if(el)el.classList.remove('active-filter');});
   const key=type==='CAN USE'?'CANUSE':type==='VENDOR FAULT'?'VENDOR':type;
   const target=$id(map[key]||'btn-ALL');
   if(target)target.classList.add('active-filter');
 }
 
-function animNum(id, target){
+function animNum(id,target){
   const el=$id(id);if(!el)return;
   const cur=parseInt(el.textContent.replace(/,/g,''))||0;
   if(cur===target){el.textContent=target.toLocaleString();return;}
   gsap.killTweensOf(el);
   const obj={v:cur};
   const diff=Math.abs(target-cur);
-  const dur=diff<10?0.2:diff<100?0.4:0.7;
-  gsap.to(obj,{
-    v:target, duration:dur, ease:'power2.out',
-    onUpdate:()=>{el.textContent=Math.round(obj.v).toLocaleString();}
-  });
+  const dur=diff<10?.2:diff<100?.4:.7;
+  gsap.to(obj,{v:target,duration:dur,ease:'power2.out',onUpdate:()=>{el.textContent=Math.round(obj.v).toLocaleString();}});
 }
 
 /* ══ PARTICLE CANVAS ══ */
@@ -906,8 +925,7 @@ function initParticles(){
         const d=Math.sqrt(dx*dx+dy*dy);
         if(d<120){
           ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
-          ctx.strokeStyle='rgba(249,115,22,'+(.12*(1-d/120))+')';
-          ctx.lineWidth=.5;ctx.stroke();
+          ctx.strokeStyle='rgba(249,115,22,'+(.12*(1-d/120))+')';ctx.lineWidth=.5;ctx.stroke();
         }
       }
     }
@@ -915,115 +933,122 @@ function initParticles(){
   draw();
 }
 
-/* ════════════════════════════════════════════════════════════
-   SYNC ENGINE
-════════════════════════════════════════════════════════════ */
-function normalizeRow(d, inspector){
+/* ══════════════════════════════════════════════════════════
+   SYNC ENGINE  v3.1
+   ★ fetchFromCloud  — GET แบบ CORS, อ่านได้ทุก field
+   ★ pushToCloud     — POST no-cors (fire-and-forget)
+   ★ deleteFromCloud — POST no-cors
+   ★ clearAllFromCloud — POST no-cors
+══════════════════════════════════════════════════════════ */
+function normalizeRow(d,inspector){
   return {
-    id       : d.id || (Date.now()+'_'+Math.random()),
-    date     : d.date     || '',
-    shift    : d.shift    || 'SHIFT A',
-    inspector: d.inspector|| inspector,
-    ref      : String(d.ref || ''),
-    line     : d.line     || '',
-    supplier : d.supplier || '',
-    partNo   : d.partNo   || '',
-    partName : d.partName || '',
-    qty      : parseInt(d.qty) || 0,
-    defect   : d.defect   || '',
-    remark   : d.remark   || '',
-    judgment : d.judgment || 'SF',
+    id       : d.id||(Date.now()+'_'+Math.random()),
+    date     : d.date||'',
+    shift    : d.shift||'SHIFT A',
+    inspector: d.inspector||inspector,
+    ref      : String(d.ref||''),
+    line     : d.line||'',
+    supplier : d.supplier||'',
+    partNo   : d.partNo||'',
+    partName : d.partName||'',
+    qty      : parseInt(d.qty)||0,
+    defect   : d.defect||'',
+    remark   : d.remark||'',
+    judgment : d.judgment||'SF',
   };
 }
 
+/* ── fetchFromCloud ────────────────────────────────── */
 let _fetchInFlight = false;
 async function fetchFromCloud(inspector, ms){
   ms = ms || FETCH_TIMEOUT;
+  const url = GOOGLE_URL + '?inspector=' + encodeURIComponent(inspector) + '&t=' + Date.now();
   const doFetch = (timeout) => {
     const ctrl = new AbortController();
     const t = setTimeout(()=>ctrl.abort(), timeout);
-    return fetch(
-      GOOGLE_URL + '?inspector=' + encodeURIComponent(inspector) + '&t=' + Date.now(),
-      { signal: ctrl.signal, cache: 'no-store' }
-    ).then(res => { clearTimeout(t); return res; })
-     .catch(err => { clearTimeout(t); throw err; });
+    return fetch(url,{signal:ctrl.signal,cache:'no-store'})
+      .then(res=>{ clearTimeout(t); return res; })
+      .catch(err=>{ clearTimeout(t); throw err; });
   };
   try {
     let res;
     try      { res = await doFetch(ms); }
-    catch(e) { res = await doFetch(Math.min(ms, 4000)); }
+    catch(e) { res = await doFetch(Math.min(ms,4000)); }
     if(!res.ok) return [];
     const text = await res.text();
-    let r;
-    try { r = JSON.parse(text); } catch(e){ return []; }
-    if(!r || r.status!=='success' || !Array.isArray(r.data)) return [];
-    return r.data.map(d => normalizeRow(d, inspector));
+    let r; try{ r=JSON.parse(text); }catch(e){ return []; }
+    if(!r||r.status!=='success'||!Array.isArray(r.data)) return [];
+    const rows = r.data.map(d=>normalizeRow(d,inspector));
+    // ★ อัปเดต cloud refs cache ทุกครั้งที่ fetch สำเร็จ
+    cloudRefSetFromRows(rows);
+    saveAllCloudRefs();
+    return rows;
   } catch(err){ return []; }
 }
 
+/* ── pushToCloud (insert) ── */
 function pushToCloud(rows){
   if(!rows.length) return Promise.resolve();
-  const payload = JSON.stringify(rows.map(r=>({
-    date:r.date, shift:r.shift, inspector:r.inspector, ref:r.ref,
-    line:r.line, supplier:r.supplier, partNo:r.partNo, partName:r.partName,
-    qty:r.qty, defect:r.defect, remark:r.remark, judgment:r.judgment,
-  })));
   const ctrl = new AbortController();
   setTimeout(()=>ctrl.abort(), PUSH_TIMEOUT);
-  return fetch(GOOGLE_URL, {
-    method:'POST', mode:'no-cors', cache:'no-cache',
+  return fetch(GOOGLE_URL,{
+    method:'POST',mode:'no-cors',cache:'no-cache',
     headers:{'Content-Type':'application/json'},
-    body: payload,
-    signal: ctrl.signal,
+    body:JSON.stringify(rows.map(r=>({
+      date:r.date,shift:r.shift,inspector:r.inspector,ref:r.ref,
+      line:r.line,supplier:r.supplier,partNo:r.partNo,partName:r.partName,
+      qty:r.qty,defect:r.defect,remark:r.remark,judgment:r.judgment,
+    }))),
+    signal:ctrl.signal,
   }).catch(()=>{});
 }
 
-/* ════════════════════════════════════════════════
-   ★ deleteFromCloud — ส่ง action=delete ไป GAS
-   ★ ใช้ no-cors = fire-and-forget (เร็ว, ไม่ block UI)
-════════════════════════════════════════════════ */
-function deleteFromCloud(ref, inspector){
+/* ── deleteFromCloud ── */
+function deleteFromCloud(ref,inspector){
   if(!ref) return Promise.resolve();
   const ctrl = new AbortController();
   setTimeout(()=>ctrl.abort(), PUSH_TIMEOUT);
-  return fetch(GOOGLE_URL, {
-    method  : 'POST',
-    mode    : 'no-cors',
-    cache   : 'no-cache',
-    headers : {'Content-Type':'application/json'},
-    body    : JSON.stringify({ action:'delete', ref:String(ref), inspector:String(inspector||currentUser) }),
-    signal  : ctrl.signal,
+  return fetch(GOOGLE_URL,{
+    method:'POST',mode:'no-cors',cache:'no-cache',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'delete',ref:String(ref),inspector:String(inspector||currentUser)}),
+    signal:ctrl.signal,
   }).catch(()=>{});
 }
 
-/* ════════════════════════════════════════════════
-   ★ clearAllFromCloud — ส่ง action=clearAll ไป GAS
-════════════════════════════════════════════════ */
+/* ── clearAllFromCloud ── */
 function clearAllFromCloud(inspector){
   if(!inspector) return Promise.resolve();
   const ctrl = new AbortController();
   setTimeout(()=>ctrl.abort(), PUSH_TIMEOUT);
-  return fetch(GOOGLE_URL, {
-    method  : 'POST',
-    mode    : 'no-cors',
-    cache   : 'no-cache',
-    headers : {'Content-Type':'application/json'},
-    body    : JSON.stringify({ action:'clearAll', inspector:String(inspector) }),
-    signal  : ctrl.signal,
+  return fetch(GOOGLE_URL,{
+    method:'POST',mode:'no-cors',cache:'no-cache',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'clearAll',inspector:String(inspector)}),
+    signal:ctrl.signal,
   }).catch(()=>{});
 }
 
+/* ── mergeCloud: รวมข้อมูลจาก cloud เข้า local ── */
 function mergeCloud(cloudRows){
-  const ex = new Set(records.map(r=>r.ref));
-  const newRows = cloudRows.filter(r=>!ex.has(r.ref));
-  if(newRows.length){
-    records.push(...newRows);
-    invalidateMyRecCache();
-  }
+  // สร้าง map ของ local records ด้วย ref
+  const localRefMap = new Map(records.map(r=>[String(r.ref)+'|'+r.inspector, r]));
+  let added = 0;
+  cloudRows.forEach(r=>{
+    const key = String(r.ref)+'|'+r.inspector;
+    if(!localRefMap.has(key)){
+      records.push(r);
+      added++;
+    }
+  });
+  if(added) invalidateMyRecCache();
+  // อัปเดต synced set และ cloud refs
   syncedReset(cloudRows.map(r=>r.ref));
-  return newRows.length;
+  cloudRefSetFromRows(cloudRows);
+  return added;
 }
 
+/* ── schedulePush: push unsync records ── */
 let _pushInFlight = false;
 function schedulePush(){
   clearTimeout(pushDebounce);
@@ -1034,7 +1059,10 @@ function schedulePush(){
     _pushInFlight = true;
     try{
       await pushToCloud(unsync);
-      unsync.forEach(r=>syncedAdd(r.ref));
+      unsync.forEach(r=>{
+        syncedAdd(r.ref);
+        cloudRefAdd(r.ref);   // ★ เพิ่มใน cloud refs cache
+      });
       saveLocal();
       showSyncBadge('☁️ Auto-synced','#10b981');
       setSyncPulse('live','LIVE SYNC');
@@ -1043,6 +1071,7 @@ function schedulePush(){
   }, PUSH_DEBOUNCE);
 }
 
+/* ── startPolling: เช็คทุก POLL_MS ── */
 function startPolling(){
   if(pollingTimer) clearInterval(pollingTimer);
   pollingTimer = setInterval(async()=>{
@@ -1057,41 +1086,39 @@ function startPolling(){
         saveLocal(); refreshAll();
         showSyncBadge('🔔 +'+added+' new','#60a5fa');
         setSyncPulse('live','↓ '+added+' NEW');
-        setTimeout(()=>setSyncPulse('live','LIVE SYNC'), 2500);
+        setTimeout(()=>setSyncPulse('live','LIVE SYNC'),2500);
       } else {
         setSyncPulse('live','LIVE SYNC');
       }
-    } catch(e){ setSyncPulse('offline','OFFLINE'); }
+    }catch(e){ setSyncPulse('offline','OFFLINE'); }
     finally{ _fetchInFlight=false; }
   }, POLL_MS);
 }
 
+/* ── syncToCloud: manual sync button ── */
 async function syncToCloud(){
   if(_fetchInFlight){ toast('⏳ Sync กำลังทำงาน…'); return; }
-  const btn=$id('syncBtnMain'), icon=$id('syncIcon');
+  const btn=$id('syncBtnMain'),icon=$id('syncIcon');
   btn.disabled=true; icon.classList.add('spin');
   setSyncPulse('syncing','SYNCING…');
-  _fetchInFlight = true;
-  const unsync = getMyRecords().filter(r=>!syncedHas(r.ref));
+  _fetchInFlight=true;
+  const unsync=getMyRecords().filter(r=>!syncedHas(r.ref));
   try{
-    const [cloud] = await Promise.all([
-      fetchFromCloud(currentUser, FETCH_TIMEOUT),
-      unsync.length ? pushToCloud(unsync) : Promise.resolve(),
+    const [cloud]=await Promise.all([
+      fetchFromCloud(currentUser,FETCH_TIMEOUT),
+      unsync.length?pushToCloud(unsync):Promise.resolve(),
     ]);
-    if(unsync.length) unsync.forEach(r=>syncedAdd(r.ref));
-    let pulled = 0;
-    if(cloud.length){
-      pulled = mergeCloud(cloud);
-      if(pulled) refreshAll();
-    }
+    if(unsync.length) unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref); });
+    let pulled=0;
+    if(cloud.length){ pulled=mergeCloud(cloud); if(pulled)refreshAll(); }
     saveLocal();
     toast(`✅ ↑${unsync.length} pushed  ↓${pulled} pulled`);
     setSyncPulse('live','LIVE SYNC');
-  } catch(e){
+  }catch(e){
     toast('⚠️ Sync error — ลองใหม่อีกครั้ง');
     setSyncPulse('offline','OFFLINE');
-  } finally{
-    _fetchInFlight = false;
+  }finally{
+    _fetchInFlight=false;
     btn.disabled=false; icon.classList.remove('spin');
   }
 }
@@ -1124,13 +1151,15 @@ async function login(){
   $id('loginForm').style.display='none';
   $id('loProgress').style.display='flex';
   $id('loginBtn').disabled=true;
-  await setStep(1,'active');await sleep(200);await setStep(1,'done');
-  await setStep(2,'active');$id('loBar').style.width='55%';await sleep(100);
+  await setStep(1,'active'); await sleep(200); await setStep(1,'done');
+  await setStep(2,'active'); $id('loBar').style.width='55%'; await sleep(100);
   $id('currentUserDisp').textContent=name;
+
+  // ★ STEP 3: fetch cloud ก่อน render dashboard (ป้องกัน duplicate ทันที)
   const tl=gsap.timeline();
   tl.to('#loCard',{scale:.88,opacity:0,y:-20,duration:.3,ease:'power3.in'});
   tl.to('#loginOverlay',{opacity:0,duration:.45,ease:'power2.in',
-    onComplete:()=>{$id('loginOverlay').style.display='none';}
+    onComplete:()=>{ $id('loginOverlay').style.display='none'; }
   });
   tl.to('#appShell',{opacity:1,duration:.55,ease:'back.out(1.6)',
     onStart:()=>{
@@ -1139,19 +1168,21 @@ async function login(){
       refreshAll();
     }
   },'-=0.2');
+
   await setStep(2,'done');
   await setStep(3,'active');
   $id('ls2note').textContent='syncing…';
   setSyncPulse('syncing','SYNCING…');
-  const pendingPush = getMyRecords().filter(r=>!syncedHas(r.ref));
+
+  const pendingPush=getMyRecords().filter(r=>!syncedHas(r.ref));
   Promise.all([
     fetchFromCloud(name, FETCH_TIMEOUT),
-    pendingPush.length ? pushToCloud(pendingPush) : Promise.resolve(),
+    pendingPush.length?pushToCloud(pendingPush):Promise.resolve(),
   ]).then(([cloud])=>{
     $id('loBar').style.width='100%'; setStep(3,'done');
-    if(pendingPush.length) pendingPush.forEach(r=>syncedAdd(r.ref));
+    if(pendingPush.length) pendingPush.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref); });
     if(cloud.length>0){
-      const added = mergeCloud(cloud);
+      const added=mergeCloud(cloud);
       saveLocal();
       if(added){ refreshAll(); toast('✅ Cloud: +'+added+' รายการใหม่'); }
       setSyncPulse('live','LIVE SYNC');
@@ -1162,7 +1193,9 @@ async function login(){
   });
 }
 
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&$id('loginOverlay').style.display!=='none')login();});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&$id('loginOverlay').style.display!=='none')login();
+});
 
 /* ══ SESSION RESUME ══ */
 window.addEventListener('load',async()=>{
@@ -1177,20 +1210,19 @@ window.addEventListener('load',async()=>{
     $id('appShell').classList.add('visible');
     refreshAll();
     setSyncPulse('syncing','SYNCING…');
-    const pendingPush = getMyRecords().filter(r=>!syncedHas(r.ref));
-    const [cloud] = await Promise.all([
-      fetchFromCloud(saved, FETCH_TIMEOUT),
-      pendingPush.length ? pushToCloud(pendingPush) : Promise.resolve(),
+    const pendingPush=getMyRecords().filter(r=>!syncedHas(r.ref));
+    const [cloud]=await Promise.all([
+      fetchFromCloud(saved,FETCH_TIMEOUT),
+      pendingPush.length?pushToCloud(pendingPush):Promise.resolve(),
     ]).catch(()=>[[]]);
-    if(pendingPush.length) pendingPush.forEach(r=>syncedAdd(r.ref));
-    if(cloud && cloud.length>0){
-      const added = mergeCloud(cloud);
+    if(pendingPush.length) pendingPush.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref); });
+    if(cloud&&cloud.length>0){
+      const added=mergeCloud(cloud);
       saveLocal();
       if(added) refreshAll();
       setSyncPulse('live','LIVE SYNC');
-    } else {
-      saveLocal();
-      setSyncPulse('offline','OFFLINE');
+    }else{
+      saveLocal(); setSyncPulse('offline','OFFLINE');
     }
     startPolling();
   }
@@ -1222,7 +1254,7 @@ async function logout(){
   if(unsync.length){
     toast('⏳ Syncing before logout…');
     await pushToCloud(unsync);
-    unsync.forEach(r=>syncedAdd(r.ref));
+    unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref); });
     saveLocalImmediate();
   }
   if(pollingTimer)clearInterval(pollingTimer);
@@ -1245,20 +1277,45 @@ function handleJudgment(val){
   if(btn){btn.style.backgroundColor=color;btn.style.boxShadow=`0 10px 25px -5px ${color}66`;}
 }
 
-/* ══ FORM SUBMIT ══ */
+/* ══════════════════════════════════════════════════════════
+   FORM SUBMIT
+   ★★★ ตรวจ duplicate ทั้ง local + cloud refs ★★★
+══════════════════════════════════════════════════════════ */
 $id('claimForm').addEventListener('submit',e=>{
   e.preventDefault();
   const ref=$id('refNo').value.trim();
-  if(getMyRecords().some(r=>r.ref===ref)){shake($id('refNo'));toast('⚠️ Duplicate Reference No!');return;}
-  records.push({
-    id:Date.now(),date:$id('inputDate').value,shift:$id('shift').value,
-    inspector:currentUser,ref,line:$id('lineNo').value,
-    supplier:$id('supplier').value,partNo:$id('partNo').value,
-    partName:$id('partOn').value,qty:parseInt($id('qty').value)||0,
-    defect:$id('defectName').value,remark:$id('remark').value,
-    judgment:$id('judgmentSelect').value
-  });
+
+  // ★ ตรวจ duplicate ทั้ง local + cloud refs
+  if(isDuplicate(ref)){
+    shake($id('refNo'));
+    toast('⚠️ Duplicate! REF นี้มีในระบบแล้ว');
+    $id('refNo').style.borderColor='#ef4444';
+    setTimeout(()=>$id('refNo').style.borderColor='',2000);
+    return;
+  }
+
+  const newRow = {
+    id       : Date.now()+'_'+Math.random().toString(36).slice(2),
+    date     : $id('inputDate').value,
+    shift    : $id('shift').value,
+    inspector: currentUser,
+    ref,
+    line     : $id('lineNo').value,
+    supplier : $id('supplier').value,
+    partNo   : $id('partNo').value,
+    partName : $id('partOn').value,
+    qty      : parseInt($id('qty').value)||0,
+    defect   : $id('defectName').value,
+    remark   : $id('remark').value,
+    judgment : $id('judgmentSelect').value,
+  };
+
+  // ★ เพิ่มใน cloud refs cache ทันที (ป้องกัน double-click / race condition)
+  cloudRefAdd(ref);
+
+  records.push(newRow);
   saveAndRefresh();
+
   const sb=$id('submitBtn');
   if(sb){
     const orig=sb.style.backgroundColor;
@@ -1271,7 +1328,7 @@ $id('claimForm').addEventListener('submit',e=>{
     const f=$id(fid);if(!f)return;
     gsap.fromTo(f,{backgroundColor:'rgba(16,185,129,.08)'},{backgroundColor:'rgba(255,255,255,.6)',duration:.6,delay:i*.03});
   });
-  e.target.reset();handleJudgment('');
+  e.target.reset(); handleJudgment('');
   $id('inputDate').valueAsDate=new Date();
   toast('✅ บันทึกข้อมูลสำเร็จ');
 });
@@ -1305,10 +1362,10 @@ function smoothSearch(){
 
 /* ══ RENDER TABLE ══ */
 const SM_MAP={
-  'SF':          {dot:'bg-orange-500',cls:'text-orange-600 bg-orange-50'},
-  'VENDOR FAULT':{dot:'bg-red-500',   cls:'text-red-600 bg-red-50'},
-  'CTC':         {dot:'bg-blue-500',  cls:'text-blue-600 bg-blue-50'},
-  'CAN USE':     {dot:'bg-emerald-500',cls:'text-emerald-600 bg-emerald-50'}
+  'SF'          :{dot:'bg-orange-500', cls:'text-orange-600 bg-orange-50'},
+  'VENDOR FAULT':{dot:'bg-red-500',    cls:'text-red-600 bg-red-50'},
+  'CTC'         :{dot:'bg-blue-500',   cls:'text-blue-600 bg-blue-50'},
+  'CAN USE'     :{dot:'bg-emerald-500',cls:'text-emerald-600 bg-emerald-50'}
 };
 
 let _searchCache=null,_searchCacheKey='';
@@ -1323,16 +1380,14 @@ function getSearchCache(){
   _searchCacheKey=key;
   return _searchCache;
 }
-function invalidateCache(){_searchCache=null;_searchCacheKey='';}
+function invalidateCache(){ _searchCache=null; _searchCacheKey=''; }
 
 let _lastRenderHash='';
-
 function renderTable(){
   const tbody=$id('tableBody');
   const search=($id('searchInput').value||'').toLowerCase();
   const myR=getMyRecords();
   const cache=getSearchCache();
-  const syncSet=_syncedSet;
 
   const filtered=[];
   for(let i=myR.length-1;i>=0;i--){
@@ -1349,7 +1404,7 @@ function renderTable(){
   let html='';
   filtered.forEach(r=>{
     const s=SM_MAP[r.judgment]||SM_MAP['SF'];
-    const synced=syncSet.has(r.ref);
+    const synced=_syncedSet.has(r.ref);
     const safeId=String(r.id).replace(/"/g,'&quot;');
     html+=`<tr class="group hover:bg-white/60 border-l-4 border-transparent hover:border-orange-500" data-rid="${safeId}">
       <td class="pl-8 py-5 font-bold text-[11px] text-slate-400">${r.date}</td>
@@ -1368,139 +1423,117 @@ function renderTable(){
 
   tbody.innerHTML=html;
   requestAnimationFrame(()=>{
-    const rows=tbody.querySelectorAll('tr');
-    rows.forEach(tr=>tr.classList.add('vis'));
+    tbody.querySelectorAll('tr').forEach(tr=>tr.classList.add('vis'));
   });
 }
 
-/* ══════════════════════════════════════════════
-   TABLE EVENT DELEGATION
-══════════════════════════════════════════════ */
+/* ══ TABLE EVENT DELEGATION ══ */
 document.addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]');if(!btn)return;
   const tr=btn.closest('tr[data-rid]');if(!tr)return;
   const rid=tr.dataset.rid;
   if(btn.dataset.action==='clone')  cloneRecord(rid);
-  if(btn.dataset.action==='delete') showDeleteModal(rid, tr);
+  if(btn.dataset.action==='delete') showDeleteModal(rid,tr);
 });
 
-/* ════════════════════════════════════════════════════════════
-   ★ DELETE MODAL — แทนที่ confirm() ทั่วไปด้วย custom modal
-   ★ เสถียรกว่า: ไม่ block event loop, ไม่มี race condition
-   ★ ลบ local + ส่ง deleteFromCloud พร้อมกัน (fire-and-forget)
-════════════════════════════════════════════════════════════ */
-let _pendingDelete = null; // { id, trEl, ref, inspector }
-
+/* ══════════════════════════════════════════════════════════
+   DELETE MODAL
+   ★ ลบเฉพาะข้อมูลของ currentUser เท่านั้น
+══════════════════════════════════════════════════════════ */
+let _pendingDelete = null;
 function showDeleteModal(id, trEl){
-  const r = findRecord(id);
+  const r=findRecord(id);
   if(!r){ toast('⚠️ ไม่พบข้อมูล'); return; }
-
-  _pendingDelete = { id, trEl, ref: r.ref, inspector: r.inspector };
-
-  const desc = `Ref: ${r.ref} · ${r.supplier} · ${r.date}`;
-  $id('delModalDesc').textContent = desc;
-
-  const modal = $id('deleteModal');
-  modal.classList.add('show');
-
-  // focus cancel ก่อน (UX best practice)
-  requestAnimationFrame(()=> $id('delCancelBtn').focus());
+  // ★ ตรวจสอบ ownership ก่อนลบ
+  if(r.inspector !== currentUser){
+    toast('⛔ ไม่มีสิทธิ์ลบข้อมูลของผู้ใช้อื่น');
+    return;
+  }
+  _pendingDelete={ id, trEl, ref:r.ref, inspector:r.inspector };
+  $id('delModalDesc').textContent=`Ref: ${r.ref} · ${r.supplier} · ${r.date}`;
+  $id('deleteModal').classList.add('show');
+  requestAnimationFrame(()=>$id('delCancelBtn').focus());
 }
-
 function hideDeleteModal(){
   $id('deleteModal').classList.remove('show');
-  _pendingDelete = null;
+  _pendingDelete=null;
 }
-
 $id('delCancelBtn').addEventListener('click', hideDeleteModal);
 $id('deleteModal').addEventListener('click', e=>{
-  if(e.target === $id('deleteModal')) hideDeleteModal();
+  if(e.target===$id('deleteModal')) hideDeleteModal();
 });
-
 document.addEventListener('keydown', e=>{
-  if(e.key==='Escape' && _pendingDelete) hideDeleteModal();
+  if(e.key==='Escape'&&_pendingDelete) hideDeleteModal();
 });
 
 $id('delConfirmBtn').addEventListener('click', ()=>{
   if(!_pendingDelete) return;
   const { id, trEl, ref, inspector } = _pendingDelete;
+  // ★ double-check ownership
+  if(inspector !== currentUser){ hideDeleteModal(); toast('⛔ ไม่มีสิทธิ์ลบ'); return; }
   hideDeleteModal();
 
-  // ── 1. Animate row out ──
-  if(trEl && trEl.isConnected){
-    trEl.style.pointerEvents = 'none';
+  if(trEl&&trEl.isConnected){
+    trEl.style.pointerEvents='none';
     trEl.classList.add('row-deleting');
   }
 
-  // ── 2. อัปเดต local state ทันที (ไม่รอ animation) ──
-  records = records.filter(x => String(x.id) !== String(id));
+  // ★ ลบ local และ cloud refs cache
+  records = records.filter(x=>String(x.id)!==String(id));
   syncedDelete(ref);
+  cloudRefDelete(ref);   // ★ ลบออกจาก cloud refs cache
   invalidateMyRecCache();
   invalidateCache();
-  _lastRenderHash = '';
+  _lastRenderHash='';
 
-  // ── 3. Save + refresh UI ──
   saveLocal();
 
-  // ── 4. ส่ง cloud delete (fire-and-forget) ──
+  // ★ ส่ง cloud delete (fire-and-forget, ตรงกับ inspector เท่านั้น)
   deleteFromCloud(ref, inspector);
-  showSyncBadge('🗑 Deleting from Cloud…','#ef4444');
+  showSyncBadge('🗑 Deleting…','#ef4444');
 
-  // ── 5. รอ animation จบแล้วค่อย re-render ──
   setTimeout(()=>{
     refreshAll();
-    toast('🗑 ลบข้อมูลแล้ว (Local + Cloud)');
-    showSyncBadge('✅ Deleted from Cloud','#10b981');
+    toast('🗑 ลบสำเร็จ (Local + Cloud)');
+    showSyncBadge('✅ Deleted','#10b981');
   }, 320);
 });
 
-/* ══ DELETE LEGACY (ไม่มี UI แล้ว ไว้ backup) ══ */
-function delRow(id, trEl){
-  // redirect ไป modal แทน
-  showDeleteModal(id, trEl);
-}
-
-function findRecord(id){
-  return records.find(x=>String(x.id)===String(id));
-}
-
-/* ════════════════════════════════════════════════════
-   ★ CLEAR ALL DATA — พร้อม custom confirm + cloud delete
-════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════
+   CLEAR ALL DATA
+   ★ ลบเฉพาะข้อมูลของ currentUser เท่านั้น (ทั้ง local + cloud)
+══════════════════════════════════════════════════════════ */
 function clearAllData(){
-  const myCount = getMyRecords().length;
-  if(myCount === 0){ toast('⚠️ ไม่มีข้อมูลให้ลบ'); return; }
-
-  // ใช้ custom confirm dialog แทน browser confirm (เสถียรกว่า)
-  const proceed = window.confirm(
-    `⚠️ ลบข้อมูลทั้งหมดของ ${currentUser}?\n` +
-    `จำนวน ${myCount} รายการ\n\n` +
+  const myCount=getMyRecords().length;
+  if(myCount===0){ toast('⚠️ ไม่มีข้อมูลให้ลบ'); return; }
+  const proceed=window.confirm(
+    `⚠️ ลบข้อมูลทั้งหมดของ ${currentUser}?\n`+
+    `จำนวน ${myCount} รายการ\n\n`+
     `⚡ จะลบออกจาก Google Sheets ด้วย`
   );
   if(!proceed) return;
 
-  // ── snapshot inspector ก่อน clear ──
-  const inspector = currentUser;
+  const inspector=currentUser;
 
-  // ── ลบ local ──
-  records = records.filter(r => r.inspector !== inspector);
+  // ★ ลบเฉพาะ records ของ inspector นี้
+  records=records.filter(r=>r.inspector!==inspector);
+  cloudRefClear(inspector);   // ★ ล้าง cloud refs ของ inspector นี้
   syncedReset([]);
   invalidateMyRecCache();
   invalidateCache();
-  _lastRenderHash = '';
+  _lastRenderHash='';
 
-  // ── save + refresh ──
   saveLocal();
   refreshAll();
 
-  // ── cloud clear (fire-and-forget) ──
+  // ★ cloud clear (fire-and-forget, ตรง inspector เท่านั้น)
   clearAllFromCloud(inspector);
   showSyncBadge('🗑 Clearing Cloud…','#ef4444');
 
   setTimeout(()=>{
     toast(`🧹 ลบทั้งหมด ${myCount} รายการ (Local + Cloud)`);
     showSyncBadge('✅ Cloud Cleared','#10b981');
-  }, 400);
+  },400);
 }
 
 /* ══ CLONE ══ */
@@ -1536,6 +1569,10 @@ function cloneRecord(id){
   toast('📑 Clone สำเร็จ — ตรวจ REF แล้วกด Commit');
 }
 
+function findRecord(id){
+  return records.find(x=>String(x.id)===String(id));
+}
+
 /* ══ DATALISTS ══ */
 let _dlTimer=null;
 function updateDataLists(){
@@ -1555,7 +1592,6 @@ function updateDataLists(){
 /* ══ REFRESH ALL ══ */
 let _refreshRAF=null;
 let _lastKpiHash='';
-
 function refreshAll(){
   invalidateCache();
   if(_refreshRAF)cancelAnimationFrame(_refreshRAF);
@@ -1565,7 +1601,7 @@ function refreshAll(){
     let tQ=0,sf=0,ven=0,ctc=0,ok=0,sfL=0,venL=0,ctcL=0,okL=0;
     d.forEach(r=>{
       tQ+=r.qty;
-      if(r.judgment==='SF')               {sf+=r.qty;sfL++;}
+      if(r.judgment==='SF')              {sf+=r.qty;sfL++;}
       else if(r.judgment==='VENDOR FAULT'){ven+=r.qty;venL++;}
       else if(r.judgment==='CTC')         {ctc+=r.qty;ctcL++;}
       else if(r.judgment==='CAN USE')     {ok+=r.qty;okL++;}
@@ -1588,7 +1624,7 @@ function refreshAll(){
     }
     if('requestIdleCallback' in window){
       requestIdleCallback(updateDataLists,{timeout:2000});
-    }else{setTimeout(updateDataLists,300);}
+    }else{ setTimeout(updateDataLists,300); }
   });
 }
 
@@ -1621,10 +1657,10 @@ function refreshDash(){
   let tQ=0,sf=0,ven2=0,ctc=0,ok=0,sfL=0,venL=0,ctcL=0,okL=0;
   data.forEach(r=>{
     tQ+=r.qty;
-    if(r.judgment==='SF')           {sf+=r.qty;sfL++;}
+    if(r.judgment==='SF')              {sf+=r.qty;sfL++;}
     else if(r.judgment==='VENDOR FAULT'){ven2+=r.qty;venL++;}
-    else if(r.judgment==='CTC')     {ctc+=r.qty;ctcL++;}
-    else if(r.judgment==='CAN USE') {ok+=r.qty;okL++;}
+    else if(r.judgment==='CTC')         {ctc+=r.qty;ctcL++;}
+    else if(r.judgment==='CAN USE')     {ok+=r.qty;okL++;}
   });
   animNum('dTotalQty',tQ);$id('dTotalLot').textContent=data.length;
   const pct=(v,t)=>t>0?Math.round((v/t)*100)+'%':'0%';
@@ -1793,6 +1829,7 @@ function importExcel(input){
     const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
     const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
     const pd=v=>{if(!v)return '';if(v instanceof Date)return new Date(v.getTime()-(v.getTimezoneOffset()*60000)).toISOString().split('T')[0];if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;}return String(v);};
+    // ★ กรอง duplicate จาก import ด้วย
     const items=json.map(r=>({
       id:Date.now()+Math.random(),date:pd(r.date||r.Date||r.DATE),
       shift:r.shift||r.Shift||'SHIFT A',inspector:currentUser,
@@ -1801,9 +1838,12 @@ function importExcel(input){
       partName:String(r.partName||r.PartName||''),qty:parseInt(r.qty||r.Qty||0),
       defect:String(r.defect||r.Defect||''),remark:String(r.remark||r.Remark||''),
       judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase()
-    }));
+    })).filter(r=>!isDuplicate(r.ref));   // ★ กรอง duplicate
+    if(!items.length){ toast('⚠️ ไม่มีข้อมูลใหม่ (ซ้ำทั้งหมด)'); input.value=''; return; }
+    items.forEach(r=>cloudRefAdd(r.ref));  // ★ เพิ่มใน cloud refs
     records=[...records,...items];
-    _lastRenderHash='';saveAndRefresh();toast('📥 Imported '+items.length+' records');input.value='';
+    _lastRenderHash=''; saveAndRefresh();
+    toast('📥 Imported '+items.length+' records'); input.value='';
   };
   reader.readAsArrayBuffer(file);
 }
@@ -1815,7 +1855,7 @@ function exportToExcel(){
   XLSX.writeFile(wb,'SQE_'+currentUser+'_'+Date.now()+'.xlsx');
 }
 
-function openJobProject(){window.location.href='job_project.html';}
+function openJobProject(){ window.location.href='job_project.html'; }
 </script>
 </body>
 </html>
