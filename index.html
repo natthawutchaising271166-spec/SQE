@@ -25,8 +25,6 @@ html,body{
     radial-gradient(circle at 90% 80%,rgba(59,130,246,.08) 0%,transparent 40%);
 }
 .orbitron{font-family:'Orbitron',sans-serif;font-variant-numeric:tabular-nums}
-
-/* ════ LOGIN ════ */
 #loginOverlay{
   position:fixed;inset:0;background:#060a14;z-index:9999;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
@@ -123,8 +121,6 @@ html,body{
 .lo-bar-t{height:4px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;margin-top:.5rem;position:relative}
 .lo-bar{height:100%;background:linear-gradient(90deg,#f97316,#fbbf24,#10b981);background-size:200% 100%;border-radius:99px;width:0%;transition:width .5s cubic-bezier(.22,.68,0,1.2);animation:barShift 2s linear infinite}
 @keyframes barShift{to{background-position:-200% 0}}
-
-/* ════ SYNC ════ */
 #syncPulse{
   display:inline-flex;align-items:center;gap:5px;
   font-size:.62rem;font-weight:800;letter-spacing:.08em;
@@ -136,8 +132,6 @@ html,body{
 #syncPulse.offline{background:rgba(239,68,68,.09);border-color:rgba(239,68,68,.2);color:#ef4444}
 .sdot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:sdotA 1.4s ease-in-out infinite}
 @keyframes sdotA{0%,100%{opacity:.3;transform:scale(.7)}50%{opacity:1;transform:scale(1.4)}}
-
-/* ════ APP SHELL ════ */
 #appShell{
   position:fixed;inset:0;display:flex;flex-direction:column;
   padding:1.5rem;gap:1.5rem;
@@ -166,12 +160,26 @@ html,body{
 @keyframes rippleOut{from{opacity:.7;transform:scale(.6)}to{opacity:0;transform:scale(2.2)}}
 tbody tr{opacity:0;transform:translateY(8px);will-change:opacity,transform;}
 tbody tr.vis{opacity:1;transform:translateY(0);transition:opacity .22s ease, transform .22s cubic-bezier(.22,.68,0,1.2);}
-tbody tr:nth-child(1).vis{transition-delay:.01s}tbody tr:nth-child(2).vis{transition-delay:.02s}tbody tr:nth-child(3).vis{transition-delay:.03s}tbody tr:nth-child(4).vis{transition-delay:.04s}tbody tr:nth-child(5).vis{transition-delay:.05s}tbody tr:nth-child(6).vis{transition-delay:.06s}tbody tr:nth-child(7).vis{transition-delay:.07s}tbody tr:nth-child(8).vis{transition-delay:.08s}tbody tr:nth-child(9).vis{transition-delay:.09s}tbody tr:nth-child(10).vis{transition-delay:.10s}tbody tr:nth-child(11).vis{transition-delay:.11s}tbody tr:nth-child(12).vis{transition-delay:.12s}
+tbody tr:nth-child(1).vis{transition-delay:.01s}
+tbody tr:nth-child(2).vis{transition-delay:.02s}
+tbody tr:nth-child(3).vis{transition-delay:.03s}
+tbody tr:nth-child(4).vis{transition-delay:.04s}
+tbody tr:nth-child(5).vis{transition-delay:.05s}
+tbody tr:nth-child(6).vis{transition-delay:.06s}
+tbody tr:nth-child(7).vis{transition-delay:.07s}
+tbody tr:nth-child(8).vis{transition-delay:.08s}
+tbody tr:nth-child(9).vis{transition-delay:.09s}
+tbody tr:nth-child(10).vis{transition-delay:.10s}
+tbody tr:nth-child(11).vis{transition-delay:.11s}
+tbody tr:nth-child(12).vis{transition-delay:.12s}
 tbody tr:hover{background:rgba(255,255,255,.7)!important;transition:background .15s!important}
 tbody tr td:first-child{position:relative}
-tbody tr td:first-child::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:linear-gradient(180deg,#f97316,#ea580c);border-radius:0 3px 3px 0;opacity:0;transform:scaleY(.3);transition:all .22s cubic-bezier(.34,1.56,.64,1);}
+tbody tr td:first-child::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;
+  background:linear-gradient(180deg,#f97316,#ea580c);border-radius:0 3px 3px 0;
+  opacity:0;transform:scaleY(.3);transition:all .22s cubic-bezier(.34,1.56,.64,1);
+}
 tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
-.neon-in{background:rgba(255,255,255,.6);border:1.5px solid rgba(255,255,255,.85);transition:all .22s cubic-bezier(.22,.68,0,1.2);outline:none;}
 .neon-in:focus{background:#fff;border-color:var(--or);box-shadow:0 0 0 3px rgba(249,115,22,.12),0 4px 16px -4px rgba(249,115,22,.15);transform:scale(1.015);}
 .neon-in:hover:not(:focus){background:rgba(255,255,255,.82);border-color:rgba(249,115,22,.3)}
 #judgmentSelect{transition:all .28s cubic-bezier(.34,1.56,.64,1)}
@@ -190,12 +198,16 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 .s-dot{animation:sdot 2s infinite}
 @keyframes sdot{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.3);opacity:1}}
 @keyframes rowDelete{to{opacity:0;transform:translateX(40px) scale(.95);max-height:0;padding:0;margin:0}}
-.row-deleting{animation:rowDelete .3s ease-in forwards}
+.row-deleting{animation:rowDelete .3s ease-in forwards;pointer-events:none;}
 @keyframes btnSuccess{0%{transform:scale(1)}40%{transform:scale(1.07)}70%{transform:scale(.97)}100%{transform:scale(1)}}
 .btn-success{animation:btnSuccess .5s cubic-bezier(.34,1.56,.64,1)}
 @keyframes kpiCardIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
 #kpiGrid > div{animation:kpiCardIn .45s cubic-bezier(.34,1.56,.64,1) both}
-#kpiGrid > div:nth-child(1){animation-delay:.05s}#kpiGrid > div:nth-child(2){animation-delay:.1s}#kpiGrid > div:nth-child(3){animation-delay:.15s}#kpiGrid > div:nth-child(4){animation-delay:.2s}#kpiGrid > div:nth-child(5){animation-delay:.25s}
+#kpiGrid > div:nth-child(1){animation-delay:.05s}
+#kpiGrid > div:nth-child(2){animation-delay:.1s}
+#kpiGrid > div:nth-child(3){animation-delay:.15s}
+#kpiGrid > div:nth-child(4){animation-delay:.2s}
+#kpiGrid > div:nth-child(5){animation-delay:.25s}
 #sidebar{animation:sideIn .5s cubic-bezier(.34,1.56,.64,1) both .1s}
 @keyframes sideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:none}}
 #mainPanel{animation:panelIn .5s cubic-bezier(.22,.68,0,1.2) both .15s}
@@ -206,14 +218,41 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 .bar-wrap:hover{transform:translateX(3px)}
 .bar-wrap:hover .bar-fill{filter:brightness(1.15)}
 [id^="qty"],[id^="lot"],[id^="pct"],[id^="master"]{transition:all .2s ease}
-#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(90px);background:#0f172a;color:#fff;padding:13px 28px;border-radius:1rem;font-weight:800;font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;box-shadow:0 15px 40px rgba(0,0,0,.3);z-index:99999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;border:1px solid rgba(249,115,22,.2);}
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  background:#0f172a;color:#fff;padding:13px 28px;border-radius:1rem;
+  font-weight:800;font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;
+  box-shadow:0 15px 40px rgba(0,0,0,.3);z-index:99999;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  white-space:nowrap;border:1px solid rgba(249,115,22,.2);
+}
 #toast.show{transform:translateX(-50%) translateY(0)}
-#syncBadge{position:fixed;top:12px;right:12px;z-index:8000;background:#0f172a;border:1px solid rgba(249,115,22,.3);color:#fff;font-size:.68rem;font-weight:800;padding:7px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:none;animation:bdgIn .35s cubic-bezier(.34,1.56,.64,1);}
+#syncBadge{
+  position:fixed;top:12px;right:12px;z-index:8000;
+  background:#0f172a;border:1px solid rgba(249,115,22,.3);color:#fff;
+  font-size:.68rem;font-weight:800;padding:7px 14px;border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);display:none;
+  animation:bdgIn .35s cubic-bezier(.34,1.56,.64,1);
+}
 @keyframes bdgIn{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* ════════════════════════════════════════════════════
-   DASHBOARD — FIX + BIGGER KPI ROW
-════════════════════════════════════════════════════ */
+/* ── Delete confirm modal ── */
+#deleteModal{
+  position:fixed;inset:0;z-index:20000;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(6,10,20,.7);backdrop-filter:blur(12px);
+}
+#deleteModal.show{display:flex}
+.del-card{
+  background:#fff;border-radius:1.8rem;padding:2.4rem 2.8rem;
+  text-align:center;max-width:380px;width:90%;
+  box-shadow:0 40px 100px rgba(0,0,0,.35);
+  animation:delCardIn .32s cubic-bezier(.34,1.56,.64,1);
+  border:1.5px solid rgba(239,68,68,.15);
+}
+@keyframes delCardIn{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:none}}
+
 #dashboardModal{
   position:fixed;inset:0;display:none;
   align-items:stretch;justify-content:stretch;
@@ -234,52 +273,21 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 }
 .dash-body{
   flex:1 1 0;min-height:0;display:flex;flex-direction:column;
-  gap:.6rem;padding:.85rem 1.2rem .85rem;overflow:hidden;
+  gap:.55rem;padding:.75rem 1.1rem .75rem;overflow:hidden;
 }
-
-/* ── KPI ROW: taller + more padding ── */
 .dash-kpi-row{
   flex:0 0 auto;display:grid;
   grid-template-columns:repeat(5,1fr);
-  gap:.65rem;
-  height:clamp(120px,17vh,168px);   /* ← ใหญ่ขึ้นจาก 78-105px */
+  gap:.55rem;height:clamp(78px,10.5vh,105px);
 }
 .dkpi{
   display:flex;flex-direction:column;justify-content:space-between;
-  border-radius:1.4rem;
-  padding:clamp(.8rem,1.4vh,1.2rem) clamp(.9rem,1.4vw,1.25rem);  /* ← padding เพิ่ม */
+  border-radius:1.15rem;padding:.7rem .85rem;
   transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s;
   animation:dkpiIn .5s cubic-bezier(.34,1.56,.64,1) both;cursor:default;
-  position:relative;overflow:hidden;
 }
-.dkpi:hover{transform:translateY(-3px) scale(1.015);box-shadow:0 16px 40px -8px rgba(0,0,0,.16);}
-@keyframes dkpiIn{from{opacity:0;transform:translateY(20px) scale(.92)}to{opacity:1;transform:none}}
-
-/* ── label บนสุดของ dkpi ── */
-.dkpi-label{
-  font-size:clamp(.62rem,.85vw,.78rem);  /* ← ใหญ่ขึ้น */
-  font-weight:900;letter-spacing:.08em;text-transform:uppercase;
-}
-/* ── ตัวเลขหลัก ── */
-.dkpi-num{
-  font-family:'Orbitron',sans-serif;font-variant-numeric:tabular-nums;
-  font-weight:900;line-height:1;
-  font-size:clamp(1.7rem,3.2vw,3.2rem);  /* ← ใหญ่ขึ้นมาก */
-  letter-spacing:-.02em;
-}
-/* ── แถว lot ล่าง ── */
-.dkpi-sub{
-  font-size:clamp(.58rem,.75vw,.7rem);  /* ← ใหญ่ขึ้น */
-  font-weight:700;text-transform:uppercase;
-}
-/* ── badge % ── */
-.dkpi-badge{
-  font-family:'Orbitron',sans-serif;font-variant-numeric:tabular-nums;
-  font-weight:900;border-radius:999px;line-height:1;
-  font-size:clamp(.64rem,.88vw,.82rem);  /* ← ใหญ่ขึ้น */
-  padding:3px 9px;
-}
-
+.dkpi:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 12px 30px -8px rgba(0,0,0,.13);}
+@keyframes dkpiIn{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}
 .dash-stats-row{
   flex:0 0 auto;display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -322,11 +330,13 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 }
 @keyframes drankIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .bar-wrap{margin-bottom:7px;cursor:pointer}
-.bar-lbl{font-size:clamp(.57rem,.73vw,.66rem);font-weight:800;color:#475569;margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;gap:4px;}
+.bar-lbl{
+  font-size:clamp(.57rem,.73vw,.66rem);font-weight:800;color:#475569;
+  margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;gap:4px;
+}
 .bar-lbl .bar-k{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 .bar-bg{background:rgba(0,0,0,.05);height:10px;border-radius:10px;overflow:hidden}
 .bar-fill{height:100%;border-radius:10px;transition:width 1.1s cubic-bezier(.16,1,.3,1);width:0%}
-
 @media(max-width:1200px){.dash-charts-row{grid-template-columns:1.5fr 1fr 1fr}}
 @media(max-width:1050px){
   .dash-kpi-row{grid-template-columns:repeat(3,1fr)}
@@ -371,6 +381,20 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 
 <div id="toast"></div>
 <div id="syncBadge"><span id="syncBadgeIcon" style="margin-right:6px">●</span><span id="syncBadgeText"></span></div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div id="deleteModal">
+  <div class="del-card">
+    <div class="text-4xl mb-3">🗑️</div>
+    <h3 class="font-black text-slate-800 text-lg mb-1">ยืนยันการลบ?</h3>
+    <p id="delModalDesc" class="text-slate-500 text-sm font-medium mb-5">รายการนี้จะถูกลบออกจาก Google Sheets ด้วย</p>
+    <div class="flex gap-3">
+      <button id="delCancelBtn" class="btn flex-1 bg-slate-100 text-slate-600 font-black py-3 rounded-xl text-sm hover:bg-slate-200">ยกเลิก</button>
+      <button id="delConfirmBtn" class="btn flex-1 bg-red-500 text-white font-black py-3 rounded-xl text-sm hover:bg-red-600">ลบเลย</button>
+    </div>
+    <p class="mt-3 text-[10px] text-slate-400 font-medium">⚡ ลบพร้อมกันทั้ง Local และ Google Sheets</p>
+  </div>
+</div>
 
 <!-- LOGIN -->
 <div id="loginOverlay">
@@ -549,7 +573,7 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
   </div>
 </div>
 
-<!-- ════ DASHBOARD MODAL ════ -->
+<!-- DASHBOARD MODAL -->
 <div id="dashboardModal" onclick="closeDashboard()">
 <div class="glass-dash" onclick="event.stopPropagation()">
   <div class="dash-topbar">
@@ -585,57 +609,46 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
   </div>
 
   <div class="dash-body">
-    <!-- ════ KPI ROW — ใช้ class ใหม่แทน inline style ════ -->
     <div class="dash-kpi-row">
-
-      <!-- TOTAL -->
       <div class="dkpi bg-slate-900 text-white shadow-xl" style="animation-delay:.0s">
         <div class="flex justify-between items-start">
-          <p class="dkpi-label opacity-55 tracking-widest">Total QTY</p>
-          <span class="bg-orange-500/20 text-orange-400 font-black px-2 py-0.5 rounded-md leading-tight" style="font-size:.65rem">ALL</span>
+          <p class="uppercase opacity-55 font-black tracking-widest" style="font-size:clamp(.55rem,.7vw,.65rem)">Total QTY</p>
+          <span class="bg-orange-500/20 text-orange-400 font-black px-1.5 py-0.5 rounded-md leading-tight" style="font-size:.58rem">ALL</span>
         </div>
-        <div id="dTotalQty" class="dkpi-num" style="text-shadow:0 0 30px rgba(249,115,22,.35)">0</div>
-        <div class="dkpi-sub opacity-55">Lots: <span id="dTotalLot" class="text-orange-400 font-black">0</span></div>
+        <div id="dTotalQty" class="orbitron font-black leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem);text-shadow:0 0 25px rgba(249,115,22,.3)">0</div>
+        <div class="font-bold opacity-55 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dTotalLot" class="text-orange-400 font-black">0</span></div>
       </div>
-
-      <!-- SF -->
       <div class="dkpi bg-white/80 border-b-4 border-orange-400 shadow-sm" style="animation-delay:.07s">
         <div class="flex justify-between items-start">
-          <p class="dkpi-label text-orange-600">SF Fault</p>
-          <span id="dSFpct" class="dkpi-badge bg-orange-500 text-white">0%</span>
+          <p class="text-orange-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">SF Fault</p>
+          <span id="dSFpct" class="bg-orange-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
         </div>
-        <div id="dSFqty" class="dkpi-num text-orange-500">0</div>
-        <div class="dkpi-sub text-slate-400">Lots: <span id="dSFlot" class="text-slate-800 font-black">0</span></div>
+        <div id="dSFqty" class="orbitron font-black text-orange-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
+        <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dSFlot" class="text-slate-800 font-black">0</span></div>
       </div>
-
-      <!-- VENDOR -->
       <div class="dkpi bg-white/80 border-b-4 border-red-400 shadow-sm" style="animation-delay:.13s">
         <div class="flex justify-between items-start">
-          <p class="dkpi-label text-red-600">Vendor</p>
-          <span id="dVENpct" class="dkpi-badge bg-red-500 text-white">0%</span>
+          <p class="text-red-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">Vendor</p>
+          <span id="dVENpct" class="bg-red-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
         </div>
-        <div id="dVENqty" class="dkpi-num text-red-500">0</div>
-        <div class="dkpi-sub text-slate-400">Lots: <span id="dVENlot" class="text-slate-800 font-black">0</span></div>
+        <div id="dVENqty" class="orbitron font-black text-red-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
+        <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dVENlot" class="text-slate-800 font-black">0</span></div>
       </div>
-
-      <!-- CTC -->
       <div class="dkpi bg-white/80 border-b-4 border-blue-400 shadow-sm" style="animation-delay:.19s">
         <div class="flex justify-between items-start">
-          <p class="dkpi-label text-blue-600">CTC</p>
-          <span id="dCTCpct" class="dkpi-badge bg-blue-500 text-white">0%</span>
+          <p class="text-blue-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">CTC</p>
+          <span id="dCTCpct" class="bg-blue-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
         </div>
-        <div id="dCTCqty" class="dkpi-num text-blue-500">0</div>
-        <div class="dkpi-sub text-slate-400">Lots: <span id="dCTClot" class="text-slate-800 font-black">0</span></div>
+        <div id="dCTCqty" class="orbitron font-black text-blue-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
+        <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dCTClot" class="text-slate-800 font-black">0</span></div>
       </div>
-
-      <!-- CAN USE -->
       <div class="dkpi bg-white/80 border-b-4 border-emerald-400 shadow-sm" style="animation-delay:.25s">
         <div class="flex justify-between items-start">
-          <p class="dkpi-label text-emerald-600">Can Use</p>
-          <span id="dOKpct" class="dkpi-badge bg-emerald-500 text-white">0%</span>
+          <p class="text-emerald-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">Can Use</p>
+          <span id="dOKpct" class="bg-emerald-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
         </div>
-        <div id="dOKqty" class="dkpi-num text-emerald-500">0</div>
-        <div class="dkpi-sub text-slate-400">Lots: <span id="dOKlot" class="text-slate-800 font-black">0</span></div>
+        <div id="dOKqty" class="orbitron font-black text-emerald-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
+        <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dOKlot" class="text-slate-800 font-black">0</span></div>
       </div>
     </div>
 
@@ -737,9 +750,10 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 
 <script>
 /* ══ CONFIG ══ */
-const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbzntKyjg6RLpiTc1UGMOaucN4bNbhgTNeasI4tWe4ASy-xmyX_4JkQLTXONYP66-Yziig/exec';
+const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbyyLPBUxVWF20GQYiU1pU7cW7IgSRHiOWdM5zHB5-ozH3D2yoxVbmefI4RMIGBg6luRYg/exec';
 const STORAGE_KEY = 'qdit_v3_records';
 const SYNCED_KEY  = 'qdit_v3_synced';
+
 const FETCH_TIMEOUT  = 5000;
 const PUSH_TIMEOUT   = 4000;
 const POLL_MS        = 8000;
@@ -783,15 +797,21 @@ let _saveTimer=null;
 function saveLocal(){
   localStorage.setItem(SYNCED_KEY, JSON.stringify([..._syncedSet]));
   clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }, 80);
+  _saveTimer = setTimeout(()=>{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  }, 80);
 }
 function saveLocalImmediate(){
   localStorage.setItem(SYNCED_KEY,  JSON.stringify([..._syncedSet]));
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
 }
+
 function saveAndRefresh(){
-  invalidateCache(); invalidateMyRecCache();
-  saveLocal(); refreshAll(); schedulePush();
+  invalidateCache();
+  invalidateMyRecCache();
+  saveLocal();
+  refreshAll();
+  schedulePush();
 }
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
@@ -800,6 +820,7 @@ function toast(msg){
   const el=$id('toast');el.textContent=msg;el.classList.add('show');
   clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),3200);
 }
+
 function showSyncBadge(msg,color){
   const b=$id('syncBadge');
   $id('syncBadgeText').textContent=msg;
@@ -807,6 +828,7 @@ function showSyncBadge(msg,color){
   b.style.display='block';clearTimeout(b._t);
   b._t=setTimeout(()=>b.style.display='none',4000);
 }
+
 function setSyncPulse(state,text){
   const el=$id('syncPulse');if(!el)return;
   el.className=`mt-2 inline-flex items-center gap-1 text-[.62rem] font-black uppercase tracking-[.08em] px-2 py-1 rounded-lg border transition-all ${
@@ -816,6 +838,7 @@ function setSyncPulse(state,text){
   }`;
   $id('syncPulseText').textContent=text||'LIVE SYNC';
 }
+
 function shake(el){if(!el)return;gsap.fromTo(el,{x:-8},{x:8,repeat:5,yoyo:true,duration:.06,ease:'power1.inOut'});}
 
 document.addEventListener('click',e=>{
@@ -829,9 +852,13 @@ document.addEventListener('click',e=>{
 
 function updateFilterBtns(type){
   const map={'ALL':'btn-ALL','SF':'btn-SF','VENDOR FAULT':'btn-VENDOR','CTC':'btn-CTC','CAN USE':'btn-CANUSE'};
-  Object.values(map).forEach(id=>{const el=$id(id);if(!el)return;el.classList.remove('active-filter');});
+  Object.values(map).forEach(id=>{
+    const el=$id(id);if(!el)return;
+    el.classList.remove('active-filter');
+  });
   const key=type==='CAN USE'?'CANUSE':type==='VENDOR FAULT'?'VENDOR':type;
-  const target=$id(map[key]||'btn-ALL');if(target)target.classList.add('active-filter');
+  const target=$id(map[key]||'btn-ALL');
+  if(target)target.classList.add('active-filter');
 }
 
 function animNum(id, target){
@@ -842,7 +869,8 @@ function animNum(id, target){
   const obj={v:cur};
   const diff=Math.abs(target-cur);
   const dur=diff<10?0.2:diff<100?0.4:0.7;
-  gsap.to(obj,{v:target, duration:dur, ease:'power2.out',
+  gsap.to(obj,{
+    v:target, duration:dur, ease:'power2.out',
     onUpdate:()=>{el.textContent=Math.round(obj.v).toLocaleString();}
   });
 }
@@ -867,7 +895,8 @@ function initParticles(){
     ctx.clearRect(0,0,W,H);
     pts.forEach(p=>{
       p.x+=p.vx;p.y+=p.vy;
-      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
       ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
       ctx.fillStyle=p.color+p.a+')';ctx.fill();
     });
@@ -877,7 +906,8 @@ function initParticles(){
         const d=Math.sqrt(dx*dx+dy*dy);
         if(d<120){
           ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
-          ctx.strokeStyle='rgba(249,115,22,'+(.12*(1-d/120))+')';ctx.lineWidth=.5;ctx.stroke();
+          ctx.strokeStyle='rgba(249,115,22,'+(.12*(1-d/120))+')';
+          ctx.lineWidth=.5;ctx.stroke();
         }
       }
     }
@@ -885,163 +915,328 @@ function initParticles(){
   draw();
 }
 
-/* ════ SYNC ENGINE ════ */
+/* ════════════════════════════════════════════════════════════
+   SYNC ENGINE
+════════════════════════════════════════════════════════════ */
 function normalizeRow(d, inspector){
   return {
-    id:d.id||(Date.now()+'_'+Math.random()), date:d.date||'',
-    shift:d.shift||'SHIFT A', inspector:d.inspector||inspector, ref:String(d.ref||''),
-    line:d.line||'', supplier:d.supplier||'', partNo:d.partNo||'', partName:d.partName||'',
-    qty:parseInt(d.qty)||0, defect:d.defect||'', remark:d.remark||'', judgment:d.judgment||'SF',
+    id       : d.id || (Date.now()+'_'+Math.random()),
+    date     : d.date     || '',
+    shift    : d.shift    || 'SHIFT A',
+    inspector: d.inspector|| inspector,
+    ref      : String(d.ref || ''),
+    line     : d.line     || '',
+    supplier : d.supplier || '',
+    partNo   : d.partNo   || '',
+    partName : d.partName || '',
+    qty      : parseInt(d.qty) || 0,
+    defect   : d.defect   || '',
+    remark   : d.remark   || '',
+    judgment : d.judgment || 'SF',
   };
 }
+
 let _fetchInFlight = false;
 async function fetchFromCloud(inspector, ms){
-  ms=ms||FETCH_TIMEOUT;
-  const doFetch=(timeout)=>{
-    const ctrl=new AbortController();
-    const t=setTimeout(()=>ctrl.abort(),timeout);
-    return fetch(GOOGLE_URL+'?inspector='+encodeURIComponent(inspector)+'&t='+Date.now(),
-      {signal:ctrl.signal,cache:'no-store'}).then(res=>{clearTimeout(t);return res;}).catch(err=>{clearTimeout(t);throw err;});
+  ms = ms || FETCH_TIMEOUT;
+  const doFetch = (timeout) => {
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), timeout);
+    return fetch(
+      GOOGLE_URL + '?inspector=' + encodeURIComponent(inspector) + '&t=' + Date.now(),
+      { signal: ctrl.signal, cache: 'no-store' }
+    ).then(res => { clearTimeout(t); return res; })
+     .catch(err => { clearTimeout(t); throw err; });
   };
-  try{
-    let res;try{res=await doFetch(ms);}catch(e){res=await doFetch(Math.min(ms,4000));}
-    if(!res.ok)return[];
-    const text=await res.text();let r;try{r=JSON.parse(text);}catch(e){return[];}
-    if(!r||r.status!=='success'||!Array.isArray(r.data))return[];
-    return r.data.map(d=>normalizeRow(d,inspector));
-  }catch(err){return[];}
+  try {
+    let res;
+    try      { res = await doFetch(ms); }
+    catch(e) { res = await doFetch(Math.min(ms, 4000)); }
+    if(!res.ok) return [];
+    const text = await res.text();
+    let r;
+    try { r = JSON.parse(text); } catch(e){ return []; }
+    if(!r || r.status!=='success' || !Array.isArray(r.data)) return [];
+    return r.data.map(d => normalizeRow(d, inspector));
+  } catch(err){ return []; }
 }
+
 function pushToCloud(rows){
-  if(!rows.length)return Promise.resolve();
-  const payload=JSON.stringify(rows.map(r=>({
-    date:r.date,shift:r.shift,inspector:r.inspector,ref:r.ref,
-    line:r.line,supplier:r.supplier,partNo:r.partNo,partName:r.partName,
-    qty:r.qty,defect:r.defect,remark:r.remark,judgment:r.judgment,
+  if(!rows.length) return Promise.resolve();
+  const payload = JSON.stringify(rows.map(r=>({
+    date:r.date, shift:r.shift, inspector:r.inspector, ref:r.ref,
+    line:r.line, supplier:r.supplier, partNo:r.partNo, partName:r.partName,
+    qty:r.qty, defect:r.defect, remark:r.remark, judgment:r.judgment,
   })));
-  const ctrl=new AbortController();
-  setTimeout(()=>ctrl.abort(),PUSH_TIMEOUT);
-  return fetch(GOOGLE_URL,{method:'POST',mode:'no-cors',cache:'no-cache',
-    headers:{'Content-Type':'application/json'},body:payload,signal:ctrl.signal,
+  const ctrl = new AbortController();
+  setTimeout(()=>ctrl.abort(), PUSH_TIMEOUT);
+  return fetch(GOOGLE_URL, {
+    method:'POST', mode:'no-cors', cache:'no-cache',
+    headers:{'Content-Type':'application/json'},
+    body: payload,
+    signal: ctrl.signal,
   }).catch(()=>{});
 }
+
+/* ════════════════════════════════════════════════
+   ★ deleteFromCloud — ส่ง action=delete ไป GAS
+   ★ ใช้ no-cors = fire-and-forget (เร็ว, ไม่ block UI)
+════════════════════════════════════════════════ */
+function deleteFromCloud(ref, inspector){
+  if(!ref) return Promise.resolve();
+  const ctrl = new AbortController();
+  setTimeout(()=>ctrl.abort(), PUSH_TIMEOUT);
+  return fetch(GOOGLE_URL, {
+    method  : 'POST',
+    mode    : 'no-cors',
+    cache   : 'no-cache',
+    headers : {'Content-Type':'application/json'},
+    body    : JSON.stringify({ action:'delete', ref:String(ref), inspector:String(inspector||currentUser) }),
+    signal  : ctrl.signal,
+  }).catch(()=>{});
+}
+
+/* ════════════════════════════════════════════════
+   ★ clearAllFromCloud — ส่ง action=clearAll ไป GAS
+════════════════════════════════════════════════ */
+function clearAllFromCloud(inspector){
+  if(!inspector) return Promise.resolve();
+  const ctrl = new AbortController();
+  setTimeout(()=>ctrl.abort(), PUSH_TIMEOUT);
+  return fetch(GOOGLE_URL, {
+    method  : 'POST',
+    mode    : 'no-cors',
+    cache   : 'no-cache',
+    headers : {'Content-Type':'application/json'},
+    body    : JSON.stringify({ action:'clearAll', inspector:String(inspector) }),
+    signal  : ctrl.signal,
+  }).catch(()=>{});
+}
+
 function mergeCloud(cloudRows){
-  const ex=new Set(records.map(r=>r.ref));
-  const newRows=cloudRows.filter(r=>!ex.has(r.ref));
-  if(newRows.length){records.push(...newRows);invalidateMyRecCache();}
+  const ex = new Set(records.map(r=>r.ref));
+  const newRows = cloudRows.filter(r=>!ex.has(r.ref));
+  if(newRows.length){
+    records.push(...newRows);
+    invalidateMyRecCache();
+  }
   syncedReset(cloudRows.map(r=>r.ref));
   return newRows.length;
 }
-let _pushInFlight=false;
+
+let _pushInFlight = false;
 function schedulePush(){
   clearTimeout(pushDebounce);
-  pushDebounce=setTimeout(async()=>{
-    if(_pushInFlight)return;
-    const unsync=getMyRecords().filter(r=>!syncedHas(r.ref));
-    if(!unsync.length)return;
-    _pushInFlight=true;
+  pushDebounce = setTimeout(async()=>{
+    if(_pushInFlight) return;
+    const unsync = getMyRecords().filter(r=>!syncedHas(r.ref));
+    if(!unsync.length) return;
+    _pushInFlight = true;
     try{
       await pushToCloud(unsync);
-      unsync.forEach(r=>syncedAdd(r.ref));saveLocal();
-      showSyncBadge('☁️ Auto-synced','#10b981');setSyncPulse('live','LIVE SYNC');
-    }catch(e){}finally{_pushInFlight=false;}
-  },PUSH_DEBOUNCE);
+      unsync.forEach(r=>syncedAdd(r.ref));
+      saveLocal();
+      showSyncBadge('☁️ Auto-synced','#10b981');
+      setSyncPulse('live','LIVE SYNC');
+    }catch(e){}
+    finally{ _pushInFlight=false; }
+  }, PUSH_DEBOUNCE);
 }
+
 function startPolling(){
-  if(pollingTimer)clearInterval(pollingTimer);
-  pollingTimer=setInterval(async()=>{
-    if(_fetchInFlight)return;_fetchInFlight=true;setSyncPulse('syncing','SYNCING…');
+  if(pollingTimer) clearInterval(pollingTimer);
+  pollingTimer = setInterval(async()=>{
+    if(_fetchInFlight) return;
+    _fetchInFlight = true;
+    setSyncPulse('syncing','SYNCING…');
     try{
-      const cloud=await fetchFromCloud(currentUser,FETCH_TIMEOUT);
-      if(!cloud.length){setSyncPulse('offline','OFFLINE');return;}
-      const added=mergeCloud(cloud);
-      if(added){saveLocal();refreshAll();showSyncBadge('🔔 +'+added+' new','#60a5fa');setSyncPulse('live','↓ '+added+' NEW');setTimeout(()=>setSyncPulse('live','LIVE SYNC'),2500);}
-      else{setSyncPulse('live','LIVE SYNC');}
-    }catch(e){setSyncPulse('offline','OFFLINE');}finally{_fetchInFlight=false;}
-  },POLL_MS);
+      const cloud = await fetchFromCloud(currentUser, FETCH_TIMEOUT);
+      if(!cloud.length){ setSyncPulse('offline','OFFLINE'); return; }
+      const added = mergeCloud(cloud);
+      if(added){
+        saveLocal(); refreshAll();
+        showSyncBadge('🔔 +'+added+' new','#60a5fa');
+        setSyncPulse('live','↓ '+added+' NEW');
+        setTimeout(()=>setSyncPulse('live','LIVE SYNC'), 2500);
+      } else {
+        setSyncPulse('live','LIVE SYNC');
+      }
+    } catch(e){ setSyncPulse('offline','OFFLINE'); }
+    finally{ _fetchInFlight=false; }
+  }, POLL_MS);
 }
+
 async function syncToCloud(){
-  if(_fetchInFlight){toast('⏳ Sync กำลังทำงาน…');return;}
-  const btn=$id('syncBtnMain'),icon=$id('syncIcon');
-  btn.disabled=true;icon.classList.add('spin');setSyncPulse('syncing','SYNCING…');_fetchInFlight=true;
-  const unsync=getMyRecords().filter(r=>!syncedHas(r.ref));
+  if(_fetchInFlight){ toast('⏳ Sync กำลังทำงาน…'); return; }
+  const btn=$id('syncBtnMain'), icon=$id('syncIcon');
+  btn.disabled=true; icon.classList.add('spin');
+  setSyncPulse('syncing','SYNCING…');
+  _fetchInFlight = true;
+  const unsync = getMyRecords().filter(r=>!syncedHas(r.ref));
   try{
-    const [cloud]=await Promise.all([fetchFromCloud(currentUser,FETCH_TIMEOUT),unsync.length?pushToCloud(unsync):Promise.resolve()]);
-    if(unsync.length)unsync.forEach(r=>syncedAdd(r.ref));
-    let pulled=0;if(cloud.length){pulled=mergeCloud(cloud);if(pulled)refreshAll();}
-    saveLocal();toast('✅ ↑'+unsync.length+' pushed  ↓'+pulled+' pulled');setSyncPulse('live','LIVE SYNC');
-  }catch(e){toast('⚠️ Sync error — ลองใหม่อีกครั้ง');setSyncPulse('offline','OFFLINE');}
-  finally{_fetchInFlight=false;btn.disabled=false;icon.classList.remove('spin');}
+    const [cloud] = await Promise.all([
+      fetchFromCloud(currentUser, FETCH_TIMEOUT),
+      unsync.length ? pushToCloud(unsync) : Promise.resolve(),
+    ]);
+    if(unsync.length) unsync.forEach(r=>syncedAdd(r.ref));
+    let pulled = 0;
+    if(cloud.length){
+      pulled = mergeCloud(cloud);
+      if(pulled) refreshAll();
+    }
+    saveLocal();
+    toast(`✅ ↑${unsync.length} pushed  ↓${pulled} pulled`);
+    setSyncPulse('live','LIVE SYNC');
+  } catch(e){
+    toast('⚠️ Sync error — ลองใหม่อีกครั้ง');
+    setSyncPulse('offline','OFFLINE');
+  } finally{
+    _fetchInFlight = false;
+    btn.disabled=false; icon.classList.remove('spin');
+  }
+}
+
+/* ══ LOGIN PROGRESS ══ */
+async function setStep(n,state){
+  for(let i=1;i<=3;i++){
+    const el=$id('ls'+i);if(!el)continue;
+    el.classList.remove('active','done');
+    if(i<n)el.classList.add('done');
+    if(i===n)el.classList.add(state);
+  }
+  const pcts={1:20,2:60,3:88};
+  $id('loBar').style.width=(pcts[n]||20)+'%';
 }
 
 /* ══ LOGIN ══ */
-async function setStep(n,state){
-  for(let i=1;i<=3;i++){const el=$id('ls'+i);if(!el)continue;el.classList.remove('active','done');if(i<n)el.classList.add('done');if(i===n)el.classList.add(state);}
-  const pcts={1:20,2:60,3:88};$id('loBar').style.width=(pcts[n]||20)+'%';
-}
 async function login(){
-  const name=($id('loginName').value||'').trim().toUpperCase();const pass=$id('loginPass').value;
+  const name=($id('loginName').value||'').trim().toUpperCase();
+  const pass=$id('loginPass').value;
   if(!name){shake($id('loginName'));toast('❌ กรุณาระบุชื่อ');return;}
   if(pass!=='1234'){
     $id('loginPass').style.borderColor='#ef4444';
     gsap.fromTo('#loginPass',{x:0},{x:[-8,8,-6,6,-4,4,0],duration:.5});
-    setTimeout(()=>$id('loginPass').style.borderColor='',1500);toast('⛔ รหัสผ่านไม่ถูกต้อง');return;
+    setTimeout(()=>$id('loginPass').style.borderColor='',1500);
+    toast('⛔ รหัสผ่านไม่ถูกต้อง');return;
   }
-  currentUser=name;sessionStorage.setItem('currentUser',name);
-  $id('loginForm').style.display='none';$id('loProgress').style.display='flex';$id('loginBtn').disabled=true;
+  currentUser=name;
+  sessionStorage.setItem('currentUser',name);
+  $id('loginForm').style.display='none';
+  $id('loProgress').style.display='flex';
+  $id('loginBtn').disabled=true;
   await setStep(1,'active');await sleep(200);await setStep(1,'done');
   await setStep(2,'active');$id('loBar').style.width='55%';await sleep(100);
   $id('currentUserDisp').textContent=name;
   const tl=gsap.timeline();
   tl.to('#loCard',{scale:.88,opacity:0,y:-20,duration:.3,ease:'power3.in'});
-  tl.to('#loginOverlay',{opacity:0,duration:.45,ease:'power2.in',onComplete:()=>{$id('loginOverlay').style.display='none';}});
-  tl.to('#appShell',{opacity:1,duration:.55,ease:'back.out(1.6)',onStart:()=>{$id('appShell').style.visibility='visible';$id('appShell').classList.add('visible');refreshAll();}},'-=0.2');
-  await setStep(2,'done');await setStep(3,'active');$id('ls2note').textContent='syncing…';setSyncPulse('syncing','SYNCING…');
-  const pendingPush=getMyRecords().filter(r=>!syncedHas(r.ref));
-  Promise.all([fetchFromCloud(name,FETCH_TIMEOUT),pendingPush.length?pushToCloud(pendingPush):Promise.resolve()]).then(([cloud])=>{
-    $id('loBar').style.width='100%';setStep(3,'done');
-    if(pendingPush.length)pendingPush.forEach(r=>syncedAdd(r.ref));
-    if(cloud.length>0){const added=mergeCloud(cloud);saveLocal();if(added){refreshAll();toast('✅ Cloud: +'+added+' รายการใหม่');}setSyncPulse('live','LIVE SYNC');}
-    else{saveLocal();setSyncPulse('offline','OFFLINE');}
+  tl.to('#loginOverlay',{opacity:0,duration:.45,ease:'power2.in',
+    onComplete:()=>{$id('loginOverlay').style.display='none';}
+  });
+  tl.to('#appShell',{opacity:1,duration:.55,ease:'back.out(1.6)',
+    onStart:()=>{
+      $id('appShell').style.visibility='visible';
+      $id('appShell').classList.add('visible');
+      refreshAll();
+    }
+  },'-=0.2');
+  await setStep(2,'done');
+  await setStep(3,'active');
+  $id('ls2note').textContent='syncing…';
+  setSyncPulse('syncing','SYNCING…');
+  const pendingPush = getMyRecords().filter(r=>!syncedHas(r.ref));
+  Promise.all([
+    fetchFromCloud(name, FETCH_TIMEOUT),
+    pendingPush.length ? pushToCloud(pendingPush) : Promise.resolve(),
+  ]).then(([cloud])=>{
+    $id('loBar').style.width='100%'; setStep(3,'done');
+    if(pendingPush.length) pendingPush.forEach(r=>syncedAdd(r.ref));
+    if(cloud.length>0){
+      const added = mergeCloud(cloud);
+      saveLocal();
+      if(added){ refreshAll(); toast('✅ Cloud: +'+added+' รายการใหม่'); }
+      setSyncPulse('live','LIVE SYNC');
+    }else{
+      saveLocal(); setSyncPulse('offline','OFFLINE');
+    }
     startPolling();
   });
 }
+
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&$id('loginOverlay').style.display!=='none')login();});
 
+/* ══ SESSION RESUME ══ */
 window.addEventListener('load',async()=>{
-  $id('inputDate').valueAsDate=new Date();startClock();initParticles();forceViewportReset();
+  $id('inputDate').valueAsDate=new Date();
+  startClock(); initParticles();
+  forceViewportReset();
   const saved=sessionStorage.getItem('currentUser');
   if(saved){
-    currentUser=saved;$id('currentUserDisp').textContent=saved;
-    $id('loginOverlay').style.display='none';$id('appShell').classList.add('visible');
-    refreshAll();setSyncPulse('syncing','SYNCING…');
-    const pendingPush=getMyRecords().filter(r=>!syncedHas(r.ref));
-    const [cloud]=await Promise.all([fetchFromCloud(saved,FETCH_TIMEOUT),pendingPush.length?pushToCloud(pendingPush):Promise.resolve()]).catch(()=>[[]]);
-    if(pendingPush.length)pendingPush.forEach(r=>syncedAdd(r.ref));
-    if(cloud&&cloud.length>0){const added=mergeCloud(cloud);saveLocal();if(added)refreshAll();setSyncPulse('live','LIVE SYNC');}
-    else{saveLocal();setSyncPulse('offline','OFFLINE');}
+    currentUser=saved;
+    $id('currentUserDisp').textContent=saved;
+    $id('loginOverlay').style.display='none';
+    $id('appShell').classList.add('visible');
+    refreshAll();
+    setSyncPulse('syncing','SYNCING…');
+    const pendingPush = getMyRecords().filter(r=>!syncedHas(r.ref));
+    const [cloud] = await Promise.all([
+      fetchFromCloud(saved, FETCH_TIMEOUT),
+      pendingPush.length ? pushToCloud(pendingPush) : Promise.resolve(),
+    ]).catch(()=>[[]]);
+    if(pendingPush.length) pendingPush.forEach(r=>syncedAdd(r.ref));
+    if(cloud && cloud.length>0){
+      const added = mergeCloud(cloud);
+      saveLocal();
+      if(added) refreshAll();
+      setSyncPulse('live','LIVE SYNC');
+    } else {
+      saveLocal();
+      setSyncPulse('offline','OFFLINE');
+    }
     startPolling();
   }
 });
+
 function forceViewportReset(){
   gsap.set(['html','body','#appShell'],{clearProps:'all'});
-  document.documentElement.style.display='none';void document.documentElement.offsetHeight;document.documentElement.style.display='';
+  document.documentElement.style.display='none';
+  void document.documentElement.offsetHeight;
+  document.documentElement.style.display='';
   let vm=document.querySelector('meta[name=viewport]');
   if(vm){const orig=vm.content;vm.content='width=device-width, initial-scale=1.0, viewport-fit=cover';setTimeout(()=>{vm.content=orig;},80);}
 }
+
 window.addEventListener('pageshow',e=>{
   forceViewportReset();
-  if(e.persisted&&currentUser){setTimeout(()=>{refreshAll();const shell=$id('appShell');if(shell){shell.classList.remove('visible');void shell.offsetWidth;shell.classList.add('visible');}},50);}
+  if(e.persisted&&currentUser){
+    setTimeout(()=>{
+      refreshAll();
+      const shell=$id('appShell');
+      if(shell){shell.classList.remove('visible');void shell.offsetWidth;shell.classList.add('visible');}
+    },50);
+  }
 });
+
+/* ══ LOGOUT ══ */
 async function logout(){
   const unsync=getMyRecords().filter(r=>!syncedHas(r.ref));
-  if(unsync.length){toast('⏳ Syncing before logout…');await pushToCloud(unsync);unsync.forEach(r=>syncedAdd(r.ref));saveLocalImmediate();}
+  if(unsync.length){
+    toast('⏳ Syncing before logout…');
+    await pushToCloud(unsync);
+    unsync.forEach(r=>syncedAdd(r.ref));
+    saveLocalImmediate();
+  }
   if(pollingTimer)clearInterval(pollingTimer);
-  sessionStorage.removeItem('currentUser');location.reload();
+  sessionStorage.removeItem('currentUser');
+  location.reload();
 }
+
+/* ══ CLOCK ══ */
 function startClock(){
   const tick=()=>{const n=new Date();const el=$id('liveClock');if(el)el.textContent=n.toLocaleDateString('en-GB')+' · '+n.toLocaleTimeString('en-GB');};
   tick();setInterval(tick,1000);
 }
+
+/* ══ JUDGMENT COLOR ══ */
 function handleJudgment(val){
   const sel=$id('judgmentSelect'),btn=$id('submitBtn');
   const c={'SF':'#f97316','VENDOR FAULT':'#ef4444','CTC':'#3b82f6','CAN USE':'#10b981'};
@@ -1065,10 +1260,19 @@ $id('claimForm').addEventListener('submit',e=>{
   });
   saveAndRefresh();
   const sb=$id('submitBtn');
-  if(sb){const orig=sb.style.backgroundColor;sb.style.backgroundColor='#10b981';sb.style.boxShadow='0 10px 25px -5px #10b98166';sb.classList.add('btn-success');setTimeout(()=>{sb.style.backgroundColor=orig;sb.style.boxShadow='';sb.classList.remove('btn-success');},700);}
+  if(sb){
+    const orig=sb.style.backgroundColor;
+    sb.style.backgroundColor='#10b981';sb.style.boxShadow='0 10px 25px -5px #10b98166';
+    sb.classList.add('btn-success');
+    setTimeout(()=>{sb.style.backgroundColor=orig;sb.style.boxShadow='';sb.classList.remove('btn-success');},700);
+  }
   const fields=['refNo','supplier','qty','partNo','partOn','defectName','remark'];
-  fields.forEach((fid,i)=>{const f=$id(fid);if(!f)return;gsap.fromTo(f,{backgroundColor:'rgba(16,185,129,.08)'},{backgroundColor:'rgba(255,255,255,.6)',duration:.6,delay:i*.03});});
-  e.target.reset();handleJudgment('');$id('inputDate').valueAsDate=new Date();
+  fields.forEach((fid,i)=>{
+    const f=$id(fid);if(!f)return;
+    gsap.fromTo(f,{backgroundColor:'rgba(16,185,129,.08)'},{backgroundColor:'rgba(255,255,255,.6)',duration:.6,delay:i*.03});
+  });
+  e.target.reset();handleJudgment('');
+  $id('inputDate').valueAsDate=new Date();
   toast('✅ บันทึกข้อมูลสำเร็จ');
 });
 
@@ -1082,36 +1286,54 @@ function setFilter(type){
   });
   updateFilterBtns(type);
   const tb=$id('tableBody');
-  gsap.to(tb,{opacity:0,y:6,duration:.12,ease:'power2.in',onComplete:()=>{renderTable();gsap.to(tb,{opacity:1,y:0,duration:.22,ease:'power2.out'});}});
+  gsap.to(tb,{opacity:0,y:6,duration:.12,ease:'power2.in',onComplete:()=>{
+    renderTable();
+    gsap.to(tb,{opacity:1,y:0,duration:.22,ease:'power2.out'});
+  }});
 }
+
 let searchDebounce;
 function smoothSearch(){
-  clearTimeout(searchDebounce);const tb=$id('tableBody');gsap.to(tb,{opacity:.4,duration:.1});
-  searchDebounce=setTimeout(()=>{renderTable();gsap.to(tb,{opacity:1,duration:.2,ease:'power1.out'});},150);
+  clearTimeout(searchDebounce);
+  const tb=$id('tableBody');
+  gsap.to(tb,{opacity:.4,duration:.1});
+  searchDebounce=setTimeout(()=>{
+    renderTable();
+    gsap.to(tb,{opacity:1,duration:.2,ease:'power1.out'});
+  },150);
 }
 
 /* ══ RENDER TABLE ══ */
 const SM_MAP={
-  'SF':{dot:'bg-orange-500',cls:'text-orange-600 bg-orange-50'},
-  'VENDOR FAULT':{dot:'bg-red-500',cls:'text-red-600 bg-red-50'},
-  'CTC':{dot:'bg-blue-500',cls:'text-blue-600 bg-blue-50'},
-  'CAN USE':{dot:'bg-emerald-500',cls:'text-emerald-600 bg-emerald-50'}
+  'SF':          {dot:'bg-orange-500',cls:'text-orange-600 bg-orange-50'},
+  'VENDOR FAULT':{dot:'bg-red-500',   cls:'text-red-600 bg-red-50'},
+  'CTC':         {dot:'bg-blue-500',  cls:'text-blue-600 bg-blue-50'},
+  'CAN USE':     {dot:'bg-emerald-500',cls:'text-emerald-600 bg-emerald-50'}
 };
+
 let _searchCache=null,_searchCacheKey='';
 function getSearchCache(){
   const key=records.length+'_'+currentUser;
   if(_searchCache&&_searchCacheKey===key)return _searchCache;
   const myR=records.filter(r=>r.inspector===currentUser);
   _searchCache=new Map();
-  myR.forEach(r=>{_searchCache.set(r.id,(r.date+' '+r.shift+' '+r.ref+' '+r.line+' '+r.supplier+' '+r.partNo+' '+r.partName+' '+r.defect+' '+r.remark+' '+r.judgment).toLowerCase());});
-  _searchCacheKey=key;return _searchCache;
+  myR.forEach(r=>{
+    _searchCache.set(r.id,(r.date+' '+r.shift+' '+r.ref+' '+r.line+' '+r.supplier+' '+r.partNo+' '+r.partName+' '+r.defect+' '+r.remark+' '+r.judgment).toLowerCase());
+  });
+  _searchCacheKey=key;
+  return _searchCache;
 }
 function invalidateCache(){_searchCache=null;_searchCacheKey='';}
+
 let _lastRenderHash='';
+
 function renderTable(){
   const tbody=$id('tableBody');
   const search=($id('searchInput').value||'').toLowerCase();
-  const myR=getMyRecords();const cache=getSearchCache();const syncSet=_syncedSet;
+  const myR=getMyRecords();
+  const cache=getSearchCache();
+  const syncSet=_syncedSet;
+
   const filtered=[];
   for(let i=myR.length-1;i>=0;i--){
     const r=myR[i];
@@ -1119,16 +1341,20 @@ function renderTable(){
     if(search&&!(cache.get(r.id)||'').includes(search))continue;
     filtered.push(r);
   }
+
   const hash=filterType+'|'+search+'|'+filtered.map(r=>r.id+'_'+r.judgment+'_'+r.qty).join(',');
-  if(hash===_lastRenderHash)return;_lastRenderHash=hash;
+  if(hash===_lastRenderHash)return;
+  _lastRenderHash=hash;
+
   let html='';
   filtered.forEach(r=>{
-    const s=SM_MAP[r.judgment]||SM_MAP['SF'];const synced=syncSet.has(r.ref);
+    const s=SM_MAP[r.judgment]||SM_MAP['SF'];
+    const synced=syncSet.has(r.ref);
     const safeId=String(r.id).replace(/"/g,'&quot;');
     html+=`<tr class="group hover:bg-white/60 border-l-4 border-transparent hover:border-orange-500" data-rid="${safeId}">
       <td class="pl-8 py-5 font-bold text-[11px] text-slate-400">${r.date}</td>
       <td class="text-[11px] font-black text-slate-700">${r.shift}<br><span class="text-slate-400 font-bold">L: ${r.line||'—'}</span></td>
-      <td class="text-[11px] font-black text-slate-400"><span style="color:${synced?'#10b981':'#cbd5e1'}" title="Cloud sync">●</span> #${r.ref}</td>
+      <td class="text-[11px] font-black text-slate-400"><span style="color:${synced?'#10b981':'#cbd5e1'}" title="${synced?'Synced to Cloud':'Not synced yet'}">●</span> #${r.ref}</td>
       <td><div class="text-[11px] font-black text-slate-800 uppercase">${r.supplier}</div><div class="text-[10px] text-slate-500 font-bold">${r.partNo} / ${r.partName}</div></td>
       <td class="text-center text-lg font-black orbitron italic text-slate-700">${r.qty.toLocaleString()}</td>
       <td><div class="text-[11px] font-bold text-slate-600 uppercase">${r.defect}</div></td>
@@ -1139,69 +1365,197 @@ function renderTable(){
         <button data-action="delete" class="btn opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 rounded-lg px-1.5 py-0.5 hover:bg-red-50" title="Delete">✕</button>
       </td></tr>`;
   });
+
   tbody.innerHTML=html;
-  requestAnimationFrame(()=>{ tbody.querySelectorAll('tr').forEach(tr=>tr.classList.add('vis')); });
+  requestAnimationFrame(()=>{
+    const rows=tbody.querySelectorAll('tr');
+    rows.forEach(tr=>tr.classList.add('vis'));
+  });
 }
 
+/* ══════════════════════════════════════════════
+   TABLE EVENT DELEGATION
+══════════════════════════════════════════════ */
 document.addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]');if(!btn)return;
   const tr=btn.closest('tr[data-rid]');if(!tr)return;
   const rid=tr.dataset.rid;
-  if(btn.dataset.action==='clone')cloneRecord(rid);
-  if(btn.dataset.action==='delete')delRow(rid,tr);
+  if(btn.dataset.action==='clone')  cloneRecord(rid);
+  if(btn.dataset.action==='delete') showDeleteModal(rid, tr);
 });
-function findRecord(id){return records.find(x=>String(x.id)===String(id));}
-function delRow(id,trEl){
-  if(!confirm('ลบรายการนี้?'))return;
-  trEl.classList.add('row-deleting');
-  setTimeout(()=>{
-    const r=findRecord(id);if(!r)return;
-    records=records.filter(x=>String(x.id)!==String(id));
-    syncedDelete(r.ref);invalidateMyRecCache();_lastRenderHash='';saveAndRefresh();toast('🗑 ลบข้อมูลแล้ว');
-  },290);
+
+/* ════════════════════════════════════════════════════════════
+   ★ DELETE MODAL — แทนที่ confirm() ทั่วไปด้วย custom modal
+   ★ เสถียรกว่า: ไม่ block event loop, ไม่มี race condition
+   ★ ลบ local + ส่ง deleteFromCloud พร้อมกัน (fire-and-forget)
+════════════════════════════════════════════════════════════ */
+let _pendingDelete = null; // { id, trEl, ref, inspector }
+
+function showDeleteModal(id, trEl){
+  const r = findRecord(id);
+  if(!r){ toast('⚠️ ไม่พบข้อมูล'); return; }
+
+  _pendingDelete = { id, trEl, ref: r.ref, inspector: r.inspector };
+
+  const desc = `Ref: ${r.ref} · ${r.supplier} · ${r.date}`;
+  $id('delModalDesc').textContent = desc;
+
+  const modal = $id('deleteModal');
+  modal.classList.add('show');
+
+  // focus cancel ก่อน (UX best practice)
+  requestAnimationFrame(()=> $id('delCancelBtn').focus());
 }
+
+function hideDeleteModal(){
+  $id('deleteModal').classList.remove('show');
+  _pendingDelete = null;
+}
+
+$id('delCancelBtn').addEventListener('click', hideDeleteModal);
+$id('deleteModal').addEventListener('click', e=>{
+  if(e.target === $id('deleteModal')) hideDeleteModal();
+});
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && _pendingDelete) hideDeleteModal();
+});
+
+$id('delConfirmBtn').addEventListener('click', ()=>{
+  if(!_pendingDelete) return;
+  const { id, trEl, ref, inspector } = _pendingDelete;
+  hideDeleteModal();
+
+  // ── 1. Animate row out ──
+  if(trEl && trEl.isConnected){
+    trEl.style.pointerEvents = 'none';
+    trEl.classList.add('row-deleting');
+  }
+
+  // ── 2. อัปเดต local state ทันที (ไม่รอ animation) ──
+  records = records.filter(x => String(x.id) !== String(id));
+  syncedDelete(ref);
+  invalidateMyRecCache();
+  invalidateCache();
+  _lastRenderHash = '';
+
+  // ── 3. Save + refresh UI ──
+  saveLocal();
+
+  // ── 4. ส่ง cloud delete (fire-and-forget) ──
+  deleteFromCloud(ref, inspector);
+  showSyncBadge('🗑 Deleting from Cloud…','#ef4444');
+
+  // ── 5. รอ animation จบแล้วค่อย re-render ──
+  setTimeout(()=>{
+    refreshAll();
+    toast('🗑 ลบข้อมูลแล้ว (Local + Cloud)');
+    showSyncBadge('✅ Deleted from Cloud','#10b981');
+  }, 320);
+});
+
+/* ══ DELETE LEGACY (ไม่มี UI แล้ว ไว้ backup) ══ */
+function delRow(id, trEl){
+  // redirect ไป modal แทน
+  showDeleteModal(id, trEl);
+}
+
+function findRecord(id){
+  return records.find(x=>String(x.id)===String(id));
+}
+
+/* ════════════════════════════════════════════════════
+   ★ CLEAR ALL DATA — พร้อม custom confirm + cloud delete
+════════════════════════════════════════════════════ */
+function clearAllData(){
+  const myCount = getMyRecords().length;
+  if(myCount === 0){ toast('⚠️ ไม่มีข้อมูลให้ลบ'); return; }
+
+  // ใช้ custom confirm dialog แทน browser confirm (เสถียรกว่า)
+  const proceed = window.confirm(
+    `⚠️ ลบข้อมูลทั้งหมดของ ${currentUser}?\n` +
+    `จำนวน ${myCount} รายการ\n\n` +
+    `⚡ จะลบออกจาก Google Sheets ด้วย`
+  );
+  if(!proceed) return;
+
+  // ── snapshot inspector ก่อน clear ──
+  const inspector = currentUser;
+
+  // ── ลบ local ──
+  records = records.filter(r => r.inspector !== inspector);
+  syncedReset([]);
+  invalidateMyRecCache();
+  invalidateCache();
+  _lastRenderHash = '';
+
+  // ── save + refresh ──
+  saveLocal();
+  refreshAll();
+
+  // ── cloud clear (fire-and-forget) ──
+  clearAllFromCloud(inspector);
+  showSyncBadge('🗑 Clearing Cloud…','#ef4444');
+
+  setTimeout(()=>{
+    toast(`🧹 ลบทั้งหมด ${myCount} รายการ (Local + Cloud)`);
+    showSyncBadge('✅ Cloud Cleared','#10b981');
+  }, 400);
+}
+
+/* ══ CLONE ══ */
 function cloneRecord(id){
-  const r=findRecord(id);if(!r){toast('⚠️ ไม่พบข้อมูล');return;}
-  $id('inputDate').value=$r.date||'';$id('shift').value=r.shift||'SHIFT A';
-  $id('lineNo').value=r.line||'';$id('refNo').value=r.ref||'';
-  $id('supplier').value=r.supplier||'';$id('qty').value=r.qty||'';
-  $id('partNo').value=r.partNo||'';$id('partOn').value=r.partName||'';
-  $id('defectName').value=r.defect||'';$id('remark').value=r.remark||'';
-  $id('judgmentSelect').value=r.judgment||'';handleJudgment(r.judgment||'');
-  const sidebar=$id('sidebar');if(sidebar)sidebar.scrollTo({top:0,behavior:'smooth'});
+  const r=findRecord(id);
+  if(!r){toast('⚠️ ไม่พบข้อมูล');return;}
+  $id('inputDate').value      = r.date||'';
+  $id('shift').value          = r.shift||'SHIFT A';
+  $id('lineNo').value         = r.line||'';
+  $id('refNo').value          = r.ref||'';
+  $id('supplier').value       = r.supplier||'';
+  $id('qty').value            = r.qty||'';
+  $id('partNo').value         = r.partNo||'';
+  $id('partOn').value         = r.partName||'';
+  $id('defectName').value     = r.defect||'';
+  $id('remark').value         = r.remark||'';
+  $id('judgmentSelect').value = r.judgment||'';
+  handleJudgment(r.judgment||'');
+  const sidebar=$id('sidebar');
+  if(sidebar)sidebar.scrollTo({top:0,behavior:'smooth'});
   const fields=['inputDate','shift','lineNo','refNo','supplier','qty','partNo','partOn','defectName','remark','judgmentSelect'];
   fields.forEach((fid,i)=>{
     const el=$id(fid);if(!el)return;
-    gsap.fromTo(el,{backgroundColor:'rgba(59,130,246,.13)',borderColor:'rgba(59,130,246,.5)'},{backgroundColor:'rgba(255,255,255,.6)',borderColor:'rgba(255,255,255,.85)',duration:.7,delay:i*.03,ease:'power2.out'});
+    gsap.fromTo(el,
+      {backgroundColor:'rgba(59,130,246,.13)',borderColor:'rgba(59,130,246,.5)'},
+      {backgroundColor:'rgba(255,255,255,.6)',borderColor:'rgba(255,255,255,.85)',duration:.7,delay:i*.03,ease:'power2.out'}
+    );
   });
-  requestAnimationFrame(()=>{const refEl=$id('refNo');if(refEl){refEl.focus();refEl.select();}});
+  requestAnimationFrame(()=>{
+    const refEl=$id('refNo');
+    if(refEl){refEl.focus();refEl.select();}
+  });
   toast('📑 Clone สำเร็จ — ตรวจ REF แล้วกด Commit');
 }
-function del(id){
-  const r=findRecord(id);
-  if(!r||!confirm('ลบ Ref: '+r.ref+' ใช่หรือไม่?'))return;
-  records=records.filter(x=>String(x.id)!==String(id));
-  syncedDelete(r.ref);invalidateMyRecCache();_lastRenderHash='';saveAndRefresh();toast('🗑 Deleted');
-}
-function clearAllData(){
-  if(!confirm('ลบข้อมูลของคุณทั้งหมดใช่หรือไม่?'))return;
-  records=records.filter(r=>r.inspector!==currentUser);
-  syncedReset([]);invalidateMyRecCache();_lastRenderHash='';saveAndRefresh();toast('🧹 Cleared');
-}
 
+/* ══ DATALISTS ══ */
 let _dlTimer=null;
 function updateDataLists(){
   clearTimeout(_dlTimer);
   _dlTimer=setTimeout(()=>{
     const d=getMyRecords();
-    const setList=(id,key)=>{const el=$id(id);if(!el)return;el.innerHTML=[...new Set(d.map(r=>r[key]).filter(Boolean))].map(v=>`<option value="${v}">`).join('');};
+    const setList=(id,key)=>{
+      const el=$id(id);if(!el)return;
+      el.innerHTML=[...new Set(d.map(r=>r[key]).filter(Boolean))].map(v=>`<option value="${v}">`).join('');
+    };
     setList('refList','ref');setList('lineList','line');setList('supList','supplier');
-    setList('ptList','partNo');setList('lotList','partName');setList('defectList','defect');setList('inspectorList','inspector');
+    setList('ptList','partNo');setList('lotList','partName');setList('defectList','defect');
+    setList('inspectorList','inspector');
   },300);
 }
 
 /* ══ REFRESH ALL ══ */
-let _refreshRAF=null,_lastKpiHash='';
+let _refreshRAF=null;
+let _lastKpiHash='';
+
 function refreshAll(){
   invalidateCache();
   if(_refreshRAF)cancelAnimationFrame(_refreshRAF);
@@ -1211,34 +1565,37 @@ function refreshAll(){
     let tQ=0,sf=0,ven=0,ctc=0,ok=0,sfL=0,venL=0,ctcL=0,okL=0;
     d.forEach(r=>{
       tQ+=r.qty;
-      if(r.judgment==='SF'){sf+=r.qty;sfL++;}
+      if(r.judgment==='SF')               {sf+=r.qty;sfL++;}
       else if(r.judgment==='VENDOR FAULT'){ven+=r.qty;venL++;}
-      else if(r.judgment==='CTC'){ctc+=r.qty;ctcL++;}
-      else if(r.judgment==='CAN USE'){ok+=r.qty;okL++;}
+      else if(r.judgment==='CTC')         {ctc+=r.qty;ctcL++;}
+      else if(r.judgment==='CAN USE')     {ok+=r.qty;okL++;}
     });
     const kpiHash=`${tQ}_${sf}_${ven}_${ctc}_${ok}`;
-    const kpiChanged=kpiHash!==_lastKpiHash;_lastKpiHash=kpiHash;
+    const kpiChanged=kpiHash!==_lastKpiHash;
+    _lastKpiHash=kpiHash;
     animNum('masterQty',tQ);$id('masterLot').textContent=d.length;
     const pct=(v,t)=>t>0?Math.round((v/t)*100)+'%':'0%';
-    animNum('qtySF',sf);$id('lotSF').textContent=sfL;$id('pctSF').textContent=pct(sf,tQ);
+    animNum('qtySF',sf);     $id('lotSF').textContent=sfL;    $id('pctSF').textContent=pct(sf,tQ);
     animNum('qtyVendor',ven);$id('lotVendor').textContent=venL;$id('pctVendor').textContent=pct(ven,tQ);
-    animNum('qtyCTC',ctc);$id('lotCTC').textContent=ctcL;$id('pctCTC').textContent=pct(ctc,tQ);
-    animNum('qtyCanUse',ok);$id('lotCanUse').textContent=okL;$id('pctCanUse').textContent=pct(ok,tQ);
+    animNum('qtyCTC',ctc);   $id('lotCTC').textContent=ctcL;  $id('pctCTC').textContent=pct(ctc,tQ);
+    animNum('qtyCanUse',ok); $id('lotCanUse').textContent=okL;$id('pctCanUse').textContent=pct(ok,tQ);
     renderTable();
     if(kpiChanged){
       const cards=$id('kpiGrid')?.querySelectorAll('.stat-card');
-      if(cards)cards.forEach((c,i)=>{setTimeout(()=>{c.classList.add('kpi-flash');setTimeout(()=>c.classList.remove('kpi-flash'),620);},i*50);});
+      if(cards)cards.forEach((c,i)=>{
+        setTimeout(()=>{c.classList.add('kpi-flash');setTimeout(()=>c.classList.remove('kpi-flash'),620);},i*50);
+      });
     }
-    if('requestIdleCallback' in window){requestIdleCallback(updateDataLists,{timeout:2000});}
-    else{setTimeout(updateDataLists,300);}
+    if('requestIdleCallback' in window){
+      requestIdleCallback(updateDataLists,{timeout:2000});
+    }else{setTimeout(updateDataLists,300);}
   });
 }
 
-/* ════════════════════════════════════════════════
-   DASHBOARD
-════════════════════════════════════════════════ */
+/* ══ DASHBOARD ══ */
 function openDashboard(){
-  $id('dashboardModal').style.display='flex';$id('dashUser').textContent=currentUser;
+  $id('dashboardModal').style.display='flex';
+  $id('dashUser').textContent=currentUser;
   const vendors=[...new Set(getMyRecords().map(r=>r.supplier))].filter(Boolean).sort();
   $id('dashVendor').innerHTML='<option value="ALL">ALL VENDORS</option>'+vendors.map(v=>`<option value="${v}">${v}</option>`).join('');
   resetDashFilters();
@@ -1247,11 +1604,13 @@ function openDashboard(){
 }
 function closeDashboard(){
   gsap.to('.glass-dash',{opacity:0,y:10,duration:.18,ease:'power2.in',onComplete:()=>{
-    $id('dashboardModal').style.display='none';gsap.set(['.glass-dash','#dashboardModal'],{clearProps:'all'});
+    $id('dashboardModal').style.display='none';
+    gsap.set(['.glass-dash','#dashboardModal'],{clearProps:'all'});
   }});
 }
 function resetDashFilters(){
-  $id('dashStart').value='';$id('dashEnd').value='';$id('dashVendor').value='ALL';refreshDash();
+  $id('dashStart').value='';$id('dashEnd').value='';$id('dashVendor').value='ALL';
+  refreshDash();
 }
 function refreshDash(){
   const start=$id('dashStart').value,end=$id('dashEnd').value,ven=$id('dashVendor').value;
@@ -1259,21 +1618,19 @@ function refreshDash(){
   if(start)data=data.filter(r=>r.date>=start);
   if(end)  data=data.filter(r=>r.date<=end);
   if(ven!=='ALL')data=data.filter(r=>r.supplier===ven);
-
   let tQ=0,sf=0,ven2=0,ctc=0,ok=0,sfL=0,venL=0,ctcL=0,okL=0;
   data.forEach(r=>{
     tQ+=r.qty;
-    if(r.judgment==='SF'){sf+=r.qty;sfL++;}
+    if(r.judgment==='SF')           {sf+=r.qty;sfL++;}
     else if(r.judgment==='VENDOR FAULT'){ven2+=r.qty;venL++;}
-    else if(r.judgment==='CTC'){ctc+=r.qty;ctcL++;}
-    else if(r.judgment==='CAN USE'){ok+=r.qty;okL++;}
+    else if(r.judgment==='CTC')     {ctc+=r.qty;ctcL++;}
+    else if(r.judgment==='CAN USE') {ok+=r.qty;okL++;}
   });
   animNum('dTotalQty',tQ);$id('dTotalLot').textContent=data.length;
   const pct=(v,t)=>t>0?Math.round((v/t)*100)+'%':'0%';
   const upd=(pre,qty,lot,p)=>{animNum('d'+pre+'qty',qty);$id('d'+pre+'lot').textContent=lot;$id('d'+pre+'pct').textContent=p;};
   upd('SF',sf,sfL,pct(sf,tQ));upd('VEN',ven2,venL,pct(ven2,tQ));
   upd('CTC',ctc,ctcL,pct(ctc,tQ));upd('OK',ok,okL,pct(ok,tQ));
-
   const rejQ=sf+ven2+ctc;
   const rejRateEl=$id('dRejRate');if(rejRateEl)rejRateEl.textContent=tQ>0?Math.round((rejQ/tQ)*100)+'%':'0%';
   const shiftMap={};data.forEach(r=>{shiftMap[r.shift]=(shiftMap[r.shift]||0)+r.qty;});
@@ -1282,7 +1639,6 @@ function refreshDash(){
   const avgEl=$id('dAvgQty');if(avgEl)avgEl.textContent=data.length>0?Math.round(tQ/data.length).toLocaleString():'0';
   const days=new Set(data.map(r=>r.date)).size;
   const daysEl=$id('dActiveDays');if(daysEl)daysEl.textContent=days;
-
   const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   if(data.length>1){
     const cnt=new Array(12).fill(0);
@@ -1291,8 +1647,8 @@ function refreshDash(){
     const top=sf>=ven2&&sf>=ctc?'SF FAULT':ven2>=ctc?'VENDOR FAULT':'CTC FAULT';
     $id('monthlyInsight').innerHTML='Peak: <b>'+peak+'</b> · <span style="color:#ef4444;font-weight:900">'+top+'</span>';
   }else{$id('monthlyInsight').textContent='—';}
-
-  renderDashCharts(data);renderRankings(data);
+  renderDashCharts(data);
+  renderRankings(data);
 }
 
 function renderDashCharts(data){
@@ -1308,30 +1664,31 @@ function renderDashCharts(data){
   const tCtx=$id('trendChart');
   if(tCtx) charts.trend=new Chart(tCtx,{
     type:'line',
-    data:{labels:mo,datasets:[{label:'Qty',data:byMonth,borderColor:'#f97316',borderWidth:3,tension:.42,fill:true,
-      backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||200);g.addColorStop(0,'rgba(249,115,22,.18)');g.addColorStop(1,'rgba(249,115,22,.01)');return g;},
-      pointRadius:4,pointBackgroundColor:'#fff',pointBorderColor:'#f97316',pointBorderWidth:2.5,pointHoverRadius:7,pointHoverBorderWidth:3}]},
+    data:{labels:mo,datasets:[{
+      label:'Qty',data:byMonth,
+      borderColor:'#f97316',borderWidth:3,tension:.42,fill:true,
+      backgroundColor:ctx=>{
+        const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||200);
+        g.addColorStop(0,'rgba(249,115,22,.18)');g.addColorStop(1,'rgba(249,115,22,.01)');return g;
+      },
+      pointRadius:4,pointBackgroundColor:'#fff',pointBorderColor:'#f97316',pointBorderWidth:2.5,
+      pointHoverRadius:7,pointHoverBorderWidth:3
+    }]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},datalabels:{display:false},tooltip},
-      scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10,weight:'bold'},color:'#94a3b8'}},y:{grid:{display:false},border:{display:false},ticks:{display:false}}},
+      scales:{
+        x:{grid:{display:false},border:{display:false},ticks:{font:{size:10,weight:'bold'},color:'#94a3b8'}},
+        y:{grid:{display:false},border:{display:false},ticks:{display:false}}
+      },
       animation:{duration:900,easing:'easeOutQuart'}
     }
   });
-
-  /* ════════════════════════════════════════════════════════
-     FIX: totalQ ใน donut = data.reduce → ตรงกับ dTotalQty
-     เดิม: sfQ+venQ+ctcQ+okQ (ขาด records ที่ judgment อื่น)
-     ใหม่: sum qty ทั้งหมดใน data ตรงๆ
-  ════════════════════════════════════════════════════════ */
-  const sfQ =data.filter(r=>r.judgment==='SF').reduce((s,r)=>s+r.qty,0);
+  const sfQ=data.filter(r=>r.judgment==='SF').reduce((s,r)=>s+r.qty,0);
   const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
   const ctcQ=data.filter(r=>r.judgment==='CTC').reduce((s,r)=>s+r.qty,0);
-  const okQ =data.filter(r=>r.judgment==='CAN USE').reduce((s,r)=>s+r.qty,0);
-
-  // ── FIXED: ใช้ tQ จาก data ทั้งหมด ไม่ใช่แค่ sum 4 category ──
-  const totalQ = data.reduce((s,r)=>s+r.qty, 0);
+  const okQ=data.filter(r=>r.judgment==='CAN USE').reduce((s,r)=>s+r.qty,0);
+  const totalQ=sfQ+venQ+ctcQ+okQ;
   const dn=$id('donutTotal');if(dn)dn.textContent=totalQ.toLocaleString();
-
   const dCtx=$id('donutChart');
   if(dCtx) charts.donut=new Chart(dCtx,{
     type:'doughnut',
@@ -1348,24 +1705,41 @@ function renderDashCharts(data){
       plugins:{
         legend:{display:true,position:'bottom',labels:{color:'rgba(255,255,255,.6)',font:{size:8,weight:'bold'},boxWidth:7,padding:6,usePointStyle:true,pointStyleWidth:6}},
         datalabels:{display:false},
-        tooltip:{...tooltip,callbacks:{label:ctx=>{const v=ctx.parsed;return ' '+v.toLocaleString()+' ('+(totalQ>0?((v/totalQ)*100).toFixed(1):'0')+'%)'}}}
+        tooltip:{...tooltip,callbacks:{label:ctx=>{const v=ctx.parsed;const t=totalQ||1;return ' '+v.toLocaleString()+' ('+(t>0?((v/t)*100).toFixed(1):'0')+'%)';}}}
       },
       animation:{animateRotate:true,animateScale:true,duration:1000,easing:'easeOutQuart'}
     }
   });
-
   const lineMap={};
   data.forEach(r=>{if(r.line)lineMap[r.line]=(lineMap[r.line]||0)+r.qty;});
   const topLines=Object.entries(lineMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const rCtx=$id('radarChart');
   if(rCtx&&topLines.length) charts.radar=new Chart(rCtx,{
     type:'bar',
-    data:{labels:topLines.map(l=>l[0]),datasets:[{label:'Qty',data:topLines.map(l=>l[1]),
-      backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(ctx.chart.width||300,0,0,0);g.addColorStop(0,'rgba(249,115,22,.9)');g.addColorStop(1,'rgba(249,115,22,.35)');return g;},
-      hoverBackgroundColor:'rgba(249,115,22,1)',borderRadius:6,barThickness:16}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',layout:{padding:{right:44}},
-      scales:{x:{display:false,grid:{display:false},border:{display:false}},y:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:10,weight:'bold'},padding:4}}},
-      plugins:{legend:{display:false},datalabels:{anchor:'end',align:'end',color:'#94a3b8',font:{size:9,weight:'bold',family:'Orbitron'},formatter:v=>v.toLocaleString(),clip:false},tooltip},
+    data:{
+      labels:topLines.map(l=>l[0]),
+      datasets:[{
+        label:'Qty',data:topLines.map(l=>l[1]),
+        backgroundColor:ctx=>{
+          const g=ctx.chart.ctx.createLinearGradient(ctx.chart.width||300,0,0,0);
+          g.addColorStop(0,'rgba(249,115,22,.9)');g.addColorStop(1,'rgba(249,115,22,.35)');return g;
+        },
+        hoverBackgroundColor:'rgba(249,115,22,1)',
+        borderRadius:6,barThickness:16
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      layout:{padding:{right:44}},
+      scales:{
+        x:{display:false,grid:{display:false},border:{display:false}},
+        y:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:10,weight:'bold'},padding:4}}
+      },
+      plugins:{
+        legend:{display:false},
+        datalabels:{anchor:'end',align:'end',color:'#94a3b8',font:{size:9,weight:'bold',family:'Orbitron'},formatter:v=>v.toLocaleString(),clip:false},
+        tooltip
+      },
       animation:{duration:900,easing:'easeOutQuart'}
     }
   });
@@ -1387,9 +1761,11 @@ function renderRankings(data){
   const totalQty=data.reduce((s,r)=>s+r.qty,0)||1;
   const getTop=(key,n=8)=>{const m={};data.forEach(r=>{if(r[key])m[r[key]]=(m[r[key]]||0)+r.qty;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,n);};
   const draw=(id,items,color,accentColor)=>{
-    const maxV=items[0]?.[1]||1;const el=$id(id);if(!el)return;
+    const maxV=items[0]?.[1]||1;
+    const el=$id(id);if(!el)return;
     el.innerHTML=items.map(([k,v],i)=>{
-      const pct=Math.round((v/totalQty)*100);const barW=Math.round((v/maxV)*100);
+      const pct=Math.round((v/totalQty)*100);
+      const barW=Math.round((v/maxV)*100);
       const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
       return `<div class="bar-wrap" title="${k}: ${v.toLocaleString()} (${pct}%)">
         <div class="bar-lbl"><span class="bar-k">${rank} ${k}</span>
@@ -1400,11 +1776,13 @@ function renderRankings(data){
         <div class="bar-bg"><div class="bar-fill" style="width:0%;background:${color}" data-w="${barW}"></div></div>
       </div>`;
     }).join('');
-    requestAnimationFrame(()=>{el.querySelectorAll('.bar-fill').forEach((b,i)=>{setTimeout(()=>{b.style.width=b.dataset.w+'%';},i*55+80);});});
+    requestAnimationFrame(()=>{
+      el.querySelectorAll('.bar-fill').forEach((b,i)=>{setTimeout(()=>{b.style.width=b.dataset.w+'%';},i*55+80);});
+    });
   };
   draw('rankSuppliers',getTop('supplier'),'linear-gradient(90deg,#f97316,#fbbf24)','#f97316');
-  draw('rankDefects',getTop('defect'),'linear-gradient(90deg,#ef4444,#f87171)','#ef4444');
-  draw('rankParts',getTop('partNo'),'linear-gradient(90deg,#3b82f6,#60a5fa)','#3b82f6');
+  draw('rankDefects',  getTop('defect'),  'linear-gradient(90deg,#ef4444,#f87171)','#ef4444');
+  draw('rankParts',    getTop('partNo'),  'linear-gradient(90deg,#3b82f6,#60a5fa)','#3b82f6');
 }
 
 /* ══ IMPORT / EXPORT ══ */
@@ -1424,16 +1802,19 @@ function importExcel(input){
       defect:String(r.defect||r.Defect||''),remark:String(r.remark||r.Remark||''),
       judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase()
     }));
-    records=[...records,...items];_lastRenderHash='';saveAndRefresh();toast('📥 Imported '+items.length+' records');input.value='';
+    records=[...records,...items];
+    _lastRenderHash='';saveAndRefresh();toast('📥 Imported '+items.length+' records');input.value='';
   };
   reader.readAsArrayBuffer(file);
 }
+
 function exportToExcel(){
   const d=getMyRecords();if(!d.length)return toast('⚠️ No data to export');
   const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Records');
   XLSX.writeFile(wb,'SQE_'+currentUser+'_'+Date.now()+'.xlsx');
 }
+
 function openJobProject(){window.location.href='job_project.html';}
 </script>
 </body>
