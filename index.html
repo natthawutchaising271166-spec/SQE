@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>QDIT AURA · SQE Support V3</title>
+<title>QDIT AURA · SQE Support V4</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -121,6 +121,26 @@ html,body{
 .lo-bar-t{height:4px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;margin-top:.5rem;position:relative}
 .lo-bar{height:100%;background:linear-gradient(90deg,#f97316,#fbbf24,#10b981);background-size:200% 100%;border-radius:99px;width:0%;transition:width .5s cubic-bezier(.22,.68,0,1.2);animation:barShift 2s linear infinite}
 @keyframes barShift{to{background-position:-200% 0}}
+
+/* ── Loading Overlay (NEW) ── */
+#initOverlay{
+  position:fixed;inset:0;z-index:8000;
+  background:rgba(241,245,249,.92);backdrop-filter:blur(20px);
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  animation:fadeIn .25s ease;
+}
+#initOverlay.show{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.init-spinner{
+  width:48px;height:48px;border-radius:50%;
+  border:3px solid rgba(249,115,22,.15);
+  border-top-color:#f97316;
+  animation:spinA .8s linear infinite;
+}
+.init-msg{font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:900;color:#64748b;letter-spacing:.15em;text-transform:uppercase}
+.init-sub{font-size:.65rem;font-weight:700;color:#94a3b8;letter-spacing:.08em}
+.init-count{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;color:#f97316;min-width:32px;text-align:center;transition:all .3s}
+
 #syncPulse{
   display:inline-flex;align-items:center;gap:5px;
   font-size:.62rem;font-weight:800;letter-spacing:.08em;
@@ -342,6 +362,14 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 </head>
 <body>
 
+<!-- Loading overlay shown during cloud init -->
+<div id="initOverlay">
+  <div class="init-spinner"></div>
+  <div class="init-msg" id="initMsg">กำลังโหลดข้อมูล…</div>
+  <div class="init-sub" id="initSub">กรุณารอสักครู่</div>
+  <div class="init-count" id="initCount"></div>
+</div>
+
 <div id="toast"></div>
 <div id="syncBadge"><span id="syncBadgeIcon" style="margin-right:6px">●</span><span id="syncBadgeText"></span></div>
 
@@ -393,7 +421,7 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
       SQE <span class="text-orange-500">support</span>
     </h2>
     <p class="text-[10px] font-bold text-slate-600 uppercase tracking-[.15em] mb-10" style="position:relative;z-index:2">
-      <span id="loSubtitle" class="text-slate-500">Security Terminal v3.1</span>
+      <span id="loSubtitle" class="text-slate-500">Security Terminal v4.0</span>
       <span class="ml-2 inline-flex items-center gap-1 text-emerald-500 text-[9px] font-black"><span class="sdot"></span>ONLINE</span>
     </p>
     <div id="loginForm" class="space-y-4" style="position:relative;z-index:2">
@@ -405,7 +433,7 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
       <div class="lo-bar-t"><div class="lo-bar" id="loBar"></div></div>
       <div class="lo-step" id="ls1"><div class="lo-dot">1</div><span>VERIFY CREDENTIALS</span></div>
       <div class="lo-step" id="ls2"><div class="lo-dot">2</div><span>LAUNCHING DASHBOARD</span></div>
-      <div class="lo-step" id="ls3"><div class="lo-dot">3</div><span>SYNCING CLOUD DATA</span><span id="ls2note" style="margin-left:auto;font-size:.6rem;opacity:.65;font-weight:400"></span></div>
+      <div class="lo-step" id="ls3"><div class="lo-dot">3</div><span>FETCHING CLOUD DATA</span><span id="ls2note" style="margin-left:auto;font-size:.6rem;opacity:.65;font-weight:400"></span></div>
     </div>
     <p class="mt-8 text-[9px] text-slate-700 uppercase tracking-widest opacity-40 font-bold" style="position:relative;z-index:2">
       Authorized Personnel Only · Encrypted · IP Logged
@@ -646,18 +674,26 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 <datalist id="inspectorList"></datalist>
 
 <script>
-/* ══ CONFIG ══ */
-// ★ ใส่ URL ของ GAS Web App ที่ Deploy แล้วตรงนี้
+/* ══════════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════════ */
 const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbxxHCqL3HzxI_54oo4IvXs0Du7yE86i7NcvwruJwOhCEMMBvs3HCXlBz0W_6KUPRGZ6nw/exec';
-const STORAGE_KEY = 'qdit_v3_records';
-const SYNCED_KEY  = 'qdit_v3_synced';
-const REFS_KEY    = 'qdit_v3_allrefs';
+const STORAGE_KEY = 'qdit_v4_records';
+const SYNCED_KEY  = 'qdit_v4_synced';
+const REFS_KEY    = 'qdit_v4_allrefs';
 
-const FETCH_TIMEOUT  = 12000;
-const PUSH_TIMEOUT   = 10000;
-const DELETE_TIMEOUT = 12000;
-const POLL_MS        = 6000;
-const PUSH_DEBOUNCE  = 500;
+const FETCH_TIMEOUT  = 15000;
+const PUSH_TIMEOUT   = 12000;
+const DELETE_TIMEOUT = 14000;
+const POLL_MS        = 8000;
+const PUSH_DEBOUNCE  = 600;
+
+/* ══════════════════════════════════════════════════════════
+   ★ FIX 1: _isInitializing flag
+   Blocks ALL auto-push during boot/login/session-resume.
+   Nothing is written to cloud until this is false.
+══════════════════════════════════════════════════════════ */
+let _isInitializing = true;
 
 let records     = safeJSON(STORAGE_KEY, []);
 let currentUser = '';
@@ -682,6 +718,14 @@ function clearInspectorCloudRefs(inspector){
 }
 function saveAllCloudRefs(){ localStorage.setItem(REFS_KEY,JSON.stringify([..._allCloudRefs])); }
 
+/* ★ FIX 3 (Data Integrity): Validate required fields before accepting */
+function isValidRecord(r){
+  return r && r.ref && String(r.ref).trim() !== '' &&
+         r.supplier && String(r.supplier).trim() !== '' &&
+         r.qty && parseInt(r.qty) > 0 &&
+         r.judgment && r.judgment !== '';
+}
+
 function isDuplicate(ref){
   const r=String(ref).trim();
   if(!r) return false;
@@ -692,6 +736,7 @@ Chart.register(ChartDataLabels);
 function safeJSON(k,def){try{return JSON.parse(localStorage.getItem(k))||def;}catch(e){return def;}}
 const $id=id=>document.getElementById(id);
 
+/* Cache */
 let _myRecCache=null,_myRecUser='',_myRecLen=-1;
 function getMyRecords(){
   if(_myRecCache&&_myRecUser===currentUser&&_myRecLen===records.length) return _myRecCache;
@@ -715,9 +760,24 @@ function saveLocalImmediate(){
 }
 function saveAndRefresh(){
   invalidateCache(); invalidateMyRecCache();
-  saveLocal(); refreshAll(); schedulePush();
+  saveLocal(); refreshAll();
+  /* Only schedule push when app is fully initialized */
+  if(!_isInitializing) schedulePush();
 }
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ── Init overlay helpers ── */
+function showInitOverlay(msg, sub, count){
+  const ov=$id('initOverlay'); if(!ov) return;
+  ov.classList.add('show');
+  if(msg)   $id('initMsg').textContent=msg;
+  if(sub)   $id('initSub').textContent=sub;
+  if(count!==undefined) $id('initCount').textContent=count!==''?count+'  records':'';
+}
+function hideInitOverlay(){
+  const ov=$id('initOverlay'); if(!ov) return;
+  ov.classList.remove('show');
+}
 
 let toastT;
 function toast(msg){
@@ -777,7 +837,7 @@ function animNum(id,target){
   gsap.to(obj,{v:target,duration:dur,ease:'power2.out',onUpdate:()=>{ el.textContent=Math.round(obj.v).toLocaleString(); }});
 }
 
-/* ══ PARTICLE CANVAS ══ */
+/* ── Particle Canvas ── */
 function initParticles(){
   const cv=$id('loCanvas'); if(!cv) return;
   const ctx=cv.getContext('2d');
@@ -812,18 +872,9 @@ function initParticles(){
   draw();
 }
 
-/* ════════════════════════════════════════════════════════════
-   ★★★ SYNC ENGINE — แก้ไขสมบูรณ์ ★★★
-   
-   สาเหตุเดิมที่ข้อมูลไม่ขึ้น Google Sheets:
-   - ใช้ mode:'no-cors' แต่ตั้ง Content-Type:'application/json'
-   - Browser บล็อก custom header ใน no-cors → GAS ไม่ได้รับ body
-   
-   วิธีแก้:
-   - ใช้ Content-Type:'text/plain' (allowed ใน no-cors)
-   - GAS อ่านผ่าน e.postData.contents แล้ว JSON.parse ได้ปกติ
-════════════════════════════════════════════════════════════ */
-
+/* ══════════════════════════════════════════════════════════
+   NETWORK LAYER
+══════════════════════════════════════════════════════════ */
 function normalizeRow(d,inspector){
   return {
     id       : d.id||(Date.now()+'_'+Math.random()),
@@ -842,7 +893,7 @@ function normalizeRow(d,inspector){
   };
 }
 
-/* ══ fetchFromCloud (GET) — ไม่เปลี่ยน ══ */
+/* ══ fetchFromCloud ══ */
 let _fetchInFlight=false;
 async function fetchFromCloud(inspector,ms){
   ms=ms||FETCH_TIMEOUT;
@@ -871,17 +922,20 @@ async function fetchFromCloud(inspector,ms){
 }
 
 /* ══════════════════════════════════════════════════════════
-   ★ pushToCloud — แก้ไขหลัก
-   เปลี่ยน Content-Type จาก 'application/json' → 'text/plain'
-   เหตุผล: no-cors อนุญาตเฉพาะ simple headers
-           text/plain ส่งผ่านได้ GAS อ่าน e.postData.contents ได้ปกติ
+   ★ FIX 3 (Bulk): pushToCloud always batches the full array.
+   Payload is a single POST with all rows — never loops per row.
+   Content-Type: text/plain avoids CORS preflight on no-cors.
 ══════════════════════════════════════════════════════════ */
 async function pushToCloud(rows){
-  if(!rows.length) return;
+  if(!rows||!rows.length) return;
+  /* Send ALL rows in one single batch POST */
   const payload=JSON.stringify(rows.map(r=>({
-    date:r.date, shift:r.shift, inspector:r.inspector, ref:r.ref,
-    line:r.line, supplier:r.supplier, partNo:r.partNo, partName:r.partName,
-    qty:r.qty, defect:r.defect, remark:r.remark, judgment:r.judgment,
+    id       : r.id,       /* ★ FIX 2: include unique id so GAS can match row */
+    date     : r.date,     shift:r.shift,    inspector:r.inspector,
+    ref      : r.ref,      line :r.line,     supplier :r.supplier,
+    partNo   : r.partNo,   partName:r.partName,
+    qty      : r.qty,      defect  :r.defect, remark:r.remark,
+    judgment : r.judgment,
   })));
   const ctrl=new AbortController();
   setTimeout(()=>ctrl.abort(),PUSH_TIMEOUT);
@@ -889,26 +943,26 @@ async function pushToCloud(rows){
     method : 'POST',
     mode   : 'no-cors',
     cache  : 'no-cache',
-    headers: { 'Content-Type': 'text/plain' },  // ★ แก้จาก application/json
+    headers: { 'Content-Type': 'text/plain' },
     body   : payload,
     signal : ctrl.signal,
   }).catch(()=>{});
 }
 
 /* ══════════════════════════════════════════════════════════
-   ★ deleteFromCloud — แก้ไขหลัก
-   ลอง CORS ก่อน (อ่าน response ได้) → fallback no-cors
-   ทั้งสองใช้ text/plain เพื่อให้ GAS รับ body ได้
+   ★ FIX 2 (Delete): Send BOTH id AND ref to GAS.
+   GAS can use id for exact row lookup, ref as fallback.
 ══════════════════════════════════════════════════════════ */
-async function deleteFromCloud(ref,inspector){
+async function deleteFromCloud(id, ref, inspector){
   if(!ref) return { ok:false, method:'none' };
   const payload=JSON.stringify({
     action   : 'delete',
-    ref      : String(ref),
+    id       : String(id||''),        /* ★ unique row ID */
+    ref      : String(ref),           /* ★ ref as fallback */
     inspector: String(inspector||currentUser),
   });
 
-  /* ── ลอง CORS ก่อน (text/plain = no preflight, อ่าน response ได้) ── */
+  /* Try CORS first (text/plain = simple request, no preflight) */
   try {
     const ctrl=new AbortController();
     const t=setTimeout(()=>ctrl.abort(),DELETE_TIMEOUT);
@@ -916,7 +970,7 @@ async function deleteFromCloud(ref,inspector){
       method : 'POST',
       mode   : 'cors',
       cache  : 'no-cache',
-      headers: { 'Content-Type': 'text/plain' },  // ★ text/plain = no preflight
+      headers: { 'Content-Type': 'text/plain' },
       body   : payload,
       signal : ctrl.signal,
     });
@@ -924,7 +978,7 @@ async function deleteFromCloud(ref,inspector){
     const data=await res.json();
     return { ok: data.status==='success', method:'cors', data };
   } catch(corsErr) {
-    /* ── Fallback: no-cors (fire-and-forget) ── */
+    /* Fallback: no-cors fire-and-forget */
     try {
       const ctrl2=new AbortController();
       setTimeout(()=>ctrl2.abort(),PUSH_TIMEOUT);
@@ -932,7 +986,7 @@ async function deleteFromCloud(ref,inspector){
         method : 'POST',
         mode   : 'no-cors',
         cache  : 'no-cache',
-        headers: { 'Content-Type': 'text/plain' },  // ★ text/plain
+        headers: { 'Content-Type': 'text/plain' },
         body   : payload,
         signal : ctrl2.signal,
       });
@@ -943,10 +997,6 @@ async function deleteFromCloud(ref,inspector){
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-   ★ clearAllFromCloud — แก้ไขหลัก
-   เปลี่ยน Content-Type จาก 'application/json' → 'text/plain'
-══════════════════════════════════════════════════════════ */
 function clearAllFromCloud(inspector){
   if(!inspector) return Promise.resolve();
   const ctrl=new AbortController();
@@ -955,28 +1005,39 @@ function clearAllFromCloud(inspector){
     method : 'POST',
     mode   : 'no-cors',
     cache  : 'no-cache',
-    headers: { 'Content-Type': 'text/plain' },  // ★ แก้จาก application/json
+    headers: { 'Content-Type': 'text/plain' },
     body   : JSON.stringify({ action:'clearAll', inspector:String(inspector) }),
     signal : ctrl.signal,
   }).catch(()=>{});
 }
 
-/* ══ mergeCloud ══ */
+/* ══ mergeCloud — always overwrites local with cloud truth ══ */
 function mergeCloud(cloudRows){
+  /* Build map by ref+inspector */
   const localRefMap=new Map(records.map(r=>[String(r.ref)+'|'+r.inspector,r]));
   let added=0;
   cloudRows.forEach(r=>{
     const key=String(r.ref)+'|'+r.inspector;
-    if(!localRefMap.has(key)){ records.push(r); added++; }
+    if(!localRefMap.has(key)){
+      records.push(r); added++;
+    } else {
+      /* Update existing row with cloud version (cloud is authoritative) */
+      const existing=localRefMap.get(key);
+      Object.assign(existing, r);
+    }
   });
-  if(added) invalidateMyRecCache();
+  if(added||cloudRows.length) invalidateMyRecCache();
   if(cloudRows.length) syncedReset(cloudRows.map(r=>r.ref));
   return added;
 }
 
-/* ══ schedulePush ══ */
+/* ══════════════════════════════════════════════════════════
+   ★ FIX 1 (schedulePush): Guard with _isInitializing
+   No data is ever auto-pushed during boot sequence.
+══════════════════════════════════════════════════════════ */
 let _pushInFlight=false;
 function schedulePush(){
+  if(_isInitializing) return;  /* ★ CRITICAL: block during init */
   clearTimeout(pushDebounce);
   pushDebounce=setTimeout(async()=>{
     if(_pushInFlight) return;
@@ -984,7 +1045,7 @@ function schedulePush(){
     if(!unsync.length) return;
     _pushInFlight=true;
     try{
-      await pushToCloud(unsync);
+      await pushToCloud(unsync);  /* batch send */
       unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,currentUser); });
       saveLocal();
       showSyncBadge('☁️ Auto-synced','#10b981');
@@ -998,7 +1059,7 @@ function schedulePush(){
 function startPolling(){
   if(pollingTimer) clearInterval(pollingTimer);
   pollingTimer=setInterval(async()=>{
-    if(_fetchInFlight) return;
+    if(_fetchInFlight||_isInitializing) return;
     _fetchInFlight=true;
     setSyncPulse('syncing','SYNCING…');
     try{
@@ -1018,7 +1079,7 @@ function startPolling(){
   },POLL_MS);
 }
 
-/* ══ syncToCloud (manual) ══ */
+/* ══ syncToCloud (manual button) ══ */
 async function syncToCloud(){
   if(_fetchInFlight){ toast('⏳ Sync กำลังทำงาน…'); return; }
   setSyncBtn(true); setSyncPulse('syncing','SYNCING…');
@@ -1027,7 +1088,7 @@ async function syncToCloud(){
   try{
     const [fetchResult]=await Promise.all([
       fetchFromCloud(currentUser,FETCH_TIMEOUT),
-      unsync.length?pushToCloud(unsync):Promise.resolve(),
+      unsync.length?pushToCloud(unsync):Promise.resolve(),  /* single batch */
     ]);
     if(unsync.length) unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,currentUser); });
     let pulled=0;
@@ -1044,7 +1105,100 @@ async function syncToCloud(){
   }
 }
 
-/* ══ LOGIN ══ */
+/* ══════════════════════════════════════════════════════════
+   ★ FIX 1+4 (initApp): Core initialization function.
+   
+   Flow:
+   1. Set _isInitializing = true  → blocks ALL auto-saves
+   2. Show loading overlay
+   3. Fetch FRESH data from Google Sheets (await)
+   4. Merge cloud into local
+   5. Render UI
+   6. Only THEN set _isInitializing = false → unlocks saves
+   7. Start polling
+══════════════════════════════════════════════════════════ */
+async function initApp(inspector){
+  _isInitializing = true;  /* Lock: no auto-push during init */
+  currentUser = inspector;
+  $id('currentUserDisp').textContent = inspector;
+
+  showInitOverlay('กำลังโหลดข้อมูล…','เชื่อมต่อ Google Sheets…','');
+  setSyncBtn(true);
+  setSyncPulse('syncing','LOADING…');
+
+  const myLocalRecs = getMyRecords();
+
+  try {
+    /* ★ Await full fetch before doing anything else */
+    const fetchResult = await fetchFromCloud(inspector, FETCH_TIMEOUT);
+
+    if(fetchResult.ok && fetchResult.rows.length > 0){
+      showInitOverlay('กำลังโหลดข้อมูล…','ได้รับข้อมูลจาก Cloud แล้ว…',fetchResult.rows.length);
+      const added = mergeCloud(fetchResult.rows);
+      saveLocal();
+
+      /* Render UI — this is when we show "loaded" */
+      refreshAll();
+      await sleep(80); /* allow one render frame */
+      hideInitOverlay();
+
+      if(added > 0){
+        toast(`✅ โหลดจาก Cloud: ${fetchResult.rows.length} รายการ (+${added} ใหม่)`);
+        showSyncBadge('☁️ Cloud loaded','#10b981');
+      } else {
+        showSyncBadge('✅ ข้อมูลครบถ้วน','#10b981');
+      }
+      setSyncPulse('live','LIVE SYNC');
+
+      /* Push any pending local records that cloud doesn't have */
+      const pending = getMyRecords().filter(r=>!syncedHas(r.ref));
+      if(pending.length){
+        await pushToCloud(pending);
+        pending.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,inspector); });
+        saveLocal();
+      }
+
+    } else if(myLocalRecs.length > 0){
+      /* Cloud empty / offline but we have local data — push it */
+      showInitOverlay('กำลังส่งข้อมูล…','อัพโหลดไปยัง Google Sheets…',myLocalRecs.length);
+      await pushToCloud(myLocalRecs);
+      myLocalRecs.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,inspector); });
+      saveLocal();
+      refreshAll();
+      await sleep(80);
+      hideInitOverlay();
+      toast(`☁️ ส่งข้อมูลไป Cloud: ${myLocalRecs.length} รายการ`);
+      showSyncBadge('↑ Pushed to Cloud','#f97316');
+      setSyncPulse('live','LIVE SYNC');
+
+    } else {
+      /* Fresh start — nothing anywhere */
+      refreshAll();
+      await sleep(50);
+      hideInitOverlay();
+      setSyncPulse('live','LIVE SYNC');
+    }
+
+  } catch(err){
+    /* Network failed — show local data anyway */
+    refreshAll();
+    hideInitOverlay();
+    setSyncPulse('offline','OFFLINE');
+    if(myLocalRecs.length > 0){
+      toast(`⚠️ Offline — แสดงข้อมูล Local ${myLocalRecs.length} รายการ`);
+    } else {
+      toast('⚠️ ไม่สามารถเชื่อมต่อ Cloud ได้');
+    }
+  } finally {
+    setSyncBtn(false);
+    _isInitializing = false; /* ★ Unlock: saves/pushes now allowed */
+    startPolling();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════════════════════ */
 async function setStep(n,state){
   for(let i=1;i<=3;i++){
     const el=$id('ls'+i); if(!el) continue;
@@ -1052,7 +1206,7 @@ async function setStep(n,state){
     if(i<n) el.classList.add('done');
     if(i===n) el.classList.add(state);
   }
-  const pcts={1:20,2:60,3:88};
+  const pcts={1:20,2:55,3:85};
   $id('loBar').style.width=(pcts[n]||20)+'%';
 }
 
@@ -1066,141 +1220,59 @@ async function login(){
     setTimeout(()=>$id('loginPass').style.borderColor='',1500);
     toast('⛔ รหัสผ่านไม่ถูกต้อง'); return;
   }
-  currentUser=name;
-  sessionStorage.setItem('currentUser',name);
+
+  $id('loginBtn').disabled=true;
   $id('loginForm').style.display='none';
   $id('loProgress').style.display='flex';
-  $id('loginBtn').disabled=true;
 
   await setStep(1,'active'); await sleep(200); await setStep(1,'done');
-  await setStep(2,'active'); $id('loBar').style.width='55%'; await sleep(100);
-  $id('currentUserDisp').textContent=name;
+  await setStep(2,'active');
+  $id('loBar').style.width='40%';
 
+  /* Animate the card out and reveal app shell */
   const tl=gsap.timeline();
   tl.to('#loCard',{scale:.88,opacity:0,y:-20,duration:.3,ease:'power3.in'});
-  tl.to('#loginOverlay',{opacity:0,duration:.45,ease:'power2.in',
+  tl.to('#loginOverlay',{opacity:0,duration:.4,ease:'power2.in',
     onComplete:()=>{ $id('loginOverlay').style.display='none'; }
   });
-  tl.to('#appShell',{opacity:1,duration:.55,ease:'back.out(1.6)',
+  tl.to('#appShell',{opacity:1,duration:.5,ease:'back.out(1.6)',
     onStart:()=>{
       $id('appShell').style.visibility='visible';
       $id('appShell').classList.add('visible');
-      refreshAll();
     }
   },'-=0.2');
 
   await setStep(2,'done');
   await setStep(3,'active');
-  $id('ls2note').textContent='syncing…';
 
-  setSyncBtn(true);
-  setSyncPulse('syncing','LOADING…');
+  /* Save session, then run full init flow */
+  sessionStorage.setItem('currentUser',name);
+  await initApp(name);
 
-  const myLocalRecs=getMyRecords();
-
-  try {
-    const fetchResult=await fetchFromCloud(name,FETCH_TIMEOUT);
-
-    if(fetchResult.ok&&fetchResult.rows.length>0){
-      const added=mergeCloud(fetchResult.rows);
-      saveLocal();
-      if(added) refreshAll();
-      $id('loBar').style.width='100%'; setStep(3,'done');
-      $id('ls2note').textContent=fetchResult.rows.length+' records';
-      setTimeout(()=>{
-        toast(`✅ ดึงข้อมูลจาก Cloud: ${fetchResult.rows.length} รายการ`);
-        showSyncBadge('☁️ Cloud loaded','#10b981');
-      },300);
-      setSyncPulse('live','LIVE SYNC');
-
-      const pending=getMyRecords().filter(r=>!syncedHas(r.ref));
-      if(pending.length){
-        await pushToCloud(pending);
-        pending.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,name); });
-        saveLocal();
-      }
-
-    } else if(myLocalRecs.length>0){
-      $id('ls2note').textContent='pushing '+myLocalRecs.length+'…';
-      await pushToCloud(myLocalRecs);
-      myLocalRecs.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,name); });
-      saveLocal();
-      $id('loBar').style.width='100%'; setStep(3,'done');
-      setTimeout(()=>{
-        toast(`☁️ ส่งข้อมูลไป Cloud: ${myLocalRecs.length} รายการ`);
-        showSyncBadge('↑ Pushed to Cloud','#f97316');
-      },300);
-      setSyncPulse('live','LIVE SYNC');
-
-    } else {
-      $id('loBar').style.width='100%'; setStep(3,'done');
-      $id('ls2note').textContent='ready';
-      setSyncPulse('live','LIVE SYNC');
-    }
-
-  } catch(err){
-    $id('loBar').style.width='100%'; setStep(3,'done');
-    $id('ls2note').textContent='offline';
-    setSyncPulse('offline','OFFLINE');
-    toast('⚠️ ไม่สามารถเชื่อมต่อ Cloud ได้');
-  } finally {
-    setSyncBtn(false);
-  }
-
-  startPolling();
+  setStep(3,'done');
 }
 
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&$id('loginOverlay').style.display!=='none') login();
 });
 
-/* ══ SESSION RESUME ══ */
+/* ══════════════════════════════════════════════════════════
+   ★ FIX 4 (Session Resume): Always fetch fresh on reload.
+   Never trust stale local data as the final truth.
+══════════════════════════════════════════════════════════ */
 window.addEventListener('load',async()=>{
   $id('inputDate').valueAsDate=new Date();
   startClock(); initParticles(); forceViewportReset();
   const saved=sessionStorage.getItem('currentUser');
   if(saved){
-    currentUser=saved;
-    $id('currentUserDisp').textContent=saved;
     $id('loginOverlay').style.display='none';
     $id('appShell').classList.add('visible');
+    /* Show local data immediately so UI isn't blank */
+    currentUser=saved;
+    $id('currentUserDisp').textContent=saved;
     refreshAll();
-
-    setSyncBtn(true);
-    setSyncPulse('syncing','SYNCING…');
-
-    const myLocalRecs=getMyRecords();
-    const pendingPush=myLocalRecs.filter(r=>!syncedHas(r.ref));
-
-    try {
-      const [fetchResult]=await Promise.all([
-        fetchFromCloud(saved,FETCH_TIMEOUT),
-        pendingPush.length?pushToCloud(pendingPush):Promise.resolve(),
-      ]);
-      if(pendingPush.length) pendingPush.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,saved); });
-
-      if(fetchResult&&fetchResult.ok){
-        if(fetchResult.rows.length>0){
-          const added=mergeCloud(fetchResult.rows);
-          saveLocal();
-          if(added){ refreshAll(); toast('✅ Cloud: +'+added+' รายการใหม่'); }
-        } else if(myLocalRecs.length>0&&!pendingPush.length){
-          await pushToCloud(myLocalRecs);
-          myLocalRecs.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,saved); });
-          saveLocal();
-          toast(`☁️ Re-pushed ${myLocalRecs.length} records`);
-        } else { saveLocal(); }
-        setSyncPulse('live','LIVE SYNC');
-      } else {
-        saveLocal(); setSyncPulse('offline','OFFLINE');
-      }
-    } catch(e){
-      saveLocal(); setSyncPulse('offline','OFFLINE');
-    } finally {
-      setSyncBtn(false);
-    }
-
-    startPolling();
+    /* Then do full fresh fetch */
+    await initApp(saved);
   }
 });
 
@@ -1253,10 +1325,25 @@ function handleJudgment(val){
   if(btn){ btn.style.backgroundColor=color; btn.style.boxShadow=`0 10px 25px -5px ${color}66`; }
 }
 
-/* ══ FORM SUBMIT ══ */
+/* ══════════════════════════════════════════════════════════
+   ★ FIX 3 (Validation + Duplicate): Form submit with full checks
+══════════════════════════════════════════════════════════ */
 $id('claimForm').addEventListener('submit',e=>{
   e.preventDefault();
-  const ref=$id('refNo').value.trim();
+  if(_isInitializing){ toast('⏳ กรุณารอให้ระบบโหลดเสร็จก่อน'); return; }
+
+  const ref   = $id('refNo').value.trim();
+  const supp  = $id('supplier').value.trim();
+  const qty   = parseInt($id('qty').value)||0;
+  const jdg   = $id('judgmentSelect').value;
+
+  /* Validation */
+  if(!ref){   shake($id('refNo'));     toast('❌ กรุณาระบุ Reference No'); return; }
+  if(!supp){  shake($id('supplier')); toast('❌ กรุณาระบุ Supplier');     return; }
+  if(qty<=0){ shake($id('qty'));       toast('❌ QTY ต้องมากกว่า 0');     return; }
+  if(!jdg){  shake($id('judgmentSelect')); toast('❌ กรุณาเลือก Judgment'); return; }
+
+  /* Duplicate check */
   if(isDuplicate(ref)){
     shake($id('refNo'));
     toast('⚠️ Duplicate! REF นี้มีในระบบแล้ว');
@@ -1264,6 +1351,7 @@ $id('claimForm').addEventListener('submit',e=>{
     setTimeout(()=>$id('refNo').style.borderColor='',2000);
     return;
   }
+
   const newRow={
     id       : Date.now()+'_'+Math.random().toString(36).slice(2),
     date     : $id('inputDate').value,
@@ -1271,17 +1359,20 @@ $id('claimForm').addEventListener('submit',e=>{
     inspector: currentUser,
     ref,
     line     : $id('lineNo').value,
-    supplier : $id('supplier').value,
+    supplier : supp,
     partNo   : $id('partNo').value,
     partName : $id('partOn').value,
-    qty      : parseInt($id('qty').value)||0,
+    qty,
     defect   : $id('defectName').value,
     remark   : $id('remark').value,
-    judgment : $id('judgmentSelect').value,
+    judgment : jdg,
   };
+
   cloudRefAdd(ref,currentUser);
   records.push(newRow);
-  saveAndRefresh();
+  saveAndRefresh();  /* triggers schedulePush (now safe — not initializing) */
+
+  /* Visual feedback */
   const sb=$id('submitBtn');
   if(sb){
     const orig=sb.style.backgroundColor;
@@ -1366,7 +1457,8 @@ function renderTable(){
     const s=SM_MAP[r.judgment]||SM_MAP['SF'];
     const synced=_syncedSet.has(r.ref);
     const safeId=String(r.id).replace(/"/g,'&quot;');
-    html+=`<tr class="group hover:bg-white/60 border-l-4 border-transparent hover:border-orange-500" data-rid="${safeId}">
+    const safeRef=String(r.ref).replace(/"/g,'&quot;');
+    html+=`<tr class="group hover:bg-white/60 border-l-4 border-transparent hover:border-orange-500" data-rid="${safeId}" data-ref="${safeRef}">
       <td class="pl-8 py-5 font-bold text-[11px] text-slate-400">${r.date}</td>
       <td class="text-[11px] font-black text-slate-700">${r.shift}<br><span class="text-slate-400 font-bold">L: ${r.line||'—'}</span></td>
       <td class="text-[11px] font-black text-slate-400"><span style="color:${synced?'#10b981':'#cbd5e1'}" title="${synced?'Synced to Cloud':'Not synced yet'}">●</span> #${r.ref}</td>
@@ -1393,13 +1485,16 @@ document.addEventListener('click',e=>{
   if(btn.dataset.action==='delete') showDeleteModal(rid,tr);
 });
 
-/* ══ DELETE ══ */
+/* ══════════════════════════════════════════════════════════
+   ★ FIX 2 (Delete): _pendingDelete now stores id AND ref.
+   deleteFromCloud receives both for accurate GAS row lookup.
+══════════════════════════════════════════════════════════ */
 let _pendingDelete=null;
 function showDeleteModal(id,trEl){
   const r=findRecord(id);
   if(!r){ toast('⚠️ ไม่พบข้อมูล'); return; }
   if(r.inspector!==currentUser){ toast('⛔ ไม่มีสิทธิ์ลบข้อมูลของผู้ใช้อื่น'); return; }
-  _pendingDelete={ id, trEl, ref:r.ref, inspector:r.inspector };
+  _pendingDelete={ id: r.id, trEl, ref:r.ref, inspector:r.inspector };
   $id('delModalDesc').textContent=`Ref: ${r.ref} · ${r.supplier} · ${r.date}`;
   $id('deleteModal').classList.add('show');
   requestAnimationFrame(()=>$id('delCancelBtn').focus());
@@ -1429,6 +1524,7 @@ $id('delConfirmBtn').addEventListener('click',async()=>{
 
   if(trEl&&trEl.isConnected){ trEl.style.pointerEvents='none'; trEl.classList.add('row-deleting'); }
 
+  /* Remove from local immediately */
   records=records.filter(x=>String(x.id)!==String(id));
   syncedDelete(ref);
   cloudRefDelete(ref,inspector);
@@ -1439,7 +1535,8 @@ $id('delConfirmBtn').addEventListener('click',async()=>{
   showSyncBadge('🗑 Deleting…','#ef4444');
 
   try {
-    const result=await deleteFromCloud(ref,inspector);
+    /* ★ Pass BOTH id and ref to deleteFromCloud */
+    const result=await deleteFromCloud(id, ref, inspector);
     if(result.method==='cors'&&result.ok===true){
       showDelProgress('ลบสำเร็จ!','Cloud ยืนยันแล้ว',100);
       toast('🗑 ลบสำเร็จ (Local ✓ · Cloud ✓)');
@@ -1726,28 +1823,69 @@ function renderRankings(data){
   draw('rankParts',    getTop('partNo'),  'linear-gradient(90deg,#3b82f6,#60a5fa)','#3b82f6');
 }
 
-/* ══ IMPORT / EXPORT ══ */
+/* ══════════════════════════════════════════════════════════
+   ★ FIX 3 (Bulk Import): importExcel sends ALL rows in ONE batch.
+   Never loops per row. Validates each row before accepting.
+══════════════════════════════════════════════════════════ */
 function importExcel(input){
+  if(_isInitializing){ toast('⏳ กรุณารอให้ระบบโหลดเสร็จก่อน'); input.value=''; return; }
   const file=input.files[0]; if(!file) return;
   const reader=new FileReader();
-  reader.onload=e=>{
+  reader.onload=async e=>{
     const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
     const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    const pd=v=>{if(!v)return '';if(v instanceof Date)return new Date(v.getTime()-(v.getTimezoneOffset()*60000)).toISOString().split('T')[0];if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;}return String(v);};
-    const items=json.map(r=>({
-      id:Date.now()+Math.random(), date:pd(r.date||r.Date||r.DATE),
-      shift:r.shift||r.Shift||'SHIFT A', inspector:currentUser,
-      ref:String(r.ref||r.Reference||''), line:String(r.line||r.Line||''),
-      supplier:String(r.supplier||r.Supplier||''), partNo:String(r.partNo||r.PartNo||''),
-      partName:String(r.partName||r.PartName||''), qty:parseInt(r.qty||r.Qty||0),
-      defect:String(r.defect||r.Defect||''), remark:String(r.remark||r.Remark||''),
-      judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase()
-    })).filter(r=>!isDuplicate(r.ref));
-    if(!items.length){ toast('⚠️ ไม่มีข้อมูลใหม่ (ซ้ำทั้งหมด)'); input.value=''; return; }
+    const pd=v=>{
+      if(!v)return '';
+      if(v instanceof Date)return new Date(v.getTime()-(v.getTimezoneOffset()*60000)).toISOString().split('T')[0];
+      if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;}
+      return String(v);
+    };
+
+    let skippedDupe=0, skippedInvalid=0;
+    const items=[];
+    for(const r of json){
+      const ref=String(r.ref||r.Reference||'').trim();
+      const supp=String(r.supplier||r.Supplier||'').trim();
+      const qty=parseInt(r.qty||r.Qty||0);
+      /* ★ Validate */
+      if(!ref||!supp||qty<=0){ skippedInvalid++; continue; }
+      /* ★ Duplicate check */
+      if(isDuplicate(ref)){ skippedDupe++; continue; }
+      items.push({
+        id       : Date.now()+Math.random(),
+        date     : pd(r.date||r.Date||r.DATE),
+        shift    : r.shift||r.Shift||'SHIFT A',
+        inspector: currentUser,
+        ref, line:String(r.line||r.Line||''),
+        supplier : supp, partNo:String(r.partNo||r.PartNo||''),
+        partName : String(r.partName||r.PartName||''),
+        qty,
+        defect   : String(r.defect||r.Defect||''),
+        remark   : String(r.remark||r.Remark||''),
+        judgment : String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase(),
+      });
+    }
+
+    if(!items.length){
+      toast(`⚠️ ไม่มีข้อมูลใหม่ (ซ้ำ:${skippedDupe} / Invalid:${skippedInvalid})`);
+      input.value=''; return;
+    }
+
+    /* Add to local */
     items.forEach(r=>cloudRefAdd(r.ref,currentUser));
     records=[...records,...items];
-    _lastRenderHash=''; saveAndRefresh();
-    toast('📥 Imported '+items.length+' records'); input.value='';
+    _lastRenderHash=''; saveLocal(); refreshAll();
+
+    /* ★ Batch push: send ALL new items in ONE call */
+    showInitOverlay('กำลัง Import…','อัพโหลด Batch ไปยัง Cloud…',items.length);
+    try{
+      await pushToCloud(items);
+      items.forEach(r=>{ syncedAdd(r.ref); });
+      saveLocal();
+    }catch(e){}
+    hideInitOverlay();
+    toast(`📥 Imported ${items.length} records${skippedDupe?` (${skippedDupe} ซ้ำข้าม)`:''}${skippedInvalid?` (${skippedInvalid} Invalid ข้าม)`:''}`);
+    input.value='';
   };
   reader.readAsArrayBuffer(file);
 }
