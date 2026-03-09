@@ -160,18 +160,7 @@ html,body{
 @keyframes rippleOut{from{opacity:.7;transform:scale(.6)}to{opacity:0;transform:scale(2.2)}}
 tbody tr{opacity:0;transform:translateY(8px);will-change:opacity,transform;}
 tbody tr.vis{opacity:1;transform:translateY(0);transition:opacity .22s ease, transform .22s cubic-bezier(.22,.68,0,1.2);}
-tbody tr:nth-child(1).vis{transition-delay:.01s}
-tbody tr:nth-child(2).vis{transition-delay:.02s}
-tbody tr:nth-child(3).vis{transition-delay:.03s}
-tbody tr:nth-child(4).vis{transition-delay:.04s}
-tbody tr:nth-child(5).vis{transition-delay:.05s}
-tbody tr:nth-child(6).vis{transition-delay:.06s}
-tbody tr:nth-child(7).vis{transition-delay:.07s}
-tbody tr:nth-child(8).vis{transition-delay:.08s}
-tbody tr:nth-child(9).vis{transition-delay:.09s}
-tbody tr:nth-child(10).vis{transition-delay:.10s}
-tbody tr:nth-child(11).vis{transition-delay:.11s}
-tbody tr:nth-child(12).vis{transition-delay:.12s}
+tbody tr:nth-child(1).vis{transition-delay:.01s}tbody tr:nth-child(2).vis{transition-delay:.02s}tbody tr:nth-child(3).vis{transition-delay:.03s}tbody tr:nth-child(4).vis{transition-delay:.04s}tbody tr:nth-child(5).vis{transition-delay:.05s}tbody tr:nth-child(6).vis{transition-delay:.06s}tbody tr:nth-child(7).vis{transition-delay:.07s}tbody tr:nth-child(8).vis{transition-delay:.08s}tbody tr:nth-child(9).vis{transition-delay:.09s}tbody tr:nth-child(10).vis{transition-delay:.10s}tbody tr:nth-child(11).vis{transition-delay:.11s}tbody tr:nth-child(12).vis{transition-delay:.12s}
 tbody tr:hover{background:rgba(255,255,255,.7)!important;transition:background .15s!important}
 tbody tr td:first-child{position:relative}
 tbody tr td:first-child::before{
@@ -203,11 +192,7 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 .btn-success{animation:btnSuccess .5s cubic-bezier(.34,1.56,.64,1)}
 @keyframes kpiCardIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
 #kpiGrid > div{animation:kpiCardIn .45s cubic-bezier(.34,1.56,.64,1) both}
-#kpiGrid > div:nth-child(1){animation-delay:.05s}
-#kpiGrid > div:nth-child(2){animation-delay:.1s}
-#kpiGrid > div:nth-child(3){animation-delay:.15s}
-#kpiGrid > div:nth-child(4){animation-delay:.2s}
-#kpiGrid > div:nth-child(5){animation-delay:.25s}
+#kpiGrid > div:nth-child(1){animation-delay:.05s}#kpiGrid > div:nth-child(2){animation-delay:.1s}#kpiGrid > div:nth-child(3){animation-delay:.15s}#kpiGrid > div:nth-child(4){animation-delay:.2s}#kpiGrid > div:nth-child(5){animation-delay:.25s}
 #sidebar{animation:sideIn .5s cubic-bezier(.34,1.56,.64,1) both .1s}
 @keyframes sideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:none}}
 #mainPanel{animation:panelIn .5s cubic-bezier(.22,.68,0,1.2) both .15s}
@@ -250,6 +235,21 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
   border:1.5px solid rgba(239,68,68,.15);
 }
 @keyframes delCardIn{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:none}}
+
+/* ══ DELETE PROGRESS OVERLAY ══ */
+#deleteProgressOverlay{
+  position:fixed;inset:0;z-index:25000;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(6,10,20,.55);backdrop-filter:blur(8px);
+}
+#deleteProgressOverlay.show{display:flex}
+.del-progress-card{
+  background:#0f172a;border:1px solid rgba(249,115,22,.3);
+  border-radius:1.6rem;padding:2rem 2.5rem;text-align:center;
+  box-shadow:0 40px 80px rgba(0,0,0,.5);min-width:260px;
+  animation:delCardIn .28s cubic-bezier(.34,1.56,.64,1);
+}
+
 #dashboardModal{
   position:fixed;inset:0;display:none;
   align-items:stretch;justify-content:stretch;
@@ -335,43 +335,13 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 .bar-bg{background:rgba(0,0,0,.05);height:10px;border-radius:10px;overflow:hidden}
 .bar-fill{height:100%;border-radius:10px;transition:width 1.1s cubic-bezier(.16,1,.3,1);width:0%}
 @media(max-width:1200px){.dash-charts-row{grid-template-columns:1.5fr 1fr 1fr}}
-@media(max-width:1050px){
-  .dash-kpi-row{grid-template-columns:repeat(3,1fr)}
-  .dash-stats-row{grid-template-columns:repeat(2,1fr)}
-  .dash-charts-row{grid-template-columns:1fr 1fr;flex:0 0 38%}
-}
-@media(max-width:768px){
-  .glass-dash{overflow-y:auto}
-  .dash-body{overflow-y:auto;gap:.45rem}
-  .dash-kpi-row{grid-template-columns:repeat(2,1fr);height:auto}
-  .dash-stats-row{grid-template-columns:repeat(2,1fr);height:auto}
-  .dash-charts-row{grid-template-columns:1fr;flex:0 0 auto;height:260px}
-  .dash-chart-card:not(:first-child){display:none}
-  .dash-rank-row{flex:0 0 auto;height:220px;display:grid}
-}
+@media(max-width:1050px){.dash-kpi-row{grid-template-columns:repeat(3,1fr)}.dash-stats-row{grid-template-columns:repeat(2,1fr)}.dash-charts-row{grid-template-columns:1fr 1fr;flex:0 0 38%}}
+@media(max-width:768px){.glass-dash{overflow-y:auto}.dash-body{overflow-y:auto;gap:.45rem}.dash-kpi-row{grid-template-columns:repeat(2,1fr);height:auto}.dash-stats-row{grid-template-columns:repeat(2,1fr);height:auto}.dash-charts-row{grid-template-columns:1fr;flex:0 0 auto;height:260px}.dash-chart-card:not(:first-child){display:none}.dash-rank-row{flex:0 0 auto;height:220px;display:grid}}
 .form-in{animation:formIn .4s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes formIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
-@media(max-width:1100px){
-  #appShell{padding:.75rem;gap:.75rem}
-  #brandCard{display:none!important}
-  #appHeader{grid-template-columns:1fr!important}
-  #kpiGrid{grid-template-columns:repeat(5,1fr)!important}
-  #sidebar{width:240px!important}
-}
-@media(max-width:900px){
-  #appShell{padding:.6rem;gap:.6rem}
-  #kpiGrid{grid-template-columns:repeat(3,1fr)!important}
-  #sidebar{width:210px!important}
-}
-@media(max-width:700px){
-  html,body{overflow:auto}
-  #appShell{position:relative;height:auto;overflow:visible;padding:.5rem;gap:.5rem}
-  #appHeader{display:flex!important;flex-direction:column!important}
-  #kpiGrid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:.5rem}
-  #sidebar{display:none!important}
-  #mainPanel{border-radius:1rem!important}
-  #toolbarBtns button:not(#syncBtnMain):not(#dashBtn):not(#jobBtn){display:none}
-}
+@media(max-width:1100px){#appShell{padding:.75rem;gap:.75rem}#brandCard{display:none!important}#appHeader{grid-template-columns:1fr!important}#kpiGrid{grid-template-columns:repeat(5,1fr)!important}#sidebar{width:240px!important}}
+@media(max-width:900px){#appShell{padding:.6rem;gap:.6rem}#kpiGrid{grid-template-columns:repeat(3,1fr)!important}#sidebar{width:210px!important}}
+@media(max-width:700px){html,body{overflow:auto}#appShell{position:relative;height:auto;overflow:visible;padding:.5rem;gap:.5rem}#appHeader{display:flex!important;flex-direction:column!important}#kpiGrid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:.5rem}#sidebar{display:none!important}#mainPanel{border-radius:1rem!important}#toolbarBtns button:not(#syncBtnMain):not(#dashBtn):not(#jobBtn){display:none}}
 </style>
 </head>
 <body>
@@ -393,6 +363,18 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
   </div>
 </div>
 
+<!-- DELETE PROGRESS OVERLAY (Real-time delete feedback) -->
+<div id="deleteProgressOverlay">
+  <div class="del-progress-card">
+    <div id="delProgIcon" class="text-4xl mb-3">⏳</div>
+    <div id="delProgTitle" class="text-white font-black text-base mb-1 orbitron">กำลังลบ…</div>
+    <div id="delProgSub" class="text-slate-400 font-bold text-xs">กำลังลบออกจาก Google Sheets</div>
+    <div class="mt-4 h-1 bg-slate-700 rounded-full overflow-hidden">
+      <div id="delProgBar" class="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-500" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div id="loginOverlay">
   <canvas id="loCanvas"></canvas>
@@ -401,18 +383,14 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
   <div class="lo-orb lo-orb-2"></div>
   <div class="lo-orb lo-orb-3"></div>
   <div class="lo-rings">
-    <div class="lo-ring"></div>
-    <div class="lo-ring"></div>
-    <div class="lo-ring"></div>
+    <div class="lo-ring"></div><div class="lo-ring"></div><div class="lo-ring"></div>
   </div>
   <div class="lo-card" id="loCard">
     <div class="lo-scan"></div>
     <div class="lo-c tl"></div><div class="lo-c tr"></div>
     <div class="lo-c bl"></div><div class="lo-c br"></div>
     <div class="lo-logo-w">
-      <div class="lo-lr"></div>
-      <div class="lo-lr"></div>
-      <div class="lo-lr"></div>
+      <div class="lo-lr"></div><div class="lo-lr"></div><div class="lo-lr"></div>
       <svg class="w-20 h-20 mx-auto relative z-10" viewBox="0 0 50 50">
         <circle class="q-path" cx="25" cy="25" r="20"/>
         <line class="q-path" x1="35" y1="35" x2="45" y2="45"/>
@@ -604,135 +582,65 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
       <button onclick="closeDashboard()" class="w-7 h-7 rounded-xl bg-red-500 text-white font-black text-xs hover:bg-red-600 hover:scale-110 transition-all shadow-md flex items-center justify-center">✕</button>
     </div>
   </div>
-
   <div class="dash-body">
     <div class="dash-kpi-row">
       <div class="dkpi bg-slate-900 text-white shadow-xl" style="animation-delay:.0s">
-        <div class="flex justify-between items-start">
-          <p class="uppercase opacity-55 font-black tracking-widest" style="font-size:clamp(.55rem,.7vw,.65rem)">Total QTY</p>
-          <span class="bg-orange-500/20 text-orange-400 font-black px-1.5 py-0.5 rounded-md leading-tight" style="font-size:.58rem">ALL</span>
-        </div>
+        <div class="flex justify-between items-start"><p class="uppercase opacity-55 font-black tracking-widest" style="font-size:clamp(.55rem,.7vw,.65rem)">Total QTY</p><span class="bg-orange-500/20 text-orange-400 font-black px-1.5 py-0.5 rounded-md leading-tight" style="font-size:.58rem">ALL</span></div>
         <div id="dTotalQty" class="orbitron font-black leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem);text-shadow:0 0 25px rgba(249,115,22,.3)">0</div>
         <div class="font-bold opacity-55 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dTotalLot" class="text-orange-400 font-black">0</span></div>
       </div>
       <div class="dkpi bg-white/80 border-b-4 border-orange-400 shadow-sm" style="animation-delay:.07s">
-        <div class="flex justify-between items-start">
-          <p class="text-orange-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">SF Fault</p>
-          <span id="dSFpct" class="bg-orange-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
-        </div>
+        <div class="flex justify-between items-start"><p class="text-orange-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">SF Fault</p><span id="dSFpct" class="bg-orange-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span></div>
         <div id="dSFqty" class="orbitron font-black text-orange-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
         <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dSFlot" class="text-slate-800 font-black">0</span></div>
       </div>
       <div class="dkpi bg-white/80 border-b-4 border-red-400 shadow-sm" style="animation-delay:.13s">
-        <div class="flex justify-between items-start">
-          <p class="text-red-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">Vendor</p>
-          <span id="dVENpct" class="bg-red-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
-        </div>
+        <div class="flex justify-between items-start"><p class="text-red-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">Vendor</p><span id="dVENpct" class="bg-red-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span></div>
         <div id="dVENqty" class="orbitron font-black text-red-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
         <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dVENlot" class="text-slate-800 font-black">0</span></div>
       </div>
       <div class="dkpi bg-white/80 border-b-4 border-blue-400 shadow-sm" style="animation-delay:.19s">
-        <div class="flex justify-between items-start">
-          <p class="text-blue-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">CTC</p>
-          <span id="dCTCpct" class="bg-blue-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
-        </div>
+        <div class="flex justify-between items-start"><p class="text-blue-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">CTC</p><span id="dCTCpct" class="bg-blue-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span></div>
         <div id="dCTCqty" class="orbitron font-black text-blue-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
         <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dCTClot" class="text-slate-800 font-black">0</span></div>
       </div>
       <div class="dkpi bg-white/80 border-b-4 border-emerald-400 shadow-sm" style="animation-delay:.25s">
-        <div class="flex justify-between items-start">
-          <p class="text-emerald-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">Can Use</p>
-          <span id="dOKpct" class="bg-emerald-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span>
-        </div>
+        <div class="flex justify-between items-start"><p class="text-emerald-600 uppercase font-black tracking-wider" style="font-size:clamp(.55rem,.7vw,.65rem)">Can Use</p><span id="dOKpct" class="bg-emerald-500 text-white rounded-full font-black orbitron leading-tight" style="font-size:clamp(.57rem,.75vw,.68rem);padding:1px 6px">0%</span></div>
         <div id="dOKqty" class="orbitron font-black text-emerald-500 leading-none" style="font-size:clamp(1.15rem,2.2vw,2.3rem)">0</div>
         <div class="font-bold text-slate-400 uppercase" style="font-size:clamp(.54rem,.7vw,.63rem)">Lots: <span id="dOKlot" class="text-slate-800 font-black">0</span></div>
       </div>
     </div>
-
     <div class="dash-stats-row">
-      <div class="d-stat" style="animation-delay:.3s">
-        <div class="d-stat-icon bg-red-500/10">🚫</div>
-        <div class="min-w-0">
-          <div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Rejection Rate</div>
-          <div id="dRejRate" class="orbitron font-black text-red-500 leading-tight" style="font-size:clamp(.9rem,1.6vw,1.4rem)">0%</div>
-        </div>
-      </div>
-      <div class="d-stat" style="animation-delay:.36s">
-        <div class="d-stat-icon bg-blue-500/10">🏆</div>
-        <div class="min-w-0">
-          <div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Top Shift</div>
-          <div id="dTopShift" class="orbitron font-black text-blue-500 leading-tight truncate" style="font-size:clamp(.9rem,1.6vw,1.4rem)">—</div>
-        </div>
-      </div>
-      <div class="d-stat" style="animation-delay:.42s">
-        <div class="d-stat-icon bg-orange-500/10">📦</div>
-        <div class="min-w-0">
-          <div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Avg QTY/Lot</div>
-          <div id="dAvgQty" class="orbitron font-black text-orange-500 leading-tight" style="font-size:clamp(.9rem,1.6vw,1.4rem)">0</div>
-        </div>
-      </div>
-      <div class="d-stat" style="animation-delay:.48s">
-        <div class="d-stat-icon bg-emerald-500/10">📅</div>
-        <div class="min-w-0">
-          <div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Active Days</div>
-          <div id="dActiveDays" class="orbitron font-black text-emerald-500 leading-tight" style="font-size:clamp(.9rem,1.6vw,1.4rem)">0</div>
-        </div>
-      </div>
+      <div class="d-stat" style="animation-delay:.3s"><div class="d-stat-icon bg-red-500/10">🚫</div><div class="min-w-0"><div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Rejection Rate</div><div id="dRejRate" class="orbitron font-black text-red-500 leading-tight" style="font-size:clamp(.9rem,1.6vw,1.4rem)">0%</div></div></div>
+      <div class="d-stat" style="animation-delay:.36s"><div class="d-stat-icon bg-blue-500/10">🏆</div><div class="min-w-0"><div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Top Shift</div><div id="dTopShift" class="orbitron font-black text-blue-500 leading-tight truncate" style="font-size:clamp(.9rem,1.6vw,1.4rem)">—</div></div></div>
+      <div class="d-stat" style="animation-delay:.42s"><div class="d-stat-icon bg-orange-500/10">📦</div><div class="min-w-0"><div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Avg QTY/Lot</div><div id="dAvgQty" class="orbitron font-black text-orange-500 leading-tight" style="font-size:clamp(.9rem,1.6vw,1.4rem)">0</div></div></div>
+      <div class="d-stat" style="animation-delay:.48s"><div class="d-stat-icon bg-emerald-500/10">📅</div><div class="min-w-0"><div class="font-black text-slate-400 uppercase" style="font-size:clamp(.52rem,.68vw,.6rem)">Active Days</div><div id="dActiveDays" class="orbitron font-black text-emerald-500 leading-tight" style="font-size:clamp(.9rem,1.6vw,1.4rem)">0</div></div></div>
     </div>
-
     <div class="dash-charts-row">
       <div class="dash-chart-card bg-white/80 border border-slate-200/60 shadow-sm" style="animation-delay:.2s">
-        <div class="shrink-0 flex justify-between items-start mb-1.5">
-          <div>
-            <h4 class="orbitron font-black text-slate-700 uppercase tracking-[.1em]" style="font-size:clamp(.58rem,.8vw,.7rem)">📈 Monthly Performance Trend</h4>
-            <p class="text-slate-400 font-bold" style="font-size:clamp(.5rem,.65vw,.58rem)">Total quantity per month</p>
-          </div>
-          <div id="monthlyInsight" class="font-bold text-slate-700 bg-orange-50 border border-orange-200 rounded-xl" style="font-size:clamp(.54rem,.7vw,.64rem);padding:2px 9px;white-space:nowrap">—</div>
-        </div>
+        <div class="shrink-0 flex justify-between items-start mb-1.5"><div><h4 class="orbitron font-black text-slate-700 uppercase tracking-[.1em]" style="font-size:clamp(.58rem,.8vw,.7rem)">📈 Monthly Performance Trend</h4><p class="text-slate-400 font-bold" style="font-size:clamp(.5rem,.65vw,.58rem)">Total quantity per month</p></div><div id="monthlyInsight" class="font-bold text-slate-700 bg-orange-50 border border-orange-200 rounded-xl" style="font-size:clamp(.54rem,.7vw,.64rem);padding:2px 9px;white-space:nowrap">—</div></div>
         <div class="dash-chart-wrap"><canvas id="trendChart"></canvas></div>
       </div>
       <div class="dash-chart-card shadow-xl" style="background:linear-gradient(145deg,#0f172a,#1e293b);animation-delay:.28s">
-        <div class="shrink-0 mb-1">
-          <h4 class="orbitron font-black text-orange-400 uppercase tracking-[.1em]" style="font-size:clamp(.58rem,.8vw,.7rem)">🎯 Fault Distribution</h4>
-          <p class="text-slate-500 font-bold" style="font-size:clamp(.5rem,.65vw,.58rem)">Judgment breakdown</p>
-        </div>
-        <div class="donut-wrap">
-          <canvas id="donutChart"></canvas>
-          <div class="donut-center">
-            <div id="donutTotal" class="orbitron font-black text-white leading-none" style="font-size:clamp(.85rem,1.6vw,1.45rem)">0</div>
-            <div class="text-slate-500 font-bold uppercase" style="font-size:clamp(.46rem,.62vw,.56rem)">Total QTY</div>
-          </div>
-        </div>
+        <div class="shrink-0 mb-1"><h4 class="orbitron font-black text-orange-400 uppercase tracking-[.1em]" style="font-size:clamp(.58rem,.8vw,.7rem)">🎯 Fault Distribution</h4><p class="text-slate-500 font-bold" style="font-size:clamp(.5rem,.65vw,.58rem)">Judgment breakdown</p></div>
+        <div class="donut-wrap"><canvas id="donutChart"></canvas><div class="donut-center"><div id="donutTotal" class="orbitron font-black text-white leading-none" style="font-size:clamp(.85rem,1.6vw,1.45rem)">0</div><div class="text-slate-500 font-bold uppercase" style="font-size:clamp(.46rem,.62vw,.56rem)">Total QTY</div></div></div>
       </div>
       <div class="dash-chart-card bg-white/80 border border-slate-200/60 shadow-sm" style="animation-delay:.36s">
-        <div class="shrink-0 mb-1.5">
-          <h4 class="orbitron font-black text-slate-700 uppercase tracking-[.1em]" style="font-size:clamp(.58rem,.8vw,.7rem)">🏭 Top Lines</h4>
-          <p class="text-slate-400 font-bold" style="font-size:clamp(.5rem,.65vw,.58rem)">Highest QTY production lines</p>
-        </div>
+        <div class="shrink-0 mb-1.5"><h4 class="orbitron font-black text-slate-700 uppercase tracking-[.1em]" style="font-size:clamp(.58rem,.8vw,.7rem)">🏭 Top Lines</h4><p class="text-slate-400 font-bold" style="font-size:clamp(.5rem,.65vw,.58rem)">Highest QTY production lines</p></div>
         <div class="dash-chart-wrap"><canvas id="radarChart"></canvas></div>
       </div>
     </div>
-
     <div class="dash-rank-row">
       <div class="dash-rank-card bg-white/80 border border-slate-200/60 shadow-sm" style="animation-delay:.44s">
-        <div class="shrink-0 flex justify-between items-center pb-1 mb-1 border-b border-slate-200/80">
-          <span class="font-black text-slate-600 uppercase tracking-widest flex items-center gap-1" style="font-size:clamp(.54rem,.72vw,.64rem)"><span class="text-orange-500">■</span> Top Suppliers</span>
-          <span class="text-orange-500 font-black orbitron" style="font-size:clamp(.52rem,.68vw,.6rem)">QTY</span>
-        </div>
+        <div class="shrink-0 flex justify-between items-center pb-1 mb-1 border-b border-slate-200/80"><span class="font-black text-slate-600 uppercase tracking-widest flex items-center gap-1" style="font-size:clamp(.54rem,.72vw,.64rem)"><span class="text-orange-500">■</span> Top Suppliers</span><span class="text-orange-500 font-black orbitron" style="font-size:clamp(.52rem,.68vw,.6rem)">QTY</span></div>
         <div id="rankSuppliers" class="flex-grow overflow-y-auto scroll"></div>
       </div>
       <div class="dash-rank-card bg-white/80 border border-slate-200/60 shadow-sm" style="animation-delay:.51s">
-        <div class="shrink-0 flex justify-between items-center pb-1 mb-1 border-b border-slate-200/80">
-          <span class="font-black text-slate-600 uppercase tracking-widest flex items-center gap-1" style="font-size:clamp(.54rem,.72vw,.64rem)"><span class="text-red-500">■</span> Top Defects</span>
-          <span class="text-red-500 font-black orbitron" style="font-size:clamp(.52rem,.68vw,.6rem)">QTY</span>
-        </div>
+        <div class="shrink-0 flex justify-between items-center pb-1 mb-1 border-b border-slate-200/80"><span class="font-black text-slate-600 uppercase tracking-widest flex items-center gap-1" style="font-size:clamp(.54rem,.72vw,.64rem)"><span class="text-red-500">■</span> Top Defects</span><span class="text-red-500 font-black orbitron" style="font-size:clamp(.52rem,.68vw,.6rem)">QTY</span></div>
         <div id="rankDefects" class="flex-grow overflow-y-auto scroll"></div>
       </div>
       <div class="dash-rank-card bg-white/80 border border-slate-200/60 shadow-sm" style="animation-delay:.58s">
-        <div class="shrink-0 flex justify-between items-center pb-1 mb-1 border-b border-slate-200/80">
-          <span class="font-black text-slate-600 uppercase tracking-widest flex items-center gap-1" style="font-size:clamp(.54rem,.72vw,.64rem)"><span class="text-blue-500">■</span> Top Parts</span>
-          <span class="text-blue-500 font-black orbitron" style="font-size:clamp(.52rem,.68vw,.6rem)">QTY</span>
-        </div>
+        <div class="shrink-0 flex justify-between items-center pb-1 mb-1 border-b border-slate-200/80"><span class="font-black text-slate-600 uppercase tracking-widest flex items-center gap-1" style="font-size:clamp(.54rem,.72vw,.64rem)"><span class="text-blue-500">■</span> Top Parts</span><span class="text-blue-500 font-black orbitron" style="font-size:clamp(.52rem,.68vw,.6rem)">QTY</span></div>
         <div id="rankParts" class="flex-grow overflow-y-auto scroll"></div>
       </div>
     </div>
@@ -746,140 +654,116 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 <datalist id="inspectorList"></datalist>
 
 <script>
-/* ══════════════════════════════════════════════════════════
-   CONFIG  — เปลี่ยน GOOGLE_URL เป็น Web App URL ของคุณ
-══════════════════════════════════════════════════════════ */
-const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbwN07wj5UfDXhzruTd28T3wwbhXNw9MeTB_O5zyW_pbKjeKXvsurpwrLhbK6uA6nwrRog/exec';
+/* ══ CONFIG ══ */
+const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbzsw4cWtf0kd_O2gsCOYWXn5SwixK5S1EWe04z37VbkPK2OJl5';
 const STORAGE_KEY = 'qdit_v3_records';
 const SYNCED_KEY  = 'qdit_v3_synced';
-const REFS_KEY    = 'qdit_v3_allrefs';  // ★ cloud refs cache
+const REFS_KEY    = 'qdit_v3_allrefs';
 
-/* ══ TIMING ══ */
-const FETCH_TIMEOUT  = 6000;
-const PUSH_TIMEOUT   = 5000;
-const POLL_MS        = 5000;   // ★ เร็วขึ้น
-const PUSH_DEBOUNCE  = 300;    // ★ เร็วขึ้น
+const FETCH_TIMEOUT = 9000;
+const PUSH_TIMEOUT  = 8000;
+const DELETE_TIMEOUT= 10000;   // ★ timeout สำหรับ real-time delete
+const POLL_MS       = 5000;
+const PUSH_DEBOUNCE = 300;
 
-/* ══ STATE ══ */
 let records     = safeJSON(STORAGE_KEY, []);
 let currentUser = '';
 let filterType  = 'ALL';
 let charts      = {};
 let pushDebounce, pollingTimer;
 
-/* ── syncedSet: refs ที่ push cloud สำเร็จแล้ว ─────── */
 let _syncedSet = new Set(safeJSON(SYNCED_KEY, []));
 function syncedHas(ref)   { return _syncedSet.has(String(ref)); }
 function syncedAdd(ref)   { _syncedSet.add(String(ref)); }
 function syncedDelete(ref){ _syncedSet.delete(String(ref)); }
 function syncedReset(arr) { _syncedSet = new Set(arr.map(String)); }
 
-/* ── allCloudRefs: composite key "INSPECTOR|ref" ────────
-   ★★★ ป้องกัน duplicate 100% ทั้งฝั่ง local+cloud ★★★
-   ★ composite key → reset per-inspector ได้ถูกต้อง 100% */
 let _allCloudRefs = new Set(safeJSON(REFS_KEY, []));
 const _ck = (insp, ref) => `${insp||currentUser}|${String(ref)}`;
-
 function cloudRefAdd(ref, insp)    { _allCloudRefs.add(_ck(insp||currentUser, ref)); }
 function cloudRefDelete(ref, insp) { _allCloudRefs.delete(_ck(insp||currentUser, ref)); }
 function cloudRefHas(ref, insp)    { return _allCloudRefs.has(_ck(insp||currentUser, ref)); }
-
-/* เพิ่ม refs จาก rows (ใช้ inspector จาก row เอง) */
-function cloudRefSetFromRows(rows){
-  rows.forEach(r => _allCloudRefs.add(_ck(r.inspector, r.ref)));
-}
-
-/* ★ ล้าง refs ทั้งหมดของ inspector — prefix scan */
+function cloudRefSetFromRows(rows) { rows.forEach(r => _allCloudRefs.add(_ck(r.inspector, r.ref))); }
 function clearInspectorCloudRefs(inspector){
   const prefix = inspector + '|';
-  for(const key of [..._allCloudRefs]){
-    if(key.startsWith(prefix)) _allCloudRefs.delete(key);
-  }
+  for(const key of [..._allCloudRefs]) if(key.startsWith(prefix)) _allCloudRefs.delete(key);
 }
+function saveAllCloudRefs(){ localStorage.setItem(REFS_KEY, JSON.stringify([..._allCloudRefs])); }
 
-function saveAllCloudRefs(){
-  localStorage.setItem(REFS_KEY, JSON.stringify([..._allCloudRefs]));
-}
-
-/* ── ตรวจ duplicate ทั้ง local + cloud ─────────────── */
 function isDuplicate(ref){
   const r = String(ref).trim();
   if(!r) return false;
-  // ★ ตรวจแค่ local records (source of truth) — cache _allCloudRefs อาจ stale
-  // ★ cloud-side ใช้ LockService ป้องกัน duplicate อีกชั้นอยู่แล้ว
   return records.some(x => String(x.ref).trim() === r && x.inspector === currentUser);
 }
 
 Chart.register(ChartDataLabels);
-
 function safeJSON(k,def){try{return JSON.parse(localStorage.getItem(k))||def;}catch(e){return def;}}
 const $id = id => document.getElementById(id);
 
-/* ── My records cache ── */
-let _myRecCache=null, _myRecUser='', _myRecLen=-1;
+let _myRecCache=null,_myRecUser='',_myRecLen=-1;
 function getMyRecords(){
   if(_myRecCache && _myRecUser===currentUser && _myRecLen===records.length) return _myRecCache;
   _myRecCache = records.filter(r=>r.inspector===currentUser);
-  _myRecUser  = currentUser;
-  _myRecLen   = records.length;
+  _myRecUser  = currentUser; _myRecLen = records.length;
   return _myRecCache;
 }
 function invalidateMyRecCache(){ _myRecCache=null; _myRecLen=-1; }
 
-/* ── Save local ── */
 let _saveTimer=null;
 function saveLocal(){
   localStorage.setItem(SYNCED_KEY, JSON.stringify([..._syncedSet]));
   saveAllCloudRefs();
   clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(()=>{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-  }, 60);
+  _saveTimer = setTimeout(()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }, 60);
 }
 function saveLocalImmediate(){
   localStorage.setItem(SYNCED_KEY,  JSON.stringify([..._syncedSet]));
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
   saveAllCloudRefs();
 }
-
 function saveAndRefresh(){
-  invalidateCache();
-  invalidateMyRecCache();
-  saveLocal();
-  refreshAll();
-  schedulePush();
+  invalidateCache(); invalidateMyRecCache();
+  saveLocal(); refreshAll(); schedulePush();
 }
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-/* ── Toast ── */
 let toastT;
 function toast(msg){
-  const el=$id('toast');el.textContent=msg;el.classList.add('show');
-  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),3200);
+  const el=$id('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),3200);
 }
 function showSyncBadge(msg,color){
   const b=$id('syncBadge');
   $id('syncBadgeText').textContent=msg;
   $id('syncBadgeIcon').style.color=color||'#10b981';
-  b.style.display='block';clearTimeout(b._t);
+  b.style.display='block'; clearTimeout(b._t);
   b._t=setTimeout(()=>b.style.display='none',4000);
 }
 function setSyncPulse(state,text){
-  const el=$id('syncPulse');if(!el)return;
+  const el=$id('syncPulse'); if(!el) return;
   el.className=`mt-2 inline-flex items-center gap-1 text-[.62rem] font-black uppercase tracking-[.08em] px-2 py-1 rounded-lg border transition-all ${
     state==='syncing'?'bg-orange-500/10 border-orange-500/25 text-orange-400':
     state==='offline'?'bg-red-500/10 border-red-500/20 text-red-400':
                       'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'}`;
   $id('syncPulseText').textContent=text||'LIVE SYNC';
 }
-function shake(el){if(!el)return;gsap.fromTo(el,{x:-8},{x:8,repeat:5,yoyo:true,duration:.06,ease:'power1.inOut'});}
+function shake(el){ if(!el)return; gsap.fromTo(el,{x:-8},{x:8,repeat:5,yoyo:true,duration:.06,ease:'power1.inOut'}); }
+
+/* ★ ฟังก์ชันช่วย: หมุน/หยุด SYNC icon */
+function setSyncBtn(spinning){
+  const btn=$id('syncBtnMain'), icon=$id('syncIcon');
+  if(!btn||!icon) return;
+  btn.disabled = spinning;
+  if(spinning) icon.classList.add('spin');
+  else         icon.classList.remove('spin');
+}
 
 document.addEventListener('click',e=>{
-  const btn=e.target.closest('.btn');if(!btn)return;
+  const btn=e.target.closest('.btn'); if(!btn) return;
   const r=btn.getBoundingClientRect();
   btn.style.setProperty('--rx',((e.clientX-r.left)/r.width*100)+'%');
   btn.style.setProperty('--ry',((e.clientY-r.top)/r.height*100)+'%');
-  btn.classList.remove('ripple');void btn.offsetWidth;btn.classList.add('ripple');
+  btn.classList.remove('ripple'); void btn.offsetWidth; btn.classList.add('ripple');
   setTimeout(()=>btn.classList.remove('ripple'),520);
 });
 
@@ -888,53 +772,50 @@ function updateFilterBtns(type){
   Object.values(map).forEach(id=>{const el=$id(id);if(el)el.classList.remove('active-filter');});
   const key=type==='CAN USE'?'CANUSE':type==='VENDOR FAULT'?'VENDOR':type;
   const target=$id(map[key]||'btn-ALL');
-  if(target)target.classList.add('active-filter');
+  if(target) target.classList.add('active-filter');
 }
 
 function animNum(id,target){
-  const el=$id(id);if(!el)return;
+  const el=$id(id); if(!el) return;
   const cur=parseInt(el.textContent.replace(/,/g,''))||0;
   if(cur===target){el.textContent=target.toLocaleString();return;}
   gsap.killTweensOf(el);
   const obj={v:cur};
   const diff=Math.abs(target-cur);
   const dur=diff<10?.2:diff<100?.4:.7;
-  gsap.to(obj,{v:target,duration:dur,ease:'power2.out',onUpdate:()=>{el.textContent=Math.round(obj.v).toLocaleString();}});
+  gsap.to(obj,{v:target,duration:dur,ease:'power2.out',onUpdate:()=>{ el.textContent=Math.round(obj.v).toLocaleString(); }});
 }
 
 /* ══ PARTICLE CANVAS ══ */
 function initParticles(){
-  const cv=$id('loCanvas');if(!cv)return;
+  const cv=$id('loCanvas'); if(!cv) return;
   const ctx=cv.getContext('2d');
   let W,H,pts=[];
-  const resize=()=>{W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;};
-  resize();window.addEventListener('resize',resize);
+  const resize=()=>{ W=cv.width=window.innerWidth; H=cv.height=window.innerHeight; };
+  resize(); window.addEventListener('resize',resize);
   for(let i=0;i<80;i++) pts.push({
-    x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,
-    vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,
+    x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
+    vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4,
     r:Math.random()*1.5+.5,
     color:['rgba(249,115,22,','rgba(59,130,246,','rgba(16,185,129,'][Math.floor(Math.random()*3)],
     a:Math.random()*.6+.2
   });
   const draw=()=>{
-    if(!$id('loginOverlay')||$id('loginOverlay').style.display==='none')return;
+    if(!$id('loginOverlay')||$id('loginOverlay').style.display==='none') return;
     requestAnimationFrame(draw);
     ctx.clearRect(0,0,W,H);
     pts.forEach(p=>{
-      p.x+=p.vx;p.y+=p.vy;
-      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
-      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=p.color+p.a+')';ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color+p.a+')'; ctx.fill();
     });
-    for(let i=0;i<pts.length;i++){
-      for(let j=i+1;j<pts.length;j++){
-        const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y;
-        const d=Math.sqrt(dx*dx+dy*dy);
-        if(d<120){
-          ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
-          ctx.strokeStyle='rgba(249,115,22,'+(.12*(1-d/120))+')';ctx.lineWidth=.5;ctx.stroke();
-        }
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<120){
+        ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle='rgba(249,115,22,'+(.12*(1-d/120))+')'; ctx.lineWidth=.5; ctx.stroke();
       }
     }
   };
@@ -942,11 +823,7 @@ function initParticles(){
 }
 
 /* ══════════════════════════════════════════════════════════
-   SYNC ENGINE  v3.1
-   ★ fetchFromCloud  — GET แบบ CORS, อ่านได้ทุก field
-   ★ pushToCloud     — POST no-cors (fire-and-forget)
-   ★ deleteFromCloud — POST no-cors
-   ★ clearAllFromCloud — POST no-cors
+   SYNC ENGINE v3.2
 ══════════════════════════════════════════════════════════ */
 function normalizeRow(d,inspector){
   return {
@@ -966,7 +843,6 @@ function normalizeRow(d,inspector){
   };
 }
 
-/* ── fetchFromCloud ────────────────────────────────── */
 let _fetchInFlight = false;
 async function fetchFromCloud(inspector, ms){
   ms = ms || FETCH_TIMEOUT;
@@ -987,10 +863,6 @@ async function fetchFromCloud(inspector, ms){
     let r; try{ r=JSON.parse(text); }catch(e){ return { ok:false, rows:[] }; }
     if(!r||r.status!=='success'||!Array.isArray(r.data)) return { ok:false, rows:[] };
     const rows = r.data.map(d=>normalizeRow(d,inspector));
-    /* ★★★ GROUND TRUTH: cloud ตอบสำเร็จ = รู้สถานะจริง
-       1. reset cloud refs ของ inspector นี้ก่อน (ล้าง stale)
-       2. เพิ่มเฉพาะที่ cloud มีจริง
-       → cloud ว่าง = refs ว่าง = เพิ่มใหม่ได้ทันที ★★★ */
     clearInspectorCloudRefs(inspector);
     cloudRefSetFromRows(rows);
     saveAllCloudRefs();
@@ -998,34 +870,65 @@ async function fetchFromCloud(inspector, ms){
   } catch(err){ return { ok:false, rows:[] }; }
 }
 
-/* ── pushToCloud (insert) ── */
+/* ── pushToCloud ── */
 function pushToCloud(rows){
   if(!rows.length) return Promise.resolve();
   const ctrl = new AbortController();
   setTimeout(()=>ctrl.abort(), PUSH_TIMEOUT);
   return fetch(GOOGLE_URL,{
-    method:'POST',mode:'no-cors',cache:'no-cache',
+    method:'POST', mode:'no-cors', cache:'no-cache',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify(rows.map(r=>({
-      date:r.date,shift:r.shift,inspector:r.inspector,ref:r.ref,
-      line:r.line,supplier:r.supplier,partNo:r.partNo,partName:r.partName,
-      qty:r.qty,defect:r.defect,remark:r.remark,judgment:r.judgment,
+      date:r.date, shift:r.shift, inspector:r.inspector, ref:r.ref,
+      line:r.line, supplier:r.supplier, partNo:r.partNo, partName:r.partName,
+      qty:r.qty, defect:r.defect, remark:r.remark, judgment:r.judgment,
     }))),
     signal:ctrl.signal,
   }).catch(()=>{});
 }
 
-/* ── deleteFromCloud ── */
-function deleteFromCloud(ref,inspector){
-  if(!ref) return Promise.resolve();
-  const ctrl = new AbortController();
-  setTimeout(()=>ctrl.abort(), PUSH_TIMEOUT);
-  return fetch(GOOGLE_URL,{
-    method:'POST',mode:'no-cors',cache:'no-cache',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({action:'delete',ref:String(ref),inspector:String(inspector||currentUser)}),
-    signal:ctrl.signal,
-  }).catch(()=>{});
+/* ══════════════════════════════════════════════════════════
+   ★★★ deleteFromCloud — Real-time with CORS confirmation ★★★
+   ใช้ mode:'cors' อ่าน response ได้จริง
+   Fallback: no-cors ถ้า CORS ไม่สำเร็จ
+══════════════════════════════════════════════════════════ */
+async function deleteFromCloud(ref, inspector){
+  if(!ref) return { ok: false, method: 'none' };
+  const payload = JSON.stringify({ action:'delete', ref:String(ref), inspector:String(inspector||currentUser) });
+
+  /* ── ลอง CORS mode ก่อน (อ่าน response ได้) ── */
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), DELETE_TIMEOUT);
+    const res = await fetch(GOOGLE_URL, {
+      method : 'POST',
+      mode   : 'cors',
+      cache  : 'no-cache',
+      headers: { 'Content-Type':'application/json' },
+      body   : payload,
+      signal : ctrl.signal,
+    });
+    clearTimeout(t);
+    const data = await res.json();
+    return { ok: data.status === 'success', method: 'cors', data };
+  } catch(corsErr) {
+    /* ── Fallback: no-cors (fire-and-forget) ── */
+    try {
+      const ctrl2 = new AbortController();
+      setTimeout(()=>ctrl2.abort(), PUSH_TIMEOUT);
+      await fetch(GOOGLE_URL, {
+        method : 'POST',
+        mode   : 'no-cors',
+        cache  : 'no-cache',
+        headers: { 'Content-Type':'application/json' },
+        body   : payload,
+        signal : ctrl2.signal,
+      });
+      return { ok: null, method: 'no-cors' }; // null = unknown result
+    } catch(e){
+      return { ok: false, method: 'error' };
+    }
+  }
 }
 
 /* ── clearAllFromCloud ── */
@@ -1034,32 +937,27 @@ function clearAllFromCloud(inspector){
   const ctrl = new AbortController();
   setTimeout(()=>ctrl.abort(), PUSH_TIMEOUT);
   return fetch(GOOGLE_URL,{
-    method:'POST',mode:'no-cors',cache:'no-cache',
+    method:'POST', mode:'no-cors', cache:'no-cache',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({action:'clearAll',inspector:String(inspector)}),
     signal:ctrl.signal,
   }).catch(()=>{});
 }
 
-/* ── mergeCloud: รวมข้อมูลจาก cloud เข้า local ── */
+/* ── mergeCloud ── */
 function mergeCloud(cloudRows){
-  // สร้าง map ของ local records ด้วย ref
   const localRefMap = new Map(records.map(r=>[String(r.ref)+'|'+r.inspector, r]));
   let added = 0;
   cloudRows.forEach(r=>{
     const key = String(r.ref)+'|'+r.inspector;
-    if(!localRefMap.has(key)){
-      records.push(r);
-      added++;
-    }
+    if(!localRefMap.has(key)){ records.push(r); added++; }
   });
   if(added) invalidateMyRecCache();
-  // อัปเดต synced set (cloudRefSetFromRows ทำใน fetchFromCloud แล้ว)
   if(cloudRows.length) syncedReset(cloudRows.map(r=>r.ref));
   return added;
 }
 
-/* ── schedulePush: push unsync records ── */
+/* ── schedulePush ── */
 let _pushInFlight = false;
 function schedulePush(){
   clearTimeout(pushDebounce);
@@ -1070,10 +968,7 @@ function schedulePush(){
     _pushInFlight = true;
     try{
       await pushToCloud(unsync);
-      unsync.forEach(r=>{
-        syncedAdd(r.ref);
-        cloudRefAdd(r.ref, currentUser);   // ★ เพิ่มใน cloud refs cache
-      });
+      unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, currentUser); });
       saveLocal();
       showSyncBadge('☁️ Auto-synced','#10b981');
       setSyncPulse('live','LIVE SYNC');
@@ -1082,7 +977,7 @@ function schedulePush(){
   }, PUSH_DEBOUNCE);
 }
 
-/* ── startPolling: เช็คทุก POLL_MS ── */
+/* ── startPolling ── */
 function startPolling(){
   if(pollingTimer) clearInterval(pollingTimer);
   pollingTimer = setInterval(async()=>{
@@ -1107,12 +1002,10 @@ function startPolling(){
   }, POLL_MS);
 }
 
-/* ── syncToCloud: manual sync button ── */
+/* ── syncToCloud (manual) ── */
 async function syncToCloud(){
   if(_fetchInFlight){ toast('⏳ Sync กำลังทำงาน…'); return; }
-  const btn=$id('syncBtnMain'),icon=$id('syncIcon');
-  btn.disabled=true; icon.classList.add('spin');
-  setSyncPulse('syncing','SYNCING…');
+  setSyncBtn(true); setSyncPulse('syncing','SYNCING…');
   _fetchInFlight=true;
   const unsync=getMyRecords().filter(r=>!syncedHas(r.ref));
   try{
@@ -1131,43 +1024,49 @@ async function syncToCloud(){
     setSyncPulse('offline','OFFLINE');
   }finally{
     _fetchInFlight=false;
-    btn.disabled=false; icon.classList.remove('spin');
+    setSyncBtn(false);
   }
 }
 
-/* ══ LOGIN PROGRESS ══ */
+/* ══════════════════════════════════════════════════════════
+   ★ LOGIN — Cloud-first logic
+   1. ดึงข้อมูล Cloud ก่อน (SYNC หมุน)
+   2. ถ้า Cloud มีข้อมูล → merge + แสดงผล
+   3. ถ้า Cloud ว่าง → push ข้อมูล local ขึ้นไป
+   4. SYNC หยุดหมุน + แจ้งเตือน
+══════════════════════════════════════════════════════════ */
 async function setStep(n,state){
   for(let i=1;i<=3;i++){
-    const el=$id('ls'+i);if(!el)continue;
+    const el=$id('ls'+i); if(!el) continue;
     el.classList.remove('active','done');
-    if(i<n)el.classList.add('done');
-    if(i===n)el.classList.add(state);
+    if(i<n) el.classList.add('done');
+    if(i===n) el.classList.add(state);
   }
   const pcts={1:20,2:60,3:88};
   $id('loBar').style.width=(pcts[n]||20)+'%';
 }
 
-/* ══ LOGIN ══ */
 async function login(){
   const name=($id('loginName').value||'').trim().toUpperCase();
   const pass=$id('loginPass').value;
-  if(!name){shake($id('loginName'));toast('❌ กรุณาระบุชื่อ');return;}
+  if(!name){ shake($id('loginName')); toast('❌ กรุณาระบุชื่อ'); return; }
   if(pass!=='1234'){
     $id('loginPass').style.borderColor='#ef4444';
     gsap.fromTo('#loginPass',{x:0},{x:[-8,8,-6,6,-4,4,0],duration:.5});
     setTimeout(()=>$id('loginPass').style.borderColor='',1500);
-    toast('⛔ รหัสผ่านไม่ถูกต้อง');return;
+    toast('⛔ รหัสผ่านไม่ถูกต้อง'); return;
   }
   currentUser=name;
   sessionStorage.setItem('currentUser',name);
   $id('loginForm').style.display='none';
   $id('loProgress').style.display='flex';
   $id('loginBtn').disabled=true;
+
   await setStep(1,'active'); await sleep(200); await setStep(1,'done');
   await setStep(2,'active'); $id('loBar').style.width='55%'; await sleep(100);
   $id('currentUserDisp').textContent=name;
 
-  // ★ STEP 3: fetch cloud ก่อน render dashboard (ป้องกัน duplicate ทันที)
+  /* ── แสดง Dashboard UI ── */
   const tl=gsap.timeline();
   tl.to('#loCard',{scale:.88,opacity:0,y:-20,duration:.3,ease:'power3.in'});
   tl.to('#loginOverlay',{opacity:0,duration:.45,ease:'power2.in',
@@ -1184,36 +1083,78 @@ async function login(){
   await setStep(2,'done');
   await setStep(3,'active');
   $id('ls2note').textContent='syncing…';
-  setSyncPulse('syncing','SYNCING…');
 
-  const pendingPush=getMyRecords().filter(r=>!syncedHas(r.ref));
-  Promise.all([
-    fetchFromCloud(name, FETCH_TIMEOUT),
-    pendingPush.length?pushToCloud(pendingPush):Promise.resolve(),
-  ]).then(([fetchResult])=>{
-    $id('loBar').style.width='100%'; setStep(3,'done');
-    if(pendingPush.length) pendingPush.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, name); });
-    if(fetchResult.ok){
-      const added=fetchResult.rows.length?mergeCloud(fetchResult.rows):0;
+  /* ★★★ SYNC button หมุนระหว่างโหลด Cloud ★★★ */
+  setSyncBtn(true);
+  setSyncPulse('syncing','LOADING…');
+
+  const myLocalRecs = getMyRecords();
+
+  try {
+    /* ── ดึงข้อมูล Cloud ก่อนเสมอ ── */
+    const fetchResult = await fetchFromCloud(name, FETCH_TIMEOUT);
+
+    if(fetchResult.ok && fetchResult.rows.length > 0){
+      /* ── Cloud มีข้อมูล → merge เข้า local ── */
+      const added = mergeCloud(fetchResult.rows);
       saveLocal();
-      if(added){ refreshAll(); toast('✅ Cloud: +'+added+' รายการใหม่'); }
+      if(added) refreshAll();
+      $id('loBar').style.width='100%'; setStep(3,'done');
+      $id('ls2note').textContent = fetchResult.rows.length + ' records';
+      setTimeout(()=>{
+        toast(`✅ ดึงข้อมูลจาก Cloud: ${fetchResult.rows.length} รายการ`);
+        showSyncBadge('☁️ Cloud loaded','#10b981');
+      },300);
       setSyncPulse('live','LIVE SYNC');
-    }else{
-      saveLocal(); setSyncPulse('offline','OFFLINE');
+
+      /* ── Push unsync records ที่เหลือ (ถ้ามี) ── */
+      const pending = getMyRecords().filter(r=>!syncedHas(r.ref));
+      if(pending.length){
+        await pushToCloud(pending);
+        pending.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, name); });
+        saveLocal();
+      }
+
+    } else if(myLocalRecs.length > 0){
+      /* ── Cloud ว่าง หรือ error → push local ขึ้น Cloud ── */
+      $id('ls2note').textContent = 'pushing ' + myLocalRecs.length + '…';
+      await pushToCloud(myLocalRecs);
+      myLocalRecs.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, name); });
+      saveLocal();
+      $id('loBar').style.width='100%'; setStep(3,'done');
+      setTimeout(()=>{
+        toast(`☁️ ส่งข้อมูลไป Cloud: ${myLocalRecs.length} รายการ`);
+        showSyncBadge('↑ Pushed to Cloud','#f97316');
+      },300);
+      setSyncPulse('live','LIVE SYNC');
+
+    } else {
+      /* ── ไม่มีข้อมูลทั้งคู่ ── */
+      $id('loBar').style.width='100%'; setStep(3,'done');
+      $id('ls2note').textContent = 'ready';
+      setSyncPulse('live','LIVE SYNC');
     }
-    startPolling();
-  });
+
+  } catch(err){
+    $id('loBar').style.width='100%'; setStep(3,'done');
+    $id('ls2note').textContent = 'offline';
+    setSyncPulse('offline','OFFLINE');
+    toast('⚠️ ไม่สามารถเชื่อมต่อ Cloud ได้');
+  } finally {
+    setSyncBtn(false);
+  }
+
+  startPolling();
 }
 
 document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&$id('loginOverlay').style.display!=='none')login();
+  if(e.key==='Enter'&&$id('loginOverlay').style.display!=='none') login();
 });
 
 /* ══ SESSION RESUME ══ */
-window.addEventListener('load',async()=>{
+window.addEventListener('load', async()=>{
   $id('inputDate').valueAsDate=new Date();
-  startClock(); initParticles();
-  forceViewportReset();
+  startClock(); initParticles(); forceViewportReset();
   const saved=sessionStorage.getItem('currentUser');
   if(saved){
     currentUser=saved;
@@ -1221,21 +1162,43 @@ window.addEventListener('load',async()=>{
     $id('loginOverlay').style.display='none';
     $id('appShell').classList.add('visible');
     refreshAll();
+
+    /* ★ SYNC หมุนระหว่าง Resume ★ */
+    setSyncBtn(true);
     setSyncPulse('syncing','SYNCING…');
-    const pendingPush=getMyRecords().filter(r=>!syncedHas(r.ref));
-    const [fetchResult]=await Promise.all([
-      fetchFromCloud(saved,FETCH_TIMEOUT),
-      pendingPush.length?pushToCloud(pendingPush):Promise.resolve(),
-    ]).catch(()=>[{ok:false,rows:[]}]);
-    if(pendingPush.length) pendingPush.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, saved); });
-    if(fetchResult&&fetchResult.ok){
-      const added=fetchResult.rows.length?mergeCloud(fetchResult.rows):0;
-      saveLocal();
-      if(added) refreshAll();
-      setSyncPulse('live','LIVE SYNC');
-    }else{
+
+    const myLocalRecs = getMyRecords();
+    const pendingPush = myLocalRecs.filter(r=>!syncedHas(r.ref));
+
+    try {
+      const [fetchResult] = await Promise.all([
+        fetchFromCloud(saved, FETCH_TIMEOUT),
+        pendingPush.length ? pushToCloud(pendingPush) : Promise.resolve(),
+      ]);
+      if(pendingPush.length) pendingPush.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, saved); });
+
+      if(fetchResult && fetchResult.ok){
+        if(fetchResult.rows.length > 0){
+          const added = mergeCloud(fetchResult.rows);
+          saveLocal();
+          if(added){ refreshAll(); toast('✅ Cloud: +'+added+' รายการใหม่'); }
+        } else if(myLocalRecs.length > 0 && !pendingPush.length){
+          /* Cloud ว่าง แต่ local มีข้อมูล → push ทั้งหมด */
+          await pushToCloud(myLocalRecs);
+          myLocalRecs.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, saved); });
+          saveLocal();
+          toast(`☁️ Re-pushed ${myLocalRecs.length} records to Cloud`);
+        } else { saveLocal(); }
+        setSyncPulse('live','LIVE SYNC');
+      } else {
+        saveLocal(); setSyncPulse('offline','OFFLINE');
+      }
+    } catch(e){
       saveLocal(); setSyncPulse('offline','OFFLINE');
+    } finally {
+      setSyncBtn(false);
     }
+
     startPolling();
   }
 });
@@ -1269,35 +1232,30 @@ async function logout(){
     unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, currentUser); });
     saveLocalImmediate();
   }
-  if(pollingTimer)clearInterval(pollingTimer);
+  if(pollingTimer) clearInterval(pollingTimer);
   sessionStorage.removeItem('currentUser');
   location.reload();
 }
 
 /* ══ CLOCK ══ */
 function startClock(){
-  const tick=()=>{const n=new Date();const el=$id('liveClock');if(el)el.textContent=n.toLocaleDateString('en-GB')+' · '+n.toLocaleTimeString('en-GB');};
-  tick();setInterval(tick,1000);
+  const tick=()=>{ const n=new Date(); const el=$id('liveClock'); if(el) el.textContent=n.toLocaleDateString('en-GB')+' · '+n.toLocaleTimeString('en-GB'); };
+  tick(); setInterval(tick,1000);
 }
 
 /* ══ JUDGMENT COLOR ══ */
 function handleJudgment(val){
-  const sel=$id('judgmentSelect'),btn=$id('submitBtn');
+  const sel=$id('judgmentSelect'), btn=$id('submitBtn');
   const c={'SF':'#f97316','VENDOR FAULT':'#ef4444','CTC':'#3b82f6','CAN USE':'#10b981'};
   const color=c[val]||'#1e293b';
-  sel.style.borderColor=color;sel.style.color=color;
-  if(btn){btn.style.backgroundColor=color;btn.style.boxShadow=`0 10px 25px -5px ${color}66`;}
+  sel.style.borderColor=color; sel.style.color=color;
+  if(btn){ btn.style.backgroundColor=color; btn.style.boxShadow=`0 10px 25px -5px ${color}66`; }
 }
 
-/* ══════════════════════════════════════════════════════════
-   FORM SUBMIT
-   ★★★ ตรวจ duplicate ทั้ง local + cloud refs ★★★
-══════════════════════════════════════════════════════════ */
+/* ══ FORM SUBMIT ══ */
 $id('claimForm').addEventListener('submit',e=>{
   e.preventDefault();
   const ref=$id('refNo').value.trim();
-
-  // ★ ตรวจ duplicate ทั้ง local + cloud refs
   if(isDuplicate(ref)){
     shake($id('refNo'));
     toast('⚠️ Duplicate! REF นี้มีในระบบแล้ว');
@@ -1305,7 +1263,6 @@ $id('claimForm').addEventListener('submit',e=>{
     setTimeout(()=>$id('refNo').style.borderColor='',2000);
     return;
   }
-
   const newRow = {
     id       : Date.now()+'_'+Math.random().toString(36).slice(2),
     date     : $id('inputDate').value,
@@ -1321,23 +1278,19 @@ $id('claimForm').addEventListener('submit',e=>{
     remark   : $id('remark').value,
     judgment : $id('judgmentSelect').value,
   };
-
-  // ★ เพิ่มใน cloud refs cache ทันที (ป้องกัน double-click / race condition)
   cloudRefAdd(ref, currentUser);
-
   records.push(newRow);
   saveAndRefresh();
-
   const sb=$id('submitBtn');
   if(sb){
     const orig=sb.style.backgroundColor;
-    sb.style.backgroundColor='#10b981';sb.style.boxShadow='0 10px 25px -5px #10b98166';
+    sb.style.backgroundColor='#10b981'; sb.style.boxShadow='0 10px 25px -5px #10b98166';
     sb.classList.add('btn-success');
-    setTimeout(()=>{sb.style.backgroundColor=orig;sb.style.boxShadow='';sb.classList.remove('btn-success');},700);
+    setTimeout(()=>{ sb.style.backgroundColor=orig; sb.style.boxShadow=''; sb.classList.remove('btn-success'); },700);
   }
   const fields=['refNo','supplier','qty','partNo','partOn','defectName','remark'];
   fields.forEach((fid,i)=>{
-    const f=$id(fid);if(!f)return;
+    const f=$id(fid); if(!f) return;
     gsap.fromTo(f,{backgroundColor:'rgba(16,185,129,.08)'},{backgroundColor:'rgba(255,255,255,.6)',duration:.6,delay:i*.03});
   });
   e.target.reset(); handleJudgment('');
@@ -1349,7 +1302,7 @@ $id('claimForm').addEventListener('submit',e=>{
 function setFilter(type){
   filterType=type;
   ['ALL','SF','VENDOR','CTC','CANUSE'].forEach(b=>{
-    const el=$id('btn-'+b);if(!el)return;
+    const el=$id('btn-'+b); if(!el) return;
     const on=b===(type==='CAN USE'?'CANUSE':type==='VENDOR FAULT'?'VENDOR':type);
     el.className='btn text-[10px] font-black px-5 py-2.5 rounded-xl '+(on?'bg-orange-500 text-white shadow-lg shadow-orange-200':'text-slate-400 hover:bg-slate-100');
   });
@@ -1366,24 +1319,21 @@ function smoothSearch(){
   clearTimeout(searchDebounce);
   const tb=$id('tableBody');
   gsap.to(tb,{opacity:.4,duration:.1});
-  searchDebounce=setTimeout(()=>{
-    renderTable();
-    gsap.to(tb,{opacity:1,duration:.2,ease:'power1.out'});
-  },150);
+  searchDebounce=setTimeout(()=>{ renderTable(); gsap.to(tb,{opacity:1,duration:.2,ease:'power1.out'}); },150);
 }
 
 /* ══ RENDER TABLE ══ */
 const SM_MAP={
-  'SF'          :{dot:'bg-orange-500', cls:'text-orange-600 bg-orange-50'},
-  'VENDOR FAULT':{dot:'bg-red-500',    cls:'text-red-600 bg-red-50'},
-  'CTC'         :{dot:'bg-blue-500',   cls:'text-blue-600 bg-blue-50'},
+  'SF'          :{dot:'bg-orange-500',cls:'text-orange-600 bg-orange-50'},
+  'VENDOR FAULT':{dot:'bg-red-500',   cls:'text-red-600 bg-red-50'},
+  'CTC'         :{dot:'bg-blue-500',  cls:'text-blue-600 bg-blue-50'},
   'CAN USE'     :{dot:'bg-emerald-500',cls:'text-emerald-600 bg-emerald-50'}
 };
 
 let _searchCache=null,_searchCacheKey='';
 function getSearchCache(){
   const key=records.length+'_'+currentUser;
-  if(_searchCache&&_searchCacheKey===key)return _searchCache;
+  if(_searchCache&&_searchCacheKey===key) return _searchCache;
   const myR=records.filter(r=>r.inspector===currentUser);
   _searchCache=new Map();
   myR.forEach(r=>{
@@ -1400,19 +1350,16 @@ function renderTable(){
   const search=($id('searchInput').value||'').toLowerCase();
   const myR=getMyRecords();
   const cache=getSearchCache();
-
   const filtered=[];
   for(let i=myR.length-1;i>=0;i--){
     const r=myR[i];
-    if(filterType!=='ALL'&&r.judgment!==filterType)continue;
-    if(search&&!(cache.get(r.id)||'').includes(search))continue;
+    if(filterType!=='ALL'&&r.judgment!==filterType) continue;
+    if(search&&!(cache.get(r.id)||'').includes(search)) continue;
     filtered.push(r);
   }
-
   const hash=filterType+'|'+search+'|'+filtered.map(r=>r.id+'_'+r.judgment+'_'+r.qty).join(',');
-  if(hash===_lastRenderHash)return;
+  if(hash===_lastRenderHash) return;
   _lastRenderHash=hash;
-
   let html='';
   filtered.forEach(r=>{
     const s=SM_MAP[r.judgment]||SM_MAP['SF'];
@@ -1432,35 +1379,27 @@ function renderTable(){
         <button data-action="delete" class="btn opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 rounded-lg px-1.5 py-0.5 hover:bg-red-50" title="Delete">✕</button>
       </td></tr>`;
   });
-
   tbody.innerHTML=html;
-  requestAnimationFrame(()=>{
-    tbody.querySelectorAll('tr').forEach(tr=>tr.classList.add('vis'));
-  });
+  requestAnimationFrame(()=>{ tbody.querySelectorAll('tr').forEach(tr=>tr.classList.add('vis')); });
 }
 
 /* ══ TABLE EVENT DELEGATION ══ */
 document.addEventListener('click',e=>{
-  const btn=e.target.closest('[data-action]');if(!btn)return;
-  const tr=btn.closest('tr[data-rid]');if(!tr)return;
+  const btn=e.target.closest('[data-action]'); if(!btn) return;
+  const tr=btn.closest('tr[data-rid]'); if(!tr) return;
   const rid=tr.dataset.rid;
   if(btn.dataset.action==='clone')  cloneRecord(rid);
   if(btn.dataset.action==='delete') showDeleteModal(rid,tr);
 });
 
 /* ══════════════════════════════════════════════════════════
-   DELETE MODAL
-   ★ ลบเฉพาะข้อมูลของ currentUser เท่านั้น
+   ★★★ DELETE — Real-time with Progress Overlay ★★★
 ══════════════════════════════════════════════════════════ */
 let _pendingDelete = null;
 function showDeleteModal(id, trEl){
   const r=findRecord(id);
   if(!r){ toast('⚠️ ไม่พบข้อมูล'); return; }
-  // ★ ตรวจสอบ ownership ก่อนลบ
-  if(r.inspector !== currentUser){
-    toast('⛔ ไม่มีสิทธิ์ลบข้อมูลของผู้ใช้อื่น');
-    return;
-  }
+  if(r.inspector !== currentUser){ toast('⛔ ไม่มีสิทธิ์ลบข้อมูลของผู้ใช้อื่น'); return; }
   _pendingDelete={ id, trEl, ref:r.ref, inspector:r.inspector };
   $id('delModalDesc').textContent=`Ref: ${r.ref} · ${r.supplier} · ${r.date}`;
   $id('deleteModal').classList.add('show');
@@ -1478,43 +1417,79 @@ document.addEventListener('keydown', e=>{
   if(e.key==='Escape'&&_pendingDelete) hideDeleteModal();
 });
 
-$id('delConfirmBtn').addEventListener('click', ()=>{
+/* ★ Delete Progress helpers */
+function showDelProgress(title,sub,pct){
+  const ov=$id('deleteProgressOverlay');
+  $id('delProgTitle').textContent=title;
+  $id('delProgSub').textContent=sub;
+  $id('delProgBar').style.width=pct+'%';
+  $id('delProgIcon').textContent= pct<100 ? '⏳' : (pct===200 ? '✅' : '⏳');
+  ov.classList.add('show');
+}
+function hideDelProgress(){ $id('deleteProgressOverlay').classList.remove('show'); }
+
+/* ★★★ Real-time delete confirm ★★★ */
+$id('delConfirmBtn').addEventListener('click', async()=>{
   if(!_pendingDelete) return;
   const { id, trEl, ref, inspector } = _pendingDelete;
-  // ★ double-check ownership
   if(inspector !== currentUser){ hideDeleteModal(); toast('⛔ ไม่มีสิทธิ์ลบ'); return; }
   hideDeleteModal();
 
+  /* 1. แสดง row กำลังลบ */
   if(trEl&&trEl.isConnected){
     trEl.style.pointerEvents='none';
     trEl.classList.add('row-deleting');
   }
 
-  // ★ ลบ local และ cloud refs cache
+  /* 2. ลบ local ทันที */
   records = records.filter(x=>String(x.id)!==String(id));
   syncedDelete(ref);
-  cloudRefDelete(ref, inspector);          // ลบจาก in-memory cache
-  localStorage.setItem(REFS_KEY, JSON.stringify([..._allCloudRefs])); // ★ force save ทันที
-  invalidateMyRecCache();
-  invalidateCache();
-  _lastRenderHash='';
-
+  cloudRefDelete(ref, inspector);
+  localStorage.setItem(REFS_KEY, JSON.stringify([..._allCloudRefs]));
+  invalidateMyRecCache(); invalidateCache(); _lastRenderHash='';
   saveLocal();
+  refreshAll(); // อัปเดต UI ทันที
 
-  // ★ ส่ง cloud delete (fire-and-forget, ตรงกับ inspector เท่านั้น)
-  deleteFromCloud(ref, inspector);
-  showSyncBadge('🗑 Deleting…','#ef4444');
+  /* 3. แสดง Progress Overlay สำหรับ Cloud delete */
+  showDelProgress('กำลังลบออกจาก Cloud…','กรุณารอสักครู่',40);
+  showSyncBadge('🗑 Deleting from Cloud…','#ef4444');
 
-  setTimeout(()=>{
-    refreshAll();
-    toast('🗑 ลบสำเร็จ (Local + Cloud)');
-    showSyncBadge('✅ Deleted','#10b981');
-  }, 320);
+  /* 4. ★ Real-time delete cloud ★ */
+  try {
+    const result = await deleteFromCloud(ref, inspector);
+    
+    if(result.method === 'cors' && result.ok === true){
+      /* ✅ ยืนยันจาก GAS ว่าลบสำเร็จจริง */
+      showDelProgress('ลบสำเร็จ!','Cloud ยืนยันการลบแล้ว',100);
+      $id('delProgIcon').textContent='✅';
+      toast('🗑 ลบสำเร็จ (Local ✓ · Cloud ✓ ยืนยันแล้ว)');
+      showSyncBadge('✅ Deleted Confirmed','#10b981');
+    } else if(result.method === 'no-cors' || result.ok === null){
+      /* ⏳ Fire-and-forget — ไม่รู้ผลลัพธ์จาก Cloud */
+      showDelProgress('ส่งคำสั่งลบแล้ว','Cloud กำลังประมวลผล…',80);
+      $id('delProgIcon').textContent='📤';
+      toast('🗑 ลบ Local ✓ · Cloud: กำลังประมวลผล…');
+      showSyncBadge('📤 Cloud Pending','#f97316');
+    } else {
+      /* ❌ Cloud delete ล้มเหลว */
+      showDelProgress('ลบ Local แล้ว','แต่ Cloud มีปัญหา — ลอง Sync ใหม่',60);
+      $id('delProgIcon').textContent='⚠️';
+      toast('⚠️ ลบ Local แล้ว แต่ Cloud Error — กด SYNC');
+      showSyncBadge('⚠️ Cloud Error','#ef4444');
+    }
+  } catch(err){
+    showDelProgress('ลบ Local แล้ว','Network Error',50);
+    $id('delProgIcon').textContent='⚠️';
+    toast('⚠️ Network Error — กด SYNC เพื่อลบ Cloud');
+    showSyncBadge('⚠️ Network Error','#ef4444');
+  } finally {
+    /* ซ่อน progress หลัง 1.8 วินาที */
+    setTimeout(hideDelProgress, 1800);
+  }
 });
 
 /* ══════════════════════════════════════════════════════════
    CLEAR ALL DATA
-   ★ ลบเฉพาะข้อมูลของ currentUser เท่านั้น (ทั้ง local + cloud)
 ══════════════════════════════════════════════════════════ */
 function clearAllData(){
   const myCount=getMyRecords().length;
@@ -1525,33 +1500,18 @@ function clearAllData(){
     `⚡ จะลบออกจาก Google Sheets ด้วย`
   );
   if(!proceed) return;
-
   const inspector=currentUser;
-
-  // ★ ลบเฉพาะ records ของ inspector นี้
   records=records.filter(r=>r.inspector!==inspector);
-
-  // ★ ล้าง allCloudRefs ของ inspector นี้ทั้งหมดด้วย composite key
   clearInspectorCloudRefs(inspector);
-
   syncedReset([]);
-  invalidateMyRecCache();
-  invalidateCache();
-  _lastRenderHash='';
-
-  // ★★★ บันทึกทันที ไม่ใช้ debounce ป้องกัน stale cache
-  clearInspectorCloudRefs(inspector);
+  invalidateMyRecCache(); invalidateCache(); _lastRenderHash='';
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
   localStorage.setItem(SYNCED_KEY, JSON.stringify([]));
-  localStorage.removeItem(REFS_KEY);   // ★ ล้าง refs cache ทิ้งทั้งหมด
-  _allCloudRefs = new Set();           // ★ reset in-memory ด้วย
-
+  localStorage.removeItem(REFS_KEY);
+  _allCloudRefs = new Set();
   refreshAll();
-
-  // ★ cloud clear (fire-and-forget, ตรง inspector เท่านั้น)
   clearAllFromCloud(inspector);
   showSyncBadge('🗑 Clearing Cloud…','#ef4444');
-
   setTimeout(()=>{
     toast(`🧹 ลบทั้งหมด ${myCount} รายการ (Local + Cloud)`);
     showSyncBadge('✅ Cloud Cleared','#10b981');
@@ -1561,39 +1521,27 @@ function clearAllData(){
 /* ══ CLONE ══ */
 function cloneRecord(id){
   const r=findRecord(id);
-  if(!r){toast('⚠️ ไม่พบข้อมูล');return;}
-  $id('inputDate').value      = r.date||'';
-  $id('shift').value          = r.shift||'SHIFT A';
-  $id('lineNo').value         = r.line||'';
-  $id('refNo').value          = r.ref||'';
-  $id('supplier').value       = r.supplier||'';
-  $id('qty').value            = r.qty||'';
-  $id('partNo').value         = r.partNo||'';
-  $id('partOn').value         = r.partName||'';
-  $id('defectName').value     = r.defect||'';
-  $id('remark').value         = r.remark||'';
-  $id('judgmentSelect').value = r.judgment||'';
+  if(!r){ toast('⚠️ ไม่พบข้อมูล'); return; }
+  $id('inputDate').value=$id('inputDate').value||r.date||'';
+  $id('shift').value=r.shift||'SHIFT A'; $id('lineNo').value=r.line||'';
+  $id('refNo').value=r.ref||''; $id('supplier').value=r.supplier||'';
+  $id('qty').value=r.qty||''; $id('partNo').value=r.partNo||'';
+  $id('partOn').value=r.partName||''; $id('defectName').value=r.defect||'';
+  $id('remark').value=r.remark||''; $id('judgmentSelect').value=r.judgment||'';
   handleJudgment(r.judgment||'');
   const sidebar=$id('sidebar');
-  if(sidebar)sidebar.scrollTo({top:0,behavior:'smooth'});
+  if(sidebar) sidebar.scrollTo({top:0,behavior:'smooth'});
   const fields=['inputDate','shift','lineNo','refNo','supplier','qty','partNo','partOn','defectName','remark','judgmentSelect'];
   fields.forEach((fid,i)=>{
-    const el=$id(fid);if(!el)return;
-    gsap.fromTo(el,
-      {backgroundColor:'rgba(59,130,246,.13)',borderColor:'rgba(59,130,246,.5)'},
-      {backgroundColor:'rgba(255,255,255,.6)',borderColor:'rgba(255,255,255,.85)',duration:.7,delay:i*.03,ease:'power2.out'}
-    );
+    const el=$id(fid); if(!el) return;
+    gsap.fromTo(el,{backgroundColor:'rgba(59,130,246,.13)',borderColor:'rgba(59,130,246,.5)'},
+      {backgroundColor:'rgba(255,255,255,.6)',borderColor:'rgba(255,255,255,.85)',duration:.7,delay:i*.03,ease:'power2.out'});
   });
-  requestAnimationFrame(()=>{
-    const refEl=$id('refNo');
-    if(refEl){refEl.focus();refEl.select();}
-  });
+  requestAnimationFrame(()=>{ const refEl=$id('refNo'); if(refEl){ refEl.focus(); refEl.select(); } });
   toast('📑 Clone สำเร็จ — ตรวจ REF แล้วกด Commit');
 }
 
-function findRecord(id){
-  return records.find(x=>String(x.id)===String(id));
-}
+function findRecord(id){ return records.find(x=>String(x.id)===String(id)); }
 
 /* ══ DATALISTS ══ */
 let _dlTimer=null;
@@ -1602,11 +1550,11 @@ function updateDataLists(){
   _dlTimer=setTimeout(()=>{
     const d=getMyRecords();
     const setList=(id,key)=>{
-      const el=$id(id);if(!el)return;
+      const el=$id(id); if(!el) return;
       el.innerHTML=[...new Set(d.map(r=>r[key]).filter(Boolean))].map(v=>`<option value="${v}">`).join('');
     };
-    setList('refList','ref');setList('lineList','line');setList('supList','supplier');
-    setList('ptList','partNo');setList('lotList','partName');setList('defectList','defect');
+    setList('refList','ref'); setList('lineList','line'); setList('supList','supplier');
+    setList('ptList','partNo'); setList('lotList','partName'); setList('defectList','defect');
     setList('inspectorList','inspector');
   },300);
 }
@@ -1616,7 +1564,7 @@ let _refreshRAF=null;
 let _lastKpiHash='';
 function refreshAll(){
   invalidateCache();
-  if(_refreshRAF)cancelAnimationFrame(_refreshRAF);
+  if(_refreshRAF) cancelAnimationFrame(_refreshRAF);
   _refreshRAF=requestAnimationFrame(()=>{
     _refreshRAF=null;
     const d=getMyRecords();
@@ -1631,7 +1579,7 @@ function refreshAll(){
     const kpiHash=`${tQ}_${sf}_${ven}_${ctc}_${ok}`;
     const kpiChanged=kpiHash!==_lastKpiHash;
     _lastKpiHash=kpiHash;
-    animNum('masterQty',tQ);$id('masterLot').textContent=d.length;
+    animNum('masterQty',tQ); $id('masterLot').textContent=d.length;
     const pct=(v,t)=>t>0?Math.round((v/t)*100)+'%':'0%';
     animNum('qtySF',sf);     $id('lotSF').textContent=sfL;    $id('pctSF').textContent=pct(sf,tQ);
     animNum('qtyVendor',ven);$id('lotVendor').textContent=venL;$id('pctVendor').textContent=pct(ven,tQ);
@@ -1640,13 +1588,12 @@ function refreshAll(){
     renderTable();
     if(kpiChanged){
       const cards=$id('kpiGrid')?.querySelectorAll('.stat-card');
-      if(cards)cards.forEach((c,i)=>{
-        setTimeout(()=>{c.classList.add('kpi-flash');setTimeout(()=>c.classList.remove('kpi-flash'),620);},i*50);
+      if(cards) cards.forEach((c,i)=>{
+        setTimeout(()=>{ c.classList.add('kpi-flash'); setTimeout(()=>c.classList.remove('kpi-flash'),620); },i*50);
       });
     }
-    if('requestIdleCallback' in window){
-      requestIdleCallback(updateDataLists,{timeout:2000});
-    }else{ setTimeout(updateDataLists,300); }
+    if('requestIdleCallback' in window){ requestIdleCallback(updateDataLists,{timeout:2000}); }
+    else { setTimeout(updateDataLists,300); }
   });
 }
 
@@ -1667,15 +1614,15 @@ function closeDashboard(){
   }});
 }
 function resetDashFilters(){
-  $id('dashStart').value='';$id('dashEnd').value='';$id('dashVendor').value='ALL';
+  $id('dashStart').value=''; $id('dashEnd').value=''; $id('dashVendor').value='ALL';
   refreshDash();
 }
 function refreshDash(){
-  const start=$id('dashStart').value,end=$id('dashEnd').value,ven=$id('dashVendor').value;
+  const start=$id('dashStart').value, end=$id('dashEnd').value, ven=$id('dashVendor').value;
   let data=getMyRecords();
-  if(start)data=data.filter(r=>r.date>=start);
-  if(end)  data=data.filter(r=>r.date<=end);
-  if(ven!=='ALL')data=data.filter(r=>r.supplier===ven);
+  if(start) data=data.filter(r=>r.date>=start);
+  if(end)   data=data.filter(r=>r.date<=end);
+  if(ven!=='ALL') data=data.filter(r=>r.supplier===ven);
   let tQ=0,sf=0,ven2=0,ctc=0,ok=0,sfL=0,venL=0,ctcL=0,okL=0;
   data.forEach(r=>{
     tQ+=r.qty;
@@ -1684,33 +1631,32 @@ function refreshDash(){
     else if(r.judgment==='CTC')         {ctc+=r.qty;ctcL++;}
     else if(r.judgment==='CAN USE')     {ok+=r.qty;okL++;}
   });
-  animNum('dTotalQty',tQ);$id('dTotalLot').textContent=data.length;
+  animNum('dTotalQty',tQ); $id('dTotalLot').textContent=data.length;
   const pct=(v,t)=>t>0?Math.round((v/t)*100)+'%':'0%';
   const upd=(pre,qty,lot,p)=>{animNum('d'+pre+'qty',qty);$id('d'+pre+'lot').textContent=lot;$id('d'+pre+'pct').textContent=p;};
-  upd('SF',sf,sfL,pct(sf,tQ));upd('VEN',ven2,venL,pct(ven2,tQ));
-  upd('CTC',ctc,ctcL,pct(ctc,tQ));upd('OK',ok,okL,pct(ok,tQ));
+  upd('SF',sf,sfL,pct(sf,tQ)); upd('VEN',ven2,venL,pct(ven2,tQ));
+  upd('CTC',ctc,ctcL,pct(ctc,tQ)); upd('OK',ok,okL,pct(ok,tQ));
   const rejQ=sf+ven2+ctc;
-  const rejRateEl=$id('dRejRate');if(rejRateEl)rejRateEl.textContent=tQ>0?Math.round((rejQ/tQ)*100)+'%':'0%';
-  const shiftMap={};data.forEach(r=>{shiftMap[r.shift]=(shiftMap[r.shift]||0)+r.qty;});
+  const rejRateEl=$id('dRejRate'); if(rejRateEl) rejRateEl.textContent=tQ>0?Math.round((rejQ/tQ)*100)+'%':'0%';
+  const shiftMap={}; data.forEach(r=>{ shiftMap[r.shift]=(shiftMap[r.shift]||0)+r.qty; });
   const topShift=Object.entries(shiftMap).sort((a,b)=>b[1]-a[1])[0];
-  const topShiftEl=$id('dTopShift');if(topShiftEl)topShiftEl.textContent=topShift?topShift[0].replace('SHIFT ','S'):'—';
-  const avgEl=$id('dAvgQty');if(avgEl)avgEl.textContent=data.length>0?Math.round(tQ/data.length).toLocaleString():'0';
+  const topShiftEl=$id('dTopShift'); if(topShiftEl) topShiftEl.textContent=topShift?topShift[0].replace('SHIFT ','S'):'—';
+  const avgEl=$id('dAvgQty'); if(avgEl) avgEl.textContent=data.length>0?Math.round(tQ/data.length).toLocaleString():'0';
   const days=new Set(data.map(r=>r.date)).size;
-  const daysEl=$id('dActiveDays');if(daysEl)daysEl.textContent=days;
+  const daysEl=$id('dActiveDays'); if(daysEl) daysEl.textContent=days;
   const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   if(data.length>1){
     const cnt=new Array(12).fill(0);
-    data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m))cnt[m]+=r.qty;});
+    data.forEach(r=>{ const m=new Date(r.date).getMonth(); if(!isNaN(m)) cnt[m]+=r.qty; });
     const peak=mo[cnt.indexOf(Math.max(...cnt))];
     const top=sf>=ven2&&sf>=ctc?'SF FAULT':ven2>=ctc?'VENDOR FAULT':'CTC FAULT';
     $id('monthlyInsight').innerHTML='Peak: <b>'+peak+'</b> · <span style="color:#ef4444;font-weight:900">'+top+'</span>';
-  }else{$id('monthlyInsight').textContent='—';}
-  renderDashCharts(data);
-  renderRankings(data);
+  } else { $id('monthlyInsight').textContent='—'; }
+  renderDashCharts(data); renderRankings(data);
 }
 
 function renderDashCharts(data){
-  ['trend','donut','radar'].forEach(k=>{if(charts[k]){charts[k].destroy();charts[k]=null;}});
+  ['trend','donut','radar'].forEach(k=>{ if(charts[k]){ charts[k].destroy(); charts[k]=null; } });
   const tooltip={
     enabled:true,backgroundColor:'rgba(6,10,20,.92)',
     titleFont:{family:'Orbitron',size:11,weight:'900'},bodyFont:{family:'Inter',size:10,weight:'bold'},
@@ -1718,19 +1664,14 @@ function renderDashCharts(data){
   };
   const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const byMonth=new Array(12).fill(0);
-  data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m))byMonth[m]+=r.qty;});
+  data.forEach(r=>{ const m=new Date(r.date).getMonth(); if(!isNaN(m)) byMonth[m]+=r.qty; });
   const tCtx=$id('trendChart');
   if(tCtx) charts.trend=new Chart(tCtx,{
     type:'line',
     data:{labels:mo,datasets:[{
-      label:'Qty',data:byMonth,
-      borderColor:'#f97316',borderWidth:3,tension:.42,fill:true,
-      backgroundColor:ctx=>{
-        const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||200);
-        g.addColorStop(0,'rgba(249,115,22,.18)');g.addColorStop(1,'rgba(249,115,22,.01)');return g;
-      },
-      pointRadius:4,pointBackgroundColor:'#fff',pointBorderColor:'#f97316',pointBorderWidth:2.5,
-      pointHoverRadius:7,pointHoverBorderWidth:3
+      label:'Qty',data:byMonth,borderColor:'#f97316',borderWidth:3,tension:.42,fill:true,
+      backgroundColor:ctx=>{ const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||200); g.addColorStop(0,'rgba(249,115,22,.18)'); g.addColorStop(1,'rgba(249,115,22,.01)'); return g; },
+      pointRadius:4,pointBackgroundColor:'#fff',pointBorderColor:'#f97316',pointBorderWidth:2.5,pointHoverRadius:7,pointHoverBorderWidth:3
     }]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},datalabels:{display:false},tooltip},
@@ -1745,66 +1686,50 @@ function renderDashCharts(data){
   const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
   const ctcQ=data.filter(r=>r.judgment==='CTC').reduce((s,r)=>s+r.qty,0);
   const okQ=data.filter(r=>r.judgment==='CAN USE').reduce((s,r)=>s+r.qty,0);
-  // ★ ใช้ผลรวม qty จริงทั้งหมด ตรงกับ Total QTY ด้านบนเสมอ
   const totalQ=data.reduce((s,r)=>s+r.qty,0);
-  const dn=$id('donutTotal');if(dn)dn.textContent=totalQ.toLocaleString();
+  const dn=$id('donutTotal'); if(dn) dn.textContent=totalQ.toLocaleString();
   const dCtx=$id('donutChart');
   if(dCtx) charts.donut=new Chart(dCtx,{
     type:'doughnut',
     data:{
       labels:['SF Fault','Vendor','CTC','Can Use'],
-      datasets:[{
-        data:[sfQ,venQ,ctcQ,okQ],
-        backgroundColor:['#f97316','#ef4444','#3b82f6','#10b981'],
-        hoverBackgroundColor:['#fb923c','#f87171','#60a5fa','#34d399'],
-        borderWidth:2.5,borderColor:'rgba(15,23,42,.7)',hoverOffset:8
-      }]
+      datasets:[{data:[sfQ,venQ,ctcQ,okQ],backgroundColor:['#f97316','#ef4444','#3b82f6','#10b981'],hoverBackgroundColor:['#fb923c','#f87171','#60a5fa','#34d399'],borderWidth:2.5,borderColor:'rgba(15,23,42,.7)',hoverOffset:8}]
     },
     options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
       plugins:{
         legend:{display:true,position:'bottom',labels:{color:'rgba(255,255,255,.6)',font:{size:8,weight:'bold'},boxWidth:7,padding:6,usePointStyle:true,pointStyleWidth:6}},
         datalabels:{display:false},
-        tooltip:{...tooltip,callbacks:{label:ctx=>{const v=ctx.parsed;const t=totalQ||1;return ' '+v.toLocaleString()+' ('+(t>0?((v/t)*100).toFixed(1):'0')+'%)';}}}
+        tooltip:{...tooltip,callbacks:{label:ctx=>{ const v=ctx.parsed; const t=totalQ||1; return ' '+v.toLocaleString()+' ('+(t>0?((v/t)*100).toFixed(1):'0')+'%)'; }}}
       },
       animation:{animateRotate:true,animateScale:true,duration:1000,easing:'easeOutQuart'}
     }
   });
   const lineMap={};
-  data.forEach(r=>{if(r.line)lineMap[r.line]=(lineMap[r.line]||0)+r.qty;});
+  data.forEach(r=>{ if(r.line) lineMap[r.line]=(lineMap[r.line]||0)+r.qty; });
   const topLines=Object.entries(lineMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const rCtx=$id('radarChart');
   if(rCtx&&topLines.length) charts.radar=new Chart(rCtx,{
     type:'bar',
     data:{
       labels:topLines.map(l=>l[0]),
-      datasets:[{
-        label:'Qty',data:topLines.map(l=>l[1]),
-        backgroundColor:ctx=>{
-          const g=ctx.chart.ctx.createLinearGradient(ctx.chart.width||300,0,0,0);
-          g.addColorStop(0,'rgba(249,115,22,.9)');g.addColorStop(1,'rgba(249,115,22,.35)');return g;
-        },
-        hoverBackgroundColor:'rgba(249,115,22,1)',
-        borderRadius:6,barThickness:16
+      datasets:[{label:'Qty',data:topLines.map(l=>l[1]),
+        backgroundColor:ctx=>{ const g=ctx.chart.ctx.createLinearGradient(ctx.chart.width||300,0,0,0); g.addColorStop(0,'rgba(249,115,22,.9)'); g.addColorStop(1,'rgba(249,115,22,.35)'); return g; },
+        hoverBackgroundColor:'rgba(249,115,22,1)',borderRadius:6,barThickness:16
       }]
     },
     options:{
-      responsive:true,maintainAspectRatio:false,indexAxis:'y',
-      layout:{padding:{right:44}},
+      responsive:true,maintainAspectRatio:false,indexAxis:'y',layout:{padding:{right:44}},
       scales:{
         x:{display:false,grid:{display:false},border:{display:false}},
         y:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:10,weight:'bold'},padding:4}}
       },
-      plugins:{
-        legend:{display:false},
-        datalabels:{anchor:'end',align:'end',color:'#94a3b8',font:{size:9,weight:'bold',family:'Orbitron'},formatter:v=>v.toLocaleString(),clip:false},
-        tooltip
-      },
+      plugins:{legend:{display:false},datalabels:{anchor:'end',align:'end',color:'#94a3b8',font:{size:9,weight:'bold',family:'Orbitron'},formatter:v=>v.toLocaleString(),clip:false},tooltip},
       animation:{duration:900,easing:'easeOutQuart'}
     }
   });
   else if(rCtx){
     const sm={'A':0,'B':0,'C':0};
-    data.forEach(r=>{const k=r.shift?.replace('SHIFT ','');if(sm[k]!==undefined)sm[k]+=r.qty;});
+    data.forEach(r=>{ const k=r.shift?.replace('SHIFT ',''); if(sm[k]!==undefined) sm[k]+=r.qty; });
     charts.radar=new Chart(rCtx,{type:'bar',
       data:{labels:['SHIFT A','SHIFT B','SHIFT C'],datasets:[{data:Object.values(sm),backgroundColor:['rgba(249,115,22,.85)','rgba(59,130,246,.85)','rgba(16,185,129,.85)'],borderRadius:12,barPercentage:.6}]},
       options:{responsive:true,maintainAspectRatio:false,
@@ -1818,25 +1743,22 @@ function renderDashCharts(data){
 
 function renderRankings(data){
   const totalQty=data.reduce((s,r)=>s+r.qty,0)||1;
-  const getTop=(key,n=8)=>{const m={};data.forEach(r=>{if(r[key])m[r[key]]=(m[r[key]]||0)+r.qty;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,n);};
+  const getTop=(key,n=8)=>{ const m={}; data.forEach(r=>{ if(r[key]) m[r[key]]=(m[r[key]]||0)+r.qty; }); return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,n); };
   const draw=(id,items,color,accentColor)=>{
     const maxV=items[0]?.[1]||1;
-    const el=$id(id);if(!el)return;
+    const el=$id(id); if(!el) return;
     el.innerHTML=items.map(([k,v],i)=>{
       const pct=Math.round((v/totalQty)*100);
       const barW=Math.round((v/maxV)*100);
       const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
       return `<div class="bar-wrap" title="${k}: ${v.toLocaleString()} (${pct}%)">
         <div class="bar-lbl"><span class="bar-k">${rank} ${k}</span>
-          <div class="flex items-center gap-1.5">
-            <span class="orbitron" style="font-size:.62rem;color:${accentColor};font-weight:900">${pct}%</span>
-            <span class="orbitron" style="font-size:.6rem;color:#94a3b8">${v.toLocaleString()}</span>
-          </div></div>
+          <div class="flex items-center gap-1.5"><span class="orbitron" style="font-size:.62rem;color:${accentColor};font-weight:900">${pct}%</span><span class="orbitron" style="font-size:.6rem;color:#94a3b8">${v.toLocaleString()}</span></div></div>
         <div class="bar-bg"><div class="bar-fill" style="width:0%;background:${color}" data-w="${barW}"></div></div>
       </div>`;
     }).join('');
     requestAnimationFrame(()=>{
-      el.querySelectorAll('.bar-fill').forEach((b,i)=>{setTimeout(()=>{b.style.width=b.dataset.w+'%';},i*55+80);});
+      el.querySelectorAll('.bar-fill').forEach((b,i)=>{ setTimeout(()=>{ b.style.width=b.dataset.w+'%'; },i*55+80); });
     });
   };
   draw('rankSuppliers',getTop('supplier'),'linear-gradient(90deg,#f97316,#fbbf24)','#f97316');
@@ -1846,24 +1768,23 @@ function renderRankings(data){
 
 /* ══ IMPORT / EXPORT ══ */
 function importExcel(input){
-  const file=input.files[0];if(!file)return;
+  const file=input.files[0]; if(!file) return;
   const reader=new FileReader();
   reader.onload=e=>{
     const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
     const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
     const pd=v=>{if(!v)return '';if(v instanceof Date)return new Date(v.getTime()-(v.getTimezoneOffset()*60000)).toISOString().split('T')[0];if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;}return String(v);};
-    // ★ กรอง duplicate จาก import ด้วย
     const items=json.map(r=>({
-      id:Date.now()+Math.random(),date:pd(r.date||r.Date||r.DATE),
-      shift:r.shift||r.Shift||'SHIFT A',inspector:currentUser,
-      ref:String(r.ref||r.Reference||''),line:String(r.line||r.Line||''),
-      supplier:String(r.supplier||r.Supplier||''),partNo:String(r.partNo||r.PartNo||''),
-      partName:String(r.partName||r.PartName||''),qty:parseInt(r.qty||r.Qty||0),
-      defect:String(r.defect||r.Defect||''),remark:String(r.remark||r.Remark||''),
+      id:Date.now()+Math.random(), date:pd(r.date||r.Date||r.DATE),
+      shift:r.shift||r.Shift||'SHIFT A', inspector:currentUser,
+      ref:String(r.ref||r.Reference||''), line:String(r.line||r.Line||''),
+      supplier:String(r.supplier||r.Supplier||''), partNo:String(r.partNo||r.PartNo||''),
+      partName:String(r.partName||r.PartName||''), qty:parseInt(r.qty||r.Qty||0),
+      defect:String(r.defect||r.Defect||''), remark:String(r.remark||r.Remark||''),
       judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase()
-    })).filter(r=>!isDuplicate(r.ref));   // ★ กรอง duplicate
+    })).filter(r=>!isDuplicate(r.ref));
     if(!items.length){ toast('⚠️ ไม่มีข้อมูลใหม่ (ซ้ำทั้งหมด)'); input.value=''; return; }
-    items.forEach(r=>cloudRefAdd(r.ref, currentUser));  // ★ เพิ่มใน cloud refs
+    items.forEach(r=>cloudRefAdd(r.ref, currentUser));
     records=[...records,...items];
     _lastRenderHash=''; saveAndRefresh();
     toast('📥 Imported '+items.length+' records'); input.value='';
@@ -1872,8 +1793,8 @@ function importExcel(input){
 }
 
 function exportToExcel(){
-  const d=getMyRecords();if(!d.length)return toast('⚠️ No data to export');
-  const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();
+  const d=getMyRecords(); if(!d.length) return toast('⚠️ No data to export');
+  const ws=XLSX.utils.json_to_sheet(d); const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Records');
   XLSX.writeFile(wb,'SQE_'+currentUser+'_'+Date.now()+'.xlsx');
 }
