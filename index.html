@@ -1745,7 +1745,8 @@ function renderDashCharts(data){
   const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
   const ctcQ=data.filter(r=>r.judgment==='CTC').reduce((s,r)=>s+r.qty,0);
   const okQ=data.filter(r=>r.judgment==='CAN USE').reduce((s,r)=>s+r.qty,0);
-  const totalQ=sfQ+venQ+ctcQ+okQ;
+  // ★ ใช้ผลรวม qty จริงทั้งหมด ตรงกับ Total QTY ด้านบนเสมอ
+  const totalQ=data.reduce((s,r)=>s+r.qty,0);
   const dn=$id('donutTotal');if(dn)dn.textContent=totalQ.toLocaleString();
   const dCtx=$id('donutChart');
   if(dCtx) charts.donut=new Chart(dCtx,{
