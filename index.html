@@ -122,7 +122,7 @@ html,body{
 .lo-bar{height:100%;background:linear-gradient(90deg,#f97316,#fbbf24,#10b981);background-size:200% 100%;border-radius:99px;width:0%;transition:width .5s cubic-bezier(.22,.68,0,1.2);animation:barShift 2s linear infinite}
 @keyframes barShift{to{background-position:-200% 0}}
 
-/* ── Loading Overlay (NEW) ── */
+/* ── Loading Overlay ── */
 #initOverlay{
   position:fixed;inset:0;z-index:8000;
   background:rgba(241,245,249,.92);backdrop-filter:blur(20px);
@@ -140,6 +140,14 @@ html,body{
 .init-msg{font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:900;color:#64748b;letter-spacing:.15em;text-transform:uppercase}
 .init-sub{font-size:.65rem;font-weight:700;color:#94a3b8;letter-spacing:.08em}
 .init-count{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;color:#f97316;min-width:32px;text-align:center;transition:all .3s}
+/* Retry badge */
+.init-retry{
+  font-size:.6rem;font-weight:900;letter-spacing:.1em;
+  padding:4px 12px;border-radius:8px;
+  background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:#f97316;
+  display:none;
+}
+.init-retry.show{display:block}
 
 #syncPulse{
   display:inline-flex;align-items:center;gap:5px;
@@ -362,12 +370,12 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 </head>
 <body>
 
-<!-- Loading overlay shown during cloud init -->
 <div id="initOverlay">
   <div class="init-spinner"></div>
-  <div class="init-msg" id="initMsg">กำลังโหลดข้อมูล…</div>
+  <div class="init-msg" id="initMsg">กำลังดึงข้อมูลจาก Google Sheets…</div>
   <div class="init-sub" id="initSub">กรุณารอสักครู่</div>
   <div class="init-count" id="initCount"></div>
+  <div class="init-retry" id="initRetry">🔄 RETRYING…</div>
 </div>
 
 <div id="toast"></div>
@@ -674,27 +682,18 @@ tbody tr:hover td:first-child::before{opacity:1;transform:scaleY(1)}
 <datalist id="inspectorList"></datalist>
 
 <script>
-/* ══════════════════════════════════════════════════════════
-   CONFIG
-══════════════════════════════════════════════════════════ */
 const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbxxHCqL3HzxI_54oo4IvXs0Du7yE86i7NcvwruJwOhCEMMBvs3HCXlBz0W_6KUPRGZ6nw/exec';
 const STORAGE_KEY = 'qdit_v4_records';
 const SYNCED_KEY  = 'qdit_v4_synced';
 const REFS_KEY    = 'qdit_v4_allrefs';
-
-const FETCH_TIMEOUT  = 15000;
+const FETCH_TIMEOUT  = 18000;  /* เพิ่มจาก 15000 → 18000 ms */
 const PUSH_TIMEOUT   = 12000;
 const DELETE_TIMEOUT = 14000;
 const POLL_MS        = 8000;
 const PUSH_DEBOUNCE  = 600;
+const MAX_FETCH_RETRY = 3;     /* retry fetch สูงสุด 3 ครั้ง */
 
-/* ══════════════════════════════════════════════════════════
-   ★ FIX 1: _isInitializing flag
-   Blocks ALL auto-push during boot/login/session-resume.
-   Nothing is written to cloud until this is false.
-══════════════════════════════════════════════════════════ */
 let _isInitializing = true;
-
 let records     = safeJSON(STORAGE_KEY, []);
 let currentUser = '';
 let filterType  = 'ALL';
@@ -718,14 +717,12 @@ function clearInspectorCloudRefs(inspector){
 }
 function saveAllCloudRefs(){ localStorage.setItem(REFS_KEY,JSON.stringify([..._allCloudRefs])); }
 
-/* ★ FIX 3 (Data Integrity): Validate required fields before accepting */
 function isValidRecord(r){
   return r && r.ref && String(r.ref).trim() !== '' &&
          r.supplier && String(r.supplier).trim() !== '' &&
          r.qty && parseInt(r.qty) > 0 &&
          r.judgment && r.judgment !== '';
 }
-
 function isDuplicate(ref){
   const r=String(ref).trim();
   if(!r) return false;
@@ -736,7 +733,6 @@ Chart.register(ChartDataLabels);
 function safeJSON(k,def){try{return JSON.parse(localStorage.getItem(k))||def;}catch(e){return def;}}
 const $id=id=>document.getElementById(id);
 
-/* Cache */
 let _myRecCache=null,_myRecUser='',_myRecLen=-1;
 function getMyRecords(){
   if(_myRecCache&&_myRecUser===currentUser&&_myRecLen===records.length) return _myRecCache;
@@ -761,22 +757,31 @@ function saveLocalImmediate(){
 function saveAndRefresh(){
   invalidateCache(); invalidateMyRecCache();
   saveLocal(); refreshAll();
-  /* Only schedule push when app is fully initialized */
   if(!_isInitializing) schedulePush();
 }
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-/* ── Init overlay helpers ── */
+/* ── Init Overlay helpers ── */
 function showInitOverlay(msg, sub, count){
   const ov=$id('initOverlay'); if(!ov) return;
   ov.classList.add('show');
-  if(msg)   $id('initMsg').textContent=msg;
-  if(sub)   $id('initSub').textContent=sub;
-  if(count!==undefined) $id('initCount').textContent=count!==''?count+'  records':'';
+  if(msg!==undefined)   $id('initMsg').textContent=msg;
+  if(sub!==undefined)   $id('initSub').textContent=sub;
+  if(count!==undefined && count!==''){
+    $id('initCount').textContent=count+' records';
+  } else if(count==='') {
+    $id('initCount').textContent='';
+  }
+}
+function setInitRetry(show, attempt){
+  const el=$id('initRetry'); if(!el) return;
+  if(show){ el.textContent='🔄 RETRY '+attempt+'/'+MAX_FETCH_RETRY+'…'; el.classList.add('show'); }
+  else    { el.classList.remove('show'); }
 }
 function hideInitOverlay(){
   const ov=$id('initOverlay'); if(!ov) return;
   ov.classList.remove('show');
+  setInitRetry(false);
 }
 
 let toastT;
@@ -800,7 +805,6 @@ function setSyncPulse(state,text){
   $id('syncPulseText').textContent=text||'LIVE SYNC';
 }
 function shake(el){ if(!el)return; gsap.fromTo(el,{x:-8},{x:8,repeat:5,yoyo:true,duration:.06,ease:'power1.inOut'}); }
-
 function setSyncBtn(spinning){
   const btn=$id('syncBtnMain'),icon=$id('syncIcon');
   if(!btn||!icon) return;
@@ -837,7 +841,6 @@ function animNum(id,target){
   gsap.to(obj,{v:target,duration:dur,ease:'power2.out',onUpdate:()=>{ el.textContent=Math.round(obj.v).toLocaleString(); }});
 }
 
-/* ── Particle Canvas ── */
 function initParticles(){
   const cv=$id('loCanvas'); if(!cv) return;
   const ctx=cv.getContext('2d');
@@ -872,9 +875,7 @@ function initParticles(){
   draw();
 }
 
-/* ══════════════════════════════════════════════════════════
-   NETWORK LAYER
-══════════════════════════════════════════════════════════ */
+/* ══ NETWORK LAYER ══ */
 function normalizeRow(d,inspector){
   return {
     id       : d.id||(Date.now()+'_'+Math.random()),
@@ -893,7 +894,6 @@ function normalizeRow(d,inspector){
   };
 }
 
-/* ══ fetchFromCloud ══ */
 let _fetchInFlight=false;
 async function fetchFromCloud(inspector,ms){
   ms=ms||FETCH_TIMEOUT;
@@ -908,7 +908,7 @@ async function fetchFromCloud(inspector,ms){
   try {
     let res;
     try      { res=await doFetch(ms); }
-    catch(e) { res=await doFetch(Math.min(ms,5000)); }
+    catch(e) { res=await doFetch(Math.min(ms,8000)); }
     if(!res.ok) return { ok:false, rows:[] };
     const text=await res.text();
     let r; try{ r=JSON.parse(text); }catch(e){ return {ok:false,rows:[]}; }
@@ -921,79 +921,70 @@ async function fetchFromCloud(inspector,ms){
   } catch(err){ return { ok:false, rows:[] }; }
 }
 
-/* ══════════════════════════════════════════════════════════
-   ★ FIX 3 (Bulk): pushToCloud always batches the full array.
-   Payload is a single POST with all rows — never loops per row.
-   Content-Type: text/plain avoids CORS preflight on no-cors.
-══════════════════════════════════════════════════════════ */
+/* fetchFromCloud พร้อม retry อัตโนมัติ */
+async function fetchFromCloudWithRetry(inspector, maxRetry){
+  maxRetry = maxRetry || MAX_FETCH_RETRY;
+  for(let attempt=1; attempt<=maxRetry; attempt++){
+    if(attempt > 1){
+      setInitRetry(true, attempt);
+      await sleep(1200 * (attempt - 1)); /* backoff: 0, 1.2s, 2.4s */
+    }
+    const result = await fetchFromCloud(inspector, FETCH_TIMEOUT);
+    if(result.ok){
+      setInitRetry(false);
+      return result;
+    }
+    if(attempt === maxRetry){
+      setInitRetry(false);
+      return { ok:false, rows:[] };
+    }
+  }
+  return { ok:false, rows:[] };
+}
+
 async function pushToCloud(rows){
   if(!rows||!rows.length) return;
-  /* Send ALL rows in one single batch POST */
   const payload=JSON.stringify(rows.map(r=>({
-    id       : r.id,       /* ★ FIX 2: include unique id so GAS can match row */
-    date     : r.date,     shift:r.shift,    inspector:r.inspector,
-    ref      : r.ref,      line :r.line,     supplier :r.supplier,
-    partNo   : r.partNo,   partName:r.partName,
-    qty      : r.qty,      defect  :r.defect, remark:r.remark,
-    judgment : r.judgment,
+    id:r.id, date:r.date, shift:r.shift, inspector:r.inspector,
+    ref:r.ref, line:r.line, supplier:r.supplier,
+    partNo:r.partNo, partName:r.partName,
+    qty:r.qty, defect:r.defect, remark:r.remark, judgment:r.judgment,
   })));
   const ctrl=new AbortController();
   setTimeout(()=>ctrl.abort(),PUSH_TIMEOUT);
   return fetch(GOOGLE_URL,{
-    method : 'POST',
-    mode   : 'no-cors',
-    cache  : 'no-cache',
-    headers: { 'Content-Type': 'text/plain' },
-    body   : payload,
-    signal : ctrl.signal,
+    method:'POST', mode:'no-cors', cache:'no-cache',
+    headers:{'Content-Type':'text/plain'},
+    body:payload, signal:ctrl.signal,
   }).catch(()=>{});
 }
 
-/* ══════════════════════════════════════════════════════════
-   ★ FIX 2 (Delete): Send BOTH id AND ref to GAS.
-   GAS can use id for exact row lookup, ref as fallback.
-══════════════════════════════════════════════════════════ */
 async function deleteFromCloud(id, ref, inspector){
   if(!ref) return { ok:false, method:'none' };
   const payload=JSON.stringify({
-    action   : 'delete',
-    id       : String(id||''),        /* ★ unique row ID */
-    ref      : String(ref),           /* ★ ref as fallback */
-    inspector: String(inspector||currentUser),
+    action:'delete', id:String(id||''), ref:String(ref),
+    inspector:String(inspector||currentUser),
   });
-
-  /* Try CORS first (text/plain = simple request, no preflight) */
   try {
     const ctrl=new AbortController();
     const t=setTimeout(()=>ctrl.abort(),DELETE_TIMEOUT);
     const res=await fetch(GOOGLE_URL,{
-      method : 'POST',
-      mode   : 'cors',
-      cache  : 'no-cache',
-      headers: { 'Content-Type': 'text/plain' },
-      body   : payload,
-      signal : ctrl.signal,
+      method:'POST', mode:'cors', cache:'no-cache',
+      headers:{'Content-Type':'text/plain'}, body:payload, signal:ctrl.signal,
     });
     clearTimeout(t);
     const data=await res.json();
-    return { ok: data.status==='success', method:'cors', data };
+    return { ok:data.status==='success', method:'cors', data };
   } catch(corsErr) {
-    /* Fallback: no-cors fire-and-forget */
     try {
       const ctrl2=new AbortController();
       setTimeout(()=>ctrl2.abort(),PUSH_TIMEOUT);
       await fetch(GOOGLE_URL,{
-        method : 'POST',
-        mode   : 'no-cors',
-        cache  : 'no-cache',
-        headers: { 'Content-Type': 'text/plain' },
-        body   : payload,
-        signal : ctrl2.signal,
+        method:'POST', mode:'no-cors', cache:'no-cache',
+        headers:{'Content-Type':'text/plain'}, body:payload, signal:ctrl2.signal,
       });
       return { ok:null, method:'no-cors' };
-    } catch(e){
-      return { ok:false, method:'error' };
-    }
+    } catch(e){ return { ok:false, method:'error' }; }
   }
 }
 
@@ -1002,18 +993,14 @@ function clearAllFromCloud(inspector){
   const ctrl=new AbortController();
   setTimeout(()=>ctrl.abort(),PUSH_TIMEOUT);
   return fetch(GOOGLE_URL,{
-    method : 'POST',
-    mode   : 'no-cors',
-    cache  : 'no-cache',
-    headers: { 'Content-Type': 'text/plain' },
-    body   : JSON.stringify({ action:'clearAll', inspector:String(inspector) }),
-    signal : ctrl.signal,
+    method:'POST', mode:'no-cors', cache:'no-cache',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'clearAll',inspector:String(inspector)}),
+    signal:ctrl.signal,
   }).catch(()=>{});
 }
 
-/* ══ mergeCloud — always overwrites local with cloud truth ══ */
 function mergeCloud(cloudRows){
-  /* Build map by ref+inspector */
   const localRefMap=new Map(records.map(r=>[String(r.ref)+'|'+r.inspector,r]));
   let added=0;
   cloudRows.forEach(r=>{
@@ -1021,7 +1008,6 @@ function mergeCloud(cloudRows){
     if(!localRefMap.has(key)){
       records.push(r); added++;
     } else {
-      /* Update existing row with cloud version (cloud is authoritative) */
       const existing=localRefMap.get(key);
       Object.assign(existing, r);
     }
@@ -1031,13 +1017,17 @@ function mergeCloud(cloudRows){
   return added;
 }
 
-/* ══════════════════════════════════════════════════════════
-   ★ FIX 1 (schedulePush): Guard with _isInitializing
-   No data is ever auto-pushed during boot sequence.
-══════════════════════════════════════════════════════════ */
+/* ── forceRefresh: clear ALL caches then refresh ── */
+function forceRefreshAll(){
+  invalidateMyRecCache();
+  invalidateCache();
+  _lastRenderHash = '';       /* ← สำคัญมาก: บังคับ re-render ทันที */
+  refreshAll();
+}
+
 let _pushInFlight=false;
 function schedulePush(){
-  if(_isInitializing) return;  /* ★ CRITICAL: block during init */
+  if(_isInitializing) return;
   clearTimeout(pushDebounce);
   pushDebounce=setTimeout(async()=>{
     if(_pushInFlight) return;
@@ -1045,7 +1035,7 @@ function schedulePush(){
     if(!unsync.length) return;
     _pushInFlight=true;
     try{
-      await pushToCloud(unsync);  /* batch send */
+      await pushToCloud(unsync);
       unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,currentUser); });
       saveLocal();
       showSyncBadge('☁️ Auto-synced','#10b981');
@@ -1055,7 +1045,6 @@ function schedulePush(){
   },PUSH_DEBOUNCE);
 }
 
-/* ══ startPolling ══ */
 function startPolling(){
   if(pollingTimer) clearInterval(pollingTimer);
   pollingTimer=setInterval(async()=>{
@@ -1067,7 +1056,7 @@ function startPolling(){
       if(!result.ok){ setSyncPulse('offline','OFFLINE'); return; }
       const added=mergeCloud(result.rows);
       if(added){
-        saveLocal(); refreshAll();
+        saveLocal(); forceRefreshAll();
         showSyncBadge('🔔 +'+added+' new','#60a5fa');
         setSyncPulse('live','↓ '+added+' NEW');
         setTimeout(()=>setSyncPulse('live','LIVE SYNC'),2500);
@@ -1079,7 +1068,6 @@ function startPolling(){
   },POLL_MS);
 }
 
-/* ══ syncToCloud (manual button) ══ */
 async function syncToCloud(){
   if(_fetchInFlight){ toast('⏳ Sync กำลังทำงาน…'); return; }
   setSyncBtn(true); setSyncPulse('syncing','SYNCING…');
@@ -1088,11 +1076,14 @@ async function syncToCloud(){
   try{
     const [fetchResult]=await Promise.all([
       fetchFromCloud(currentUser,FETCH_TIMEOUT),
-      unsync.length?pushToCloud(unsync):Promise.resolve(),  /* single batch */
+      unsync.length?pushToCloud(unsync):Promise.resolve(),
     ]);
     if(unsync.length) unsync.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,currentUser); });
     let pulled=0;
-    if(fetchResult.ok&&fetchResult.rows.length){ pulled=mergeCloud(fetchResult.rows); if(pulled)refreshAll(); }
+    if(fetchResult.ok&&fetchResult.rows.length){
+      pulled=mergeCloud(fetchResult.rows);
+      if(pulled) forceRefreshAll();
+    }
     saveLocal();
     toast(`✅ ↑${unsync.length} pushed  ↓${pulled} pulled`);
     setSyncPulse('live','LIVE SYNC');
@@ -1106,99 +1097,155 @@ async function syncToCloud(){
 }
 
 /* ══════════════════════════════════════════════════════════
-   ★ FIX 1+4 (initApp): Core initialization function.
+   initApp — แก้ไขใหม่ v4.1
    
-   Flow:
-   1. Set _isInitializing = true  → blocks ALL auto-saves
-   2. Show loading overlay
-   3. Fetch FRESH data from Google Sheets (await)
-   4. Merge cloud into local
-   5. Render UI
-   6. Only THEN set _isInitializing = false → unlocks saves
-   7. Start polling
+   แก้ปัญหา: เปิดเครื่องใหม่ข้อมูลไม่ขึ้น
+   - Reset cache ทั้งหมดก่อนเริ่มทุกครั้ง
+   - Retry fetch อัตโนมัติ 3 ครั้ง
+   - ใช้ saveLocalImmediate + forceRefreshAll
+   - hideInitOverlay อยู่ใน finally เสมอ
 ══════════════════════════════════════════════════════════ */
 async function initApp(inspector){
-  _isInitializing = true;  /* Lock: no auto-push during init */
+  _isInitializing = true;
   currentUser = inspector;
   $id('currentUserDisp').textContent = inspector;
 
-  showInitOverlay('กำลังโหลดข้อมูล…','เชื่อมต่อ Google Sheets…','');
+  /* ── รีเซ็ต cache ทั้งหมดตั้งแต่ต้น ── */
+  invalidateMyRecCache();
+  invalidateCache();
+  _lastRenderHash = '';
+
+  showInitOverlay('กำลังดึงข้อมูลจาก Google Sheets…','กรุณารอสักครู่…','');
   setSyncBtn(true);
   setSyncPulse('syncing','LOADING…');
 
-  const myLocalRecs = getMyRecords();
+  const myLocalRecs = getMyRecords(); /* snapshot ก่อน fetch */
 
   try {
-    /* ★ Await full fetch before doing anything else */
-    const fetchResult = await fetchFromCloud(inspector, FETCH_TIMEOUT);
+    /* Step 1: แสดงข้อมูล local ก่อนเลย (ถ้ามี) เพื่อไม่ให้หน้าจอว่าง */
+    if(myLocalRecs.length > 0){
+      forceRefreshAll();
+      showInitOverlay('กำลังดึงข้อมูลจาก Google Sheets…',
+        `Local: ${myLocalRecs.length} รายการ · กำลัง sync Cloud…`,'');
+    }
+
+    /* Step 2: Fetch จาก Cloud พร้อม retry อัตโนมัติ */
+    const fetchResult = await fetchFromCloudWithRetry(inspector, MAX_FETCH_RETRY);
 
     if(fetchResult.ok && fetchResult.rows.length > 0){
-      showInitOverlay('กำลังโหลดข้อมูล…','ได้รับข้อมูลจาก Cloud แล้ว…',fetchResult.rows.length);
+      /* ── CASE A: Cloud มีข้อมูล ── */
+      showInitOverlay(
+        'ดึงข้อมูลสำเร็จ!',
+        `ได้รับ ${fetchResult.rows.length} รายการจาก Cloud…`,
+        fetchResult.rows.length
+      );
+
+      /* รีเซ็ต cache ก่อน merge เพื่อป้องกัน stale data */
+      invalidateMyRecCache();
+      invalidateCache();
+      _lastRenderHash = '';
+
       const added = mergeCloud(fetchResult.rows);
-      saveLocal();
+      saveLocalImmediate(); /* บันทึกทันที ไม่ใช้ delay */
 
-      /* Render UI — this is when we show "loaded" */
-      refreshAll();
-      await sleep(80); /* allow one render frame */
-      hideInitOverlay();
+      /* บังคับ re-render ทันที */
+      forceRefreshAll();
+      await sleep(50); /* ให้ DOM อัปเดต */
 
-      if(added > 0){
-        toast(`✅ โหลดจาก Cloud: ${fetchResult.rows.length} รายการ (+${added} ใหม่)`);
-        showSyncBadge('☁️ Cloud loaded','#10b981');
+      /* Step 3: Push รายการที่ยังไม่ได้ sync */
+      const newLocals = getMyRecords().filter(r => !syncedHas(r.ref));
+      if(newLocals.length > 0){
+        showInitOverlay(
+          'กำลังส่งข้อมูลใหม่…',
+          `พบข้อมูลในเครื่องที่ยังไม่ได้ส่ง ${newLocals.length} รายการ`,
+          newLocals.length
+        );
+        await pushToCloud(newLocals);
+        newLocals.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, inspector); });
+        saveLocalImmediate();
+        toast(`✅ Cloud: ${fetchResult.rows.length} รายการ · ส่งใหม่: +${newLocals.length}`);
+        showSyncBadge(`☁️ +${newLocals.length} synced`, '#10b981');
       } else {
-        showSyncBadge('✅ ข้อมูลครบถ้วน','#10b981');
+        if(added > 0){
+          toast(`✅ ดึงจาก Cloud: ${fetchResult.rows.length} รายการ (+${added} ใหม่)`);
+          showSyncBadge('☁️ Cloud synced', '#10b981');
+        } else {
+          toast(`✅ ข้อมูลครบถ้วน — ${fetchResult.rows.length} รายการ`);
+          showSyncBadge('✅ Up to date', '#10b981');
+        }
       }
       setSyncPulse('live','LIVE SYNC');
 
-      /* Push any pending local records that cloud doesn't have */
-      const pending = getMyRecords().filter(r=>!syncedHas(r.ref));
-      if(pending.length){
-        await pushToCloud(pending);
-        pending.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,inspector); });
-        saveLocal();
-      }
-
-    } else if(myLocalRecs.length > 0){
-      /* Cloud empty / offline but we have local data — push it */
-      showInitOverlay('กำลังส่งข้อมูล…','อัพโหลดไปยัง Google Sheets…',myLocalRecs.length);
+    } else if(fetchResult.ok && fetchResult.rows.length === 0 && myLocalRecs.length > 0){
+      /* ── CASE B: Cloud ว่างเปล่า แต่เครื่องมีข้อมูล ── */
+      showInitOverlay(
+        'กำลังอัพโหลดข้อมูล…',
+        `Cloud ว่างเปล่า — กำลังส่ง ${myLocalRecs.length} รายการ`,
+        myLocalRecs.length
+      );
       await pushToCloud(myLocalRecs);
-      myLocalRecs.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref,inspector); });
-      saveLocal();
-      refreshAll();
-      await sleep(80);
-      hideInitOverlay();
-      toast(`☁️ ส่งข้อมูลไป Cloud: ${myLocalRecs.length} รายการ`);
+      myLocalRecs.forEach(r=>{ syncedAdd(r.ref); cloudRefAdd(r.ref, inspector); });
+      saveLocalImmediate();
+
+      /* Confirm fetch */
+      showInitOverlay('กำลังยืนยัน…','ตรวจสอบข้อมูลจาก Cloud…','');
+      const confirmResult = await fetchFromCloud(inspector, FETCH_TIMEOUT);
+      if(confirmResult.ok && confirmResult.rows.length > 0){
+        invalidateMyRecCache(); invalidateCache(); _lastRenderHash = '';
+        mergeCloud(confirmResult.rows);
+        saveLocalImmediate();
+      }
+      forceRefreshAll();
+      await sleep(50);
+      toast(`☁️ อัพโหลดสำเร็จ: ${myLocalRecs.length} รายการ → Google Sheets`);
       showSyncBadge('↑ Pushed to Cloud','#f97316');
       setSyncPulse('live','LIVE SYNC');
 
-    } else {
-      /* Fresh start — nothing anywhere */
-      refreshAll();
+    } else if(!fetchResult.ok && myLocalRecs.length > 0){
+      /* ── CASE C: Fetch ล้มเหลว แต่มีข้อมูล local ── */
+      forceRefreshAll();
       await sleep(50);
-      hideInitOverlay();
+      setSyncPulse('offline','OFFLINE');
+      toast(`⚠️ Offline — แสดงข้อมูลในเครื่อง ${myLocalRecs.length} รายการ`);
+
+    } else if(!fetchResult.ok && myLocalRecs.length === 0){
+      /* ── CASE D: Fetch ล้มเหลว + ไม่มีข้อมูล ── */
+      forceRefreshAll();
+      await sleep(50);
+      setSyncPulse('offline','OFFLINE');
+      toast('⚠️ ไม่สามารถเชื่อมต่อ Google Sheets ได้');
+
+    } else {
+      /* ── CASE E: Cloud ว่าง + local ว่าง (Fresh start) ── */
+      forceRefreshAll();
+      await sleep(50);
       setSyncPulse('live','LIVE SYNC');
     }
 
   } catch(err){
-    /* Network failed — show local data anyway */
-    refreshAll();
-    hideInitOverlay();
+    /* Error ที่ไม่คาดคิด — แสดงข้อมูล local เท่าที่มี */
+    try { forceRefreshAll(); } catch(_){}
     setSyncPulse('offline','OFFLINE');
-    if(myLocalRecs.length > 0){
-      toast(`⚠️ Offline — แสดงข้อมูล Local ${myLocalRecs.length} รายการ`);
-    } else {
-      toast('⚠️ ไม่สามารถเชื่อมต่อ Cloud ได้');
-    }
+    const localNow = getMyRecords().length;
+    toast(localNow > 0
+      ? `⚠️ Error — แสดงข้อมูลในเครื่อง ${localNow} รายการ`
+      : '⚠️ เกิดข้อผิดพลาด กรุณา Refresh'
+    );
   } finally {
+    /* ── สำคัญ: ต้อง execute เสมอ ── */
+    hideInitOverlay();
     setSyncBtn(false);
-    _isInitializing = false; /* ★ Unlock: saves/pushes now allowed */
+    _isInitializing = false;
     startPolling();
+    /* บังคับ refresh อีกครั้งหลัง overlay ปิด เผื่อ RAF ไม่ทัน */
+    requestAnimationFrame(()=>{
+      _lastRenderHash = '';
+      refreshAll();
+    });
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-   LOGIN
-══════════════════════════════════════════════════════════ */
+/* ══ LOGIN ══ */
 async function setStep(n,state){
   for(let i=1;i<=3;i++){
     const el=$id('ls'+i); if(!el) continue;
@@ -1220,35 +1267,24 @@ async function login(){
     setTimeout(()=>$id('loginPass').style.borderColor='',1500);
     toast('⛔ รหัสผ่านไม่ถูกต้อง'); return;
   }
-
   $id('loginBtn').disabled=true;
   $id('loginForm').style.display='none';
   $id('loProgress').style.display='flex';
-
   await setStep(1,'active'); await sleep(200); await setStep(1,'done');
   await setStep(2,'active');
   $id('loBar').style.width='40%';
-
-  /* Animate the card out and reveal app shell */
   const tl=gsap.timeline();
   tl.to('#loCard',{scale:.88,opacity:0,y:-20,duration:.3,ease:'power3.in'});
   tl.to('#loginOverlay',{opacity:0,duration:.4,ease:'power2.in',
     onComplete:()=>{ $id('loginOverlay').style.display='none'; }
   });
   tl.to('#appShell',{opacity:1,duration:.5,ease:'back.out(1.6)',
-    onStart:()=>{
-      $id('appShell').style.visibility='visible';
-      $id('appShell').classList.add('visible');
-    }
+    onStart:()=>{ $id('appShell').style.visibility='visible'; $id('appShell').classList.add('visible'); }
   },'-=0.2');
-
   await setStep(2,'done');
   await setStep(3,'active');
-
-  /* Save session, then run full init flow */
   sessionStorage.setItem('currentUser',name);
   await initApp(name);
-
   setStep(3,'done');
 }
 
@@ -1256,10 +1292,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&$id('loginOverlay').style.display!=='none') login();
 });
 
-/* ══════════════════════════════════════════════════════════
-   ★ FIX 4 (Session Resume): Always fetch fresh on reload.
-   Never trust stale local data as the final truth.
-══════════════════════════════════════════════════════════ */
 window.addEventListener('load',async()=>{
   $id('inputDate').valueAsDate=new Date();
   startClock(); initParticles(); forceViewportReset();
@@ -1267,11 +1299,11 @@ window.addEventListener('load',async()=>{
   if(saved){
     $id('loginOverlay').style.display='none';
     $id('appShell').classList.add('visible');
-    /* Show local data immediately so UI isn't blank */
     currentUser=saved;
     $id('currentUserDisp').textContent=saved;
+    /* แสดงข้อมูล local ก่อน แล้วค่อย sync */
+    invalidateMyRecCache(); invalidateCache(); _lastRenderHash='';
     refreshAll();
-    /* Then do full fresh fetch */
     await initApp(saved);
   }
 });
@@ -1289,6 +1321,7 @@ window.addEventListener('pageshow',e=>{
   forceViewportReset();
   if(e.persisted&&currentUser){
     setTimeout(()=>{
+      invalidateMyRecCache(); invalidateCache(); _lastRenderHash='';
       refreshAll();
       const shell=$id('appShell');
       if(shell){shell.classList.remove('visible');void shell.offsetWidth;shell.classList.add('visible');}
@@ -1325,25 +1358,17 @@ function handleJudgment(val){
   if(btn){ btn.style.backgroundColor=color; btn.style.boxShadow=`0 10px 25px -5px ${color}66`; }
 }
 
-/* ══════════════════════════════════════════════════════════
-   ★ FIX 3 (Validation + Duplicate): Form submit with full checks
-══════════════════════════════════════════════════════════ */
 $id('claimForm').addEventListener('submit',e=>{
   e.preventDefault();
   if(_isInitializing){ toast('⏳ กรุณารอให้ระบบโหลดเสร็จก่อน'); return; }
-
-  const ref   = $id('refNo').value.trim();
-  const supp  = $id('supplier').value.trim();
-  const qty   = parseInt($id('qty').value)||0;
-  const jdg   = $id('judgmentSelect').value;
-
-  /* Validation */
+  const ref=$id('refNo').value.trim();
+  const supp=$id('supplier').value.trim();
+  const qty=parseInt($id('qty').value)||0;
+  const jdg=$id('judgmentSelect').value;
   if(!ref){   shake($id('refNo'));     toast('❌ กรุณาระบุ Reference No'); return; }
   if(!supp){  shake($id('supplier')); toast('❌ กรุณาระบุ Supplier');     return; }
   if(qty<=0){ shake($id('qty'));       toast('❌ QTY ต้องมากกว่า 0');     return; }
   if(!jdg){  shake($id('judgmentSelect')); toast('❌ กรุณาเลือก Judgment'); return; }
-
-  /* Duplicate check */
   if(isDuplicate(ref)){
     shake($id('refNo'));
     toast('⚠️ Duplicate! REF นี้มีในระบบแล้ว');
@@ -1351,28 +1376,16 @@ $id('claimForm').addEventListener('submit',e=>{
     setTimeout(()=>$id('refNo').style.borderColor='',2000);
     return;
   }
-
   const newRow={
-    id       : Date.now()+'_'+Math.random().toString(36).slice(2),
-    date     : $id('inputDate').value,
-    shift    : $id('shift').value,
-    inspector: currentUser,
-    ref,
-    line     : $id('lineNo').value,
-    supplier : supp,
-    partNo   : $id('partNo').value,
-    partName : $id('partOn').value,
-    qty,
-    defect   : $id('defectName').value,
-    remark   : $id('remark').value,
-    judgment : jdg,
+    id:Date.now()+'_'+Math.random().toString(36).slice(2),
+    date:$id('inputDate').value, shift:$id('shift').value, inspector:currentUser,
+    ref, line:$id('lineNo').value, supplier:supp,
+    partNo:$id('partNo').value, partName:$id('partOn').value,
+    qty, defect:$id('defectName').value, remark:$id('remark').value, judgment:jdg,
   };
-
   cloudRefAdd(ref,currentUser);
   records.push(newRow);
-  saveAndRefresh();  /* triggers schedulePush (now safe — not initializing) */
-
-  /* Visual feedback */
+  saveAndRefresh();
   const sb=$id('submitBtn');
   if(sb){
     const orig=sb.style.backgroundColor;
@@ -1390,7 +1403,6 @@ $id('claimForm').addEventListener('submit',e=>{
   toast('✅ บันทึกข้อมูลสำเร็จ');
 });
 
-/* ══ FILTER ══ */
 function setFilter(type){
   filterType=type;
   ['ALL','SF','VENDOR','CTC','CANUSE'].forEach(b=>{
@@ -1414,7 +1426,6 @@ function smoothSearch(){
   searchDebounce=setTimeout(()=>{ renderTable(); gsap.to(tb,{opacity:1,duration:.2,ease:'power1.out'}); },150);
 }
 
-/* ══ RENDER TABLE ══ */
 const SM_MAP={
   'SF'          :{dot:'bg-orange-500',cls:'text-orange-600 bg-orange-50'},
   'VENDOR FAULT':{dot:'bg-red-500',   cls:'text-red-600 bg-red-50'},
@@ -1476,7 +1487,6 @@ function renderTable(){
   requestAnimationFrame(()=>{ tbody.querySelectorAll('tr').forEach(tr=>tr.classList.add('vis')); });
 }
 
-/* ══ TABLE EVENT DELEGATION ══ */
 document.addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]'); if(!btn) return;
   const tr=btn.closest('tr[data-rid]'); if(!tr) return;
@@ -1485,16 +1495,12 @@ document.addEventListener('click',e=>{
   if(btn.dataset.action==='delete') showDeleteModal(rid,tr);
 });
 
-/* ══════════════════════════════════════════════════════════
-   ★ FIX 2 (Delete): _pendingDelete now stores id AND ref.
-   deleteFromCloud receives both for accurate GAS row lookup.
-══════════════════════════════════════════════════════════ */
 let _pendingDelete=null;
 function showDeleteModal(id,trEl){
   const r=findRecord(id);
   if(!r){ toast('⚠️ ไม่พบข้อมูล'); return; }
   if(r.inspector!==currentUser){ toast('⛔ ไม่มีสิทธิ์ลบข้อมูลของผู้ใช้อื่น'); return; }
-  _pendingDelete={ id: r.id, trEl, ref:r.ref, inspector:r.inspector };
+  _pendingDelete={ id:r.id, trEl, ref:r.ref, inspector:r.inspector };
   $id('delModalDesc').textContent=`Ref: ${r.ref} · ${r.supplier} · ${r.date}`;
   $id('deleteModal').classList.add('show');
   requestAnimationFrame(()=>$id('delCancelBtn').focus());
@@ -1521,21 +1527,15 @@ $id('delConfirmBtn').addEventListener('click',async()=>{
   const { id, trEl, ref, inspector }=_pendingDelete;
   if(inspector!==currentUser){ hideDeleteModal(); toast('⛔ ไม่มีสิทธิ์ลบ'); return; }
   hideDeleteModal();
-
   if(trEl&&trEl.isConnected){ trEl.style.pointerEvents='none'; trEl.classList.add('row-deleting'); }
-
-  /* Remove from local immediately */
   records=records.filter(x=>String(x.id)!==String(id));
   syncedDelete(ref);
   cloudRefDelete(ref,inspector);
   invalidateMyRecCache(); invalidateCache(); _lastRenderHash='';
   saveLocal(); refreshAll();
-
   showDelProgress('กำลังลบออกจาก Cloud…','กรุณารอสักครู่',40);
   showSyncBadge('🗑 Deleting…','#ef4444');
-
   try {
-    /* ★ Pass BOTH id and ref to deleteFromCloud */
     const result=await deleteFromCloud(id, ref, inspector);
     if(result.method==='cors'&&result.ok===true){
       showDelProgress('ลบสำเร็จ!','Cloud ยืนยันแล้ว',100);
@@ -1558,7 +1558,6 @@ $id('delConfirmBtn').addEventListener('click',async()=>{
   }
 });
 
-/* ══ CLEAR ALL ══ */
 function clearAllData(){
   const myCount=getMyRecords().length;
   if(myCount===0){ toast('⚠️ ไม่มีข้อมูลให้ลบ'); return; }
@@ -1576,13 +1575,9 @@ function clearAllData(){
   refreshAll();
   clearAllFromCloud(inspector);
   showSyncBadge('🗑 Clearing Cloud…','#ef4444');
-  setTimeout(()=>{
-    toast(`🧹 ลบทั้งหมด ${myCount} รายการ`);
-    showSyncBadge('✅ Cloud Cleared','#10b981');
-  },400);
+  setTimeout(()=>{ toast(`🧹 ลบทั้งหมด ${myCount} รายการ`); showSyncBadge('✅ Cloud Cleared','#10b981'); },400);
 }
 
-/* ══ CLONE ══ */
 function cloneRecord(id){
   const r=findRecord(id);
   if(!r){ toast('⚠️ ไม่พบข้อมูล'); return; }
@@ -1600,7 +1595,6 @@ function cloneRecord(id){
 }
 function findRecord(id){ return records.find(x=>String(x.id)===String(id)); }
 
-/* ══ DATALISTS ══ */
 let _dlTimer=null;
 function updateDataLists(){
   clearTimeout(_dlTimer);
@@ -1616,7 +1610,6 @@ function updateDataLists(){
   },300);
 }
 
-/* ══ REFRESH ALL ══ */
 let _refreshRAF=null;
 let _lastKpiHash='';
 function refreshAll(){
@@ -1735,9 +1728,7 @@ function renderDashCharts(data){
       scales:{
         x:{grid:{display:false},border:{display:false},ticks:{font:{size:10,weight:'bold'},color:'#94a3b8'}},
         y:{grid:{display:false},border:{display:false},ticks:{display:false}}
-      },
-      animation:{duration:900,easing:'easeOutQuart'}
-    }
+      },animation:{duration:900,easing:'easeOutQuart'}}
   });
   const sfQ=data.filter(r=>r.judgment==='SF').reduce((s,r)=>s+r.qty,0);
   const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
@@ -1757,9 +1748,7 @@ function renderDashCharts(data){
         legend:{display:true,position:'bottom',labels:{color:'rgba(255,255,255,.6)',font:{size:8,weight:'bold'},boxWidth:7,padding:6,usePointStyle:true,pointStyleWidth:6}},
         datalabels:{display:false},
         tooltip:{...tooltip,callbacks:{label:ctx=>{ const v=ctx.parsed; const t=totalQ||1; return ' '+v.toLocaleString()+' ('+(t>0?((v/t)*100).toFixed(1):'0')+'%)'; }}}
-      },
-      animation:{animateRotate:true,animateScale:true,duration:1000,easing:'easeOutQuart'}
-    }
+      },animation:{animateRotate:true,animateScale:true,duration:1000,easing:'easeOutQuart'}}
   });
   const lineMap={};
   data.forEach(r=>{ if(r.line) lineMap[r.line]=(lineMap[r.line]||0)+r.qty; });
@@ -1774,15 +1763,13 @@ function renderDashCharts(data){
         hoverBackgroundColor:'rgba(249,115,22,1)',borderRadius:6,barThickness:16
       }]
     },
-    options:{
-      responsive:true,maintainAspectRatio:false,indexAxis:'y',layout:{padding:{right:44}},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',layout:{padding:{right:44}},
       scales:{
         x:{display:false,grid:{display:false},border:{display:false}},
         y:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:10,weight:'bold'},padding:4}}
       },
       plugins:{legend:{display:false},datalabels:{anchor:'end',align:'end',color:'#94a3b8',font:{size:9,weight:'bold',family:'Orbitron'},formatter:v=>v.toLocaleString(),clip:false},tooltip},
-      animation:{duration:900,easing:'easeOutQuart'}
-    }
+      animation:{duration:900,easing:'easeOutQuart'}}
   });
   else if(rCtx){
     const sm={'A':0,'B':0,'C':0};
@@ -1792,8 +1779,7 @@ function renderDashCharts(data){
       options:{responsive:true,maintainAspectRatio:false,
         scales:{x:{grid:{display:false},border:{display:false},ticks:{color:'#64748b',font:{size:11,weight:'bold',family:'Orbitron'}}},y:{display:false,grid:{display:false}}},
         plugins:{legend:{display:false},datalabels:{anchor:'end',align:'top',color:'#94a3b8',font:{size:10,weight:'bold',family:'Orbitron'},formatter:v=>v>0?v.toLocaleString():''},tooltip},
-        animation:{duration:900,easing:'easeOutBounce'}
-      }
+        animation:{duration:900,easing:'easeOutBounce'}}
     });
   }
 }
@@ -1823,10 +1809,6 @@ function renderRankings(data){
   draw('rankParts',    getTop('partNo'),  'linear-gradient(90deg,#3b82f6,#60a5fa)','#3b82f6');
 }
 
-/* ══════════════════════════════════════════════════════════
-   ★ FIX 3 (Bulk Import): importExcel sends ALL rows in ONE batch.
-   Never loops per row. Validates each row before accepting.
-══════════════════════════════════════════════════════════ */
 function importExcel(input){
   if(_isInitializing){ toast('⏳ กรุณารอให้ระบบโหลดเสร็จก่อน'); input.value=''; return; }
   const file=input.files[0]; if(!file) return;
@@ -1840,43 +1822,35 @@ function importExcel(input){
       if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;}
       return String(v);
     };
-
     let skippedDupe=0, skippedInvalid=0;
     const items=[];
     for(const r of json){
       const ref=String(r.ref||r.Reference||'').trim();
       const supp=String(r.supplier||r.Supplier||'').trim();
       const qty=parseInt(r.qty||r.Qty||0);
-      /* ★ Validate */
       if(!ref||!supp||qty<=0){ skippedInvalid++; continue; }
-      /* ★ Duplicate check */
       if(isDuplicate(ref)){ skippedDupe++; continue; }
       items.push({
-        id       : Date.now()+Math.random(),
-        date     : pd(r.date||r.Date||r.DATE),
-        shift    : r.shift||r.Shift||'SHIFT A',
-        inspector: currentUser,
+        id:Date.now()+Math.random(),
+        date:pd(r.date||r.Date||r.DATE),
+        shift:r.shift||r.Shift||'SHIFT A',
+        inspector:currentUser,
         ref, line:String(r.line||r.Line||''),
-        supplier : supp, partNo:String(r.partNo||r.PartNo||''),
-        partName : String(r.partName||r.PartName||''),
+        supplier:supp, partNo:String(r.partNo||r.PartNo||''),
+        partName:String(r.partName||r.PartName||''),
         qty,
-        defect   : String(r.defect||r.Defect||''),
-        remark   : String(r.remark||r.Remark||''),
-        judgment : String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase(),
+        defect:String(r.defect||r.Defect||''),
+        remark:String(r.remark||r.Remark||''),
+        judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase(),
       });
     }
-
     if(!items.length){
       toast(`⚠️ ไม่มีข้อมูลใหม่ (ซ้ำ:${skippedDupe} / Invalid:${skippedInvalid})`);
       input.value=''; return;
     }
-
-    /* Add to local */
     items.forEach(r=>cloudRefAdd(r.ref,currentUser));
     records=[...records,...items];
-    _lastRenderHash=''; saveLocal(); refreshAll();
-
-    /* ★ Batch push: send ALL new items in ONE call */
+    _lastRenderHash=''; saveLocal(); forceRefreshAll();
     showInitOverlay('กำลัง Import…','อัพโหลด Batch ไปยัง Cloud…',items.length);
     try{
       await pushToCloud(items);
