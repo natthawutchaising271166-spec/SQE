@@ -400,19 +400,23 @@ body::before {
   font-family: var(--font-head); margin-bottom: .3rem;
 }
 .kpi-value {
-  font-family: var(--font-mono);
-  font-size: 2.5rem; font-weight: 500;
+  font-family: var(--font-head);
+  font-size: 2.4rem; font-weight: 700;
   color: var(--text-900); line-height: 1.05;
-  letter-spacing: -.02em;
+  letter-spacing: -.03em;
 }
 .kpi-sub {
-  font-size: .62rem; font-weight: 600; color: var(--text-400);
-  margin-top: .35rem; font-family: var(--font-body);
+  font-size: .68rem; font-weight: 600; color: var(--text-400);
+  margin-top: .4rem; font-family: var(--font-body);
   display: flex; align-items: center; justify-content: space-between;
 }
+.kpi-lot-num {
+  font-family: var(--font-head); font-size: .78rem;
+  font-weight: 700; letter-spacing: -.01em;
+}
 .kpi-pct {
-  font-family: var(--font-mono); font-size: .72rem;
-  font-weight: 500; letter-spacing: -.01em;
+  font-family: var(--font-head); font-size: .72rem;
+  font-weight: 700; letter-spacing: -.01em;
 }
 .kpi-badge {
   display: inline-flex; align-items: center; gap: 3px;
@@ -1065,7 +1069,7 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
         <div id="masterQty" class="kpi-value" style="color:var(--text-900)">0</div>
         <div class="kpi-sub">
           <span>Lots</span>
-          <span id="masterLot" style="color:var(--blue-600);font-weight:700;font-family:var(--font-mono)">0</span>
+          <span id="masterLot" class="kpi-lot-num" style="color:var(--blue-600)">0</span>
         </div>
       </div>
       <!-- SF -->
@@ -1075,7 +1079,7 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
           <span id="pctSF" class="kpi-pct" style="color:var(--accent-or)">0%</span>
         </div>
         <div id="qtySF" class="kpi-value" style="color:var(--accent-or)">0</div>
-        <div class="kpi-sub"><span>Lots</span><span id="lotSF" style="font-family:var(--font-mono)">0</span></div>
+        <div class="kpi-sub"><span>Lots</span><span id="lotSF" class="kpi-lot-num" style="color:var(--accent-or)">0</span></div>
       </div>
       <!-- Vendor -->
       <div class="kpi-card card-lift" style="--kpi-grad:linear-gradient(90deg,#dc2626,#ef4444);--kpi-pale:rgba(239,68,68,.05)">
@@ -1084,7 +1088,7 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
           <span id="pctVendor" class="kpi-pct" style="color:var(--accent-red)">0%</span>
         </div>
         <div id="qtyVendor" class="kpi-value" style="color:var(--accent-red)">0</div>
-        <div class="kpi-sub"><span>Lots</span><span id="lotVendor" style="font-family:var(--font-mono)">0</span></div>
+        <div class="kpi-sub"><span>Lots</span><span id="lotVendor" class="kpi-lot-num" style="color:var(--accent-red)">0</span></div>
       </div>
       <!-- CTC -->
       <div class="kpi-card card-lift" style="--kpi-grad:linear-gradient(90deg,var(--blue-700),var(--blue-500));--kpi-pale:rgba(59,130,246,.05)">
@@ -1093,7 +1097,7 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
           <span id="pctCTC" class="kpi-pct" style="color:var(--blue-600)">0%</span>
         </div>
         <div id="qtyCTC" class="kpi-value" style="color:var(--blue-600)">0</div>
-        <div class="kpi-sub"><span>Lots</span><span id="lotCTC" style="font-family:var(--font-mono)">0</span></div>
+        <div class="kpi-sub"><span>Lots</span><span id="lotCTC" class="kpi-lot-num" style="color:var(--blue-600)">0</span></div>
       </div>
       <!-- Can Use -->
       <div class="kpi-card card-lift" style="--kpi-grad:linear-gradient(90deg,#059669,#10b981);--kpi-pale:rgba(16,185,129,.05)">
@@ -1102,7 +1106,7 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
           <span id="pctCanUse" class="kpi-pct" style="color:var(--accent-grn)">0%</span>
         </div>
         <div id="qtyCanUse" class="kpi-value" style="color:var(--accent-grn)">0</div>
-        <div class="kpi-sub"><span>Lots</span><span id="lotCanUse" style="font-family:var(--font-mono)">0</span></div>
+        <div class="kpi-sub"><span>Lots</span><span id="lotCanUse" class="kpi-lot-num" style="color:var(--accent-grn)">0</span></div>
       </div>
     </div>
   </header>
@@ -1315,37 +1319,37 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
     <div class="dash-kpi-row">
       <div class="dkpi" style="--dkpi-grad:linear-gradient(90deg,var(--blue-700),var(--blue-400))">
         <div style="display:flex;justify-content:space-between"><p style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.52rem,.68vw,.6rem)">Total QTY</p><span style="background:var(--blue-50);color:var(--blue-600);font-family:var(--font-head);font-weight:700;padding:1px 7px;border-radius:99px;font-size:.55rem;border:1px solid var(--blue-200)">ALL</span></div>
-        <div id="dTotalQty" style="font-family:var(--font-mono);font-weight:500;color:var(--text-900);font-size:clamp(1.1rem,2.1vw,2.1rem);letter-spacing:-.02em">0</div>
-        <div style="font-family:var(--font-body);color:var(--text-400);font-size:clamp(.5rem,.65vw,.58rem);font-weight:600">Lots: <span id="dTotalLot" style="color:var(--blue-600);font-weight:700;font-family:var(--font-mono)">0</span></div>
+        <div id="dTotalQty" style="font-family:var(--font-head);font-weight:700;color:var(--text-900);font-size:clamp(1.1rem,2.1vw,2rem);letter-spacing:-.03em">0</div>
+        <div style="font-family:var(--font-body);color:var(--text-400);font-size:clamp(.5rem,.65vw,.58rem);font-weight:600">Lots: <span id="dTotalLot" style="color:var(--blue-600);font-weight:800;font-family:var(--font-head);font-size:clamp(.6rem,.75vw,.68rem)">0</span></div>
       </div>
       <div class="dkpi" style="--dkpi-grad:linear-gradient(90deg,#ea580c,#f97316)">
         <div style="display:flex;justify-content:space-between"><p style="font-family:var(--font-head);font-weight:700;color:var(--accent-or);text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.52rem,.68vw,.6rem)">SF Fault</p><span id="dSFpct" style="background:rgba(249,115,22,.1);color:var(--accent-or);font-family:var(--font-mono);font-weight:500;padding:1px 7px;border-radius:99px;font-size:clamp(.53rem,.7vw,.62rem);border:1px solid rgba(249,115,22,.2)">0%</span></div>
-        <div id="dSFqty" style="font-family:var(--font-mono);font-weight:500;color:var(--accent-or);font-size:clamp(1.1rem,2.1vw,2.1rem);letter-spacing:-.02em">0</div>
-        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dSFlot" style="color:var(--text-700);font-weight:700;font-family:var(--font-mono)">0</span></div>
+        <div id="dSFqty" style="font-family:var(--font-head);font-weight:700;color:var(--accent-or);font-size:clamp(1.1rem,2.1vw,2rem);letter-spacing:-.03em">0</div>
+        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dSFlot" style="color:var(--accent-or);font-weight:800;font-family:var(--font-head);font-size:clamp(.6rem,.75vw,.68rem)">0</span></div>
       </div>
       <div class="dkpi" style="--dkpi-grad:linear-gradient(90deg,#dc2626,#ef4444)">
         <div style="display:flex;justify-content:space-between"><p style="font-family:var(--font-head);font-weight:700;color:var(--accent-red);text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.52rem,.68vw,.6rem)">Vendor</p><span id="dVENpct" style="background:rgba(239,68,68,.08);color:var(--accent-red);font-family:var(--font-mono);font-weight:500;padding:1px 7px;border-radius:99px;font-size:clamp(.53rem,.7vw,.62rem);border:1px solid rgba(239,68,68,.2)">0%</span></div>
-        <div id="dVENqty" style="font-family:var(--font-mono);font-weight:500;color:var(--accent-red);font-size:clamp(1.1rem,2.1vw,2.1rem);letter-spacing:-.02em">0</div>
-        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dVENlot" style="color:var(--text-700);font-weight:700;font-family:var(--font-mono)">0</span></div>
+        <div id="dVENqty" style="font-family:var(--font-head);font-weight:700;color:var(--accent-red);font-size:clamp(1.1rem,2.1vw,2rem);letter-spacing:-.03em">0</div>
+        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dVENlot" style="color:var(--accent-red);font-weight:800;font-family:var(--font-head);font-size:clamp(.6rem,.75vw,.68rem)">0</span></div>
       </div>
       <div class="dkpi" style="--dkpi-grad:linear-gradient(90deg,var(--blue-700),var(--blue-500))">
         <div style="display:flex;justify-content:space-between"><p style="font-family:var(--font-head);font-weight:700;color:var(--blue-600);text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.52rem,.68vw,.6rem)">CTC</p><span id="dCTCpct" style="background:var(--blue-50);color:var(--blue-600);font-family:var(--font-mono);font-weight:500;padding:1px 7px;border-radius:99px;font-size:clamp(.53rem,.7vw,.62rem);border:1px solid var(--blue-200)">0%</span></div>
-        <div id="dCTCqty" style="font-family:var(--font-mono);font-weight:500;color:var(--blue-600);font-size:clamp(1.1rem,2.1vw,2.1rem);letter-spacing:-.02em">0</div>
-        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dCTClot" style="color:var(--text-700);font-weight:700;font-family:var(--font-mono)">0</span></div>
+        <div id="dCTCqty" style="font-family:var(--font-head);font-weight:700;color:var(--blue-600);font-size:clamp(1.1rem,2.1vw,2rem);letter-spacing:-.03em">0</div>
+        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dCTClot" style="color:var(--blue-600);font-weight:800;font-family:var(--font-head);font-size:clamp(.6rem,.75vw,.68rem)">0</span></div>
       </div>
       <div class="dkpi" style="--dkpi-grad:linear-gradient(90deg,#059669,#10b981)">
         <div style="display:flex;justify-content:space-between"><p style="font-family:var(--font-head);font-weight:700;color:var(--accent-grn);text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.52rem,.68vw,.6rem)">Can Use</p><span id="dOKpct" style="background:rgba(16,185,129,.08);color:var(--accent-grn);font-family:var(--font-mono);font-weight:500;padding:1px 7px;border-radius:99px;font-size:clamp(.53rem,.7vw,.62rem);border:1px solid rgba(16,185,129,.2)">0%</span></div>
-        <div id="dOKqty" style="font-family:var(--font-mono);font-weight:500;color:var(--accent-grn);font-size:clamp(1.1rem,2.1vw,2.1rem);letter-spacing:-.02em">0</div>
-        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dOKlot" style="color:var(--text-700);font-weight:700;font-family:var(--font-mono)">0</span></div>
+        <div id="dOKqty" style="font-family:var(--font-head);font-weight:700;color:var(--accent-grn);font-size:clamp(1.1rem,2.1vw,2rem);letter-spacing:-.03em">0</div>
+        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dOKlot" style="color:var(--accent-grn);font-weight:800;font-family:var(--font-head);font-size:clamp(.6rem,.75vw,.68rem)">0</span></div>
       </div>
     </div>
 
     <!-- Stats Row -->
     <div class="dash-stats-row">
-      <div class="d-stat" style="animation-delay:.3s"><div class="d-stat-icon" style="background:rgba(239,68,68,.08)">🚫</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Rejection Rate</div><div id="dRejRate" style="font-family:var(--font-mono);font-weight:500;color:var(--accent-red);font-size:clamp(.88rem,1.5vw,1.3rem);letter-spacing:-.01em">0%</div></div></div>
-      <div class="d-stat" style="animation-delay:.36s"><div class="d-stat-icon" style="background:var(--blue-50)">🏆</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Top Shift</div><div id="dTopShift" style="font-family:var(--font-mono);font-weight:500;color:var(--blue-700);font-size:clamp(.88rem,1.5vw,1.3rem)">—</div></div></div>
-      <div class="d-stat" style="animation-delay:.42s"><div class="d-stat-icon" style="background:rgba(249,115,22,.08)">📦</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Avg QTY/Lot</div><div id="dAvgQty" style="font-family:var(--font-mono);font-weight:500;color:var(--accent-or);font-size:clamp(.88rem,1.5vw,1.3rem)">0</div></div></div>
-      <div class="d-stat" style="animation-delay:.48s"><div class="d-stat-icon" style="background:rgba(16,185,129,.08)">📅</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Active Days</div><div id="dActiveDays" style="font-family:var(--font-mono);font-weight:500;color:var(--accent-grn);font-size:clamp(.88rem,1.5vw,1.3rem)">0</div></div></div>
+      <div class="d-stat" style="animation-delay:.3s"><div class="d-stat-icon" style="background:rgba(239,68,68,.08)">🚫</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Rejection Rate</div><div id="dRejRate" style="font-family:var(--font-head);font-weight:700;color:var(--accent-red);font-size:clamp(.88rem,1.5vw,1.25rem);letter-spacing:-.02em">0%</div></div></div>
+      <div class="d-stat" style="animation-delay:.36s"><div class="d-stat-icon" style="background:var(--blue-50)">🏆</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Top Shift</div><div id="dTopShift" style="font-family:var(--font-head);font-weight:700;color:var(--blue-700);font-size:clamp(.88rem,1.5vw,1.25rem)">—</div></div></div>
+      <div class="d-stat" style="animation-delay:.42s"><div class="d-stat-icon" style="background:rgba(249,115,22,.08)">📦</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Avg QTY/Lot</div><div id="dAvgQty" style="font-family:var(--font-head);font-weight:700;color:var(--accent-or);font-size:clamp(.88rem,1.5vw,1.25rem)">0</div></div></div>
+      <div class="d-stat" style="animation-delay:.48s"><div class="d-stat-icon" style="background:rgba(16,185,129,.08)">📅</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Active Days</div><div id="dActiveDays" style="font-family:var(--font-head);font-weight:700;color:var(--accent-grn);font-size:clamp(.88rem,1.5vw,1.25rem)">0</div></div></div>
     </div>
 
     <!-- Charts Row -->
@@ -1361,7 +1365,7 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
         <div style="flex-shrink:0;margin-bottom:4px"><h4 style="font-family:var(--font-head);font-weight:800;color:#fff;font-size:clamp(.58rem,.8vw,.7rem)">Fault Distribution</h4><p style="color:rgba(255,255,255,.5);font-weight:500;font-size:clamp(.5rem,.65vw,.58rem)">Judgment breakdown</p></div>
         <div class="donut-wrap"><canvas id="donutChart"></canvas>
           <div class="donut-center">
-            <div id="donutTotal" style="font-family:var(--font-mono);font-weight:500;color:#fff;font-size:clamp(.88rem,1.6vw,1.5rem);letter-spacing:-.02em">0</div>
+            <div id="donutTotal" style="font-family:var(--font-head);font-weight:700;color:#fff;font-size:clamp(.88rem,1.6vw,1.45rem);letter-spacing:-.03em">0</div>
             <div style="color:rgba(255,255,255,.5);font-weight:600;text-transform:uppercase;font-size:clamp(.44rem,.6vw,.55rem);font-family:var(--font-head)">Total</div>
           </div>
         </div>
@@ -1377,7 +1381,7 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
       <div class="dash-rank-card" style="animation-delay:.44s">
         <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;margin-bottom:7px;border-bottom:1.5px solid var(--blue-100)">
           <span style="font-family:var(--font-head);font-weight:800;color:var(--text-700);text-transform:uppercase;letter-spacing:.05em;font-size:clamp(.54rem,.72vw,.63rem);display:flex;align-items:center;gap:5px">
-            <span style="width:8px;height:8px;border-radius:50%;background:var(--accent-or);display:inline-block"></span>Top Suppliers
+            Top Suppliers
           </span>
           <span style="color:var(--accent-or);font-family:var(--font-mono);font-weight:500;font-size:clamp(.5rem,.66vw,.58rem)">QTY</span>
         </div>
@@ -1386,7 +1390,7 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
       <div class="dash-rank-card" style="animation-delay:.51s">
         <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;margin-bottom:7px;border-bottom:1.5px solid var(--blue-100)">
           <span style="font-family:var(--font-head);font-weight:800;color:var(--text-700);text-transform:uppercase;letter-spacing:.05em;font-size:clamp(.54rem,.72vw,.63rem);display:flex;align-items:center;gap:5px">
-            <span style="width:8px;height:8px;border-radius:50%;background:var(--accent-red);display:inline-block"></span>Top Defects
+            Top Defects
           </span>
           <span style="color:var(--accent-red);font-family:var(--font-mono);font-weight:500;font-size:clamp(.5rem,.66vw,.58rem)">QTY</span>
         </div>
@@ -1395,7 +1399,7 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
       <div class="dash-rank-card" style="animation-delay:.58s">
         <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;margin-bottom:7px;border-bottom:1.5px solid var(--blue-100)">
           <span style="font-family:var(--font-head);font-weight:800;color:var(--text-700);text-transform:uppercase;letter-spacing:.05em;font-size:clamp(.54rem,.72vw,.63rem);display:flex;align-items:center;gap:5px">
-            <span style="width:8px;height:8px;border-radius:50%;background:var(--blue-500);display:inline-block"></span>Top Parts
+            Top Parts
           </span>
           <span style="color:var(--blue-600);font-family:var(--font-mono);font-weight:500;font-size:clamp(.5rem,.66vw,.58rem)">QTY</span>
         </div>
@@ -1582,11 +1586,11 @@ function renderTable(){
     const s=SM[r.judgment]||SM['SF'];const synced=_syncedSet.has(r.ref);
     const safeId=String(r.id).replace(/"/g,'&quot;');
     html+=`<tr class="group" data-rid="${safeId}">
-      <td style="font-family:var(--font-mono);font-size:.73rem;font-weight:400;color:var(--text-500)">${r.date}</td>
-      <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${r.shift}</div><div style="font-size:.66rem;color:var(--text-400);margin-top:1px;font-family:var(--font-mono)">L: ${r.line||'—'}</div></td>
-      <td><span style="font-family:var(--font-mono);font-size:.7rem;color:${synced?'var(--accent-grn)':'var(--text-200)'};margin-right:4px" title="${synced?'Synced':'Pending'}">●</span><span style="font-family:var(--font-mono);font-size:.73rem;font-weight:500;color:var(--blue-700)">#${r.ref}</span></td>
-      <td><div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${r.supplier}</div><div style="font-size:.66rem;color:var(--text-400);font-family:var(--font-mono);margin-top:1px">${r.partNo} · ${r.partName}</div></td>
-      <td style="text-align:center"><span style="font-family:var(--font-mono);font-size:1.05rem;font-weight:500;color:var(--text-900);letter-spacing:-.02em">${r.qty.toLocaleString()}</span></td>
+      <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">${r.date}</td>
+      <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${r.shift}</div><div style="font-size:.65rem;color:var(--text-400);margin-top:1px;font-family:var(--font-head);font-weight:600">L: ${r.line||'—'}</div></td>
+      <td><span style="font-family:var(--font-head);font-size:.68rem;color:${synced?'var(--accent-grn)':'var(--text-200)'};margin-right:4px" title="${synced?'Synced':'Pending'}">●</span><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">#${r.ref}</span></td>
+      <td><div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${r.supplier}</div><div style="font-size:.65rem;color:var(--text-400);font-family:var(--font-head);font-weight:600;margin-top:1px">${r.partNo} · ${r.partName}</div></td>
+      <td style="text-align:center"><span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900);letter-spacing:-.03em">${r.qty.toLocaleString()}</span></td>
       <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${r.defect}</td>
       <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.remark||'').replace(/"/g,'&quot;')}">${r.remark||'—'}</td>
       <td style="text-align:center">
@@ -1682,11 +1686,47 @@ function renderDashCharts(data){
   ['trend','donut','radar'].forEach(k=>{if(charts[k]){charts[k].destroy();charts[k]=null}});
   const tooltip={enabled:true,backgroundColor:'rgba(15,23,42,.9)',titleFont:{family:'Sora',size:11,weight:'800'},bodyFont:{family:'DM Mono',size:10,weight:'400'},padding:10,cornerRadius:8,borderColor:'rgba(59,130,246,.2)',borderWidth:1};
   const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const byMonth=new Array(12).fill(0);data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m))byMonth[m]+=r.qty});
+  const byMonth=new Array(12).fill(0);
+  const byMonthLot=new Array(12).fill(0);
+  data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m)){byMonth[m]+=r.qty;byMonthLot[m]++}});
+  const totalAllQty=data.reduce((s,r)=>s+r.qty,0)||1;
+  const totalAllLot=data.length||1;
   const tCtx=$id('trendChart');
   if(tCtx)charts.trend=new Chart(tCtx,{type:'line',
     data:{labels:mo,datasets:[{label:'Qty',data:byMonth,borderColor:'#2563eb',borderWidth:2.5,tension:.4,fill:true,backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||200);g.addColorStop(0,'rgba(37,99,235,.18)');g.addColorStop(1,'rgba(37,99,235,.01)');return g},pointRadius:4,pointBackgroundColor:'#fff',pointBorderColor:'#2563eb',pointBorderWidth:2.5,pointHoverRadius:7}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{display:false},tooltip},scales:{x:{grid:{color:'rgba(226,232,240,.6)'},border:{display:false},ticks:{font:{size:9.5,weight:'600',family:'Sora'},color:'#94a3b8'}},y:{grid:{color:'rgba(226,232,240,.6)'},border:{display:false},ticks:{display:false}}},animation:{duration:900,easing:'easeOutQuart'}}
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        datalabels:{display:false},
+        tooltip:{
+          enabled:true,
+          backgroundColor:'rgba(15,23,42,.92)',
+          titleFont:{family:'Sora',size:11,weight:'800'},
+          bodyFont:{family:'Sora',size:10,weight:'600'},
+          padding:{top:10,bottom:10,left:14,right:14},
+          cornerRadius:10,
+          borderColor:'rgba(59,130,246,.25)',
+          borderWidth:1,
+          displayColors:false,
+          callbacks:{
+            title:ctx=>'📅  '+ctx[0].label,
+            label:ctx=>{
+              const mi=ctx.dataIndex;
+              const qty=byMonth[mi];
+              const lot=byMonthLot[mi];
+              const qtyPct=totalAllQty>0?((qty/totalAllQty)*100).toFixed(1):'0.0';
+              const lotPct=totalAllLot>0?((lot/totalAllLot)*100).toFixed(1):'0.0';
+              return[
+                '  QTY  :  '+qty.toLocaleString()+'   ('+qtyPct+'%)',
+                '  LOT    :  '+lot.toLocaleString()+'   ('+lotPct+'%)'
+              ];
+            }
+          }
+        }
+      },
+      scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:9.5,weight:'600',family:'Sora'},color:'#94a3b8'}},y:{grid:{display:false},border:{display:false},ticks:{display:false}}},
+      animation:{duration:900,easing:'easeOutQuart'}
+    }
   });
   const sfQ=data.filter(r=>r.judgment==='SF').reduce((s,r)=>s+r.qty,0);
   const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
@@ -1718,7 +1758,7 @@ function renderRankings(data){
       const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':'·';
       return `<div class="bar-wrap" title="${k}: ${v.toLocaleString()} (${pct}%)">
         <div class="bar-lbl"><span class="bar-k">${rank} ${k}</span>
-          <div style="display:flex;align-items:center;gap:6px"><span style="font-family:var(--font-mono);font-size:.6rem;color:${accentColor};font-weight:500">${pct}%</span><span style="font-family:var(--font-mono);font-size:.58rem;color:var(--text-300)">${v.toLocaleString()}</span></div></div>
+          <div style="display:flex;align-items:center;gap:6px"><span style="font-family:var(--font-head);font-size:.62rem;color:${accentColor};font-weight:700">${pct}%</span><span style="font-family:var(--font-head);font-size:.6rem;color:var(--text-300);font-weight:600">${v.toLocaleString()}</span></div></div>
         <div class="bar-bg"><div class="bar-fill" style="background:${gradient}" data-w="${barW}"></div></div>
       </div>`;
     }).join('');
