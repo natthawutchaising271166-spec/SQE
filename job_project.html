@@ -1977,6 +1977,18 @@ tbody tr:last-child td{border-bottom:none}
       <div class="edit-field"><label class="edit-label">OK</label><input class="edit-input" type="number" id="editOk" min="0"></div>
       <div class="edit-field"><label class="edit-label">NG</label><input class="edit-input" type="number" id="editNg" min="0"></div>
       <div class="edit-field"><label class="edit-label">Report Type</label><select class="edit-input" id="editReport"><option value="VF">VF Report</option><option value="RP">RP Report</option><option value="RECORDS">RECORDS</option></select></div>
+      <!-- Image section -->
+      <div class="edit-field" style="grid-column:1/-1;">
+        <label class="edit-label">📷 รูปภาพ</label>
+        <div id="editImgZone" style="border:2px dashed var(--b200);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);position:relative;" onclick="triggerEditImagePick()">
+          <input type="file" id="editImageInput" accept="image/*" style="display:none;" onchange="previewEditImage(event)">
+          <div id="editImgPreview" style="min-height:64px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;">
+            <div style="font-size:1.8rem;">📷</div>
+            <div style="font-size:.75rem;color:var(--txt3);font-weight:500;">คลิกเพื่อเลือกรูปภาพ</div>
+            <div style="font-size:.65rem;color:var(--txt4);">PNG, JPG, WEBP — Max 8MB</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="edit-modal-actions">
       <button class="edit-btn-cancel" onclick="closeEditModal()">ยกเลิก</button>
@@ -2439,17 +2451,38 @@ function refreshSupport(){
   }).join('');
   renderGroupBars('support-group-bars',12);renderGroupByStatus('support-group-by-status');renderGroupFullTable('group-full-tbody');buildDoughnut(rp,vf,rec,'supportStatusChart');buildSupportTrend();buildSupportOkNg();buildSupportGroupChart();buildSupportMixChart();
 }
+/* Persistent hidden file input for quick image upload — fixes >4 record limit */
+(function(){
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='image/*';
+  inp.id='_imgEditInput';
+  inp.style.cssText='position:fixed;top:-999px;left:-999px;opacity:0;pointer-events:none;';
+  document.body.appendChild(inp);
+  window._imgEditInput=inp;
+})();
+
 function openImgEdit(idx){
-  // Quick image upload for existing records
-  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-  inp.onchange=e=>{
+  const inp=window._imgEditInput;
+  // Clone and re-insert to reset value (allows re-selecting same file)
+  const fresh=inp.cloneNode();
+  fresh.id='_imgEditInput';
+  fresh.style.cssText='position:fixed;top:-999px;left:-999px;opacity:0;pointer-events:none;';
+  if(inp.parentNode)inp.parentNode.replaceChild(fresh,inp);
+  window._imgEditInput=fresh;
+  fresh.onchange=e=>{
     const file=e.target.files[0];if(!file)return;
-    if(file.size>4*1024*1024){toast('❌ รูปใหญ่เกิน 4MB');return;}
+    if(file.size>8*1024*1024){toast('❌ รูปใหญ่เกิน 8MB');return;}
     const r=new FileReader();
-    r.onload=ev=>{db.support[idx].image=ev.target.result;save();toast('📷 บันทึกรูปแล้ว');refreshSupport();};
+    r.onload=ev=>{
+      if(!db.support[idx])return;
+      db.support[idx].image=ev.target.result;
+      save();
+      toast('📷 บันทึกรูปแล้ว');
+      refreshSupport();
+    };
     r.readAsDataURL(file);
   };
-  inp.click();
+  fresh.click();
 }
 function buildSupportTrend(){
   const ctx=document.getElementById('supportTrendChart');if(!ctx)return;
@@ -2623,9 +2656,82 @@ function addSupport(){
   if(isActive('master-dash'))refreshMasterDashboard();
 }
 function delSupportConfirm(i){robotConfirm('ลบ Support record นี้?',()=>{db.support.splice(i,1);save();toast('🗑 ลบแล้ว');refreshSupport();});}
-function openEditSupport(i){const s=db.support[i];if(!s)return;document.getElementById('editIdx').value=i;document.getElementById('editDate').value=s._rawDate||s.month||'';document.getElementById('editProblem').value=s.problem||'';document.getElementById('editAction').value=s.action||'Repair';document.getElementById('editPart').value=s.part||'';document.getElementById('editLot').value=s.lot||'';document.getElementById('editOk').value=s.ok!==undefined&&s.ok!==''?s.ok:'';document.getElementById('editNg').value=s.ng!==undefined&&s.ng!==''?s.ng:'';document.getElementById('editReport').value=s.report||'VF';document.getElementById('editModal').style.display='flex';}
+function openEditSupport(i){
+  const s=db.support[i];if(!s)return;
+  document.getElementById('editIdx').value=i;
+  document.getElementById('editDate').value=s._rawDate||s.month||'';
+  document.getElementById('editProblem').value=s.problem||'';
+  document.getElementById('editAction').value=s.action||'Repair';
+  document.getElementById('editPart').value=s.part||'';
+  document.getElementById('editLot').value=s.lot||'';
+  document.getElementById('editOk').value=s.ok!==undefined&&s.ok!==''?s.ok:'';
+  document.getElementById('editNg').value=s.ng!==undefined&&s.ng!==''?s.ng:'';
+  document.getElementById('editReport').value=s.report||'VF';
+  window._pendingEditImage=undefined;
+  const prev=document.getElementById('editImgPreview');
+  const zone=document.getElementById('editImgZone');
+  if(s.image){
+    prev.innerHTML=`<img src="${s.image}" style="max-height:100px;max-width:100%;border-radius:8px;object-fit:contain;display:block;margin:0 auto;"><div style="display:flex;gap:6px;margin-top:8px;justify-content:center;flex-wrap:wrap;"><button type="button" onclick="event.stopPropagation();triggerEditImagePick()" style="background:var(--grad);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;">🔄 เปลี่ยนรูป</button><button type="button" onclick="event.stopPropagation();removeEditImage()" style="background:var(--red-l);border:1px solid #fecaca;color:var(--red);border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;">🗑 ลบรูป</button></div>`;
+    zone.style.borderColor='var(--b400)';zone.style.background='var(--b50)';
+  } else {
+    prev.innerHTML=`<div style="font-size:1.8rem;">📷</div><div style="font-size:.75rem;color:var(--txt3);font-weight:500;">คลิกเพื่อเลือกรูปภาพ</div><div style="font-size:.65rem;color:var(--txt4);">PNG, JPG, WEBP — Max 8MB</div>`;
+    zone.style.borderColor='var(--b200)';zone.style.background='var(--bg)';
+  }
+  document.getElementById('editModal').style.display='flex';
+}
+function triggerEditImagePick(){
+  const old=document.getElementById('editImageInput');
+  const fresh=old.cloneNode();fresh.id='editImageInput';fresh.accept='image/*';fresh.style.display='none';
+  fresh.onchange=e=>previewEditImage(e);
+  old.parentNode.replaceChild(fresh,old);
+  fresh.click();
+}
+function previewEditImage(e){
+  const file=e.target.files[0];if(!file)return;
+  if(file.size>8*1024*1024){toast('❌ รูปใหญ่เกิน 8MB');return;}
+  const r=new FileReader();
+  r.onload=ev=>{
+    window._pendingEditImage=ev.target.result;
+    const prev=document.getElementById('editImgPreview');
+    const zone=document.getElementById('editImgZone');
+    prev.innerHTML=`<img src="${ev.target.result}" style="max-height:100px;max-width:100%;border-radius:8px;object-fit:contain;display:block;margin:0 auto;"><div style="display:flex;gap:6px;margin-top:8px;justify-content:center;flex-wrap:wrap;"><button type="button" onclick="event.stopPropagation();triggerEditImagePick()" style="background:var(--grad);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;">🔄 เปลี่ยนรูป</button><button type="button" onclick="event.stopPropagation();removeEditImage()" style="background:var(--red-l);border:1px solid #fecaca;color:var(--red);border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;">🗑 ลบรูป</button></div>`;
+    zone.style.borderColor='var(--b400)';zone.style.background='var(--b50)';
+    toast('📷 เลือกรูปแล้ว — กดบันทึกเพื่อยืนยัน');
+  };
+  r.readAsDataURL(file);
+}
+function removeEditImage(){
+  window._pendingEditImage=null;
+  const prev=document.getElementById('editImgPreview');
+  const zone=document.getElementById('editImgZone');
+  prev.innerHTML=`<div style="font-size:1.8rem;color:var(--red);">🗑</div><div style="font-size:.75rem;color:var(--red);font-weight:500;">รูปจะถูกลบเมื่อกด บันทึก</div>`;
+  zone.style.borderColor='#fca5a5';zone.style.background='#fff5f5';
+}
+function saveEditSupport(){
+  const i=parseInt(document.getElementById('editIdx').value);
+  if(isNaN(i)||!db.support[i])return toast('❌ ข้อมูลไม่ถูกต้อง');
+  const di=document.getElementById('editDate').value;
+  const d=di?new Date(di):new Date();
+  const month=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  const ok_val=document.getElementById('editOk').value;
+  const ng_val=document.getElementById('editNg').value;
+  db.support[i].problem=document.getElementById('editProblem').value;
+  db.support[i].action=document.getElementById('editAction').value;
+  db.support[i].part=document.getElementById('editPart').value;
+  db.support[i].lot=document.getElementById('editLot').value;
+  db.support[i].ok=ok_val!==''?parseInt(ok_val):'';
+  db.support[i].ng=ng_val!==''?parseInt(ng_val):'';
+  db.support[i].report=document.getElementById('editReport').value;
+  db.support[i].month=month;db.support[i]._rawDate=di;
+  db.support[i]._editedAt=fullTimestamp();db.support[i]._user=currentUser;
+  if(window._pendingEditImage===null)db.support[i].image=null;
+  else if(typeof window._pendingEditImage==='string')db.support[i].image=window._pendingEditImage;
+  window._pendingEditImage=undefined;
+  save();toast('✅ อัปเดตข้อมูลแล้ว');
+  document.getElementById('editModal').style.display='none';
+  refreshSupport();
+}
 function closeEditModal(e){if(!e||e.target===document.getElementById('editModal'))document.getElementById('editModal').style.display='none';}
-function saveEditSupport(){const i=parseInt(document.getElementById('editIdx').value);if(isNaN(i)||!db.support[i])return toast('❌ ข้อมูลไม่ถูกต้อง');const di=document.getElementById('editDate').value;const d=di?new Date(di):new Date();const month=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;const ok_val=document.getElementById('editOk').value;const ng_val=document.getElementById('editNg').value;db.support[i].problem=document.getElementById('editProblem').value;db.support[i].action=document.getElementById('editAction').value;db.support[i].part=document.getElementById('editPart').value;db.support[i].lot=document.getElementById('editLot').value;db.support[i].ok=ok_val!==''?parseInt(ok_val):'';db.support[i].ng=ng_val!==''?parseInt(ng_val):'';db.support[i].report=document.getElementById('editReport').value;db.support[i].month=month;db.support[i]._rawDate=di;db.support[i]._editedAt=fullTimestamp();db.support[i]._user=currentUser;save();toast('✅ อัปเดตข้อมูลแล้ว');document.getElementById('editModal').style.display='none';refreshSupport();}
 
 /* ══════════════════════════════════
    5S
