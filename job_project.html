@@ -220,7 +220,7 @@ body::before{
 .sb-footer{flex-shrink:0;padding:12px 12px max(16px,env(safe-area-inset-bottom,16px));border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;background:#fff;}
 .sb-nav{flex:1;overflow-y:auto;overflow-x:hidden;}
 
-.sb-btn{width:100%;border:none;padding:10px 13px;border-radius:11px;font-family:'Plus Jakarta Sans','Prompt',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .28s cubic-bezier(.34,1.56,.64,1);}
+.sb-btn{width:100%;border:none;padding:9px 13px;border-radius:11px;font-family:'Plus Jakarta Sans','Prompt',sans-serif;font-size:.73rem;font-weight:600;cursor:pointer;transition:all .28s cubic-bezier(.34,1.56,.64,1);box-sizing:border-box;}
 .sb-btn:hover{transform:translateY(-2px) scale(1.015)}
 .sb-btn:active{transform:scale(.96)}
 .sb-btn-sync{background:var(--grad);color:#fff;box-shadow:0 4px 14px var(--primary-glow)}
@@ -256,7 +256,7 @@ body::before{
 /* ────────────────────────────────────
    PAGE TRANSITIONS
 ──────────────────────────────────── */
-.page{display:none;flex-direction:column;gap:14px}
+.page{display:none;flex-direction:column;gap:14px;overflow-x:hidden;max-width:100%;}
 .page.active{display:flex}
 .page.active>*{animation:slideUp .36s cubic-bezier(.22,.68,0,1.15) both}
 .page.active>*:nth-child(1){animation-delay:.03s}.page.active>*:nth-child(2){animation-delay:.07s}
@@ -654,9 +654,9 @@ tbody tr:last-child td{border-bottom:none}
 .edit-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);}
 .edit-input{background:var(--bg);border:1.5px solid var(--border2);padding:9px 11px;border-radius:var(--r-xs);font-family:'Plus Jakarta Sans','Prompt',sans-serif;font-size:.8rem;color:var(--txt);outline:none;transition:all .2s;width:100%;}
 .edit-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft);}
-.edit-modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
-.edit-btn-cancel{background:var(--bg2);border:1px solid var(--border);padding:9px 18px;border-radius:var(--r-xs);font-family:'Plus Jakarta Sans','Prompt',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;color:var(--txt3);}
-.edit-btn-save{background:var(--grad);border:none;padding:9px 22px;border-radius:var(--r-xs);color:#fff;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans','Prompt',sans-serif;font-size:.76rem;box-shadow:0 4px 13px var(--primary-glow);}
+.edit-modal-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:14px;}
+.edit-btn-cancel{background:var(--bg2);border:1px solid var(--border);padding:7px 14px;border-radius:var(--r-xs);font-family:'Plus Jakarta Sans','Prompt',sans-serif;font-size:.73rem;font-weight:600;cursor:pointer;color:var(--txt3);}
+.edit-btn-save{background:var(--grad);border:none;padding:7px 16px;border-radius:var(--r-xs);color:#fff;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans','Prompt',sans-serif;font-size:.73rem;box-shadow:0 4px 13px var(--primary-glow);}
 
 /* ────────────────────────────────────
    AI PERFORMANCE BANNER (vivid)
@@ -698,9 +698,10 @@ tbody tr:last-child td{border-bottom:none}
    DATE FILTER BAR
 ──────────────────────────────────── */
 .date-filter-bar{
-  background:#fff;border-radius:var(--r-lg);padding:12px 16px;
+  background:#fff;border-radius:var(--r-lg);padding:10px 14px;
   border:1px solid var(--border);box-shadow:var(--sh-sm);
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;overflow:hidden;
+  max-width:100%;box-sizing:border-box;
 }
 .df-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--txt4);white-space:nowrap;}
 .df-sep{font-size:.7rem;color:var(--txt4);font-weight:600;}
@@ -717,7 +718,8 @@ tbody tr:last-child td{border-bottom:none}
 }
 .date-filter-bar input[type="date"]:focus,.date-filter-bar input[type="month"]:focus,.date-filter-bar select:focus{
   border-color:var(--b400);background:#fff;box-shadow:0 0 0 3px var(--primary-soft);
-}{overflow:hidden;border-radius:var(--r);border:1px solid var(--border);margin-top:0;}
+}
+.sup-tbl-scroll{overflow:hidden;border-radius:0 0 var(--r) var(--r);}
 
 /* ────────────────────────────────────
    SUPPORT DASHBOARD — FULL VIEWPORT
@@ -819,21 +821,10 @@ tbody tr:last-child td{border-bottom:none}
 .add-sup-body input,.add-sup-body select,.add-sup-body textarea{width:100%;padding:9px 11px;border-radius:9px;border:1.5px solid var(--border);font-size:.82rem;font-family:'Plus Jakarta Sans','Prompt',sans-serif;color:var(--txt);background:var(--bg2);transition:all .2s;outline:none;}
 .add-sup-body input:focus,.add-sup-body select:focus,.add-sup-body textarea:focus{border-color:var(--b400);background:#fff;box-shadow:0 0 0 3px var(--primary-soft);}
 .add-sup-body textarea{resize:vertical;min-height:60px;}
-.add-sup-footer{padding:0 24px 20px;display:flex;gap:8px;justify-content:flex-end;}
-/* Image upload */
-.img-upload-zone{grid-column:1/-1;border:2px dashed var(--b200);border-radius:var(--r-lg);padding:18px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);}
-.img-upload-zone:hover{border-color:var(--primary);background:var(--b50);}
-.img-upload-zone input{display:none;}
-.img-preview{max-height:80px;max-width:200px;border-radius:8px;object-fit:cover;margin-top:8px;}
-.img-remove-btn{background:var(--red);color:#fff;border:none;border-radius:99px;padding:3px 8px;font-size:.6rem;cursor:pointer;margin-top:4px;}
+.add-sup-footer{padding:0 16px 16px;display:flex;gap:6px;justify-content:flex-end;}
 /* ────────────────────────────────────
    IMAGE COLUMN — ENLARGED + DETAIL POPUP
 ──────────────────────────────────── */
-.sup-img-thumb{width:70px;height:56px;border-radius:10px;object-fit:cover;border:2px solid var(--border);cursor:zoom-in;transition:transform .32s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease;position:relative;z-index:1;display:block;}
-.sup-img-thumb:hover{transform:scale(3.2);box-shadow:0 12px 40px rgba(15,23,42,.32);z-index:9999;border-color:var(--primary);}
-.sup-img-none{width:70px;height:56px;border-radius:10px;background:var(--bg2);border:2px dashed var(--b200);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.3rem;cursor:pointer;transition:all .2s;gap:2px;}
-.sup-img-none span{font-size:.5rem;color:var(--txt4);font-weight:600;letter-spacing:.04em;}
-.sup-img-none:hover{background:var(--b50);border-color:var(--primary);}
 /* Detail popup button */
 .btn-detail{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;color:#0284c7;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:.68rem;font-weight:700;transition:all .18s;white-space:nowrap;font-family:'Plus Jakarta Sans','Prompt',sans-serif;}
 .btn-detail:hover{background:linear-gradient(135deg,#dbeafe,#bfdbfe);transform:scale(1.05);box-shadow:0 2px 8px rgba(2,132,199,.2);}
@@ -846,12 +837,6 @@ tbody tr:last-child td{border-bottom:none}
 .rec-detail-close{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);cursor:pointer;color:#fff;font-size:.8rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
 .rec-detail-close:hover{background:rgba(220,38,38,.3);}
 .rec-detail-body{padding:18px 22px;display:flex;flex-direction:column;gap:12px;}
-/* Image hero */
-.rec-img-hero{border-radius:14px;overflow:hidden;background:#f1f5f9;border:1px solid var(--border);min-height:170px;display:flex;align-items:center;justify-content:center;position:relative;}
-.rec-img-hero img{max-width:100%;max-height:280px;object-fit:contain;display:block;}
-.rec-img-empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px;color:var(--txt4);}
-.rec-img-empty-icon{font-size:2.5rem;}
-.rec-img-upload-btn{display:inline-flex;align-items:center;gap:6px;background:var(--grad);color:#fff;border:none;border-radius:var(--r);padding:7px 14px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans','Prompt',sans-serif;margin-top:6px;}
 /* OK / NG big display */
 .rec-okng-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .rec-ok-big{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:2px solid #6ee7b7;border-radius:14px;padding:14px;text-align:center;}
@@ -869,7 +854,7 @@ tbody tr:last-child td{border-bottom:none}
    SUPPORT TABLE — CLEAN UI OVERHAUL
 ──────────────────────────────────── */
 .sup-tbl-wrap{border-radius:var(--r-lg);overflow:visible;border:1px solid var(--border);box-shadow:var(--sh-sm);}
-.sup-tbl-toolbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;border-radius:var(--r-lg) var(--r-lg) 0 0;}
+.sup-tbl-toolbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border-bottom:1px solid var(--border);gap:8px;flex-wrap:wrap;border-radius:var(--r-lg) var(--r-lg) 0 0;max-width:100%;box-sizing:border-box;overflow:hidden;}
 .sup-tbl-title{font-size:.75rem;font-weight:700;color:var(--txt2);display:flex;align-items:center;gap:6px;}
 .sup-tbl-count{font-size:.62rem;background:var(--b50);color:var(--primary);padding:3px 9px;border-radius:99px;font-weight:700;border:1px solid var(--b200);}
 .sup-tbl-actions{display:flex;gap:8px;align-items:center;}
@@ -1142,7 +1127,6 @@ tbody tr:last-child td{border-bottom:none}
   </div>
   <div class="sb-footer">
     <button id="syncBtn" class="sb-btn sb-btn-sync" onclick="syncWithGoogleSheets()">🔄 SYNC CLOUD</button>
-    <button class="sb-btn sb-btn-home" onclick="window.location.href='index.html'">🏠 หน้าหลัก</button>
   </div>
 </aside>
 
@@ -1454,7 +1438,6 @@ tbody tr:last-child td{border-bottom:none}
             <th style="text-align:center;min-width:52px;">OK</th>
             <th style="text-align:center;min-width:52px;">NG</th>
             <th>Status</th>
-            <th style="text-align:center;min-width:56px;">Image</th>
             <th style="text-align:center;min-width:80px;">จัดการ</th>
           </tr></thead>
           <tbody id="supportTableBody"></tbody>
@@ -1731,19 +1714,10 @@ tbody tr:last-child td{border-bottom:none}
             <option value="RECORDS">RECORDS</option>
           </select>
         </div>
-        <!-- Image upload -->
-        <div class="img-upload-zone full" onclick="document.getElementById('supImageInput').click()" id="supImgZone">
-          <input type="file" id="supImageInput" accept="image/*" onchange="previewSupImage(event)">
-          <div id="supImgPreviewWrap">
-            <div style="font-size:1.6rem;margin-bottom:6px;">📷</div>
-            <div style="font-size:.78rem;color:var(--txt3);font-weight:500;">คลิกเพื่อแนบรูปภาพ (ไม่บังคับ)</div>
-            <div style="font-size:.68rem;color:var(--txt4);margin-top:2px;">PNG, JPG, WEBP — Max 4MB</div>
-          </div>
-        </div>
       </div>
-      <div class="add-sup-footer">
-        <button onclick="closeAddSupModal()" style="background:var(--bg2);border:1px solid var(--border);color:var(--txt3);padding:10px 20px;border-radius:var(--r);font-size:.8rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans','Prompt',sans-serif;">ยกเลิก</button>
-        <button onclick="addSupport()" class="btn-save" style="padding:10px 24px;">💾 บันทึก Support</button>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:#fff;border-radius:0 0 var(--r-xl) var(--r-xl);">
+        <button onclick="closeAddSupModal()" style="padding:8px 16px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--txt3);font-size:.76rem;font-weight:600;cursor:pointer;font-family:inherit;">ยกเลิก</button>
+        <button onclick="addSupport()" style="padding:8px 18px;border-radius:var(--r);border:none;background:var(--grad);color:#fff;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px var(--primary-glow);">💾 บันทึก</button>
       </div>
     </div>
   </div>
@@ -1977,18 +1951,6 @@ tbody tr:last-child td{border-bottom:none}
       <div class="edit-field"><label class="edit-label">OK</label><input class="edit-input" type="number" id="editOk" min="0"></div>
       <div class="edit-field"><label class="edit-label">NG</label><input class="edit-input" type="number" id="editNg" min="0"></div>
       <div class="edit-field"><label class="edit-label">Report Type</label><select class="edit-input" id="editReport"><option value="VF">VF Report</option><option value="RP">RP Report</option><option value="RECORDS">RECORDS</option></select></div>
-      <!-- Image section -->
-      <div class="edit-field" style="grid-column:1/-1;">
-        <label class="edit-label">📷 รูปภาพ</label>
-        <div id="editImgZone" style="border:2px dashed var(--b200);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);position:relative;" onclick="triggerEditImagePick()">
-          <input type="file" id="editImageInput" accept="image/*" style="display:none;" onchange="previewEditImage(event)">
-          <div id="editImgPreview" style="min-height:64px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;">
-            <div style="font-size:1.8rem;">📷</div>
-            <div style="font-size:.75rem;color:var(--txt3);font-weight:500;">คลิกเพื่อเลือกรูปภาพ</div>
-            <div style="font-size:.65rem;color:var(--txt4);">PNG, JPG, WEBP — Max 8MB</div>
-          </div>
-        </div>
-      </div>
     </div>
     <div class="edit-modal-actions">
       <button class="edit-btn-cancel" onclick="closeEditModal()">ยกเลิก</button>
@@ -2173,10 +2135,114 @@ async function pushToCloud(){db._owner=currentUser;db._lastModified=Date.now();s
 async function pullFromCloud(silent=false){try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();if(r.status==='success'&&r.data){const cloud=r.data;if(cloud._owner&&cloud._owner!==currentUser){if(!silent)console.warn('Wrong user data');return false;}const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);if(cloudMod>localMod||cloudLen>localLen){cloud._owner=currentUser;db=cloud;saveLocal();return true;}}}catch(e){}return false;}
 function saveLocal(){db._owner=currentUser;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}
 
+/* ══════════════════════════════════
+   GOOGLE SHEETS CONNECTION TEST
+══════════════════════════════════ */
+async function testGoogleSheetsConnection(){
+  try{
+    const res=await fetch(`${GOOGLE_SCRIPT_URL}?ping=1&t=${Date.now()}`);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const r=await res.json();
+    const ok=r.status==='success'||r.status==='ok'||r.pong;
+    showSyncStatus(ok?'✅ Google Sheets เชื่อมต่อแล้ว':'⚠️ Google Sheets ตอบสนองผิดปกติ', ok?'#22c55e':'#f59e0b');
+    return ok;
+  }catch(e){
+    showSyncStatus('🔴 ไม่สามารถเชื่อมต่อ Google Sheets','#dc2626');
+    return false;
+  }
+}
+
+/* ══════════════════════════════════
+   KPI COUNTER ANIMATION
+══════════════════════════════════ */
+function animateCounter(el, target, duration=900, suffix=''){
+  if(!el)return;
+  const start=performance.now();
+  const from=parseInt(el.textContent)||0;
+  const num=parseInt(target)||0;
+  function step(now){
+    const t=Math.min((now-start)/duration,1);
+    const ease=1-Math.pow(1-t,3); // easeOutCubic
+    el.textContent=Math.round(from+(num-from)*ease)+(suffix||'');
+    if(t<1)requestAnimationFrame(step);
+    else el.textContent=target+(suffix||'');
+  }
+  requestAnimationFrame(step);
+}
+
+function runDashboardEntrance(){
+  // Animate all KPI number elements on master-dash
+  const kpiIds=[
+    {id:'dash-support-count',suffix:''},
+    {id:'dash-5s-count',suffix:''},
+    {id:'dash-special-count',suffix:''},
+    {id:'dash-avg-skill',suffix:'%'},
+    {id:'dash-daily-count',suffix:''},
+  ];
+  kpiIds.forEach(({id,suffix},i)=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const target=el.textContent.replace('%','');
+    el.textContent='0'+(suffix||'');
+    setTimeout(()=>animateCounter(el,target,1000,suffix),i*120);
+  });
+  // Animate the master chart bars with a reveal
+  const bars=document.querySelectorAll('#masterChartBars .bar-fill, .gb-fill, .sp-hbar-fill, .sp-tl-fill');
+  bars.forEach((b,i)=>{
+    const target=b.style.width||b.dataset.w+'%';
+    b.style.width='0%';
+    setTimeout(()=>{b.style.transition='width 0.9s cubic-bezier(0.34,1.1,0.64,1)';b.style.width=target;},80+i*30);
+  });
+  // Flash sync status green
+  setTimeout(()=>showSyncStatus('✅ พร้อมใช้งาน — ข้อมูล Real-time','#22c55e'),600);
+}
+
 window.addEventListener('load',async()=>{
-  setLoading('กำลังเชื่อมต่อ Cloud...','โปรดรอสักครู่',10);setBtnLoading(true,'⏳ โหลด...');
-  try{setLoadingPct(30);const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);setLoadingPct(60);const r=await res.json();if(r.status==='success'&&r.data){const cloud=r.data;if(!cloud._owner||cloud._owner===currentUser){const cloudLen=getDataLen(cloud),localLen=getDataLen(db);if((cloud._lastModified||0)>(db._lastModified||0)||cloudLen>localLen){cloud._owner=currentUser;db=cloud;saveLocal();setLoading('อัปเดตจาก Cloud สำเร็จ','',80);toast('✅ โหลดข้อมูลล่าสุดจาก Cloud');}}}}catch(e){showSyncStatus('⚠️ ออฟไลน์','#f59e0b');}
-  finally{setLoadingPct(100);refreshAllPages();await sleep(400);setText('dash-timestamp','อัปเดต: '+fullTimestamp());hideLoading();setBtnLoading(false);startPolling();}
+  setLoading('🔌 กำลังเชื่อมต่อ Google Sheets...','ตรวจสอบการเชื่อมต่อ Cloud',10);
+  setBtnLoading(true,'⏳ โหลด...');
+
+  // Step 1: Test connection + pull data
+  let cloudOk=false;
+  try{
+    setLoadingPct(25);
+    const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
+    setLoadingPct(55);
+    const r=await res.json();
+    cloudOk=true;
+    if(r.status==='success'&&r.data){
+      const cloud=r.data;
+      if(!cloud._owner||cloud._owner===currentUser){
+        const cloudLen=getDataLen(cloud),localLen=getDataLen(db);
+        if((cloud._lastModified||0)>(db._lastModified||0)||cloudLen>localLen){
+          cloud._owner=currentUser;db=cloud;saveLocal();
+          setLoading('✅ โหลดข้อมูลจาก Cloud สำเร็จ!','กำลังเตรียมหน้าจอ...',75);
+          toast('✅ โหลดข้อมูลล่าสุดจาก Cloud');
+        }else{
+          setLoading('✅ เชื่อมต่อ Google Sheets แล้ว','ข้อมูล Local เป็นปัจจุบัน',75);
+        }
+      }
+    }
+  }catch(e){
+    setLoading('📵 ออฟไลน์ — ใช้ข้อมูล Local','เชื่อมต่อ Cloud ไม่ได้',60);
+    showSyncStatus('⚠️ ออฟไลน์ — บันทึกลง Local','#f59e0b');
+  }
+
+  // Step 2: Render all pages
+  setLoadingPct(88);
+  refreshAllPages();
+  setLoadingPct(100);
+
+  // Step 3: Hide loading and run entrance animation
+  await sleep(500);
+  setText('dash-timestamp',(cloudOk?'☁️ Cloud: ':'📱 Local: ')+fullTimestamp());
+  hideLoading();
+  setBtnLoading(false);
+
+  // Step 4: Dashboard entrance animation
+  setTimeout(()=>runDashboardEntrance(), 200);
+
+  // Step 5: Start polling
+  startPolling();
 });
 
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
@@ -2217,7 +2283,7 @@ function renderGroupByStatus(elId){const el=document.getElementById(elId);if(!el
 function renderGroupFullTable(tbodyId){
   const el=document.getElementById(tbodyId);if(!el)return;
   const sorted=buildGroupData();const totalAll=db.support.length||1;
-  if(!sorted.length){el.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--txt4);padding:18px;">ยังไม่มีข้อมูล</td></tr>`;return;}
+  if(!sorted.length){el.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--txt4);padding:18px;">ยังไม่มีข้อมูล</td></tr>`;return;}
   el.innerHTML=sorted.map(([n,d],i)=>{
     const t=d.total||1;
     const rp=d.RP||0,vf=d.VF||0,rec=d.RECORDS||0;
@@ -2421,15 +2487,12 @@ function refreshSupport(){
 
   // Render rows
   if(!filtered.length){
-    tb.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div><div style="font-size:.72rem;margin-top:6px;">กด <b>➕ Add New Record</b> เพื่อเพิ่มข้อมูล</div></td></tr>`;
+    tb.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div><div style="font-size:.72rem;margin-top:6px;">กด <b>➕ Add New Record</b> เพื่อเพิ่มข้อมูล</div></td></tr>`;
     renderGroupBars('support-group-bars',12);renderGroupByStatus('support-group-by-status');renderGroupFullTable('group-full-tbody');buildDoughnut(rp,vf,rec,'supportStatusChart');buildSupportTrend();buildSupportOkNg();buildSupportGroupChart();buildSupportMixChart();return;
   }
   tb.innerHTML=[...filtered].reverse().map((s)=>{
     const realIdx=db.support.indexOf(s);
     const bc=s.report==='RP'?'badge-rp':s.report==='VF'?'badge-vf':'badge-rec';
-    const imgCell=s.image
-      ?`<img src="${s.image}" class="sup-img-thumb" title="คลิกเพื่อดูรูป" onclick="window.open('${s.image}')">`
-      :`<div class="sup-img-none" onclick="openImgEdit(${realIdx})">📷<span>เพิ่มรูป</span></div>`;
     const okCell=s.ok!==undefined&&s.ok!==''?`<span class="ok-chip">✓ ${s.ok}</span>`:'<span style="color:var(--txt4);">—</span>';
     const ngCell=s.ng!==undefined&&s.ng!==''?`<span class="ng-chip">✗ ${s.ng}</span>`:'<span style="color:var(--txt4);">—</span>';
     return`<tr>
@@ -2441,7 +2504,6 @@ function refreshSupport(){
       <td style="text-align:center;">${okCell}</td>
       <td style="text-align:center;">${ngCell}</td>
       <td><span class="badge ${bc}">${s.report}</span></td>
-      <td style="text-align:center;overflow:visible;">${imgCell}</td>
       <td style="text-align:center;white-space:nowrap;">
         <button class="btn-detail" onclick="openRecDetail(${realIdx})" title="ดูรายละเอียด">🔍 ดู</button>
         <button class="btn-edit" onclick="openEditSupport(${realIdx})" title="แก้ไข" style="margin-left:3px;">✏️</button>
@@ -2451,39 +2513,9 @@ function refreshSupport(){
   }).join('');
   renderGroupBars('support-group-bars',12);renderGroupByStatus('support-group-by-status');renderGroupFullTable('group-full-tbody');buildDoughnut(rp,vf,rec,'supportStatusChart');buildSupportTrend();buildSupportOkNg();buildSupportGroupChart();buildSupportMixChart();
 }
-/* Persistent hidden file input for quick image upload — fixes >4 record limit */
-(function(){
-  const inp=document.createElement('input');
-  inp.type='file';inp.accept='image/*';
-  inp.id='_imgEditInput';
-  inp.style.cssText='position:fixed;top:-999px;left:-999px;opacity:0;pointer-events:none;';
-  document.body.appendChild(inp);
-  window._imgEditInput=inp;
-})();
 
-function openImgEdit(idx){
-  const inp=window._imgEditInput;
-  // Clone and re-insert to reset value (allows re-selecting same file)
-  const fresh=inp.cloneNode();
-  fresh.id='_imgEditInput';
-  fresh.style.cssText='position:fixed;top:-999px;left:-999px;opacity:0;pointer-events:none;';
-  if(inp.parentNode)inp.parentNode.replaceChild(fresh,inp);
-  window._imgEditInput=fresh;
-  fresh.onchange=e=>{
-    const file=e.target.files[0];if(!file)return;
-    if(file.size>8*1024*1024){toast('❌ รูปใหญ่เกิน 8MB');return;}
-    const r=new FileReader();
-    r.onload=ev=>{
-      if(!db.support[idx])return;
-      db.support[idx].image=ev.target.result;
-      save();
-      toast('📷 บันทึกรูปแล้ว');
-      refreshSupport();
-    };
-    r.readAsDataURL(file);
-  };
-  fresh.click();
-}
+
+
 function buildSupportTrend(){
   const ctx=document.getElementById('supportTrendChart');if(!ctx)return;
   if(supTrendChart)supTrendChart.destroy();
@@ -2612,23 +2644,10 @@ function openAddSupModal(){
   // reset form
   ['supProblem','supPart','supLot','supOk','supNg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const sd=document.getElementById('supDate');if(sd)sd.value=new Date().toISOString().split('T')[0];
-  const si=document.getElementById('supImageInput');if(si)si.value='';
-  _pendingSupImage=null;
-  document.getElementById('supImgPreviewWrap').innerHTML=`<div style="font-size:1.6rem;margin-bottom:6px;">📷</div><div style="font-size:.78rem;color:var(--txt3);font-weight:500;">คลิกเพื่อแนบรูปภาพ (ไม่บังคับ)</div><div style="font-size:.68rem;color:var(--txt4);margin-top:2px;">PNG, JPG, WEBP — Max 4MB</div>`;
 }
 function closeAddSupModal(){document.getElementById('addSupModal').classList.remove('open');}
 
-let _pendingSupImage=null;
-function previewSupImage(e){
-  const file=e.target.files[0];if(!file)return;
-  if(file.size>4*1024*1024){toast('❌ รูปใหญ่เกิน 4MB');return;}
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    _pendingSupImage=ev.target.result;
-    document.getElementById('supImgPreviewWrap').innerHTML=`<img src="${ev.target.result}" class="img-preview"><br><button class="img-remove-btn" onclick="event.stopPropagation();_pendingSupImage=null;document.getElementById('supImageInput').value='';document.getElementById('supImgPreviewWrap').innerHTML='<div style=\\'font-size:1.6rem;margin-bottom:6px;\\'>📷</div><div style=\\'font-size:.78rem;color:var(--txt3);\\'> คลิกเพื่อแนบรูปภาพอีกครั้ง</div>';">✕ ลบรูป</button>`;
-  };
-  reader.readAsDataURL(file);
-}
+
 
 function addSupport(){
   const prob=document.getElementById('supProblem').value,
@@ -2647,7 +2666,6 @@ function addSupport(){
     id:Date.now().toString(),problem:prob,action:act,part,report:rep,lot,
     ok:ok!==''?parseInt(ok):'',ng:ng!==''?parseInt(ng):'',
     datetime:ts,fullTimestamp:ts,month,
-    image:_pendingSupImage||null,
     _user:currentUser
   });
   save();toast('🛠️ บันทึก Support แล้ว');
@@ -2667,45 +2685,7 @@ function openEditSupport(i){
   document.getElementById('editOk').value=s.ok!==undefined&&s.ok!==''?s.ok:'';
   document.getElementById('editNg').value=s.ng!==undefined&&s.ng!==''?s.ng:'';
   document.getElementById('editReport').value=s.report||'VF';
-  window._pendingEditImage=undefined;
-  const prev=document.getElementById('editImgPreview');
-  const zone=document.getElementById('editImgZone');
-  if(s.image){
-    prev.innerHTML=`<img src="${s.image}" style="max-height:100px;max-width:100%;border-radius:8px;object-fit:contain;display:block;margin:0 auto;"><div style="display:flex;gap:6px;margin-top:8px;justify-content:center;flex-wrap:wrap;"><button type="button" onclick="event.stopPropagation();triggerEditImagePick()" style="background:var(--grad);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;">🔄 เปลี่ยนรูป</button><button type="button" onclick="event.stopPropagation();removeEditImage()" style="background:var(--red-l);border:1px solid #fecaca;color:var(--red);border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;">🗑 ลบรูป</button></div>`;
-    zone.style.borderColor='var(--b400)';zone.style.background='var(--b50)';
-  } else {
-    prev.innerHTML=`<div style="font-size:1.8rem;">📷</div><div style="font-size:.75rem;color:var(--txt3);font-weight:500;">คลิกเพื่อเลือกรูปภาพ</div><div style="font-size:.65rem;color:var(--txt4);">PNG, JPG, WEBP — Max 8MB</div>`;
-    zone.style.borderColor='var(--b200)';zone.style.background='var(--bg)';
-  }
   document.getElementById('editModal').style.display='flex';
-}
-function triggerEditImagePick(){
-  const old=document.getElementById('editImageInput');
-  const fresh=old.cloneNode();fresh.id='editImageInput';fresh.accept='image/*';fresh.style.display='none';
-  fresh.onchange=e=>previewEditImage(e);
-  old.parentNode.replaceChild(fresh,old);
-  fresh.click();
-}
-function previewEditImage(e){
-  const file=e.target.files[0];if(!file)return;
-  if(file.size>8*1024*1024){toast('❌ รูปใหญ่เกิน 8MB');return;}
-  const r=new FileReader();
-  r.onload=ev=>{
-    window._pendingEditImage=ev.target.result;
-    const prev=document.getElementById('editImgPreview');
-    const zone=document.getElementById('editImgZone');
-    prev.innerHTML=`<img src="${ev.target.result}" style="max-height:100px;max-width:100%;border-radius:8px;object-fit:contain;display:block;margin:0 auto;"><div style="display:flex;gap:6px;margin-top:8px;justify-content:center;flex-wrap:wrap;"><button type="button" onclick="event.stopPropagation();triggerEditImagePick()" style="background:var(--grad);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;">🔄 เปลี่ยนรูป</button><button type="button" onclick="event.stopPropagation();removeEditImage()" style="background:var(--red-l);border:1px solid #fecaca;color:var(--red);border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;">🗑 ลบรูป</button></div>`;
-    zone.style.borderColor='var(--b400)';zone.style.background='var(--b50)';
-    toast('📷 เลือกรูปแล้ว — กดบันทึกเพื่อยืนยัน');
-  };
-  r.readAsDataURL(file);
-}
-function removeEditImage(){
-  window._pendingEditImage=null;
-  const prev=document.getElementById('editImgPreview');
-  const zone=document.getElementById('editImgZone');
-  prev.innerHTML=`<div style="font-size:1.8rem;color:var(--red);">🗑</div><div style="font-size:.75rem;color:var(--red);font-weight:500;">รูปจะถูกลบเมื่อกด บันทึก</div>`;
-  zone.style.borderColor='#fca5a5';zone.style.background='#fff5f5';
 }
 function saveEditSupport(){
   const i=parseInt(document.getElementById('editIdx').value);
@@ -2724,9 +2704,6 @@ function saveEditSupport(){
   db.support[i].report=document.getElementById('editReport').value;
   db.support[i].month=month;db.support[i]._rawDate=di;
   db.support[i]._editedAt=fullTimestamp();db.support[i]._user=currentUser;
-  if(window._pendingEditImage===null)db.support[i].image=null;
-  else if(typeof window._pendingEditImage==='string')db.support[i].image=window._pendingEditImage;
-  window._pendingEditImage=undefined;
   save();toast('✅ อัปเดตข้อมูลแล้ว');
   document.getElementById('editModal').style.display='none';
   refreshSupport();
@@ -2821,16 +2798,6 @@ function openRecDetail(idx){
   const bcBg=s.report==='RP'?'#fef2f2':s.report==='VF'?'#eff6ff':'#fffbeb';
   const el=document.getElementById('recDetailBody');
   el.innerHTML=`
-    <div class="rec-img-hero">
-      ${s.image
-        ?`<img src="${s.image}" onclick="window.open('${s.image}')" style="cursor:zoom-in;" title="คลิกเพื่อดูรูปเต็ม">`
-        :`<div class="rec-img-empty">
-            <div class="rec-img-empty-icon">📷</div>
-            <div style="font-size:.75rem;font-weight:600;color:var(--txt4);">ยังไม่มีรูปภาพ</div>
-            <button class="rec-img-upload-btn" onclick="openImgEdit(${idx});closeRecDetail()">📁 เพิ่มรูปภาพ</button>
-          </div>`
-      }
-    </div>
     <div class="rec-okng-row">
       <div class="rec-ok-big">
         <div class="rec-big-num" style="color:#059669;">${s.ok??'—'}</div>
@@ -2841,7 +2808,7 @@ function openRecDetail(idx){
         <div class="rec-big-lbl" style="color:#dc2626;">✗ NG ของเสีย</div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;background:${bcBg};border:1px solid ${bc}33;border-radius:10px;padding:10px 14px;">
+    <div style="display:flex;align-items:center;gap:10px;background:${bcBg};border:1px solid ${bc}33;border-radius:10px;padding:10px 14px;margin-bottom:4px;">
       <div style="width:10px;height:10px;border-radius:50%;background:${bc};flex-shrink:0;box-shadow:0 0 0 3px ${bc}22;"></div>
       <div><div style="font-size:.51rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt4);">Report Type</div>
       <div style="font-size:.9rem;font-weight:800;color:${bc};">${s.report}</div></div>
@@ -2873,7 +2840,6 @@ function openRecDetail(idx){
       </div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:12px;">
-      ${s.image?`<button class="rec-img-upload-btn" onclick="openImgEdit(${idx});closeRecDetail()" style="background:var(--b50);border:1px solid var(--b200);color:var(--primary);border-radius:var(--r);padding:7px 13px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;">🔄 เปลี่ยนรูป</button>`:''}
       <button onclick="openEditSupport(${idx});closeRecDetail()" style="background:var(--b50);border:1px solid var(--b200);color:var(--primary);border-radius:var(--r);padding:7px 13px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;">✏️ แก้ไข</button>
       <button onclick="delSupportConfirm(${idx});closeRecDetail()" style="background:var(--red-l);border:1px solid #fecaca;color:var(--red);border-radius:var(--r);padding:7px 13px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;">🗑 ลบ</button>
     </div>`;
