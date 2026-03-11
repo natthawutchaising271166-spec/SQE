@@ -658,8 +658,66 @@ tbody tr:last-child td{border-bottom:none}
 .edit-btn-cancel{background:var(--bg2);border:1px solid var(--border);padding:9px 18px;border-radius:var(--r-xs);font-family:'Plus Jakarta Sans','Prompt',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;color:var(--txt3);}
 .edit-btn-save{background:var(--grad);border:none;padding:9px 22px;border-radius:var(--r-xs);color:#fff;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans','Prompt',sans-serif;font-size:.76rem;box-shadow:0 4px 13px var(--primary-glow);}
 
-/* Support table */
-.sup-tbl-wrap{overflow:hidden;border-radius:var(--r);border:1px solid var(--border);margin-top:0;}
+/* ────────────────────────────────────
+   AI PERFORMANCE BANNER (vivid)
+──────────────────────────────────── */
+.ai-perf-banner{
+  background:linear-gradient(135deg,#0c1445 0%,#0f1e5a 40%,#1a0a3d 80%,#0c1445 100%);
+  border-radius:var(--r-xl);padding:20px 22px;
+  position:relative;overflow:hidden;
+  border:1px solid rgba(56,189,248,.2);
+  box-shadow:0 8px 32px rgba(56,189,248,.12),0 0 0 1px rgba(56,189,248,.06),0 20px 60px rgba(15,23,42,.4);
+}
+.aip-orb{position:absolute;border-radius:50%;pointer-events:none;}
+.aip-orb1{width:200px;height:200px;top:-80px;right:-60px;background:radial-gradient(circle,rgba(14,165,233,.28) 0%,transparent 65%);animation:orb-float1 6s ease-in-out infinite;}
+.aip-orb2{width:140px;height:140px;bottom:-50px;left:-40px;background:radial-gradient(circle,rgba(124,58,237,.22) 0%,transparent 65%);animation:orb-float2 8s ease-in-out infinite;}
+.aip-orb3{width:80px;height:80px;top:30px;left:40%;background:radial-gradient(circle,rgba(56,189,248,.15) 0%,transparent 65%);animation:orb-float1 5s ease-in-out infinite .8s;}
+@keyframes orb-float1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(10px,-10px) scale(1.1)}}
+@keyframes orb-float2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-8px,8px) scale(1.08)}}
+@keyframes aip-spin{to{transform:rotate(360deg)}}
+
+/* ────────────────────────────────────
+   SYSTEM INSIGHT PANEL
+──────────────────────────────────── */
+.insight-panel{
+  background:var(--navy);border-radius:var(--r-xl);padding:18px 20px;
+  position:relative;overflow:hidden;border:1px solid rgba(56,189,248,.15);
+  box-shadow:0 8px 32px rgba(15,23,42,.22);min-height:200px;
+}
+.insight-panel::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(37,99,235,.2) 0%,transparent 65%);pointer-events:none;}
+.tip-cards{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.tip-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:9px 11px;display:flex;align-items:flex-start;gap:9px;transition:all .2s;}
+.tip-card:hover{background:rgba(255,255,255,.07);border-color:rgba(56,189,248,.2);transform:translateX(3px);}
+.tip-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.tip-txt{font-size:.73rem;color:rgba(255,255,255,.5);line-height:1.65;font-weight:400;}
+.tip-txt b{color:rgba(165,243,252,.75);font-weight:600;}
+/* Worker SVG mascot */
+.worker-svg{display:block;margin:0 auto 6px;}
+
+/* ────────────────────────────────────
+   DATE FILTER BAR
+──────────────────────────────────── */
+.date-filter-bar{
+  background:#fff;border-radius:var(--r-lg);padding:12px 16px;
+  border:1px solid var(--border);box-shadow:var(--sh-sm);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.df-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--txt4);white-space:nowrap;}
+.df-sep{font-size:.7rem;color:var(--txt4);font-weight:600;}
+.df-preset{display:flex;gap:5px;flex-wrap:wrap;}
+.df-btn{font-size:.62rem;font-weight:700;padding:4px 10px;border-radius:99px;border:1px solid var(--border);cursor:pointer;font-family:'Plus Jakarta Sans','Prompt',sans-serif;background:var(--bg2);color:var(--txt3);transition:all .2s;white-space:nowrap;}
+.df-btn:hover{background:var(--blue-l);color:var(--primary);border-color:var(--b300);}
+.df-btn.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 2px 8px var(--primary-glow);}
+.df-divider{width:1px;height:22px;background:var(--border);flex-shrink:0;}
+.df-result{font-size:.63rem;color:var(--txt4);white-space:nowrap;margin-left:auto;}
+.date-filter-bar input[type="date"],.date-filter-bar input[type="month"],.date-filter-bar select{
+  font-size:.7rem;padding:5px 9px;border-radius:9px;border:1px solid var(--border);
+  background:var(--bg2);color:var(--txt);font-family:'Plus Jakarta Sans','Prompt',sans-serif;
+  outline:none;transition:all .2s;cursor:pointer;
+}
+.date-filter-bar input[type="date"]:focus,.date-filter-bar input[type="month"]:focus,.date-filter-bar select:focus{
+  border-color:var(--b400);background:#fff;box-shadow:0 0 0 3px var(--primary-soft);
+}{overflow:hidden;border-radius:var(--r);border:1px solid var(--border);margin-top:0;}
 .sup-tbl-scroll{max-height:340px;overflow-y:auto;overflow-x:auto;}
 .sup-tbl{width:100%;border-collapse:collapse;min-width:900px;}
 .sup-tbl thead th{padding:8px 12px;text-align:left;background:#f0f6ff;font-size:.59rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.09em;border-bottom:2px solid var(--b200);position:sticky;top:0;z-index:5;white-space:nowrap}
@@ -943,6 +1001,22 @@ tbody tr:last-child td{border-bottom:none}
         <h1 class="main-title"><span class="title-grad">Performance Overview</span></h1>
       </div>
     </div>
+    <!-- Date Filter Bar -->
+    <div class="date-filter-bar">
+      <span class="df-label">📅 ช่วงเวลา</span>
+      <div class="df-preset">
+        <button class="df-btn" onclick="setDateFilter('master-dash','today',this)">วันนี้</button>
+        <button class="df-btn" onclick="setDateFilter('master-dash','week',this)">7 วัน</button>
+        <button class="df-btn active" onclick="setDateFilter('master-dash','month',this)">เดือนนี้</button>
+        <button class="df-btn" onclick="setDateFilter('master-dash','quarter',this)">ไตรมาส</button>
+        <button class="df-btn" onclick="setDateFilter('master-dash','year',this)">ทั้งปี 2026</button>
+      </div>
+      <div class="df-divider"></div>
+      <input type="date" id="md-from" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('master-dash')">
+      <span class="df-sep">—</span>
+      <input type="date" id="md-to" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('master-dash')">
+      <span class="df-result" id="md-filter-result">สะสมทั้งปี</span>
+    </div>
     <div class="kpi-strip">
       <div class="kpi" style="--arc-clr:rgba(37,99,235,.08)"><div class="kpi-top" style="background:var(--b600);"></div><div class="kpi-icon" style="background:var(--blue-l);">🛠️</div><div class="kpi-lbl">Total Support</div><div class="kpi-val" id="dash-support-count" style="color:var(--b600);">0</div><div class="kpi-hint" id="kpi-rp-vf">RP: 0 · VF: 0</div></div>
       <div class="kpi" style="--arc-clr:rgba(245,158,11,.08)"><div class="kpi-top" style="background:linear-gradient(90deg,#f59e0b,#d97706);"></div><div class="kpi-icon" style="background:var(--amber-l);">🧹</div><div class="kpi-lbl">5S Points</div><div class="kpi-val" id="dash-5s-count" style="color:#d97706;">0</div><div class="kpi-hint" id="kpi-5s-area">Hot area: —</div></div>
@@ -965,18 +1039,48 @@ tbody tr:last-child td{border-bottom:none}
     </div>
     <div class="g2r">
       <div class="card"><div class="card-hd">📊 Monthly Activity Trend</div><div style="height:var(--chart-master-h);"><canvas id="masterWorkChart"></canvas></div></div>
-      <div class="ai-banner">
+      <div class="ai-perf-banner">
+        <!-- Animated orb background -->
+        <div class="aip-orb aip-orb1"></div>
+        <div class="aip-orb aip-orb2"></div>
+        <div class="aip-orb aip-orb3"></div>
         <div class="shimmer"></div>
-        <div style="font-size:.58rem;font-weight:700;letter-spacing:.16em;color:var(--b300);text-transform:uppercase;margin-bottom:12px;">🤖 AI Performance Index</div>
-        <div style="text-align:center;padding:6px 0 8px;">
-          <div class="hero-num" id="dash-avg-skill2">0%</div>
-          <div style="font-size:.66rem;color:rgba(255,255,255,.3);margin-top:5px;font-weight:300;">Competency Score</div>
+        <!-- Header row -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;z-index:1;">
+          <div>
+            <div style="font-size:.52rem;font-weight:800;letter-spacing:.22em;color:rgba(165,243,252,.7);text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:1.5px;background:rgba(165,243,252,.6);border-radius:99px;"></span>AI ENGINE</div>
+            <div style="font-size:.88rem;font-weight:800;color:#fff;letter-spacing:.04em;">Performance Index</div>
+          </div>
+          <div style="position:relative;">
+            <div style="width:72px;height:72px;border-radius:50%;background:conic-gradient(from 0deg,rgba(165,243,252,.15) 0%,rgba(56,189,248,.4) 30%,rgba(14,165,233,.7) 60%,rgba(2,132,199,.9) 80%,rgba(165,243,252,.15) 100%);display:flex;align-items:center;justify-content:center;animation:aip-spin 8s linear infinite;">
+              <div style="width:56px;height:56px;border-radius:50%;background:#0c1445;display:flex;align-items:center;justify-content:center;">
+                <div class="hero-num" id="dash-avg-skill2" style="font-size:1.35rem;-webkit-text-fill-color:#38bdf8;background:none;color:#38bdf8;">0%</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div style="margin:10px 0 5px;"><div class="prog-track"><div id="dash-skill-bar" class="prog-fill"></div></div></div>
-        <p id="dash-insight" style="font-size:.74rem;color:rgba(255,255,255,.45);line-height:1.75;margin-top:11px;font-weight:300;"></p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px;">
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(220,38,38,.25);border-radius:var(--r);padding:10px;text-align:center;"><div id="dash-rp-val" style="font-size:1.5rem;font-weight:500;color:#f87171;font-family:'DM Mono',monospace;">0</div><div style="font-size:.58rem;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;">RP Cases</div></div>
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(59,130,246,.25);border-radius:var(--r);padding:10px;text-align:center;"><div id="dash-vf-val" style="font-size:1.5rem;font-weight:500;color:#60a5fa;font-family:'DM Mono',monospace;">0</div><div style="font-size:.58rem;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;">VF Cases</div></div>
+        <!-- Score label -->
+        <div style="position:relative;z-index:1;font-size:.6rem;color:rgba(165,243,252,.5);font-weight:600;letter-spacing:.1em;text-align:center;margin-bottom:8px;">COMPETENCY SCORE</div>
+        <!-- Progress bar -->
+        <div style="position:relative;z-index:1;margin-bottom:14px;">
+          <div style="height:8px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;position:relative;">
+            <div id="dash-skill-bar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#38bdf8,#0ea5e9,#7c3aed);width:0%;transition:width 1.5s cubic-bezier(.22,.68,0,1.2);position:relative;">
+              <div style="position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:16px;height:16px;border-radius:50%;background:#38bdf8;box-shadow:0 0 12px #38bdf8,0 0 24px rgba(56,189,248,.5);"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Insight text -->
+        <p id="dash-insight" style="position:relative;z-index:1;font-size:.73rem;color:rgba(165,243,252,.55);line-height:1.8;font-weight:400;margin-bottom:14px;min-height:40px;"></p>
+        <!-- Stats row -->
+        <div style="position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--r);padding:10px 8px;text-align:center;backdrop-filter:blur(4px);">
+            <div id="dash-rp-val" style="font-size:1.5rem;font-weight:500;color:#fca5a5;font-family:'DM Mono',monospace;text-shadow:0 0 14px rgba(252,165,165,.4);">0</div>
+            <div style="font-size:.55rem;color:rgba(252,165,165,.5);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;">RP Cases</div>
+          </div>
+          <div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:var(--r);padding:10px 8px;text-align:center;backdrop-filter:blur(4px);">
+            <div id="dash-vf-val" style="font-size:1.5rem;font-weight:500;color:#7dd3fc;font-family:'DM Mono',monospace;text-shadow:0 0 14px rgba(125,211,252,.4);">0</div>
+            <div style="font-size:.55rem;color:rgba(125,211,252,.5);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;">VF Cases</div>
+          </div>
         </div>
       </div>
     </div>
@@ -999,17 +1103,32 @@ tbody tr:last-child td{border-bottom:none}
   <div id="daily" class="page">
     <div class="ph">
       <div><div class="eyebrow">Overview · 2026</div><h1 class="main-title">Executive <span class="title-grad">Dashboard</span></h1></div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <select id="monthFilter" onchange="refreshDashboard()">
-          <option value="all">📊 สะสมทั้งปี 2026</option>
-          <option value="0">มกราคม</option><option value="1">กุมภาพันธ์</option>
-          <option value="2">มีนาคม</option><option value="3">เมษายน</option>
-          <option value="4">พฤษภาคม</option><option value="5">มิถุนายน</option>
-          <option value="6">กรกฎาคม</option><option value="7">สิงหาคม</option>
-          <option value="8">กันยายน</option><option value="9">ตุลาคม</option>
-          <option value="10">พฤศจิกายน</option><option value="11">ธันวาคม</option>
-        </select>
+    </div>
+    <!-- Date Filter Bar -->
+    <div class="date-filter-bar">
+      <span class="df-label">📅 กรองข้อมูล</span>
+      <div class="df-preset">
+        <button class="df-btn" onclick="setDateFilter('daily','today',this)">วันนี้</button>
+        <button class="df-btn" onclick="setDateFilter('daily','week',this)">7 วัน</button>
+        <button class="df-btn active" onclick="setDateFilter('daily','month',this)">เดือนนี้</button>
+        <button class="df-btn" onclick="setDateFilter('daily','quarter',this)">ไตรมาส</button>
+        <button class="df-btn" onclick="setDateFilter('daily','year',this)">ทั้งปี</button>
       </div>
+      <div class="df-divider"></div>
+      <select id="monthFilter" onchange="onMonthFilterChange()" style="font-size:.72rem;padding:4px 8px;border-radius:8px;">
+        <option value="all">📊 ทั้งปี</option>
+        <option value="0">ม.ค.</option><option value="1">ก.พ.</option>
+        <option value="2">มี.ค.</option><option value="3">เม.ย.</option>
+        <option value="4">พ.ค.</option><option value="5">มิ.ย.</option>
+        <option value="6">ก.ค.</option><option value="7">ส.ค.</option>
+        <option value="8">ก.ย.</option><option value="9">ต.ค.</option>
+        <option value="10">พ.ย.</option><option value="11">ธ.ค.</option>
+      </select>
+      <div class="df-divider"></div>
+      <input type="date" id="daily-from" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('daily')">
+      <span class="df-sep">—</span>
+      <input type="date" id="daily-to" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('daily')">
+      <span class="df-result" id="daily-filter-result">เดือนนี้</span>
     </div>
     <div class="ai-banner">
       <div class="shimmer"></div>
@@ -1043,10 +1162,74 @@ tbody tr:last-child td{border-bottom:none}
           </table>
         </div></div>
       </div>
-      <div class="ai-banner" style="min-height:140px;">
+      <div class="insight-panel">
         <div class="shimmer"></div>
-        <div style="font-size:.58rem;font-weight:700;letter-spacing:.15em;color:var(--b300);text-transform:uppercase;margin-bottom:10px;">💡 System Insight</div>
-        <p id="dailyTip" style="font-size:.84rem;line-height:1.9;color:rgba(255,255,255,.48);font-weight:300;">พร้อมเริ่มวันใหม่แล้วหรือยัง?</p>
+        <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div>
+            <div style="font-size:.52rem;font-weight:800;letter-spacing:.18em;color:rgba(165,243,252,.55);text-transform:uppercase;margin-bottom:3px;">💡 System Insight</div>
+            <div id="dailyTip" style="font-size:.78rem;font-weight:600;color:rgba(255,255,255,.85);line-height:1.5;max-width:200px;">พร้อมเริ่มวันใหม่แล้วหรือยัง?</div>
+          </div>
+          <!-- Worker mascot SVG -->
+          <svg class="worker-svg" viewBox="0 0 80 90" width="64" height="72" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(255,255,255,.15)"/><stop offset="100%" stop-color="rgba(0,0,0,.08)"/>
+              </linearGradient>
+            </defs>
+            <!-- Shadow -->
+            <ellipse cx="40" cy="88" rx="22" ry="3.5" fill="rgba(0,0,0,.2)"/>
+            <!-- Legs -->
+            <rect x="24" y="67" width="14" height="16" rx="6" fill="#1e40af"/>
+            <rect x="42" y="67" width="14" height="16" rx="6" fill="#1e40af"/>
+            <!-- Shoes -->
+            <ellipse cx="31" cy="83" rx="9" ry="5" fill="#172554"/>
+            <ellipse cx="49" cy="83" rx="9" ry="5" fill="#172554"/>
+            <!-- Body / uniform -->
+            <rect x="18" y="38" width="44" height="32" rx="12" fill="#2563eb"/>
+            <rect x="18" y="38" width="44" height="32" rx="12" fill="url(#wg)"/>
+            <!-- Name badge -->
+            <rect x="30" y="48" width="20" height="13" rx="4" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+            <rect x="33" y="52" width="14" height="2" rx="1" fill="rgba(255,255,255,.6)"/>
+            <rect x="34" y="55.5" width="10" height="1.5" rx="0.75" fill="rgba(255,255,255,.35)"/>
+            <!-- Arms -->
+            <rect x="2" y="42" width="18" height="10" rx="5" fill="#1d4ed8"/>
+            <!-- Clipboard in hand -->
+            <rect x="-2" y="40" width="12" height="16" rx="3" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+            <rect x="0" y="44" width="8" height="1.5" rx=".75" fill="#94a3b8"/>
+            <rect x="0" y="47" width="8" height="1.5" rx=".75" fill="#94a3b8"/>
+            <rect x="0" y="50" width="5" height="1.5" rx=".75" fill="#2563eb"/>
+            <rect x="60" y="42" width="18" height="10" rx="5" fill="#1d4ed8"/>
+            <!-- Neck -->
+            <rect x="33" y="28" width="14" height="12" rx="7" fill="#1e3a8a"/>
+            <!-- Head -->
+            <rect x="22" y="8" width="36" height="28" rx="12" fill="#fbbf24"/>
+            <!-- Hair / helmet -->
+            <rect x="20" y="6" width="40" height="14" rx="8" fill="#f59e0b"/>
+            <rect x="18" y="12" width="44" height="7" rx="3.5" fill="#f59e0b"/>
+            <!-- Helmet shine -->
+            <rect x="26" y="8" width="14" height="4" rx="2" fill="rgba(255,255,255,.35)"/>
+            <!-- Eyes -->
+            <circle cx="34" cy="23" r="4.5" fill="white"/>
+            <circle cx="46" cy="23" r="4.5" fill="white"/>
+            <circle cx="35" cy="23" r="2.5" fill="#1e3a8a"/>
+            <circle cx="47" cy="23" r="2.5" fill="#1e3a8a"/>
+            <circle cx="36" cy="21.5" r="1" fill="white"/>
+            <circle cx="48" cy="21.5" r="1" fill="white"/>
+            <!-- Smile -->
+            <path d="M 33 30 Q 40 35 47 30" stroke="rgba(255,255,255,.7)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- Ear muffs -->
+            <circle cx="22" cy="22" r="4" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>
+            <circle cx="58" cy="22" r="4" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>
+            <!-- Thumbs up sparkle -->
+            <text x="60" y="36" font-size="11" opacity=".9">👍</text>
+          </svg>
+        </div>
+        <!-- Tip cards -->
+        <div class="tip-cards" style="position:relative;z-index:1;">
+          <div class="tip-card"><div class="tip-icon">📋</div><div class="tip-txt"><b>บันทึกสม่ำเสมอ</b> — ข้อมูลที่บันทึกทุกวันช่วยให้ AI วิเคราะห์แนวโน้มได้แม่นยำขึ้น</div></div>
+          <div class="tip-card"><div class="tip-icon">🎯</div><div class="tip-txt"><b>เป้าหมาย 2026</b> — Attendance &gt;95% · RP/VF &lt;5 ครั้ง/เดือน · Skill avg &gt;75%</div></div>
+          <div class="tip-card"><div class="tip-icon">⚡</div><div class="tip-txt" id="dynamicTip">กำลังโหลดข้อมูลอัจฉริยะ...</div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1054,6 +1237,22 @@ tbody tr:last-child td{border-bottom:none}
   <!-- ── SUPPORT ── -->
   <div id="support" class="page">
     <div><div class="eyebrow">Production Floor</div><h1 class="main-title">Support <span class="title-grad">Production Line</span></h1></div>
+    <!-- Date Filter Bar -->
+    <div class="date-filter-bar">
+      <span class="df-label">📅 กรองวันที่</span>
+      <div class="df-preset">
+        <button class="df-btn" onclick="setDateFilter('support','today',this)">วันนี้</button>
+        <button class="df-btn" onclick="setDateFilter('support','week',this)">7 วัน</button>
+        <button class="df-btn active" onclick="setDateFilter('support','month',this)">เดือนนี้</button>
+        <button class="df-btn" onclick="setDateFilter('support','quarter',this)">ไตรมาส</button>
+        <button class="df-btn" onclick="setDateFilter('support','year',this)">ทั้งปี</button>
+      </div>
+      <div class="df-divider"></div>
+      <input type="date" id="sup-from" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('support')">
+      <span class="df-sep">—</span>
+      <input type="date" id="sup-to" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('support')">
+      <span class="df-result" id="sup-filter-result">เดือนนี้</span>
+    </div>
     <div class="kpi-strip">
       <div class="kpi" style="background:var(--navy);border-color:rgba(255,255,255,.05);--arc-clr:rgba(255,255,255,.04)"><div class="kpi-top" style="background:linear-gradient(90deg,var(--b500),var(--violet));"></div><div class="kpi-icon" style="background:rgba(255,255,255,.07);">🛠️</div><div class="kpi-lbl" style="color:rgba(255,255,255,.38);">Total Support</div><div class="kpi-val" id="sum-total" style="color:#fff;">0</div></div>
       <div class="kpi" style="--arc-clr:rgba(220,38,38,.08)"><div class="kpi-top" style="background:var(--red);"></div><div class="kpi-icon" style="background:var(--red-l);">🔴</div><div class="kpi-lbl">RP Cases</div><div class="kpi-val" id="sum-rp" style="color:var(--red);">0</div></div>
@@ -1103,9 +1302,24 @@ tbody tr:last-child td{border-bottom:none}
   <div id="5s" class="page">
     <div class="ph">
       <div><div class="eyebrow">Quality</div><h1 class="main-title">5S Excellence <span class="title-grad">System</span></h1></div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <input type="month" id="filter5sMonth" value="2026-03" onchange="refresh5S()">
+    </div>
+    <!-- Date Filter Bar -->
+    <div class="date-filter-bar">
+      <span class="df-label">📅 กรองข้อมูล</span>
+      <div class="df-preset">
+        <button class="df-btn" onclick="setDateFilter('5s','today',this)">วันนี้</button>
+        <button class="df-btn" onclick="setDateFilter('5s','week',this)">7 วัน</button>
+        <button class="df-btn active" onclick="setDateFilter('5s','month',this)">เดือนนี้</button>
+        <button class="df-btn" onclick="setDateFilter('5s','quarter',this)">ไตรมาส</button>
+        <button class="df-btn" onclick="setDateFilter('5s','year',this)">ทั้งปี</button>
       </div>
+      <div class="df-divider"></div>
+      <input type="month" id="filter5sMonth" value="2026-03" onchange="refresh5S()" style="font-size:.72rem;padding:4px 8px;border-radius:8px;">
+      <div class="df-divider"></div>
+      <input type="date" id="s5-from" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('5s')">
+      <span class="df-sep">—</span>
+      <input type="date" id="s5-to" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('5s')">
+      <span class="df-result" id="s5-filter-result">เดือนนี้</span>
     </div>
     <div class="kpi-strip">
       <div class="kpi" style="--arc-clr:rgba(245,158,11,.08)"><div class="kpi-top" style="background:linear-gradient(90deg,#f59e0b,#d97706);"></div><div class="kpi-icon" style="background:var(--amber-l);">📅</div><div class="kpi-lbl">สะสมทั้งปี</div><div class="kpi-val" id="s5-total-year" style="color:#d97706;">0</div></div>
@@ -1138,6 +1352,21 @@ tbody tr:last-child td{border-bottom:none}
         <div id="skillLevelBadge" class="level-badge level-basic">—</div>
         <button style="background:var(--red-l);border:1px solid #fecaca;padding:9px 14px;border-radius:var(--r);color:var(--red);font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans','Prompt';font-size:.75rem;transition:all .28s;" onclick="clearAllSkills()">🗑 ล้างทั้งหมด</button>
       </div>
+    </div>
+    <!-- Date Filter Bar -->
+    <div class="date-filter-bar">
+      <span class="df-label">📅 ดูพัฒนาการ</span>
+      <div class="df-preset">
+        <button class="df-btn" onclick="setDateFilter('multi','month',this)">เดือนนี้</button>
+        <button class="df-btn" onclick="setDateFilter('multi','quarter',this)">ไตรมาส</button>
+        <button class="df-btn active" onclick="setDateFilter('multi','year',this)">ทั้งปี</button>
+        <button class="df-btn" onclick="setDateFilter('multi','all',this)">ทั้งหมด</button>
+      </div>
+      <div class="df-divider"></div>
+      <input type="date" id="sk-from" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('multi')">
+      <span class="df-sep">—</span>
+      <input type="date" id="sk-to" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('multi')">
+      <span class="df-result" id="sk-filter-result">ทั้งปี 2026</span>
     </div>
     <div class="skill-kpi-strip">
       <div class="skill-kpi" style="border-top:3px solid var(--b600);"><div class="skill-kpi-val" id="sk-avg" style="color:var(--b600);">0%</div><div class="skill-kpi-lbl">Average Score</div></div>
@@ -1207,6 +1436,22 @@ tbody tr:last-child td{border-bottom:none}
         <div class="sp-live-badge"><span class="sp-live-dot"></span>LIVE</div>
         <div id="sp-total-badge" style="background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);padding:6px 16px;border-radius:12px;font-size:.8rem;font-weight:800;color:var(--b300);">0 Projects</div>
       </div>
+    </div>
+    <!-- Date Filter Bar -->
+    <div class="date-filter-bar">
+      <span class="df-label">📅 กรองโครงการ</span>
+      <div class="df-preset">
+        <button class="df-btn" onclick="setDateFilter('special','today',this)">วันนี้</button>
+        <button class="df-btn" onclick="setDateFilter('special','week',this)">7 วัน</button>
+        <button class="df-btn active" onclick="setDateFilter('special','month',this)">เดือนนี้</button>
+        <button class="df-btn" onclick="setDateFilter('special','quarter',this)">ไตรมาส</button>
+        <button class="df-btn" onclick="setDateFilter('special','year',this)">ทั้งปี</button>
+      </div>
+      <div class="df-divider"></div>
+      <input type="date" id="sp-from" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('special')">
+      <span class="df-sep">—</span>
+      <input type="date" id="sp-to" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('special')">
+      <span class="df-result" id="sp-filter-result">เดือนนี้</span>
     </div>
     <div class="sp-kpi-grid">
       <div class="sp-kpi-card"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--grad);border-radius:var(--r-lg) 0 0 var(--r-lg);"></div><div class="sp-kpi-ico" style="background:var(--blue-l);">⭐</div><div class="sp-kpi-num" id="sp-kpi-total" style="color:var(--b600);">0</div><div class="sp-kpi-lbl">Total Projects</div><div class="sp-kpi-delta neutral" id="sp-kpi-total-delta">All time</div></div>
@@ -1291,6 +1536,110 @@ tbody tr:last-child td{border-bottom:none}
 </div>
 
 <script>
+/* ══════════════════════════════════
+   DATE FILTER SYSTEM
+══════════════════════════════════ */
+// State: per-page filter range
+const pageFilters={
+  'master-dash':{from:null,to:null},
+  'daily':{from:null,to:null},
+  'support':{from:null,to:null},
+  '5s':{from:null,to:null},
+  'multi':{from:null,to:null},
+  'special':{from:null,to:null},
+};
+
+const PAGE_FROM_IDS={'master-dash':'md-from','daily':'daily-from','support':'sup-from','5s':'s5-from','multi':'sk-from','special':'sp-from'};
+const PAGE_TO_IDS={'master-dash':'md-to','daily':'daily-to','support':'sup-to','5s':'s5-to','multi':'sk-to','special':'sp-to'};
+const PAGE_RESULT_IDS={'master-dash':'md-filter-result','daily':'daily-filter-result','support':'sup-filter-result','5s':'s5-filter-result','multi':'sk-filter-result','special':'sp-filter-result'};
+
+function getDateRange(preset){
+  const now=new Date();const y=now.getFullYear();const m=now.getMonth();const d=now.getDate();
+  const fmt=dt=>dt.toISOString().split('T')[0];
+  if(preset==='today'){const t=fmt(now);return{from:t,to:t,label:'วันนี้'};}
+  if(preset==='week'){const f=new Date(now);f.setDate(d-6);return{from:fmt(f),to:fmt(now),label:'7 วันล่าสุด'};}
+  if(preset==='month'){return{from:fmt(new Date(y,m,1)),to:fmt(new Date(y,m+1,0)),label:`เดือน ${now.toLocaleDateString('th-TH',{month:'long'})}`};}
+  if(preset==='quarter'){const qStart=Math.floor(m/3)*3;return{from:fmt(new Date(y,qStart,1)),to:fmt(new Date(y,qStart+3,0)),label:`ไตรมาส Q${Math.floor(m/3)+1}`};}
+  if(preset==='year'){return{from:`${y}-01-01`,to:`${y}-12-31`,label:`ทั้งปี ${y}`};}
+  if(preset==='all'){return{from:null,to:null,label:'ทั้งหมด'};}
+  return{from:null,to:null,label:'ทั้งหมด'};
+}
+
+function setDateFilter(page,preset,btn){
+  // Update button states
+  const bar=btn?.closest('.date-filter-bar');
+  if(bar)bar.querySelectorAll('.df-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const range=getDateRange(preset);
+  pageFilters[page]=range;
+  // Set input values
+  const fEl=document.getElementById(PAGE_FROM_IDS[page]);const tEl=document.getElementById(PAGE_TO_IDS[page]);
+  if(fEl)fEl.value=range.from||'';if(tEl)tEl.value=range.to||'';
+  setText(PAGE_RESULT_IDS[page],range.label);
+  // Refresh page
+  if(page==='master-dash')refreshMasterDashboard();
+  else if(page==='daily')refreshDashboard();
+  else if(page==='support')refreshSupport();
+  else if(page==='5s')refresh5S();
+  else if(page==='multi')refreshSkills();
+  else if(page==='special')refreshSpecial();
+}
+
+function applyCustomFilter(page){
+  const fEl=document.getElementById(PAGE_FROM_IDS[page]);const tEl=document.getElementById(PAGE_TO_IDS[page]);
+  const from=fEl?.value||null,to=tEl?.value||null;
+  pageFilters[page]={from,to};
+  // Clear preset buttons
+  const bar=fEl?.closest('.date-filter-bar');
+  if(bar)bar.querySelectorAll('.df-btn').forEach(b=>b.classList.remove('active'));
+  const label=from&&to?`${from.slice(5)} – ${to.slice(5)}`:from?`จาก ${from.slice(5)}`:'กำหนดเอง';
+  setText(PAGE_RESULT_IDS[page],label);
+  if(page==='master-dash')refreshMasterDashboard();
+  else if(page==='daily')refreshDashboard();
+  else if(page==='support')refreshSupport();
+  else if(page==='5s')refresh5S();
+  else if(page==='special')refreshSpecial();
+}
+
+function filterByDateRange(arr,dateField,page){
+  const f=pageFilters[page];if(!f||(!f.from&&!f.to))return arr;
+  return arr.filter(item=>{
+    const d=item[dateField]||item.date||item.month||'';if(!d)return true;
+    // Handle month format YYYY-MM
+    let itemDate=d;if(d.length===7)itemDate=d+'-01';
+    if(f.from&&itemDate<f.from)return false;
+    if(f.to&&itemDate>f.to+(d.length===7?'-31':''))return false;
+    return true;
+  });
+}
+
+function onMonthFilterChange(){
+  const v=document.getElementById('monthFilter')?.value;
+  const now=new Date();const y=now.getFullYear();
+  if(v==='all'){pageFilters['daily']={from:null,to:null};}
+  else{const m=parseInt(v);const from=`${y}-${String(m+1).padStart(2,'0')}-01`;const to=new Date(y,m+1,0).toISOString().split('T')[0];pageFilters['daily']={from,to};}
+  refreshDashboard();
+}
+
+// Initialize default date filters on load
+(function initFilters(){
+  const now=new Date();const y=now.getFullYear();const m=now.getMonth();
+  const monthFrom=`${y}-${String(m+1).padStart(2,'0')}-01`;
+  const monthTo=new Date(y,m+1,0).toISOString().split('T')[0];
+  ['daily','support','5s','special'].forEach(p=>{ pageFilters[p]={from:monthFrom,to:monthTo,label:'เดือนนี้'}; });
+  pageFilters['master-dash']={from:`${y}-01-01`,to:`${y}-12-31`,label:`ทั้งปี ${y}`};
+  pageFilters['multi']={from:null,to:null,label:'ทั้งหมด'};
+  // Set input values after DOM ready
+  setTimeout(()=>{
+    Object.keys(PAGE_FROM_IDS).forEach(page=>{
+      const f=pageFilters[page];if(!f)return;
+      const fEl=document.getElementById(PAGE_FROM_IDS[page]);const tEl=document.getElementById(PAGE_TO_IDS[page]);
+      if(fEl&&f.from)fEl.value=f.from;if(tEl&&f.to)tEl.value=f.to;
+      if(f.label)setText(PAGE_RESULT_IDS[page],f.label);
+    });
+  },200);
+})();
+
 /* ══════════════════════════════════
    SIDEBAR
 ══════════════════════════════════ */
@@ -1436,7 +1785,7 @@ function buildMasterChart(){
   const c=canvas.getContext('2d'),h=canvas.parentElement?.clientHeight||215;
   const g1=c.createLinearGradient(0,0,0,h);g1.addColorStop(0,'rgba(37,99,235,.5)');g1.addColorStop(.5,'rgba(37,99,235,.1)');g1.addColorStop(1,'rgba(37,99,235,0)');
   const g2=c.createLinearGradient(0,0,0,h);g2.addColorStop(0,'rgba(124,58,237,.5)');g2.addColorStop(.5,'rgba(124,58,237,.1)');g2.addColorStop(1,'rgba(124,58,237,0)');
-  masterChart=new Chart(c,{type:'line',data:{labels:mo,datasets:[{label:'Support',data:sD,borderColor:'#2563eb',backgroundColor:g1,tension:.45,fill:true,pointBackgroundColor:'#2563eb',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5},{label:'5S',data:s5D,borderColor:'#7c3aed',backgroundColor:g2,tension:.45,fill:true,pointBackgroundColor:'#7c3aed',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:18,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94a3b8'}},y:{grid:{color:'rgba(37,99,235,.06)'},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94a3b8',stepSize:1}}}}});}
+  masterChart=new Chart(c,{type:'line',data:{labels:mo,datasets:[{label:'Support',data:sD,borderColor:'#2563eb',backgroundColor:g1,tension:.45,fill:true,pointBackgroundColor:'#2563eb',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5},{label:'5S',data:s5D,borderColor:'#7c3aed',backgroundColor:g2,tension:.45,fill:true,pointBackgroundColor:'#7c3aed',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:18,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94a3b8'}},y:{grid:{display:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94a3b8',stepSize:1}}}}});}
 function buildDoughnut(rp,vf,rec,cid){const ctx=document.getElementById(cid);if(!ctx)return;if(cid==='statusDoughnut'&&doughnutChart)doughnutChart.destroy();if(cid==='supportStatusChart'&&supStatusChart)supStatusChart.destroy();if(!rp&&!vf&&!rec)return;const ch=new Chart(ctx.getContext('2d'),{type:'doughnut',data:{labels:['RP','VF','Records'],datasets:[{data:[rp,vf,rec],backgroundColor:['#dc2626','#2563eb','#d97706'],borderWidth:4,borderColor:'#fff',hoverOffset:14}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:16,font:{size:11}}}}}});if(cid==='statusDoughnut')doughnutChart=ch;else supStatusChart=ch;}
 
 /* ══════════════════════════════════
@@ -1462,7 +1811,11 @@ function refreshDashboard(){
     const daily_sorted=[...db.daily].sort((a,b)=>new Date(a.date)-new Date(b.date));const cumulMap={};
     daily_sorted.forEach(d=>{if(d.type==='leave')runLv++;else runHol++;const runOff=runLv+runHol;const runWork=totalWorkingDays-runOff;cumulMap[d.id||d.date+'_'+d.type]={pw:Math.max(0,Math.round((runWork/totalWorkingDays)*100)),po:Math.round((runOff/totalWorkingDays)*100)};});
     tb.innerHTML=rows.map((d)=>{const key=d.id||d.date+'_'+d.type;const cm=cumulMap[key]||{pw:'-',po:'-'};return`<tr><td style="white-space:nowrap;font-size:.75rem;">${d.fullTimestamp||dateOnly(d.date)}</td><td><span class="badge ${d.type==='leave'?'badge-lv':'badge-hol'}">${d.type==='leave'?'ลางาน':'วันหยุด'}</span></td><td style="font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${cm.pw}%</td><td style="font-weight:700;color:var(--red);font-family:'DM Mono',monospace;">${cm.po}%</td><td style="font-size:.72rem;color:var(--txt3);">${d.note||'—'}</td><td style="text-align:center;"><button class="btn-del" onclick="delDailyConfirm('${d.id||d.date+'_'+d.type}')" title="ลบ">🗑</button></td></tr>`;}).join('');}
-  buildAttendChart();const tip=document.getElementById('dailyTip');if(tip)tip.textContent=lv>5?'⚠️ วันลาสะสมมาก ควรวางแผนใหม่':pctWork>90?'🌟 สถิติการมาทำงานยอดเยี่ยม!':'💪 รักษาความสม่ำเสมอต่อไปนะครับ!';runAIAnalytics();
+  buildAttendChart();
+  const tip=document.getElementById('dailyTip');if(tip)tip.textContent=lv>5?'⚠️ วันลาสะสมมาก ควรวางแผนใหม่':pctWork>90?'🌟 สถิติการมาทำงานยอดเยี่ยม!':'💪 รักษาความสม่ำเสมอต่อไปนะครับ!';
+  const dynTip=document.getElementById('dynamicTip');
+  if(dynTip){const msgs=['บันทึกข้อมูลทุกวันช่วยให้ AI วิเคราะห์ได้แม่นขึ้น 3x','ยิ่งมี Support น้อย ยิ่งแสดงถึงคุณภาพ Process ที่ดี','Skill ที่ &gt;80% หมายถึงคุณพร้อมสอนผู้อื่นได้แล้ว!','ตรวจสอบ 5S ประจำสัปดาห์ช่วยลด Defect ได้ถึง 30%'];dynTip.innerHTML=`<b>💬 Today:</b> ${msgs[new Date().getDay()%msgs.length]}`;}
+  runAIAnalytics();
 }
 function buildAttendChart(){const ctx=document.getElementById('attendanceChart');if(!ctx)return;if(attendChart)attendChart.destroy();const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];const lD=Array(12).fill(0),hD=Array(12).fill(0);db.daily.forEach(d=>{const m=new Date(d.date).getMonth();if(!isNaN(m)){if(d.type==='leave')lD[m]++;else hD[m]++;}});attendChart=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels:mo,datasets:[{label:'ลางาน',data:lD,backgroundColor:'rgba(220,38,38,.78)',borderRadius:7,borderSkipped:false},{label:'วันหยุด',data:hD,backgroundColor:'rgba(37,99,235,.68)',borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:16,font:{size:11}}}},scales:{x:{stacked:true,grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94a3b8'}},y:{stacked:true,grid:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94a3b8',stepSize:1},border:{display:false}}}}});}
 function addDaily(){const d=document.getElementById('dailyDate').value,t=document.getElementById('dailyType').value,note=document.getElementById('dailyNote').value;if(!d)return toast('❌ เลือกวันที่ก่อน');const id=Date.now().toString();db.daily.push({id,date:d,type:t,note,fullTimestamp:fullTimestamp(d)});save();toast('📅 บันทึกแล้ว');document.getElementById('dailyNote').value='';refreshDashboard();}
@@ -1473,9 +1826,10 @@ function delDailyConfirm(id){robotConfirm('ลบรายการวันล�
 ══════════════════════════════════ */
 function refreshSupport(){
   const tb=document.getElementById('supportTableBody');if(!tb)return;
-  const rp=db.support.filter(s=>s.report==='RP').length,vf=db.support.filter(s=>s.report==='VF').length,rec=db.support.filter(s=>s.report==='RECORDS').length;
-  setText('sum-total',db.support.length);setText('sum-rp',rp);setText('sum-vf',vf);setText('sum-records',rec);
-  tb.innerHTML=[...db.support].reverse().map((s,i)=>{const realIdx=db.support.length-1-i;const bc=s.report==='RP'?'badge-rp':s.report==='VF'?'badge-vf':'badge-rec';return`<tr><td style="padding-left:14px;white-space:nowrap;font-size:.73rem;">${s.fullTimestamp||s.datetime||'—'}</td><td style="font-size:.76rem;">${s.problem||'—'}</td><td style="font-size:.76rem;">${s.action||'—'}</td><td><b>${s.part||'—'}</b></td><td style="font-size:.74rem;color:var(--violet);font-family:'DM Mono',monospace;">${s.lot||'—'}</td><td style="text-align:center;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${s.ok!==undefined&&s.ok!==''?s.ok:'—'}</td><td style="text-align:center;font-weight:700;color:var(--red);font-family:'DM Mono',monospace;">${s.ng!==undefined&&s.ng!==''?s.ng:'—'}</td><td><span class="badge ${bc}">${s.report}</span></td><td style="text-align:center;display:flex;gap:2px;justify-content:center;"><button class="btn-edit" onclick="openEditSupport(${realIdx})" title="แก้ไข">✏️</button><button class="btn-del" onclick="delSupportConfirm(${realIdx})" title="ลบ">🗑</button></td></tr>`;}).join('');
+  const filtered=filterByDateRange(db.support,'month','support');
+  const rp=filtered.filter(s=>s.report==='RP').length,vf=filtered.filter(s=>s.report==='VF').length,rec=filtered.filter(s=>s.report==='RECORDS').length;
+  setText('sum-total',filtered.length);setText('sum-rp',rp);setText('sum-vf',vf);setText('sum-records',rec);
+  tb.innerHTML=[...filtered].reverse().map((s,i)=>{const realIdx=db.support.indexOf(s);const bc=s.report==='RP'?'badge-rp':s.report==='VF'?'badge-vf':'badge-rec';return`<tr><td style="padding-left:14px;white-space:nowrap;font-size:.73rem;">${s.fullTimestamp||s.datetime||'—'}</td><td style="font-size:.76rem;">${s.problem||'—'}</td><td style="font-size:.76rem;">${s.action||'—'}</td><td><b>${s.part||'—'}</b></td><td style="font-size:.74rem;color:var(--violet);font-family:'DM Mono',monospace;">${s.lot||'—'}</td><td style="text-align:center;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${s.ok!==undefined&&s.ok!==''?s.ok:'—'}</td><td style="text-align:center;font-weight:700;color:var(--red);font-family:'DM Mono',monospace;">${s.ng!==undefined&&s.ng!==''?s.ng:'—'}</td><td><span class="badge ${bc}">${s.report}</span></td><td style="text-align:center;display:flex;gap:2px;justify-content:center;"><button class="btn-edit" onclick="openEditSupport(${realIdx})" title="แก้ไข">✏️</button><button class="btn-del" onclick="delSupportConfirm(${realIdx})" title="ลบ">🗑</button></td></tr>`;}).join('');
   renderGroupBars('support-group-bars',12);renderGroupByStatus('support-group-by-status');renderGroupFullTable('group-full-tbody');buildDoughnut(rp,vf,rec,'supportStatusChart');buildSupportTrend();
 }
 function buildSupportTrend(){const ctx=document.getElementById('supportTrendChart');if(!ctx)return;if(supTrendChart)supTrendChart.destroy();const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];const rpD=Array(12).fill(0),vfD=Array(12).fill(0),recD=Array(12).fill(0);db.support.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12){if(s.report==='RP')rpD[m]++;else if(s.report==='VF')vfD[m]++;else recD[m]++;}}});supTrendChart=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels:mo,datasets:[{label:'RP',data:rpD,backgroundColor:'rgba(220,38,38,.8)',borderRadius:6,borderSkipped:false},{label:'VF',data:vfD,backgroundColor:'rgba(37,99,235,.8)',borderRadius:6,borderSkipped:false},{label:'Records',data:recD,backgroundColor:'rgba(217,119,6,.8)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:16,font:{size:11}}}},scales:{x:{stacked:true,grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94a3b8'}},y:{stacked:true,grid:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94a3b8',stepSize:1},border:{display:false}}}}});}
@@ -1490,7 +1844,7 @@ function saveEditSupport(){const i=parseInt(document.getElementById('editIdx').v
 ══════════════════════════════════ */
 function refresh5S(){const fm=(document.getElementById('filter5sMonth')||{}).value||'';const tb=document.getElementById('s5TableBody');if(!tb)return;setText('s5-total-year',db.s5.reduce((s,c)=>s+(c.count||0),0));const mf=db.s5.filter(s=>s.month===fm);setText('s5-total-month',mf.reduce((s,c)=>s+(c.count||0),0));const oM={},aM={};db.s5.forEach(s=>{if(s.owner)oM[s.owner]=(oM[s.owner]||0)+(s.count||0);if(s.area)aM[s.area]=(aM[s.area]||0)+(s.count||0);});const to=Object.entries(oM).sort((a,b)=>b[1]-a[1])[0];const ta=Object.entries(aM).sort((a,b)=>b[1]-a[1])[0];setText('top-owners',to?to[0]:'—');setText('top-areas',ta?ta[0]:'—');tb.innerHTML=mf.map(s=>`<tr><td>${s.area||'—'}</td><td style="font-family:'DM Mono',monospace;">${s.count||0}</td><td>${s.detail||'—'}</td><td>${s.owner||'—'}</td><td style="font-size:.72rem;color:var(--txt4);">${s.fullTimestamp||'—'}</td><td style="text-align:center;"><button class="btn-del" onclick="del5SConfirm('${s.id}')" title="ลบ">🗑</button></td></tr>`).join('');build5SChart();build5SAreaBars(aM);}
 function build5SAreaBars(aM){const el=document.getElementById('s5-area-bars');if(!el)return;const sorted=Object.entries(aM).sort((a,b)=>b[1]-a[1]).slice(0,8);if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}const max=sorted[0][1];el.innerHTML=sorted.map(([n,c],i)=>`<div class="gb-row"><div class="gb-rank">${i+1}</div><div class="gb-name">${n}</div><div class="gb-track"><div class="gb-fill" style="width:${(c/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div><span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${c}</span></div>`).join('');}
-function build5SChart(){const ctx=document.getElementById('s5TrendChart');if(!ctx)return;if(s5Chart)s5Chart.destroy();const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];const mD=Array(12).fill(0);db.s5.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12)mD[m]+=(s.count||0);}});const c=ctx.getContext('2d'),h=ctx.parentElement?.clientHeight||195;const gO=c.createLinearGradient(0,0,0,h);gO.addColorStop(0,'rgba(37,99,235,.5)');gO.addColorStop(.5,'rgba(37,99,235,.1)');gO.addColorStop(1,'rgba(37,99,235,0)');s5Chart=new Chart(c,{type:'line',data:{labels:mo,datasets:[{label:'5S Findings',data:mD,borderColor:'#2563eb',backgroundColor:gO,tension:.45,fill:true,pointBackgroundColor:COLORS,pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94a3b8'}},y:{grid:{color:'rgba(37,99,235,.06)'},beginAtZero:true,ticks:{font:{size:10},color:'#94a3b8',stepSize:1},border:{display:false}}}}});}
+function build5SChart(){const ctx=document.getElementById('s5TrendChart');if(!ctx)return;if(s5Chart)s5Chart.destroy();const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];const mD=Array(12).fill(0);db.s5.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12)mD[m]+=(s.count||0);}});const c=ctx.getContext('2d'),h=ctx.parentElement?.clientHeight||195;const gO=c.createLinearGradient(0,0,0,h);gO.addColorStop(0,'rgba(37,99,235,.5)');gO.addColorStop(.5,'rgba(37,99,235,.1)');gO.addColorStop(1,'rgba(37,99,235,0)');s5Chart=new Chart(c,{type:'line',data:{labels:mo,datasets:[{label:'5S Findings',data:mD,borderColor:'#2563eb',backgroundColor:gO,tension:.45,fill:true,pointBackgroundColor:COLORS,pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94a3b8'}},y:{grid:{display:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94a3b8',stepSize:1}}}}});}
 function add5S(){const area=document.getElementById('s5Area').value,count=parseInt(document.getElementById('s5Count').value)||0,detail=document.getElementById('s5Detail').value,owner=document.getElementById('s5Owner').value,month=document.getElementById('filter5sMonth').value;if(!area)return toast('❌ ระบุพื้นที่');db.s5.push({id:Date.now().toString(),area,count,detail,owner,month,fullTimestamp:fullTimestamp(),_user:currentUser});save();toast('🧹 บันทึก 5S แล้ว');['s5Area','s5Count','s5Detail','s5Owner'].forEach(id=>document.getElementById(id).value='');refresh5S();}
 function del5SConfirm(id){robotConfirm('ลบรายการ 5S นี้?',()=>{db.s5=db.s5.filter(s=>s.id!==id);save();toast('🗑 ลบแล้ว');refresh5S();});}
 
@@ -1535,21 +1889,21 @@ function animateCount(el,from,to,dur=700){if(!el)return;const start=performance.
 function deriveStatus(result){if(!result||result.trim()==='')return{cls:'sp-status-pending',txt:'Pending'};const r=result.toLowerCase();if(r.includes('เสร็จ')||r.includes('done')||r.includes('complete')||r.includes('สำเร็จ')||r.includes('ok')||r.includes('ผ่าน'))return{cls:'sp-status-done',txt:'Done'};if(r.includes('กำลัง')||r.includes('wip')||r.includes('progress')||r.includes('ดำเนิน'))return{cls:'sp-status-wip',txt:'In Progress'};return{cls:'sp-status-done',txt:'Done'};}
 function refreshSpecial(){
   const tb=document.getElementById('specialTableBody');if(!tb)return;const total=db.special.length;
+  const filtered=filterByDateRange(db.special,'date','special');
   const now=new Date();const thisMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const monthEntries=db.special.filter(s=>s.date&&s.date.slice(0,7)===thisMonth).length;
-  const withResult=db.special.filter(s=>s.result&&s.result.trim()).length;
-  const rate=total>0?Math.round((withResult/total)*100):0;
-  const assignorMap={};db.special.forEach(s=>{const k=s.by||'(ไม่ระบุ)';assignorMap[k]=(assignorMap[k]||0)+1;});
+  const monthEntries=filtered.length;
+  const withResult=filtered.filter(s=>s.result&&s.result.trim()).length;
+  const rate=filtered.length>0?Math.round((withResult/filtered.length)*100):0;
+  const assignorMap={};filtered.forEach(s=>{const k=s.by||'(ไม่ระบุ)';assignorMap[k]=(assignorMap[k]||0)+1;});
   const sortedAssignors=Object.entries(assignorMap).sort((a,b)=>b[1]-a[1]);const topAssignor=sortedAssignors[0];
   animateCount(document.getElementById('sp-kpi-total'),0,total);animateCount(document.getElementById('sp-kpi-month'),0,monthEntries);
   setTimeout(()=>{const el=document.getElementById('sp-kpi-rate');if(el)el.textContent=rate+'%';},200);
   setText('sp-kpi-total-delta',`All ${total} jobs`);setText('sp-kpi-month-lbl',now.toLocaleDateString('th-TH',{month:'long',year:'numeric'}));
   setText('sp-kpi-top-by',topAssignor?topAssignor[0]:'—');setText('sp-kpi-top-by-n',topAssignor?`${topAssignor[1]} jobs`:'0 jobs');
-  setText('sp-total-badge',`${total} Projects`);setText('sp-table-count',`${total} records`);setText('dash-special-count',total);
-  renderAssignorBars(sortedAssignors);renderMonthlyTimeline();buildResultChart(withResult,total-withResult);
-  if(!total){tb.innerHTML=`<tr><td colspan="7"><div class="sp-empty"><div class="sp-empty-icon">⭐</div><div class="sp-empty-txt">ยังไม่มีงานพิเศษ — กรอกแบบฟอร์มด้านบน</div></div></td></tr>`;return;}
-  const rows=[...db.special].reverse();
-  tb.innerHTML=rows.map((s,i)=>{const idx=db.special.length-1-i;const st=deriveStatus(s.result);const aColor=getAssignorColor(s.by);const dateDisplay=s.fullTimestamp||s.date||'—';return`<tr class="sp-row-new" style="animation-delay:${i*0.04}s"><td><div class="sp-row-num">${db.special.length-i}</div></td><td><div style="font-weight:700;font-size:.8rem;color:var(--txt);">${s.project||s.job||'—'}</div></td><td><div class="sp-date-pill" title="${dateDisplay}">📅 ${dateDisplay}</div></td><td><div class="sp-assignor-tag" style="color:${aColor};background:${aColor}15;border-color:${aColor}30;"><span style="width:7px;height:7px;border-radius:50%;background:${aColor};flex-shrink:0;"></span>${s.by||'—'}</div></td><td><div class="sp-status ${st.cls}">${st.txt}</div></td><td><div class="sp-result-txt">${s.result||'—'}</div></td><td style="text-align:center;"><button class="sp-del-btn" onclick="delSpecialConfirm(${idx})" title="ลบ">🗑</button></td></tr>`;}).join('');
+  setText('sp-total-badge',`${filtered.length} Projects`);setText('sp-table-count',`${filtered.length} records`);setText('dash-special-count',total);
+  renderAssignorBars(sortedAssignors);renderMonthlyTimeline();buildResultChart(withResult,filtered.length-withResult);
+  if(!filtered.length){tb.innerHTML=`<tr><td colspan="7"><div class="sp-empty"><div class="sp-empty-icon">⭐</div><div class="sp-empty-txt">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div></div></td></tr>`;return;}
+  tb.innerHTML=[...filtered].reverse().map((s,i)=>{const idx=db.special.indexOf(s);const st=deriveStatus(s.result);const aColor=getAssignorColor(s.by);const dateDisplay=s.fullTimestamp||s.date||'—';return`<tr class="sp-row-new" style="animation-delay:${i*0.04}s"><td><div class="sp-row-num">${filtered.length-i}</div></td><td><div style="font-weight:700;font-size:.8rem;color:var(--txt);">${s.project||s.job||'—'}</div></td><td><div class="sp-date-pill" title="${dateDisplay}">📅 ${dateDisplay}</div></td><td><div class="sp-assignor-tag" style="color:${aColor};background:${aColor}15;border-color:${aColor}30;"><span style="width:7px;height:7px;border-radius:50%;background:${aColor};flex-shrink:0;"></span>${s.by||'—'}</div></td><td><div class="sp-status ${st.cls}">${st.txt}</div></td><td><div class="sp-result-txt">${s.result||'—'}</div></td><td style="text-align:center;"><button class="sp-del-btn" onclick="delSpecialConfirm(${idx})" title="ลบ">🗑</button></td></tr>`;}).join('');
 }
 function renderAssignorBars(sorted){const el=document.getElementById('sp-assignor-bars');if(!el)return;if(!sorted.length){el.innerHTML='<div class="sp-empty" style="padding:20px 0;"><div class="sp-empty-icon" style="font-size:1.8rem;">👤</div><div class="sp-empty-txt">ยังไม่มีข้อมูล</div></div>';return;}const max=sorted[0][1];el.innerHTML=sorted.slice(0,10).map(([name,count],i)=>{const color=getAssignorColor(name);return`<div class="sp-hbar-item" style="animation-delay:${i*0.06}s"><div class="sp-hbar-rank">${i+1}</div><div class="sp-hbar-name" title="${name}">${name}</div><div class="sp-hbar-track"><div class="sp-hbar-fill" style="width:0%;background:linear-gradient(90deg,${color},${color}cc);" data-w="${(count/max)*100}"></div></div><div class="sp-hbar-val" style="color:${color};">${count}</div></div>`;}).join('');setTimeout(()=>{el.querySelectorAll('.sp-hbar-fill').forEach(f=>{f.style.width=f.dataset.w+'%';});},80);}
 function renderMonthlyTimeline(){const el=document.getElementById('sp-monthly-timeline');if(!el)return;const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];const counts=Array(12).fill(0);db.special.forEach(s=>{if(s.date){const m=new Date(s.date).getMonth();if(!isNaN(m))counts[m]++;}});const max=Math.max(...counts)||1;el.innerHTML=`<div class="sp-timeline">${counts.map((c,i)=>`<div class="sp-tl-row"><div class="sp-tl-mo">${mo[i]}</div><div class="sp-tl-track"><div class="sp-tl-fill" data-w="${(c/max)*100}" style="width:0%;background:${COLORS[i]};"></div></div><div class="sp-tl-num" style="color:${c>0?COLORS[i]:'var(--txt4)'};">${c||''}</div></div>`).join('')}</div>`;setTimeout(()=>{el.querySelectorAll('.sp-tl-fill').forEach(f=>{f.style.width=f.dataset.w+'%';});},120);}
