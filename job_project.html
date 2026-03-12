@@ -863,12 +863,57 @@ tbody tr:last-child td{border-bottom:none}
 .btn-dash-open{display:flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border:none;border-radius:var(--r);padding:8px 14px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans','Prompt',sans-serif;transition:all .2s;}
 .btn-dash-open:hover{background:var(--navy2);transform:translateY(-1px);}
 .sup-tbl-scroll{max-height:calc(100vh - 310px);overflow-y:auto;overflow-x:auto;background:#fff;border-radius:0 0 var(--r-lg) var(--r-lg);}
-.sup-tbl{width:100%;border-collapse:separate;border-spacing:0;min-width:1180px;}
+.sup-tbl{width:100%;border-collapse:separate;border-spacing:0;min-width:1240px;}
 .sup-tbl thead th{padding:10px 12px;text-align:left;background:#f0f6ff;font-size:.59rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.09em;border-bottom:2px solid var(--b200);position:sticky;top:0;z-index:5;white-space:nowrap;}
 .sup-tbl tbody td{padding:10px 12px;font-size:.78rem;border-bottom:1px solid rgba(37,99,235,.06);color:var(--txt);vertical-align:middle;}
 .sup-tbl tbody tr:nth-child(even) td{background:#f7faff;}
 .sup-tbl tbody tr:nth-child(odd) td{background:#fff;}
 .sup-tbl tbody tr:hover td{background:#eff6ff!important;transition:background .12s;}
+/* ── Support Image System ── */
+.sup-img-cell{width:72px;text-align:center;padding:6px 8px!important;overflow:visible!important;}
+.sup-img-thumb{
+  width:64px;height:50px;border-radius:9px;object-fit:cover;
+  border:2px solid var(--b200);cursor:pointer;display:block;margin:0 auto;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,border-color .2s;
+  position:relative;z-index:1;
+}
+.sup-img-thumb:hover{transform:scale(3.4);box-shadow:0 16px 48px rgba(15,23,42,.35);z-index:9999;border-color:var(--primary);}
+.sup-img-none{
+  width:64px;height:50px;border-radius:9px;background:var(--bg2);
+  border:2px dashed var(--b200);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;cursor:pointer;
+  transition:all .22s;gap:2px;margin:0 auto;
+}
+.sup-img-none:hover{background:var(--b50);border-color:var(--primary);transform:scale(1.05);}
+.sup-img-none .ni-icon{font-size:1.1rem;line-height:1;}
+.sup-img-none .ni-lbl{font-size:.45rem;font-weight:700;color:var(--txt4);text-transform:uppercase;letter-spacing:.06em;}
+.img-sync-dot{
+  width:7px;height:7px;border-radius:50%;
+  display:inline-block;margin-left:4px;
+  animation:pulse-g 2s infinite;
+}
+/* Image upload zone in modal */
+.img-zone{
+  grid-column:1/-1;border:2px dashed var(--b200);border-radius:12px;
+  padding:14px 16px;text-align:center;cursor:pointer;
+  transition:all .22s;background:var(--bg);position:relative;
+}
+.img-zone:hover{border-color:var(--primary);background:var(--b50);}
+.img-zone input[type=file]{display:none;}
+.img-zone-inner{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.img-zone-icon{font-size:1.8rem;}
+.img-zone-lbl{font-size:.72rem;font-weight:600;color:var(--txt3);}
+.img-zone-sub{font-size:.62rem;color:var(--txt4);}
+.img-zone-preview{max-height:90px;max-width:100%;border-radius:8px;object-fit:contain;display:block;margin:0 auto;}
+.img-zone-btns{display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;}
+.img-zone-btn{padding:4px 12px;border-radius:8px;font-size:.67rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;}
+.img-zone-btn-chg{background:var(--grad);color:#fff;}
+.img-zone-btn-del{background:var(--red-l);color:var(--red);border:1px solid #fecaca!important;border:none;}
+/* Cloud sync indicator on image cell */
+.sup-img-wrap{position:relative;display:inline-block;}
+.sup-img-syncing::after{content:'⏳';position:absolute;top:-4px;right:-4px;font-size:.55rem;background:#fff;border-radius:99px;padding:1px 2px;border:1px solid var(--border);}
+.sup-img-synced::after{content:'☁️';position:absolute;top:-4px;right:-4px;font-size:.55rem;background:#fff;border-radius:99px;padding:1px 2px;border:1px solid var(--b200);}
+
 .ok-chip{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:4px 10px;background:#ecfdf5;border:1.5px solid #6ee7b7;border-radius:99px;color:#059669;font-weight:800;font-size:.76rem;font-family:'DM Mono',monospace;}
 .ng-chip{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:4px 10px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:99px;color:#dc2626;font-weight:800;font-size:.76rem;font-family:'DM Mono',monospace;}
 .btn-edit{background:var(--b50);border:1px solid var(--b200);color:var(--primary);border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.72rem;transition:all .18s;}
@@ -1439,7 +1484,8 @@ tbody tr:last-child td{border-bottom:none}
             <th style="text-align:center;min-width:52px;">OK</th>
             <th style="text-align:center;min-width:52px;">NG</th>
             <th>Status</th>
-            <th style="text-align:center;min-width:80px;">จัดการ</th>
+            <th style="text-align:center;width:80px;">📷</th>
+            <th style="text-align:center;min-width:96px;">จัดการ</th>
           </tr></thead>
           <tbody id="supportTableBody"></tbody>
         </table>
@@ -1716,6 +1762,15 @@ tbody tr:last-child td{border-bottom:none}
           </select>
         </div>
       </div>
+        <div class="img-zone full" id="addImgZone" onclick="triggerFileInput('addImgInput',updateAddPreview)">
+          <input type="file" id="addImgInput" accept="image/*">
+          <div class="img-zone-inner" id="addImgInner">
+            <div class="img-zone-icon">📷</div>
+            <div class="img-zone-lbl">แนบรูปภาพ (ไม่บังคับ)</div>
+            <div class="img-zone-sub">PNG, JPG, WEBP — Max 8MB</div>
+          </div>
+        </div>
+      </div>
       <div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:#fff;border-radius:0 0 var(--r-xl) var(--r-xl);">
         <button onclick="closeAddSupModal()" style="padding:8px 16px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--txt3);font-size:.76rem;font-weight:600;cursor:pointer;font-family:inherit;">ยกเลิก</button>
         <button onclick="addSupport()" style="padding:8px 18px;border-radius:var(--r);border:none;background:var(--grad);color:#fff;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px var(--primary-glow);">💾 บันทึก</button>
@@ -1952,6 +2007,17 @@ tbody tr:last-child td{border-bottom:none}
       <div class="edit-field"><label class="edit-label">OK</label><input class="edit-input" type="number" id="editOk" min="0"></div>
       <div class="edit-field"><label class="edit-label">NG</label><input class="edit-input" type="number" id="editNg" min="0"></div>
       <div class="edit-field"><label class="edit-label">Report Type</label><select class="edit-input" id="editReport"><option value="VF">VF Report</option><option value="RP">RP Report</option><option value="RECORDS">RECORDS</option></select></div>
+      <div style="grid-column:1/-1;">
+        <label class="edit-label">📷 รูปภาพ</label>
+        <div class="img-zone" id="editImgZone" onclick="triggerFileInput('editImgInput',updateEditPreview)">
+          <input type="file" id="editImgInput" accept="image/*">
+          <div id="editImgInner" class="img-zone-inner">
+            <div class="img-zone-icon">📷</div>
+            <div class="img-zone-lbl">คลิกเพื่อเลือก/เปลี่ยนรูป</div>
+            <div class="img-zone-sub">PNG, JPG, WEBP — Max 8MB</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="edit-modal-actions">
       <button class="edit-btn-cancel" onclick="closeEditModal()">ยกเลิก</button>
@@ -2112,6 +2178,236 @@ function loadLocalDB(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)r
 let db=loadLocalDB();
 let skillChart=null,masterChart=null,doughnutChart=null,supStatusChart=null,supTrendChart=null,attendChart=null,s5Chart=null,skillLvChart=null,skillCmpChart=null,skillPolarChart=null,spResultChart=null,supOkNgChart=null,supGroupChart=null,supMixChart=null;
 let currentSkillSort='val';let pushTimer=null;
+/* ══════════════════════════════════
+   IMAGE MAP — SEPARATE STORAGE
+   Images stored by recordId, never inside main db
+   Separate Google Sheet: "Images"
+══════════════════════════════════ */
+const IMG_STORAGE_KEY=`wap_images_v1_${currentUser}`;
+const IMG_SCRIPT_URL="https://script.google.com/macros/s/AKfycbyj7DduO-5LwyAa15KxecxIOUrH6-QOJ8TVPg2Ix6l2N59DsHO7G39rBDd8fJwFqs4LIw/exec"; 
+let imageMap={}; // {recordId: base64string}
+let imgPushTimer=null;
+
+function loadLocalImageMap(){
+  try{
+    const raw=localStorage.getItem(IMG_STORAGE_KEY);
+    return raw?JSON.parse(raw):{};
+  }catch(e){return {};}
+}
+function saveLocalImageMap(){
+  try{localStorage.setItem(IMG_STORAGE_KEY,JSON.stringify(imageMap));}catch(e){
+    // If localStorage is full, trim oldest images
+    const keys=Object.keys(imageMap);
+    if(keys.length>0){delete imageMap[keys[0]];saveLocalImageMap();}
+  }
+}
+imageMap=loadLocalImageMap();
+
+/* Pull all images for current user from Images sheet */
+async function pullImagesFromCloud(silent=false){
+  try{
+    const res=await fetch(`${IMG_SCRIPT_URL}?action=getImages&user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
+    const r=await res.json();
+    if(r.status==='success'&&r.images){
+      // r.images = [{recordId, imageBase64, updatedAt}]
+      let changed=false;
+      r.images.forEach(item=>{
+        if(item.recordId&&item.imageBase64){
+          imageMap[item.recordId]=item.imageBase64;
+          changed=true;
+        }
+      });
+      if(changed){saveLocalImageMap();if(!silent)refreshSupportImagesOnly();}
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+/* Push a single image to Images sheet */
+async function pushImageToCloud(recordId, base64){
+  if(!recordId||!base64)return;
+  try{
+    await fetch(IMG_SCRIPT_URL,{
+      method:'POST',mode:'no-cors',cache:'no-cache',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'saveImage',user:currentUser,recordId,imageBase64:base64,updatedAt:Date.now()})
+    });
+    showSyncStatus('📷 รูปภาพขึ้น Cloud แล้ว','#22c55e');
+  }catch(e){showSyncStatus('⚠️ รูปยังไม่ได้ sync','#f59e0b');}
+}
+
+/* Delete image from Images sheet */
+async function deleteImageFromCloud(recordId){
+  if(!recordId)return;
+  try{
+    await fetch(IMG_SCRIPT_URL,{
+      method:'POST',mode:'no-cors',cache:'no-cache',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'deleteImage',user:currentUser,recordId})
+    });
+  }catch(e){}
+}
+
+/* Save image locally + schedule cloud push */
+function saveImage(recordId, base64){
+  imageMap[recordId]=base64;
+  saveLocalImageMap();
+  clearTimeout(imgPushTimer);
+  imgPushTimer=setTimeout(()=>pushImageToCloud(recordId,base64),800);
+}
+
+/* Remove image locally + cloud */
+function removeImage(recordId){
+  delete imageMap[recordId];
+  saveLocalImageMap();
+  deleteImageFromCloud(recordId);
+}
+
+/* Re-render ONLY image cells without full table rebuild */
+function refreshSupportImagesOnly(){
+  db.support.forEach((s,i)=>{
+    const cell=document.querySelector(`[data-img-id="${s.id}"]`);
+    if(cell) cell.innerHTML=getImgCellHTML(s.id,i);
+  });
+}
+
+/* Render image cell HTML for a record */
+function getImgCell(id, idx){
+  const b=imageMap[id];
+  if(b){
+    return `<div class="sup-img-wrap" data-img-id="${id}">
+      <img src="${b}" class="sup-img-thumb"
+        onclick="event.stopPropagation();imgZoomOrChange(event,'${id}',${idx})"
+        title="คลิกเพื่อซูม · ดับเบิ้ลคลิกเพื่อเปลี่ยน">
+      <div class="sup-img-synced"></div>
+    </div>`;
+  }
+  return `<div class="sup-img-none" data-img-id="${id}" onclick="openQuickImgEdit('${id}',${idx})" title="เพิ่มรูปภาพ">
+    <div class="ni-icon">📷</div>
+    <div class="ni-lbl">เพิ่มรูป</div>
+  </div>`;
+}
+function getImgCellHTML(id,idx){return getImgCell(id,idx);}
+
+/* Zoom modal + change on double click */
+let _imgZoomTimer=null;
+function imgZoomOrChange(e,id,idx){
+  if(_imgZoomTimer){
+    clearTimeout(_imgZoomTimer);_imgZoomTimer=null;
+    // Double click → change
+    openQuickImgEdit(id,idx);
+  }else{
+    _imgZoomTimer=setTimeout(()=>{
+      _imgZoomTimer=null;
+      // Single click → zoom
+      const src=imageMap[id];if(!src)return;
+      const ov=document.createElement('div');
+      ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(8px);';
+      ov.onclick=()=>document.body.removeChild(ov);
+      const wrap=document.createElement('div');
+      wrap.style.cssText='position:relative;max-width:90vw;max-height:90vh;';
+      const img=document.createElement('img');
+      img.src=src;img.style.cssText='max-width:90vw;max-height:85vh;border-radius:14px;object-fit:contain;box-shadow:0 24px 80px rgba(0,0,0,.6);';
+      const btnRow=document.createElement('div');
+      btnRow.style.cssText='position:absolute;bottom:-42px;left:0;right:0;display:flex;justify-content:center;gap:10px;';
+      btnRow.innerHTML=`<button onclick="event.stopPropagation();openQuickImgEdit('${id}',${idx});document.body.removeChild(document.querySelector('[style*=\"z-index:99999\"]'))" style="padding:6px 14px;background:var(--grad);color:#fff;border:none;border-radius:8px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;">🔄 เปลี่ยนรูป</button>
+      <button onclick="event.stopPropagation();if(confirm('ลบรูปภาพ?')){removeImage('${id}');refreshSupportImagesOnly();document.body.removeChild(document.querySelector('[style*=\"z-index:99999\"]'));toast('🗑 ลบรูปแล้ว');}" style="padding:6px 14px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;">🗑 ลบ</button>`;
+      wrap.append(img,btnRow);ov.appendChild(wrap);document.body.appendChild(ov);
+    },220);
+  }
+}
+
+/* Persistent DOM input for quick image edit */
+(function(){
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='image/*';inp.id='_qImgInput';
+  inp.style.cssText='position:fixed;top:-999px;left:-999px;opacity:0;pointer-events:none;';
+  document.body.appendChild(inp);
+  window._qImgInput=inp;
+})();
+
+function openQuickImgEdit(recordId,idx){
+  const old=window._qImgInput;
+  const fresh=old.cloneNode();fresh.id='_qImgInput';
+  fresh.style.cssText='position:fixed;top:-999px;left:-999px;opacity:0;pointer-events:none;';
+  if(old.parentNode)old.parentNode.replaceChild(fresh,old);
+  window._qImgInput=fresh;
+  fresh.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    if(file.size>8*1024*1024){toast('❌ รูปใหญ่เกิน 8MB');return;}
+    compressAndSaveImage(file,recordId,()=>{
+      refreshSupportImagesOnly();toast('📷 บันทึกรูปแล้ว — กำลัง Sync...');
+    });
+  };
+  fresh.click();
+}
+
+/* Compress image to max 800px and ~200KB */
+function compressAndSaveImage(file, recordId, cb){
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=800;
+      let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){if(w>h){h=Math.round(h*(MAX/w));w=MAX;}else{w=Math.round(w*(MAX/h));h=MAX;}}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const compressed=canvas.toDataURL('image/jpeg',0.72);
+      saveImage(recordId,compressed);
+      if(cb)cb(compressed);
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* Generic file input trigger (resets value for re-pick) */
+function triggerFileInput(inputId, cb){
+  const old=document.getElementById(inputId);if(!old)return;
+  const fresh=old.cloneNode();
+  fresh.id=inputId;fresh.accept='image/*';fresh.style.display='none';
+  old.parentNode.replaceChild(fresh,old);
+  fresh.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    if(file.size>8*1024*1024){toast('❌ รูปใหญ่เกิน 8MB');return;}
+    const r=new FileReader();
+    r.onload=ev=>{if(cb)cb(ev.target.result,file);};
+    r.readAsDataURL(file);
+  };
+  fresh.click();
+}
+
+/* Add modal image preview */
+let _pendingAddImg=null;
+function updateAddPreview(base64){
+  _pendingAddImg=base64;
+  const inner=document.getElementById('addImgInner');
+  if(inner) inner.innerHTML=`<img src="${base64}" class="img-zone-preview"><div class="img-zone-btns"><button class="img-zone-btn img-zone-btn-chg" onclick="event.stopPropagation();triggerFileInput('addImgInput',updateAddPreview)">🔄 เปลี่ยน</button><button class="img-zone-btn img-zone-btn-del" onclick="event.stopPropagation();_pendingAddImg=null;resetAddImgZone()">🗑 ลบ</button></div>`;
+  const zone=document.getElementById('addImgZone');if(zone){zone.style.borderColor='var(--b400)';zone.style.background='var(--b50)';}
+}
+function resetAddImgZone(){
+  const inner=document.getElementById('addImgInner');
+  if(inner)inner.innerHTML='<div class="img-zone-icon">📷</div><div class="img-zone-lbl">แนบรูปภาพ (ไม่บังคับ)</div><div class="img-zone-sub">PNG, JPG, WEBP — Max 8MB</div>';
+  const zone=document.getElementById('addImgZone');if(zone){zone.style.borderColor='';zone.style.background='';}
+}
+
+/* Edit modal image preview */
+let _pendingEditImg=undefined; // undefined=unchanged, null=remove, str=new
+function updateEditPreview(base64){
+  _pendingEditImg=base64;
+  const inner=document.getElementById('editImgInner');
+  if(inner)inner.innerHTML=`<img src="${base64}" class="img-zone-preview"><div class="img-zone-btns"><button class="img-zone-btn img-zone-btn-chg" onclick="event.stopPropagation();triggerFileInput('editImgInput',updateEditPreview)">🔄 เปลี่ยน</button><button class="img-zone-btn img-zone-btn-del" onclick="event.stopPropagation();_pendingEditImg=null;resetEditImgZone()">🗑 ลบ</button></div>`;
+  const zone=document.getElementById('editImgZone');if(zone){zone.style.borderColor='var(--b400)';zone.style.background='var(--b50)';}
+}
+function resetEditImgZone(txt='คลิกเพื่อเลือก/เปลี่ยนรูป'){
+  const inner=document.getElementById('editImgInner');
+  if(inner)inner.innerHTML=`<div class="img-zone-icon">📷</div><div class="img-zone-lbl">${txt}</div><div class="img-zone-sub">PNG, JPG, WEBP — Max 8MB</div>`;
+  const zone=document.getElementById('editImgZone');if(zone){zone.style.borderColor='';zone.style.background='';}
+}
+
 const COLORS=['#2563eb','#dc2626','#7c3aed','#059669','#d97706','#0891b2','#db2777','#0d9488','#65a30d','#4f46e5','#ea580c','#f59e0b'];
 
 /* ══════════════════════════════════
@@ -2229,26 +2525,46 @@ window.addEventListener('load',async()=>{
   }
 
   // Step 2: Render all pages
-  setLoadingPct(88);
+  setLoadingPct(85);
   refreshAllPages();
+  setLoadingPct(92);
+
+  // Step 3: Pull images (non-blocking)
+  if(cloudOk){
+    setLoading('📷 โหลดรูปภาพ...','กำลังดึงรูปจาก Images Sheet',94);
+    pullImagesFromCloud(true).then(ok=>{
+      if(ok){refreshSupportImagesOnly();showSyncStatus('📷 โหลดรูปภาพสำเร็จ','#22c55e');}
+    });
+  }
   setLoadingPct(100);
 
-  // Step 3: Hide loading and run entrance animation
-  await sleep(500);
+  // Step 4: Hide loading and run entrance animation
+  await sleep(450);
   setText('dash-timestamp',(cloudOk?'☁️ Cloud: ':'📱 Local: ')+fullTimestamp());
   hideLoading();
   setBtnLoading(false);
 
-  // Step 4: Dashboard entrance animation
+  // Step 5: Dashboard entrance animation
   setTimeout(()=>runDashboardEntrance(), 200);
 
-  // Step 5: Start polling
+  // Step 6: Start polling (both DB and images)
   startPolling();
 });
 
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 async function syncWithGoogleSheets(){if(document.getElementById('syncBtn').classList.contains('loading'))return;setBtnLoading(true,'⏳ SYNCING...');showSyncStatus('🔄 กำลัง Sync...','#f59e0b');try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();if(r.status==='success'&&r.data){const cloud=r.data;if(!cloud._owner||cloud._owner===currentUser){const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);if(cloudMod>localMod||cloudLen>localLen){cloud._owner=currentUser;db=cloud;saveLocal();refreshAllPages();showSyncStatus('✅ ดึงข้อมูลจาก Cloud','#22c55e');toast('✅ Sync: โหลดจาก Cloud');}else{await pushToCloud();showSyncStatus('☁️ อัปโหลดขึ้น Cloud','#22c55e');toast('✅ Sync: อัปโหลดขึ้น Cloud');}}}else{await pushToCloud();}setText('dash-timestamp','Sync: '+fullTimestamp());}catch(e){showSyncStatus('❌ Sync ล้มเหลว','#dc2626');toast('❌ Sync ล้มเหลว');}finally{setBtnLoading(false);}}
-function startPolling(){setInterval(async()=>{const updated=await pullFromCloud(true);if(updated){refreshAllPages();showSyncStatus('🔔 อัปเดตจากอุปกรณ์อื่น','#60a5fa');setText('dash-timestamp','Real-time: '+fullTimestamp());}},30000);}
+function startPolling(){
+  // Poll main DB every 30s
+  setInterval(async()=>{
+    const updated=await pullFromCloud(true);
+    if(updated){refreshAllPages();showSyncStatus('🔔 อัปเดตข้อมูลจากอุปกรณ์อื่น','#60a5fa');setText('dash-timestamp','Real-time: '+fullTimestamp());}
+  },30000);
+  // Poll images every 60s
+  setInterval(async()=>{
+    const imgUpdated=await pullImagesFromCloud(true);
+    if(imgUpdated) showSyncStatus('📷 รูปภาพอัปเดต Real-time','#60a5fa');
+  },60000);
+}
 function setBtnLoading(on,txt='🔄 SYNC CLOUD'){const b=document.getElementById('syncBtn');b.classList.toggle('loading',on);b.innerText=txt;b.disabled=on;}
 
 /* ══════════════════════════════════
@@ -2284,7 +2600,7 @@ function renderGroupByStatus(elId){const el=document.getElementById(elId);if(!el
 function renderGroupFullTable(tbodyId){
   const el=document.getElementById(tbodyId);if(!el)return;
   const sorted=buildGroupData();const totalAll=db.support.length||1;
-  if(!sorted.length){el.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--txt4);padding:18px;">ยังไม่มีข้อมูล</td></tr>`;return;}
+  if(!sorted.length){el.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--txt4);padding:18px;">ยังไม่มีข้อมูล</td></tr>`;return;}
   el.innerHTML=sorted.map(([n,d],i)=>{
     const t=d.total||1;
     const rp=d.RP||0,vf=d.VF||0,rec=d.RECORDS||0;
@@ -2488,7 +2804,7 @@ function refreshSupport(){
 
   // Render rows
   if(!filtered.length){
-    tb.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div><div style="font-size:.72rem;margin-top:6px;">กด <b>➕ Add New Record</b> เพื่อเพิ่มข้อมูล</div></td></tr>`;
+    tb.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div><div style="font-size:.72rem;margin-top:6px;">กด <b>➕ Add New Record</b> เพื่อเพิ่มข้อมูล</div></td></tr>`;
     renderGroupBars('support-group-bars',12);renderGroupByStatus('support-group-by-status');renderGroupFullTable('group-full-tbody');buildDoughnut(rp,vf,rec,'supportStatusChart');buildSupportTrend();buildSupportOkNg();buildSupportGroupChart();buildSupportMixChart();return;
   }
   tb.innerHTML=[...filtered].reverse().map((s)=>{
@@ -2505,6 +2821,7 @@ function refreshSupport(){
       <td style="text-align:center;">${okCell}</td>
       <td style="text-align:center;">${ngCell}</td>
       <td><span class="badge ${bc}">${s.report}</span></td>
+      <td class="sup-img-cell">${getImgCell(s.id,realIdx)}</td>
       <td style="text-align:center;white-space:nowrap;">
         <button class="btn-detail" onclick="openRecDetail(${realIdx})" title="ดูรายละเอียด">🔍 ดู</button>
         <button class="btn-edit" onclick="openEditSupport(${realIdx})" title="แก้ไข" style="margin-left:3px;">✏️</button>
@@ -2642,9 +2959,12 @@ function buildSupportMixChart(){
 }
 function openAddSupModal(){
   document.getElementById('addSupModal').classList.add('open');
-  // reset form
   ['supProblem','supPart','supLot','supOk','supNg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const sd=document.getElementById('supDate');if(sd)sd.value=new Date().toISOString().split('T')[0];
+  _pendingAddImg=null;
+  resetAddImgZone();
+  // Reset file input
+  const ai=document.getElementById('addImgInput');if(ai)ai.value='';
 }
 function closeAddSupModal(){document.getElementById('addSupModal').classList.remove('open');}
 
@@ -2663,18 +2983,31 @@ function addSupport(){
   const d=di?new Date(di):new Date();
   const month=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
   const ts=fullTimestamp(d);
+  const newId=Date.now().toString();
   db.support.push({
-    id:Date.now().toString(),problem:prob,action:act,part,report:rep,lot,
+    id:newId,problem:prob,action:act,part,report:rep,lot,
     ok:ok!==''?parseInt(ok):'',ng:ng!==''?parseInt(ng):'',
     datetime:ts,fullTimestamp:ts,month,
     _user:currentUser
   });
+  // Save image separately (not in db) — by recordId
+  if(_pendingAddImg&&typeof _pendingAddImg==='string'&&_pendingAddImg.startsWith('data:')){
+    saveImage(newId,_pendingAddImg);
+  }
+  _pendingAddImg=null;
   save();toast('🛠️ บันทึก Support แล้ว');
   closeAddSupModal();
   refreshSupport();
   if(isActive('master-dash'))refreshMasterDashboard();
 }
-function delSupportConfirm(i){robotConfirm('ลบ Support record นี้?',()=>{db.support.splice(i,1);save();toast('🗑 ลบแล้ว');refreshSupport();});}
+function delSupportConfirm(i){
+  const s=db.support[i];
+  robotConfirm('ลบ Support record นี้?',()=>{
+    if(s&&s.id)removeImage(s.id);
+    db.support.splice(i,1);
+    save();toast('🗑 ลบแล้ว');refreshSupport();
+  });
+}
 function openEditSupport(i){
   const s=db.support[i];if(!s)return;
   document.getElementById('editIdx').value=i;
@@ -2686,6 +3019,15 @@ function openEditSupport(i){
   document.getElementById('editOk').value=s.ok!==undefined&&s.ok!==''?s.ok:'';
   document.getElementById('editNg').value=s.ng!==undefined&&s.ng!==''?s.ng:'';
   document.getElementById('editReport').value=s.report||'VF';
+  // Load image from imageMap
+  _pendingEditImg=undefined;
+  const existImg=imageMap[s.id];
+  if(existImg){
+    updateEditPreview(existImg);
+    _pendingEditImg=undefined; // reset after preview — unchanged
+  }else{
+    resetEditImgZone('คลิกเพื่อเพิ่มรูปภาพ');
+  }
   document.getElementById('editModal').style.display='flex';
 }
 function saveEditSupport(){
@@ -2705,6 +3047,13 @@ function saveEditSupport(){
   db.support[i].report=document.getElementById('editReport').value;
   db.support[i].month=month;db.support[i]._rawDate=di;
   db.support[i]._editedAt=fullTimestamp();db.support[i]._user=currentUser;
+  // Apply image change (undefined=keep, null=remove, string=new)
+  const recId=db.support[i].id;
+  if(recId){
+    if(_pendingEditImg===null){removeImage(recId);refreshSupportImagesOnly();}
+    else if(typeof _pendingEditImg==='string'&&_pendingEditImg.startsWith('data:')){saveImage(recId,_pendingEditImg);refreshSupportImagesOnly();}
+  }
+  _pendingEditImg=undefined;
   save();toast('✅ อัปเดตข้อมูลแล้ว');
   document.getElementById('editModal').style.display='none';
   refreshSupport();
@@ -2798,7 +3147,14 @@ function openRecDetail(idx){
   const bc=s.report==='RP'?'#dc2626':s.report==='VF'?'#2563eb':'#d97706';
   const bcBg=s.report==='RP'?'#fef2f2':s.report==='VF'?'#eff6ff':'#fffbeb';
   const el=document.getElementById('recDetailBody');
+  const recImg=imageMap[s.id];
   el.innerHTML=`
+    ${recImg?`<div class="rec-img-hero" style="border-radius:12px;overflow:hidden;background:#f1f5f9;border:1px solid var(--border);min-height:160px;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:2px;">
+      <img src="${recImg}" onclick="imgZoomOrChange(event,'${s.id}',${idx})" style="max-width:100%;max-height:260px;object-fit:contain;display:block;cursor:zoom-in;" title="คลิกเพื่อซูม · ดับเบิ้ลคลิกเพื่อเปลี่ยน">
+    </div>`:`<div onclick="openQuickImgEdit('${s.id}',${idx})" style="border:2px dashed var(--b200);border-radius:12px;padding:24px;text-align:center;cursor:pointer;background:var(--bg);margin-bottom:2px;transition:all .2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--b200)'">
+      <div style="font-size:2rem;margin-bottom:6px;">📷</div>
+      <div style="font-size:.73rem;color:var(--txt4);font-weight:600;">คลิกเพื่อเพิ่มรูปภาพ</div>
+    </div>`}
     <div class="rec-okng-row">
       <div class="rec-ok-big">
         <div class="rec-big-num" style="color:#059669;">${s.ok??'—'}</div>
