@@ -2437,7 +2437,10 @@ function compressAndSaveImage(file, recordId, cb){
 }
 
 /* Generic file input trigger (resets value for re-pick) */
-function triggerFileInput(inputId, cb){
+function triggerFileInput(inputId, cb, e){
+  // ✅ ป้องกัน Loop จากการ click ตัวเอง (Bubbling) - แก้ปัญหาเด้ง 3 ครั้ง
+  if (e && e.target && e.target.tagName === 'INPUT') return;
+  
   const old=document.getElementById(inputId);if(!old)return;
   const fresh=old.cloneNode();
   fresh.id=inputId;fresh.accept='image/*';fresh.style.display='none';
@@ -3052,22 +3055,39 @@ function addSupport(){
     ok=document.getElementById('supOk').value,
     ng=document.getElementById('supNg').value;
   if(!prob)return toast('❌ กรอกรายละเอียดปัญหา');
-  const d=di?new Date(di):new Date();
+  
+  // ✅ ใช้เวลาปัจจุบันสำหรับ timestamp จริง
+  const ts=fullTimestamp(); // เวลาบันทึกจริง (ไม่ใช่เวลาจาก date picker)
+  const now=new Date();
+  
+  // วันที่เหตุการณ์สำหรับ grouping/filtering
+  const d=di?new Date(di):now;
   const month=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  const ts=fullTimestamp(d);
+  
   const newId=Date.now().toString();
   db.support.push({
-    id:newId,problem:prob,action:act,part,report:rep,lot,
-    ok:ok!==''?parseInt(ok):'',ng:ng!==''?parseInt(ng):'',
-    datetime:ts,fullTimestamp:ts,month,
+    id:newId,
+    problem:prob,
+    action:act,
+    part,
+    report:rep,
+    lot,
+    ok:ok!==''?parseInt(ok):'',
+    ng:ng!==''?parseInt(ng):'',
+    datetime:ts,
+    fullTimestamp:ts, // ✅ เวลาบันทึกจริง
+    month,
+    eventDate:di||now.toISOString().split('T')[0],
     _user:currentUser
   });
+  
   // Save image separately (not in db) — by recordId
   if(_pendingAddImg&&typeof _pendingAddImg==='string'&&_pendingAddImg.startsWith('data:')){
     saveImage(newId,_pendingAddImg);
   }
   _pendingAddImg=null;
-  save();toast('🛠️ บันทึก Support แล้ว');
+  save();
+  toast('🛠️ บันทึก Support แล้ว');
   closeAddSupModal();
   refreshSupport();
   if(isActive('master-dash'))refreshMasterDashboard();
