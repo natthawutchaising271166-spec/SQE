@@ -2438,21 +2438,33 @@ function compressAndSaveImage(file, recordId, cb){
 
 /* Generic file input trigger (resets value for re-pick) */
 function triggerFileInput(inputId, cb, e){
-  // ✅ ป้องกัน Loop จากการ click ตัวเอง (Bubbling) - แก้ปัญหาเด้ง 3 ครั้ง
+  // ✅ ป้องกันการเรียกซ้ำจาก bubbling
   if (e && e.target && e.target.tagName === 'INPUT') return;
   
-  const old=document.getElementById(inputId);if(!old)return;
+  const old=document.getElementById(inputId);
+  if(!old) return;
+  
   const fresh=old.cloneNode();
-  fresh.id=inputId;fresh.accept='image/*';fresh.style.display='none';
+  fresh.id=inputId;
+  fresh.accept='image/*';
+  fresh.style.display='none';
+  
+  // ✅ สำคัญมาก: หยุด propagation ของ click จาก input
+  fresh.onclick = (ev) => ev.stopPropagation();
+  
   old.parentNode.replaceChild(fresh,old);
+  
   fresh.onchange=e=>{
-    const file=e.target.files[0];if(!file)return;
+    const file=e.target.files[0];
+    if(!file)return;
     if(file.size>8*1024*1024){toast('❌ รูปใหญ่เกิน 8MB');return;}
     const r=new FileReader();
     r.onload=ev=>{if(cb)cb(ev.target.result,file);};
     r.readAsDataURL(file);
   };
-  fresh.click();
+  
+  // ✅ ใช้ setTimeout เพื่อให้ DOM update เสร็จก่อน
+  setTimeout(() => fresh.click(), 0);
 }
 
 /* Add modal image preview */
@@ -2460,8 +2472,17 @@ let _pendingAddImg=null;
 function updateAddPreview(base64){
   _pendingAddImg=base64;
   const inner=document.getElementById('addImgInner');
-  if(inner) inner.innerHTML=`<img src="${base64}" class="img-zone-preview"><div class="img-zone-btns"><button class="img-zone-btn img-zone-btn-chg" onclick="event.stopPropagation();triggerFileInput('addImgInput',updateAddPreview)">🔄 เปลี่ยน</button><button class="img-zone-btn img-zone-btn-del" onclick="event.stopPropagation();_pendingAddImg=null;resetAddImgZone()">🗑 ลบ</button></div>`;
-  const zone=document.getElementById('addImgZone');if(zone){zone.style.borderColor='var(--b400)';zone.style.background='var(--b50)';}
+  if(inner) inner.innerHTML=`
+    <img src="${base64}" class="img-zone-preview">
+    <div class="img-zone-btns">
+      <button class="img-zone-btn img-zone-btn-chg" onclick="event.stopPropagation();triggerFileInput('addImgInput',updateAddPreview,event)">🔄 เปลี่ยน</button>
+      <button class="img-zone-btn img-zone-btn-del" onclick="event.stopPropagation();_pendingAddImg=null;resetAddImgZone()">🗑 ลบ</button>
+    </div>`;
+  const zone=document.getElementById('addImgZone');
+  if(zone){
+    zone.style.borderColor='var(--b400)';
+    zone.style.background='var(--b50)';
+  }
 }
 function resetAddImgZone(){
   const inner=document.getElementById('addImgInner');
@@ -2474,8 +2495,17 @@ let _pendingEditImg=undefined; // undefined=unchanged, null=remove, str=new
 function updateEditPreview(base64){
   _pendingEditImg=base64;
   const inner=document.getElementById('editImgInner');
-  if(inner)inner.innerHTML=`<img src="${base64}" class="img-zone-preview"><div class="img-zone-btns"><button class="img-zone-btn img-zone-btn-chg" onclick="event.stopPropagation();triggerFileInput('editImgInput',updateEditPreview)">🔄 เปลี่ยน</button><button class="img-zone-btn img-zone-btn-del" onclick="event.stopPropagation();_pendingEditImg=null;resetEditImgZone()">🗑 ลบ</button></div>`;
-  const zone=document.getElementById('editImgZone');if(zone){zone.style.borderColor='var(--b400)';zone.style.background='var(--b50)';}
+  if(inner) inner.innerHTML=`
+    <img src="${base64}" class="img-zone-preview">
+    <div class="img-zone-btns">
+      <button class="img-zone-btn img-zone-btn-chg" onclick="event.stopPropagation();triggerFileInput('editImgInput',updateEditPreview,event)">🔄 เปลี่ยน</button>
+      <button class="img-zone-btn img-zone-btn-del" onclick="event.stopPropagation();_pendingEditImg=null;resetEditImgZone()">🗑 ลบ</button>
+    </div>`;
+  const zone=document.getElementById('editImgZone');
+  if(zone){
+    zone.style.borderColor='var(--b400)';
+    zone.style.background='var(--b50)';
+  }
 }
 function resetEditImgZone(txt='คลิกเพื่อเลือก/เปลี่ยนรูป'){
   const inner=document.getElementById('editImgInner');
