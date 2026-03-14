@@ -79,6 +79,226 @@ body::before{
   background-size:24px 24px;pointer-events:none;z-index:0;
 }
 
+/* --- Dark Mode System --- */
+body.dark-theme {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #334155;
+    --card: #1e293b;
+    --txt: #f1f5f9;
+    --txt2: #cbd5e1;
+    --txt3: #94a3b8;
+    --border: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .sidebar, 
+body.dark-theme .topbar,
+body.dark-theme .sb-footer,
+body.dark-theme .sp-table-card,
+body.dark-theme .sp-form-card,
+body.dark-theme .card,
+body.dark-theme .kpi,
+body.dark-theme .mini-stat {
+    background: #1e293b !important;
+    border-color: var(--border) !important;
+}
+
+body.dark-theme .sb-name, body.dark-theme .main-title, body.dark-theme .sp-kpi-num {
+    color: #fff !important;
+}
+
+/* Floating Button UI */
+.floating-theme-btn {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #fff;
+    border: 1px solid rgba(37,99,235,0.2);
+    border-radius: 99px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+body.dark-theme .floating-theme-btn {
+    background: #2563eb;
+    color: #fff;
+    border-color: transparent;
+}
+.floating-theme-btn {
+    position: fixed;
+    top: 10px;
+    right: 190px;
+    z-index: 9999; /* ให้อยู่เหนือทุกเลเยอร์ */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 99px;
+    cursor: pointer;
+    box-shadow: var(--sh-md);
+    transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--txt);
+}
+
+.floating-theme-btn:hover {
+    transform: translateY(2px) scale(1.05);
+    box-shadow: var(--sh-lg);
+    border-color: var(--primary);
+}
+
+/* --- Global Dark Mode Overrides --- */
+body.dark-theme {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --card: #1e293b;
+    --txt: #f1f5f9;
+    --txt2: #cbd5e1;
+    --border: #334155;
+    background-color: var(--bg) !important;
+    color: var(--txt);
+}
+
+/* 1. บังคับสีพื้นหลังการ์ดและคอนเทนเนอร์ทั้งหมด */
+body.dark-theme .card, 
+body.dark-theme .sp-table-card, 
+body.dark-theme .sp-form-card, 
+body.dark-theme .chart-container,
+body.dark-theme .sdb-chart-card,
+body.dark-theme .kpi-card {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 2. จัดการตารางข้อมูล (Tables) ให้ครบทุกส่วน */
+body.dark-theme table, 
+body.dark-theme .sp-main-table {
+    background: var(--card) !important;
+    color: var(--txt) !important;
+}
+/* --- ปรับแต่งกล่องตัวเลข Overview ให้เนียน --- */
+body.dark-theme .sp-kpi-card, 
+body.dark-theme .kpi-box,
+body.dark-theme .stat-card {
+    background: var(--card) !important; /* สี Navy เข้มเท่ากันทั้งหมด */
+    border: 1px solid var(--border) !important;
+    border-left: 4px solid var(--primary) !important; /* เพิ่มแถบสีด้านข้างให้ดูหรู */
+    box-shadow: none !important;
+}
+
+/* แก้ไขพื้นหลังของตัวเลข (ถ้ามีกล่องขาวซ้อน) */
+body.dark-theme .sp-kpi-num,
+body.dark-theme .kpi-value,
+body.dark-theme .count-number {
+    background: transparent !important; /* ลบพื้นหลังสีขาว */
+    color: #38bdf8 !important; /* สีฟ้า Azure */
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+/* ปรับสีตัวหนังสืออธิบาย (Label) */
+body.dark-theme .sp-kpi-label,
+body.dark-theme .kpi-title {
+    color: var(--txt3) !important;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ส่วนของ Icon ในกล่องตัวเลข (ถ้ามี) */
+body.dark-theme .kpi-icon {
+    background: rgba(56, 189, 248, 0.1) !important;
+    color: #38bdf8 !important;
+}
+
+
+body.dark-theme thead th {
+    background: #161e2e !important;
+    color: #38bdf8 !important; /* สีฟ้าสว่างให้อ่านง่ายขึ้น */
+    border-bottom: 2px solid var(--border) !important;
+}
+
+body.dark-theme td {
+    border-bottom: 1px solid var(--border) !important;
+    color: var(--txt2) !important;
+}
+
+body.dark-theme tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03) !important; /* แถวเว้นแถวแบบจางๆ */
+}
+
+/* 3. ช่องกรอกข้อมูลและปุ่ม (Inputs & Selects) */
+body.dark-theme input, 
+body.dark-theme select, 
+body.dark-theme textarea {
+    background: #0f172a !important;
+    border: 1px solid var(--border) !important;
+    color: #fff !important;
+}
+
+/* 4. หัวข้อตัวหนังสือต่างๆ */
+body.dark-theme h1, body.dark-theme h2, body.dark-theme h3, 
+body.dark-theme .sp-kpi-label, body.dark-theme .main-title {
+    color: #fff !important;
+}
+
+/* --- Special Jobs Specific Overrides --- */
+body.dark-theme .special-jobs-container, 
+body.dark-theme [id*="special"], 
+body.dark-theme [class*="job-"] {
+    background-color: var(--bg) !important;
+    color: var(--txt) !important;
+}
+
+/* หากหน้า Special Jobs ใช้การ์ดรูปแบบพิเศษ */
+body.dark-theme .job-card,
+body.dark-theme .task-item,
+body.dark-theme .modal-content {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--txt) !important;
+}
+
+/* จัดการส่วนหัวตารางและแถวในหน้า Special Jobs */
+body.dark-theme .special-table thead th,
+body.dark-theme #specialJobsTable thead th {
+    background: #161e2e !important;
+    color: #38bdf8 !important;
+}
+
+/* แก้ไขสีตัวหนังสือใน List หรือป้ายกำกับ (Labels) */
+body.dark-theme .job-status, 
+body.dark-theme .job-desc,
+body.dark-theme .special-label {
+    color: var(--txt2) !important;
+}
+
+/* ดักจับทุก Element ที่อาจจะหลุดรอด (ใช้ Selector แบบกว้าง) */
+body.dark-theme section, 
+body.dark-theme article {
+    background-color: transparent !important;
+}
+
+/* ซ่อนข้อความในหน้าจอเล็ก (เหลือแค่ไอคอน) */
+@media (max-width: 600px) {
+    .btn-text { display: none; }
+    .floating-theme-btn { padding: 8px; border-radius: 50%; }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -1034,6 +1254,10 @@ tbody tr:last-child td{border-bottom:none}
 }
 </style>
 </head>
+<button id="themeToggle" class="floating-theme-btn">
+    <span class="btn-icon">🌙</span>
+    <span class="btn-text">Dark Mode</span>
+</button>
 <body>
 
 <!-- ════════════════════════════════
@@ -1215,6 +1439,7 @@ tbody tr:last-child td{border-bottom:none}
   <div class="sb-footer">
     <button id="syncBtn" class="sb-btn sb-btn-sync" onclick="syncWithGoogleSheets()">🔄 SYNC CLOUD</button>
     <button class="sb-btn sb-btn-home" onclick="window.location.href='index.html'">🏠 หน้าหลัก</button>
+</button>
   </div>
 </aside>
 
@@ -1241,13 +1466,19 @@ tbody tr:last-child td{border-bottom:none}
     <!-- Date Filter Bar -->
     <div class="date-filter-bar">
       <span class="df-label">📅 ช่วงเวลา</span>
-      <div class="df-preset">
-        <button class="df-btn" onclick="setDateFilter('master-dash','today',this)">วันนี้</button>
-        <button class="df-btn" onclick="setDateFilter('master-dash','week',this)">7 วัน</button>
-        <button class="df-btn active" onclick="setDateFilter('master-dash','month',this)">เดือนนี้</button>
-        <button class="df-btn" onclick="setDateFilter('master-dash','quarter',this)">ไตรมาส</button>
-        <button class="df-btn" onclick="setDateFilter('master-dash','year',this)">ทั้งปี 2026</button>
-      </div>
+ <div class="df-preset">
+    <button class="df-btn" onclick="setDateFilter('today', this)">วันนี้</button>
+    <button class="df-btn" onclick="setDateFilter('7days', this)">7 วัน</button>
+    <button class="df-btn active" onclick="setDateFilter('month', this)">เดือนนี้</button>
+    <button class="df-btn" onclick="setDateFilter('quarter', this)">ไตรมาส</button>
+    <button class="df-btn" onclick="setDateFilter('year', this)">ทั้งปี</button>
+</div>
+
+<div class="df-custom-range">
+    <input type="date" id="date-start" class="df-input-sm">
+    <input type="date" id="date-end" class="df-input-sm">
+    <button onclick="setDateFilter('custom', this)" class="df-btn">ตกลง</button>
+</div>
       <div class="df-divider"></div>
       <input type="date" id="md-from" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('master-dash')">
       <span class="df-sep">—</span>
@@ -1344,13 +1575,20 @@ tbody tr:last-child td{border-bottom:none}
     <!-- Date Filter Bar -->
     <div class="date-filter-bar">
       <span class="df-label">📅 กรองข้อมูล</span>
-      <div class="df-preset">
-        <button class="df-btn" onclick="setDateFilter('daily','today',this)">วันนี้</button>
-        <button class="df-btn" onclick="setDateFilter('daily','week',this)">7 วัน</button>
-        <button class="df-btn active" onclick="setDateFilter('daily','month',this)">เดือนนี้</button>
-        <button class="df-btn" onclick="setDateFilter('daily','quarter',this)">ไตรมาส</button>
-        <button class="df-btn" onclick="setDateFilter('daily','year',this)">ทั้งปี</button>
-      </div>
+<div class="df-preset">
+    <button class="df-btn" onclick="setDateFilter('today', this)">วันนี้</button>
+    <button class="df-btn" onclick="setDateFilter('week', this)">7 วัน</button>
+    <button class="df-btn active" onclick="setDateFilter('month', this)">เดือนนี้</button>
+    <button class="df-btn" onclick="setDateFilter('quarter', this)">ไตรมาส</button>
+    <button class="df-btn" onclick="setDateFilter('year', this)">ทั้งปี</button>
+</div>
+
+<div class="df-custom-range" style="display:flex; align-items:center; gap:8px; margin-left:15px;">
+    <input type="date" id="date-start" class="df-input-sm">
+    <span style="color:var(--txt3)">-</span>
+    <input type="date" id="date-end" class="df-input-sm">
+    <button onclick="setDateFilter('custom', this)" class="df-btn active" style="background:var(--grad); border:none;">ตกลง</button>
+</div>
       <div class="df-divider"></div>
       <select id="monthFilter" onchange="onMonthFilterChange()" style="font-size:.72rem;padding:4px 8px;border-radius:8px;">
         <option value="all">📊 ทั้งปี</option>
@@ -3325,6 +3563,45 @@ function openRecDetail(idx){
   document.getElementById('recDetailModal').classList.add('open');
 }
 function closeRecDetail(){document.getElementById('recDetailModal').classList.remove('open');}
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const btnIcon = themeToggle.querySelector('.btn-icon');
+    const btnText = themeToggle.querySelector('.btn-text');
+
+    function applyTheme(isDark) {
+        if (isDark) {
+            document.body.classList.add('dark-theme');
+            btnIcon.innerText = '☀️';
+            btnText.innerText = 'Light Mode';
+        } else {
+            document.body.classList.remove('dark-theme');
+            btnIcon.innerText = '🌙';
+            btnText.innerText = 'Dark Mode';
+        }
+    }
+
+    // คลิกเพื่อสลับ
+    themeToggle.addEventListener('click', () => {
+        const isDark = document.body.classList.toggle('dark-theme');
+        localStorage.setItem('wap-theme', isDark ? 'dark' : 'light');
+        applyTheme(isDark);
+    });
+
+    // โหลดค่าเริ่มต้น
+    const savedTheme = localStorage.getItem('wap-theme');
+    if (savedTheme === 'dark') {
+        applyTheme(true);
+    }
+});
+</script>
+<style>
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+</style>
 </script>
 </body>
 </html>
