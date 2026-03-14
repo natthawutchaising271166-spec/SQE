@@ -665,175 +665,497 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
 }
 
 /* ═══════════════════════════════════════════════════
-   DASHBOARD MODAL
+   DASHBOARD MODAL — POWER BI STYLE REDESIGN
 ═══════════════════════════════════════════════════ */
 #dashboardModal {
   position: fixed; inset: 0;
   display: none; align-items: stretch; justify-content: stretch;
-  background: rgba(15,23,42,.55); backdrop-filter: blur(20px);
+  background: rgba(15,23,42,.4);
+  backdrop-filter: blur(12px);
   z-index: 5000;
 }
+
+/* Main Dashboard Container */
 .glass-dash {
   width: 100%; height: 100dvh;
-  background: var(--bg-canvas);
+  background: #f8fafc;
   display: flex; flex-direction: column; overflow: hidden;
+  font-family: var(--font-body);
 }
+
+/* Dashboard Topbar */
 .dash-topbar {
-  flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between;
-  height: 58px; padding: 0 1.4rem; gap: .75rem;
+  flex: 0 0 auto;
+  height: 64px;
+  padding: 0 1.5rem;
   background: #fff;
-  border-bottom: 1.5px solid var(--blue-100);
-  box-shadow: 0 2px 8px rgba(37,99,235,.06);
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
 }
+
+/* Dashboard Body */
 .dash-body {
-  flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;
-  gap: .55rem; padding: .75rem 1.1rem; overflow: hidden;
-}
-.dash-kpi-row {
-  flex: 0 0 auto; display: grid;
-  grid-template-columns: repeat(5,1fr); gap: .55rem;
-  height: clamp(82px,11vh,108px);
-}
-.dkpi {
-  display: flex; flex-direction: column; justify-content: space-between;
-  border-radius: var(--r-md); padding: .7rem .85rem;
-  background: #fff; border: 1px solid rgba(226,232,240,.8);
-  box-shadow: var(--shadow-xs);
-  transition: all .22s; cursor: default; position: relative; overflow: hidden;
-  animation: dkpiIn .45s cubic-bezier(.34,1.56,.64,1) both;
-}
-.dkpi::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--dkpi-grad,linear-gradient(90deg,var(--blue-600),var(--blue-400))); }
-.dkpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-@keyframes dkpiIn { from{opacity:0;transform:translateY(14px) scale(.95)} to{opacity:1;transform:none} }
-
-.dash-stats-row {
-  flex: 0 0 auto; display: grid;
-  grid-template-columns: repeat(4,1fr); gap: .55rem;
-  height: clamp(54px,7vh,72px);
-}
-.d-stat {
-  display: flex; align-items: center; gap: .55rem;
-  border-radius: var(--r-sm); padding: .4rem .75rem;
-  background: #fff; border: 1px solid rgba(226,232,240,.7);
-  box-shadow: var(--shadow-xs);
-  animation: dkpiIn .4s ease-out both; overflow: hidden;
-}
-.d-stat-icon {
-  width: clamp(26px,2.5vw,32px); height: clamp(26px,2.5vw,32px);
-  border-radius: var(--r-xs); display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; font-size: clamp(.8rem,1.2vw,.95rem);
+  flex: 1; min-height: 0;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.dash-charts-row {
-  flex: 0 0 37%; display: grid;
-  grid-template-columns: 1.7fr 1fr 1.1fr; gap: .55rem;
-  min-height: 0; overflow: hidden;
+/* ═══ KPI HERO SECTION ═══ */
+.dash-kpi-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
 }
+
+.kpi-main-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.kpi-main-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+.kpi-main-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--kpi-color, #3b82f6);
+}
+
+.kpi-main-card .kpi-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--kpi-bg, rgba(59,130,246,0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.kpi-main-card .kpi-title {
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.kpi-main-card .kpi-value-hero {
+  font-family: var(--font-head);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.kpi-main-card .kpi-details {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.kpi-main-card .kpi-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kpi-main-card .kpi-detail-value {
+  font-weight: 700;
+  color: #1e293b;
+  font-family: var(--font-mono);
+}
+
+/* Mini KPI Grid */
+.kpi-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.kpi-mini-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.kpi-mini-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+}
+
+.kpi-mini-card .kpi-accent {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 4px;
+  background: var(--kpi-color, #3b82f6);
+}
+
+.kpi-mini-card .kpi-content {
+  padding-left: 0.75rem;
+}
+
+.kpi-mini-card .kpi-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.kpi-mini-card .kpi-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.kpi-mini-card .kpi-value {
+  font-family: var(--font-head);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.kpi-mini-card .kpi-unit {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.kpi-mini-card .kpi-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.kpi-mini-card .kpi-lot {
+  color: #64748b;
+}
+
+.kpi-mini-card .kpi-lot strong {
+  color: #334155;
+  font-weight: 700;
+}
+
+.kpi-mini-card .kpi-pct {
+  font-weight: 700;
+  color: var(--kpi-color, #3b82f6);
+  font-family: var(--font-mono);
+}
+
+/* ═══ CHARTS SECTION ═══ */
+.dash-charts-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1.5rem;
+}
+
 .dash-chart-card {
-  display: flex; flex-direction: column; min-height: 0;
-  border-radius: var(--r-md); padding: .65rem .85rem;
-  overflow: hidden; background: #fff;
-  border: 1px solid rgba(226,232,240,.8);
-  box-shadow: var(--shadow-xs);
-  animation: chartIn .5s ease-out both;
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
 }
-@keyframes chartIn { from{opacity:0;transform:scale(.94)} to{opacity:1;transform:none} }
-.dash-chart-wrap { position:relative; flex:1 1 0; min-height:0; width:100%; overflow:hidden; }
-.dash-chart-wrap canvas { position:absolute!important; inset:0!important; width:100%!important; height:100%!important; }
-.donut-wrap { position:relative; flex:1 1 0; min-height:0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.donut-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
 
-.dash-rank-row {
-  flex: 1 1 0; min-height: 0; display: grid;
-  grid-template-columns: repeat(3,1fr); gap: .55rem;
+.dash-chart-card .chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
 }
-.dash-rank-card {
-  display: flex; flex-direction: column; min-height: 0;
-  border-radius: var(--r-md); padding: .65rem .8rem;
-  overflow: hidden; background: #fff;
-  border: 1px solid rgba(226,232,240,.8);
-  box-shadow: var(--shadow-xs);
-  animation: rankIn .4s ease-out both;
-}
-@keyframes rankIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
 
-.bar-wrap { margin-bottom: 8px; cursor: pointer; transition: transform .15s; }
-.bar-wrap:hover { transform: translateX(3px); }
-.bar-lbl {
-  font-size: clamp(.56rem,.72vw,.64rem); font-weight: 700; color: var(--text-500);
-  margin-bottom: 3px; display: flex; justify-content: space-between; align-items: center; gap: 4px;
+.dash-chart-card .chart-title {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.25rem;
 }
-.bar-lbl .bar-k { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-.bar-bg { background: #f1f5f9; height: 7px; border-radius: 99px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 99px; transition: width 1.1s cubic-bezier(.16,1,.3,1); width: 0%; }
 
-/* Dash date inputs */
+.dash-chart-card .chart-subtitle {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.dash-chart-card .chart-body {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+/* Donut Chart Special Styling */
+.donut-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.donut-center-text {
+  position: absolute;
+  text-align: center;
+  pointer-events: none;
+}
+
+.donut-center-text .total-value {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.donut-center-text .total-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
+/* ═══ RANKINGS SECTION ═══ */
+.dash-rankings-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.rank-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.rank-card .rank-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.rank-card .rank-title {
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rank-card .rank-subtitle {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.rank-card .rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+
+.rank-item:hover {
+  background: #f8fafc;
+  transform: translateX(4px);
+}
+
+.rank-item .rank-badge {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.rank-item .rank-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rank-item .rank-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rank-item .rank-bar-container {
+  height: 4px;
+  background: #f1f5f9;
+  border-radius: 99px;
+  margin-top: 0.35rem;
+  overflow: hidden;
+}
+
+.rank-item .rank-bar {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rank-item .rank-stats {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.rank-item .rank-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.rank-item .rank-pct {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Dashboard Filter Controls */
+.dash-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dash-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  padding: 0.5rem 1rem;
+  border-radius: 99px;
+  border: 1px solid #e2e8f0;
+}
+
 .dash-date-input {
-  font-size: .72rem; font-weight: 600; background: var(--bg-input);
-  border: 1px solid var(--border); color: var(--text-900);
-  border-radius: var(--r-xs); padding: .3rem .65rem; outline: none;
-  font-family: var(--font-body); transition: border-color .2s;
+  background: transparent;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  font-family: var(--font-mono);
+  outline: none;
+  cursor: pointer;
 }
-.dash-date-input:focus { border-color: var(--blue-400); }
+
 .dash-select {
-  font-size: .72rem; font-weight: 600; background: var(--bg-input);
-  border: 1px solid var(--border); color: var(--text-900);
-  border-radius: var(--r-xs); padding: .3rem .7rem; outline: none;
-  cursor: pointer; max-width: 130px; font-family: var(--font-body);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
 }
 
-/* Animations */
-.spin { animation: spin .9s linear infinite; }
-@keyframes kpiFlash { 0%{box-shadow:0 0 0 0 rgba(59,130,246,.35)} 50%{box-shadow:0 0 0 8px rgba(59,130,246,0)} 100%{box-shadow:none} }
-.kpi-flash { animation: kpiFlash .6s ease-out; }
-@keyframes rowDelete { to{opacity:0;transform:translateX(40px) scale(.95);max-height:0;padding:0} }
-.row-deleting { animation: rowDelete .3s ease-in forwards; pointer-events: none; }
-@keyframes btnSuccess { 0%{transform:scale(1)} 40%{transform:scale(1.06)} 70%{transform:scale(.98)} 100%{transform:scale(1)} }
-.btn-success { animation: btnSuccess .5s cubic-bezier(.34,1.56,.64,1); }
-.form-in { animation: formIn .35s cubic-bezier(.34,1.56,.64,1) both; }
-@keyframes formIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:none} }
+/* Animation Classes */
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-/* Floating mascot */
-@keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
-@keyframes floatSway { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-6px) rotate(2deg)} }
-.mascot-float  { animation: floatY 3.5s ease-in-out infinite; }
-.mascot-sway   { animation: floatSway 4s ease-in-out infinite; }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-[id^="qty"],[id^="lot"],[id^="pct"],[id^="master"] { transition: all .2s ease; }
+.animate-in {
+  animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
 
-/* ─ Responsive ─ */
-@media(max-width:1100px) {
-  #appShell{padding:.65rem;gap:.65rem}
-  #brandCard{display:none!important}
-  #kpiGrid{grid-template-columns:repeat(5,1fr)!important}
-  #sidebar{width:230px!important}
+/* Responsive */
+@media (max-width: 1200px) {
+  .dash-charts-section {
+    grid-template-columns: 1fr 1fr;
+  }
+  .dash-rankings-section {
+    grid-template-columns: 1fr 1fr;
+  }
+  .kpi-mini-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
-@media(max-width:900px) {
-  #kpiGrid{grid-template-columns:repeat(3,1fr)!important}
-  #sidebar{width:205px!important}
+
+@media (max-width: 768px) {
+  .dash-kpi-hero {
+    grid-template-columns: 1fr;
+  }
+  .dash-charts-section {
+    grid-template-columns: 1fr;
+  }
+  .dash-rankings-section {
+    grid-template-columns: 1fr;
+  }
+  .dash-topbar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+  .dash-controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
 }
-@media(max-width:700px) {
-  html,body{overflow:auto}
-  #appShell{position:relative;height:auto;overflow:visible;padding:.5rem;gap:.5rem}
-  #appHeader{display:flex!important;flex-direction:column!important}
-  #kpiGrid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:.5rem}
-  #sidebar{display:none!important}
-  #mainPanel{border-radius:var(--r-lg)!important}
-}
-@media(max-width:1050px) {
-  .dash-kpi-row{grid-template-columns:repeat(3,1fr)}
-  .dash-stats-row{grid-template-columns:repeat(2,1fr)}
-  .dash-charts-row{grid-template-columns:1fr 1fr;flex:0 0 38%}
-}
-@media(max-width:768px) {
-  .glass-dash{overflow-y:auto}
-  .dash-body{overflow-y:auto;gap:.45rem}
-  .dash-kpi-row{grid-template-columns:repeat(2,1fr);height:auto}
-  .dash-stats-row{grid-template-columns:repeat(2,1fr);height:auto}
-  .dash-charts-row{grid-template-columns:1fr;flex:0 0 auto;height:260px}
-  .dash-chart-card:not(:first-child){display:none}
-  .dash-rank-row{flex:0 0 auto;height:220px}
-}
+
 /* ═══════════════════════════════════════════════════
    DARK MODE THEME
 ═══════════════════════════════════════════════════ */
@@ -1411,146 +1733,197 @@ html.dark-mode .dash-chart-card[style*="linear-gradient(145deg, var(--blue-900)"
 </div>
 
 <!-- ════════════════════════════════
-     DASHBOARD MODAL
+     DASHBOARD MODAL — REDESIGNED
 ════════════════════════════════ -->
 <div id="dashboardModal" onclick="closeDashboard()">
 <div class="glass-dash" onclick="event.stopPropagation()">
   <!-- Topbar -->
   <div class="dash-topbar">
-    <div style="display:flex;align-items:center;gap:.75rem;flex-shrink:0;min-width:0">
-      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue-700),var(--blue-500));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(37,99,235,.3)">
-        <svg width="16" height="16" viewBox="0 0 50 50" fill="none">
+    <div style="display:flex;align-items:center;gap:1rem">
+      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue-700),var(--blue-500));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(37,99,235,.25)">
+        <svg width="18" height="18" viewBox="0 0 50 50" fill="none">
           <circle stroke="#fff" stroke-width="5" cx="25" cy="25" r="17"/>
           <line stroke="#fff" stroke-width="5" stroke-linecap="round" x1="35" y1="35" x2="44" y2="44"/>
         </svg>
       </div>
-      <h2 style="font-family:var(--font-head);font-weight:800;color:var(--text-900);font-size:clamp(.85rem,1.6vw,1.2rem);white-space:nowrap;letter-spacing:-.02em">
-        SQE <span style="color:var(--blue-600)">Analytics</span>
-      </h2>
-      <!-- Dashboard mascot (magnifier) -->
-      <svg class="mascot-float" width="28" height="28" viewBox="0 0 28 28" fill="none" style="flex-shrink:0">
-        <circle cx="11" cy="11" r="8" fill="var(--blue-50)" stroke="var(--blue-400)" stroke-width="2"/>
-        <circle cx="11" cy="11" r="4" fill="var(--blue-100)"/>
-        <circle cx="11" cy="11" r="1.5" fill="var(--blue-500)"/>
-        <line x1="17" y1="17" x2="25" y2="25" stroke="var(--blue-500)" stroke-width="2.5" stroke-linecap="round"/>
-      </svg>
-      <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#059669;font-family:var(--font-head);font-weight:700;padding:2px 9px;border-radius:99px;font-size:.58rem">
-        <span style="width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 1.4s ease-in-out infinite;display:inline-block"></span>LIVE
+      <div>
+        <h2 style="font-family:var(--font-head);font-weight:800;color:#0f172a;font-size:1.35rem;letter-spacing:-.02em">Analytics Dashboard</h2>
+        <p style="font-size:.75rem;color:#64748b;font-weight:500"><span id="dashUser" style="color:var(--blue-600);font-weight:700"></span> · <span id="dashTime"></span></p>
       </div>
-      <span style="color:var(--text-400);font-size:.62rem;font-weight:600;white-space:nowrap">
-        · <span id="dashUser" style="color:var(--blue-600);font-weight:700"></span>
-      </span>
     </div>
-    <div style="display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0">
-      <div style="display:flex;align-items:center;gap:.4rem;background:var(--bg-input);padding:.3rem .75rem;border-radius:99px;border:1px solid var(--border)">
-        <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="var(--text-400)" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+    
+    <div class="dash-controls">
+      <div class="dash-filter-group">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#94a3b8"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         <input type="date" id="dashStart" onchange="refreshDash()" class="dash-date-input">
-        <span style="color:var(--text-300);font-weight:700">—</span>
+        <span style="color:#cbd5e1;font-weight:600">→</span>
         <input type="date" id="dashEnd" onchange="refreshDash()" class="dash-date-input">
       </div>
-      <select id="dashVendor" onchange="refreshDash()" class="dash-select"></select>
-      <button onclick="resetDashFilters()" title="Reset"
-        style="padding:.4rem .6rem;color:var(--text-400);background:var(--bg-input);border:1px solid var(--border);border-radius:99px;cursor:pointer;transition:all .2s;display:flex;align-items:center"
-        onmouseover="this.style.color='var(--blue-600)';this.style.borderColor='var(--blue-300)'" onmouseout="this.style.color='var(--text-400)';this.style.borderColor='var(--border)'">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      <select id="dashVendor" onchange="refreshDash()" class="dash-select" style="min-width:140px"></select>
+      <button onclick="resetDashFilters()" title="Reset" style="padding:.5rem .75rem;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.35rem;font-weight:600;font-size:.75rem">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Reset
       </button>
-      <button onclick="closeDashboard()"
-        style="width:28px;height:28px;border-radius:99px;background:var(--accent-red);color:#fff;font-weight:800;font-size:.75rem;border:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(239,68,68,.3)"
-        onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='var(--accent-red)'">✕</button>
+      <button onclick="closeDashboard()" style="width:36px;height:36px;border-radius:10px;background:#ef4444;color:#fff;font-weight:800;font-size:1.1rem;border:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(239,68,68,.3)">✕</button>
     </div>
   </div>
 
   <!-- Body -->
   <div class="dash-body">
-    <!-- KPI Row -->
-    <div class="dash-kpi-row">
-      <div class="dkpi" style="--dkpi-grad:linear-gradient(90deg,var(--blue-700),var(--blue-400))">
-        <div style="display:flex;justify-content:space-between"><p style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.52rem,.68vw,.6rem)">Total QTY</p><span style="background:var(--blue-50);color:var(--blue-600);font-family:var(--font-head);font-weight:700;padding:1px 7px;border-radius:99px;font-size:.55rem;border:1px solid var(--blue-200)">ALL</span></div>
-        <div id="dTotalQty" style="font-family:var(--font-head);font-weight:700;color:var(--text-900);font-size:clamp(1.1rem,2.1vw,2rem);letter-spacing:-.03em">0</div>
-        <div style="font-family:var(--font-body);color:var(--text-400);font-size:clamp(.5rem,.65vw,.58rem);font-weight:600">Lots: <span id="dTotalLot" style="color:var(--blue-600);font-weight:800;font-family:var(--font-head);font-size:clamp(.6rem,.75vw,.68rem)">0</span></div>
-      </div>
-      <div class="dkpi" style="--dkpi-grad:linear-gradient(90deg,#ea580c,#f97316)">
-        <div style="display:flex;justify-content:space-between"><p style="font-family:var(--font-head);font-weight:700;color:var(--accent-or);text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.52rem,.68vw,.6rem)">SF Fault</p><span id="dSFpct" style="background:rgba(249,115,22,.1);color:var(--accent-or);font-family:var(--font-mono);font-weight:500;padding:1px 7px;border-radius:99px;font-size:clamp(.53rem,.7vw,.62rem);border:1px solid rgba(249,115,22,.2)">0%</span></div>
-        <div id="dSFqty" style="font-family:var(--font-head);font-weight:700;color:var(--accent-or);font-size:clamp(1.1rem,2.1vw,2rem);letter-spacing:-.03em">0</div>
-        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dSFlot" style="color:var(--accent-or);font-weight:800;font-family:var(--font-head);font-size:clamp(.6rem,.75vw,.68rem)">0</span></div>
-      </div>
-      <div class="dkpi" style="--dkpi-grad:linear-gradient(90deg,#dc2626,#ef4444)">
-        <div style="display:flex;justify-content:space-between"><p style="font-family:var(--font-head);font-weight:700;color:var(--accent-red);text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.52rem,.68vw,.6rem)">Vendor</p><span id="dVENpct" style="background:rgba(239,68,68,.08);color:var(--accent-red);font-family:var(--font-mono);font-weight:500;padding:1px 7px;border-radius:99px;font-size:clamp(.53rem,.7vw,.62rem);border:1px solid rgba(239,68,68,.2)">0%</span></div>
-        <div id="dVENqty" style="font-family:var(--font-head);font-weight:700;color:var(--accent-red);font-size:clamp(1.1rem,2.1vw,2rem);letter-spacing:-.03em">0</div>
-        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dVENlot" style="color:var(--accent-red);font-weight:800;font-family:var(--font-head);font-size:clamp(.6rem,.75vw,.68rem)">0</span></div>
-      </div>
-      <div class="dkpi" style="--dkpi-grad:linear-gradient(90deg,var(--blue-700),var(--blue-500))">
-        <div style="display:flex;justify-content:space-between"><p style="font-family:var(--font-head);font-weight:700;color:var(--blue-600);text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.52rem,.68vw,.6rem)">CTC</p><span id="dCTCpct" style="background:var(--blue-50);color:var(--blue-600);font-family:var(--font-mono);font-weight:500;padding:1px 7px;border-radius:99px;font-size:clamp(.53rem,.7vw,.62rem);border:1px solid var(--blue-200)">0%</span></div>
-        <div id="dCTCqty" style="font-family:var(--font-head);font-weight:700;color:var(--blue-600);font-size:clamp(1.1rem,2.1vw,2rem);letter-spacing:-.03em">0</div>
-        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dCTClot" style="color:var(--blue-600);font-weight:800;font-family:var(--font-head);font-size:clamp(.6rem,.75vw,.68rem)">0</span></div>
-      </div>
-      <div class="dkpi" style="--dkpi-grad:linear-gradient(90deg,#059669,#10b981)">
-        <div style="display:flex;justify-content:space-between"><p style="font-family:var(--font-head);font-weight:700;color:var(--accent-grn);text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.52rem,.68vw,.6rem)">Can Use</p><span id="dOKpct" style="background:rgba(16,185,129,.08);color:var(--accent-grn);font-family:var(--font-mono);font-weight:500;padding:1px 7px;border-radius:99px;font-size:clamp(.53rem,.7vw,.62rem);border:1px solid rgba(16,185,129,.2)">0%</span></div>
-        <div id="dOKqty" style="font-family:var(--font-head);font-weight:700;color:var(--accent-grn);font-size:clamp(1.1rem,2.1vw,2rem);letter-spacing:-.03em">0</div>
-        <div style="font-size:clamp(.5rem,.65vw,.58rem);color:var(--text-400);font-weight:600">Lots: <span id="dOKlot" style="color:var(--accent-grn);font-weight:800;font-family:var(--font-head);font-size:clamp(.6rem,.75vw,.68rem)">0</span></div>
-      </div>
-    </div>
-
-    <!-- Stats Row -->
-    <div class="dash-stats-row">
-      <div class="d-stat" style="animation-delay:.3s"><div class="d-stat-icon" style="background:rgba(239,68,68,.08)">🚫</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Rejection Rate</div><div id="dRejRate" style="font-family:var(--font-head);font-weight:700;color:var(--accent-red);font-size:clamp(.88rem,1.5vw,1.25rem);letter-spacing:-.02em">0%</div></div></div>
-      <div class="d-stat" style="animation-delay:.36s"><div class="d-stat-icon" style="background:var(--blue-50)">🏆</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Top Shift</div><div id="dTopShift" style="font-family:var(--font-head);font-weight:700;color:var(--blue-700);font-size:clamp(.88rem,1.5vw,1.25rem)">—</div></div></div>
-      <div class="d-stat" style="animation-delay:.42s"><div class="d-stat-icon" style="background:rgba(249,115,22,.08)">📦</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Avg QTY/Lot</div><div id="dAvgQty" style="font-family:var(--font-head);font-weight:700;color:var(--accent-or);font-size:clamp(.88rem,1.5vw,1.25rem)">0</div></div></div>
-      <div class="d-stat" style="animation-delay:.48s"><div class="d-stat-icon" style="background:rgba(16,185,129,.08)">📅</div><div style="min-width:0"><div style="font-family:var(--font-head);font-weight:700;color:var(--text-400);text-transform:uppercase;font-size:clamp(.5rem,.65vw,.58rem)">Active Days</div><div id="dActiveDays" style="font-family:var(--font-head);font-weight:700;color:var(--accent-grn);font-size:clamp(.88rem,1.5vw,1.25rem)">0</div></div></div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="dash-charts-row">
-      <div class="dash-chart-card" style="animation-delay:.2s">
-        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
-          <div><h4 style="font-family:var(--font-head);font-weight:800;color:var(--text-900);font-size:clamp(.58rem,.8vw,.7rem)">Monthly Performance</h4><p style="color:var(--text-400);font-weight:500;font-size:clamp(.5rem,.65vw,.58rem)">Total qty per month</p></div>
-          <div id="monthlyInsight" style="font-weight:700;color:var(--text-700);background:var(--blue-50);border:1px solid var(--blue-200);border-radius:99px;font-size:clamp(.52rem,.68vw,.62rem);padding:2px 10px;white-space:nowrap;font-family:var(--font-head)">—</div>
+    <!-- ═══ KPI HERO SECTION ═══ -->
+    <div class="dash-kpi-hero">
+      <!-- Total Production -->
+      <div class="kpi-main-card animate-in" style="--kpi-color:#3b82f6;--kpi-bg:rgba(59,130,246,0.1);animation-delay:0.1s">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-title">Total Production</div>
+        <div class="kpi-value-hero" id="dHeroQty">0</div>
+        <div class="kpi-details">
+          <div class="kpi-detail-item"><span>📦</span><span class="kpi-detail-value" id="dHeroLot">0</span> Lots</div>
+          <div class="kpi-detail-item"><span>📅</span><span class="kpi-detail-value" id="dHeroDays">0</span> Days</div>
         </div>
-        <div class="dash-chart-wrap"><canvas id="trendChart"></canvas></div>
       </div>
-      <div class="dash-chart-card" style="background:linear-gradient(145deg,var(--blue-900),var(--blue-800));border-color:var(--blue-700);animation-delay:.28s">
-        <div style="flex-shrink:0;margin-bottom:4px"><h4 style="font-family:var(--font-head);font-weight:800;color:#fff;font-size:clamp(.58rem,.8vw,.7rem)">Fault Distribution</h4><p style="color:rgba(255,255,255,.5);font-weight:500;font-size:clamp(.5rem,.65vw,.58rem)">Judgment breakdown</p></div>
-        <div class="donut-wrap"><canvas id="donutChart"></canvas>
-          <div class="donut-center">
-            <div id="donutTotal" style="font-family:var(--font-head);font-weight:700;color:#fff;font-size:clamp(.88rem,1.6vw,1.45rem);letter-spacing:-.03em">0</div>
-            <div style="color:rgba(255,255,255,.5);font-weight:600;text-transform:uppercase;font-size:clamp(.44rem,.6vw,.55rem);font-family:var(--font-head)">Total</div>
+      
+      <!-- Quality Score -->
+      <div class="kpi-main-card animate-in" style="--kpi-color:#10b981;--kpi-bg:rgba(16,185,129,0.1);animation-delay:0.15s">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-title">Pass Rate (Can Use)</div>
+        <div class="kpi-value-hero" id="dHeroPass">0%</div>
+        <div class="kpi-details">
+          <div class="kpi-detail-item"><span>📊</span>Rejection: <span class="kpi-detail-value" style="color:#ef4444" id="dHeroRej">0%</span></div>
+          <div class="kpi-detail-item"><span>⚡</span>Avg/Lot: <span class="kpi-detail-value" id="dHeroAvg">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini KPI Grid -->
+    <div class="kpi-mini-grid animate-in" style="animation-delay:0.2s">
+      <div class="kpi-mini-card" style="--kpi-color:#f97316">
+        <div class="kpi-accent"></div>
+        <div class="kpi-content">
+          <div class="kpi-label">SF Fault</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="dMiniSF">0</span>
+            <span class="kpi-unit">PCS</span>
+          </div>
+          <div class="kpi-meta">
+            <span class="kpi-lot"><strong id="dMiniSFLot">0</strong> Lots</span>
+            <span class="kpi-pct" id="dMiniSFPct">0%</span>
           </div>
         </div>
       </div>
-      <div class="dash-chart-card" style="animation-delay:.36s">
-        <div style="flex-shrink:0;margin-bottom:4px"><h4 style="font-family:var(--font-head);font-weight:800;color:var(--text-900);font-size:clamp(.58rem,.8vw,.7rem)">Top Lines</h4><p style="color:var(--text-400);font-weight:500;font-size:clamp(.5rem,.65vw,.58rem)">Highest QTY production lines</p></div>
-        <div class="dash-chart-wrap"><canvas id="radarChart"></canvas></div>
+      
+      <div class="kpi-mini-card" style="--kpi-color:#ef4444">
+        <div class="kpi-accent"></div>
+        <div class="kpi-content">
+          <div class="kpi-label">Vendor Fault</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="dMiniVen">0</span>
+            <span class="kpi-unit">PCS</span>
+          </div>
+          <div class="kpi-meta">
+            <span class="kpi-lot"><strong id="dMiniVenLot">0</strong> Lots</span>
+            <span class="kpi-pct" id="dMiniVenPct">0%</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="kpi-mini-card" style="--kpi-color:#3b82f6">
+        <div class="kpi-accent"></div>
+        <div class="kpi-content">
+          <div class="kpi-label">CTC Fault</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="dMiniCTC">0</span>
+            <span class="kpi-unit">PCS</span>
+          </div>
+          <div class="kpi-meta">
+            <span class="kpi-lot"><strong id="dMiniCTCLot">0</strong> Lots</span>
+            <span class="kpi-pct" id="dMiniCTCPct">0%</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="kpi-mini-card" style="--kpi-color:#10b981">
+        <div class="kpi-accent"></div>
+        <div class="kpi-content">
+          <div class="kpi-label">Can Use (OK)</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="dMiniOK">0</span>
+            <span class="kpi-unit">PCS</span>
+          </div>
+          <div class="kpi-meta">
+            <span class="kpi-lot"><strong id="dMiniOKLot">0</strong> Lots</span>
+            <span class="kpi-pct" id="dMiniOKPct">0%</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Rankings -->
-    <div class="dash-rank-row">
-      <div class="dash-rank-card" style="animation-delay:.44s">
-        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;margin-bottom:7px;border-bottom:1.5px solid var(--blue-100)">
-          <span style="font-family:var(--font-head);font-weight:800;color:var(--text-700);text-transform:uppercase;letter-spacing:.05em;font-size:clamp(.54rem,.72vw,.63rem);display:flex;align-items:center;gap:5px">
-            Top Suppliers
-          </span>
-          <span style="color:var(--accent-or);font-family:var(--font-mono);font-weight:500;font-size:clamp(.5rem,.66vw,.58rem)">QTY</span>
+    <!-- ═══ CHARTS SECTION ═══ -->
+    <div class="dash-charts-section animate-in" style="animation-delay:0.25s">
+      <!-- Trend Chart -->
+      <div class="dash-chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Production Trend</div>
+            <div class="chart-subtitle">Monthly performance overview</div>
+          </div>
+          <div id="trendInsight" style="padding:.35rem .85rem;background:#eff6ff;border-radius:99px;font-size:.7rem;font-weight:700;color:#1e40af;border:1px solid #bfdbfe">Peak: —</div>
         </div>
-        <div id="rankSuppliers" style="flex-grow:1;overflow-y:auto" class="scroll"></div>
+        <div class="chart-body"><canvas id="trendChart"></canvas></div>
       </div>
-      <div class="dash-rank-card" style="animation-delay:.51s">
-        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;margin-bottom:7px;border-bottom:1.5px solid var(--blue-100)">
-          <span style="font-family:var(--font-head);font-weight:800;color:var(--text-700);text-transform:uppercase;letter-spacing:.05em;font-size:clamp(.54rem,.72vw,.63rem);display:flex;align-items:center;gap:5px">
-            Top Defects
-          </span>
-          <span style="color:var(--accent-red);font-family:var(--font-mono);font-weight:500;font-size:clamp(.5rem,.66vw,.58rem)">QTY</span>
+      
+      <!-- Donut Chart -->
+      <div class="dash-chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Fault Distribution</div>
+            <div class="chart-subtitle">Judgment breakdown</div>
+          </div>
         </div>
-        <div id="rankDefects" style="flex-grow:1;overflow-y:auto" class="scroll"></div>
+        <div class="donut-container">
+          <canvas id="donutChart"></canvas>
+          <div class="donut-center-text">
+            <div class="total-value" id="donutCenter">0</div>
+            <div class="total-label">Total PCS</div>
+          </div>
+        </div>
       </div>
-      <div class="dash-rank-card" style="animation-delay:.58s">
-        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;margin-bottom:7px;border-bottom:1.5px solid var(--blue-100)">
-          <span style="font-family:var(--font-head);font-weight:800;color:var(--text-700);text-transform:uppercase;letter-spacing:.05em;font-size:clamp(.54rem,.72vw,.63rem);display:flex;align-items:center;gap:5px">
-            Top Parts
-          </span>
-          <span style="color:var(--blue-600);font-family:var(--font-mono);font-weight:500;font-size:clamp(.5rem,.66vw,.58rem)">QTY</span>
+      
+      <!-- Top Lines Chart -->
+      <div class="dash-chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Top Production Lines</div>
+            <div class="chart-subtitle">By quantity output</div>
+          </div>
         </div>
-        <div id="rankParts" style="flex-grow:1;overflow-y:auto" class="scroll"></div>
+        <div class="chart-body"><canvas id="radarChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ═══ RANKINGS SECTION ═══ -->
+    <div class="dash-rankings-section animate-in" style="animation-delay:0.3s">
+      <div class="rank-card">
+        <div class="rank-header">
+          <span class="rank-title">🏆 Top Suppliers</span>
+          <span class="rank-subtitle">By QTY</span>
+        </div>
+        <div class="rank-list" id="rankSuppliers"></div>
+      </div>
+      
+      <div class="rank-card">
+        <div class="rank-header">
+          <span class="rank-title">⚠️ Top Defects</span>
+          <span class="rank-subtitle">By QTY</span>
+        </div>
+        <div class="rank-list" id="rankDefects"></div>
+      </div>
+      
+      <div class="rank-card">
+        <div class="rank-header">
+          <span class="rank-title">📦 Top Parts</span>
+          <span class="rank-subtitle">By QTY</span>
+        </div>
+        <div class="rank-list" id="rankParts"></div>
       </div>
     </div>
   </div>
@@ -1883,126 +2256,254 @@ function refreshAll(){
 }
 
 /* ══ DASHBOARD ══ */
-function openDashboard(){$id('dashboardModal').style.display='flex';$id('dashUser').textContent=currentUser;const vendors=[...new Set(getMyRecords().map(r=>r.supplier))].filter(Boolean).sort();$id('dashVendor').innerHTML='<option value="ALL">All Vendors</option>'+vendors.map(v=>`<option value="${v}">${v}</option>`).join('');resetDashFilters();gsap.fromTo('#dashboardModal',{opacity:0},{opacity:1,duration:.28,ease:'power2.out'});gsap.fromTo('.glass-dash',{opacity:0,y:14},{opacity:1,y:0,duration:.36,ease:'back.out(1.4)',delay:.05})}
+function openDashboard(){
+  $id('dashboardModal').style.display='flex';
+  $id('dashUser').textContent=currentUser;
+  
+  // Set current time
+  const now = new Date();
+  $id('dashTime').textContent = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+  
+  // Populate vendor dropdown
+  const vendors=[...new Set(getMyRecords().map(r=>r.supplier))].filter(Boolean).sort();
+  $id('dashVendor').innerHTML='<option value="ALL">All Vendors</option>'+vendors.map(v=>`<option value="${v}">${v}</option>`).join('');
+  
+  resetDashFilters();
+  
+  gsap.fromTo('#dashboardModal',{opacity:0},{opacity:1,duration:.3,ease:'power2.out'});
+  gsap.fromTo('.glass-dash',{opacity:0,y:20},{opacity:1,y:0,duration:.4,ease:'back.out(1.4)',delay:.05});
+}
 function closeDashboard(){gsap.to('.glass-dash',{opacity:0,y:8,duration:.18,ease:'power2.in',onComplete:()=>{$id('dashboardModal').style.display='none';gsap.set(['.glass-dash','#dashboardModal'],{clearProps:'all'})}})}
 function resetDashFilters(){$id('dashStart').value='';$id('dashEnd').value='';$id('dashVendor').value='ALL';refreshDash()}
 function refreshDash(){
-  const start=$id('dashStart').value,end=$id('dashEnd').value,ven=$id('dashVendor').value;
-  let data=getMyRecords();if(start)data=data.filter(r=>r.date>=start);if(end)data=data.filter(r=>r.date<=end);if(ven!=='ALL')data=data.filter(r=>r.supplier===ven);
-  let tQ=0,sf=0,ven2=0,ctc=0,ok=0,sfL=0,venL=0,ctcL=0,okL=0;
-  data.forEach(r=>{tQ+=r.qty;if(r.judgment==='SF'){sf+=r.qty;sfL++}else if(r.judgment==='VENDOR FAULT'){ven2+=r.qty;venL++}else if(r.judgment==='CTC'){ctc+=r.qty;ctcL++}else if(r.judgment==='CAN USE'){ok+=r.qty;okL++}});
-  animNum('dTotalQty',tQ);$id('dTotalLot').textContent=data.length;
-  const pct=(v,t)=>t>0?Math.round((v/t)*100)+'%':'0%';
-  const upd=(pre,qty,lot,p)=>{animNum('d'+pre+'qty',qty);$id('d'+pre+'lot').textContent=lot;$id('d'+pre+'pct').textContent=p};
-  upd('SF',sf,sfL,pct(sf,tQ));upd('VEN',ven2,venL,pct(ven2,tQ));upd('CTC',ctc,ctcL,pct(ctc,tQ));upd('OK',ok,okL,pct(ok,tQ));
-  const rejQ=sf+ven2+ctc;const rejEl=$id('dRejRate');if(rejEl)rejEl.textContent=tQ>0?Math.round((rejQ/tQ)*100)+'%':'0%';
-  const shiftMap={};data.forEach(r=>{shiftMap[r.shift]=(shiftMap[r.shift]||0)+r.qty});const topShift=Object.entries(shiftMap).sort((a,b)=>b[1]-a[1])[0];
-  const topShiftEl=$id('dTopShift');if(topShiftEl)topShiftEl.textContent=topShift?topShift[0].replace('SHIFT ','S'):'—';
-  const avgEl=$id('dAvgQty');if(avgEl)avgEl.textContent=data.length>0?Math.round(tQ/data.length).toLocaleString():'0';
-  const days=new Set(data.map(r=>r.date)).size;const daysEl=$id('dActiveDays');if(daysEl)daysEl.textContent=days;
+  const start=$id('dashStart').value, end=$id('dashEnd').value, ven=$id('dashVendor').value;
+  let data=getMyRecords();
+  if(start) data=data.filter(r=>r.date>=start);
+  if(end) data=data.filter(r=>r.date<=end);
+  if(ven!=='ALL') data=data.filter(r=>r.supplier===ven);
+  
+  let tQ=0, sf=0, ven2=0, ctc=0, ok=0;
+  let sfL=0, venL=0, ctcL=0, okL=0;
+  
+  data.forEach(r=>{
+    tQ+=r.qty;
+    if(r.judgment==='SF'){sf+=r.qty;sfL++}
+    else if(r.judgment==='VENDOR FAULT'){ven2+=r.qty;venL++}
+    else if(r.judgment==='CTC'){ctc+=r.qty;ctcL++}
+    else if(r.judgment==='CAN USE'){ok+=r.qty;okL++}
+  });
+  
+  const totalLot = data.length;
+  const activeDays = new Set(data.map(r=>r.date)).size;
+  const rejQ = sf + ven2 + ctc;
+  const rejPct = tQ>0 ? Math.round((rejQ/tQ)*100) : 0;
+  const passPct = tQ>0 ? Math.round((ok/tQ)*100) : 0;
+  const avgPerLot = totalLot>0 ? Math.round(tQ/totalLot) : 0;
+  
+  // Hero Cards
+  animNum('dHeroQty', tQ);
+  $id('dHeroLot').textContent = totalLot.toLocaleString();
+  $id('dHeroDays').textContent = activeDays;
+  $id('dHeroPass').textContent = passPct + '%';
+  $id('dHeroRej').textContent = rejPct + '%';
+  $id('dHeroAvg').textContent = avgPerLot.toLocaleString();
+  
+  // Mini KPI Cards
+  const pct = (v,t) => t>0 ? Math.round((v/t)*100) : 0;
+  
+  animNum('dMiniSF', sf);
+  $id('dMiniSFLot').textContent = sfL;
+  $id('dMiniSFPct').textContent = pct(sf,tQ) + '%';
+  
+  animNum('dMiniVen', ven2);
+  $id('dMiniVenLot').textContent = venL;
+  $id('dMiniVenPct').textContent = pct(ven2,tQ) + '%';
+  
+  animNum('dMiniCTC', ctc);
+  $id('dMiniCTCLot').textContent = ctcL;
+  $id('dMiniCTCPct').textContent = pct(ctc,tQ) + '%';
+  
+  animNum('dMiniOK', ok);
+  $id('dMiniOKLot').textContent = okL;
+  $id('dMiniOKPct').textContent = pct(ok,tQ) + '%';
+  
+  // Trend Insight
   const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  if(data.length>1){const cnt=new Array(12).fill(0);data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m))cnt[m]+=r.qty});const peak=mo[cnt.indexOf(Math.max(...cnt))];const top=sf>=ven2&&sf>=ctc?'SF':ven2>=ctc?'Vendor':'CTC';$id('monthlyInsight').innerHTML='Peak: <b>'+peak+'</b> · <span style="color:var(--accent-red)">'+top+'</span>'}else $id('monthlyInsight').textContent='—';
-  renderDashCharts(data);renderRankings(data);
+  if(data.length>1){
+    const cnt=new Array(12).fill(0);
+    data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m))cnt[m]+=r.qty});
+    const peak=mo[cnt.indexOf(Math.max(...cnt))];
+    const topFault=sf>=ven2&&sf>=ctc?'SF':ven2>=ctc?'Vendor':'CTC';
+    $id('trendInsight').innerHTML='Peak: <b>'+peak+'</b> · Top Fault: <span style="color:#ef4444">'+topFault+'</span>';
+  }else{
+    $id('trendInsight').textContent='Peak: —';
+  }
+  
+  renderDashCharts(data);
+  renderRankings(data);
 }
 
 function renderDashCharts(data) {
-  // ทำลายกราฟเก่าก่อนสร้างใหม่
+  // Destroy old charts
   ['trend', 'donut', 'radar'].forEach(k => {
     if (charts[k]) { charts[k].destroy(); charts[k] = null; }
   });
 
-  // ★ ตรวจสอบว่าอยู่ใน Dark Mode หรือไม่
   const isDark = document.documentElement.classList.contains('dark-mode');
-
-  // กำหนดสีตาม Theme
   const chartColors = {
-    gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
-    textColor: isDark ? 'rgba(255, 255, 255, 0.7)' : '#94a3b8',
+    gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
+    textColor: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748b',
     tooltipBg: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(15, 23, 42, 0.9)',
   };
 
-  // --- 1. TREND CHART (เส้น) ---
-  const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const byMonth = new Array(12).fill(0);
-  const byMonthLot = new Array(12).fill(0);
-  data.forEach(r => { const m = new Date(r.date).getMonth(); if (!isNaN(m)) { byMonth[m] += r.qty; byMonthLot[m]++; } });
+  // 1. TREND CHART
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const byMonth=new Array(12).fill(0);
+  const byMonthLot=new Array(12).fill(0);
+  data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m)){byMonth[m]+=r.qty;byMonthLot[m]++}});
   
-  const totalAllQty = data.reduce((s, r) => s + r.qty, 0) || 1;
-  const totalAllLot = data.length || 1;
-
-  const tCtx = $id('trendChart');
-  if (tCtx) charts.trend = new Chart(tCtx, {
-    type: 'line',
-    data: {
-      labels: mo,
-      datasets: [{
-        label: 'Qty',
-        data: byMonth,
-        borderColor: '#2563eb',
-        borderWidth: 2.5,
-        tension: .4,
-        fill: true,
-        backgroundColor: ctx => {
-          const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height || 200);
-          // ★ ปรับสี Gradient ให้เหมาะกับ Theme
-          g.addColorStop(0, isDark ? 'rgba(37, 99, 235, 0.25)' : 'rgba(37, 99, 235, 0.18)');
-          g.addColorStop(1, isDark ? 'rgba(37, 99, 235, 0.02)' : 'rgba(37, 99, 235, 0.01)');
+  const totalAllQty=data.reduce((s,r)=>s+r.qty,0)||1;
+  const tCtx=$id('trendChart');
+  if(tCtx) charts.trend=new Chart(tCtx,{
+    type:'line',
+    data:{
+      labels:mo,
+      datasets:[{
+        label:'Qty',
+        data:byMonth,
+        borderColor:'#3b82f6',
+        borderWidth:3,
+        tension:.4,
+        fill:true,
+        backgroundColor:ctx=>{
+          const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||200);
+          g.addColorStop(0,'rgba(59,130,246,0.2)');
+          g.addColorStop(1,'rgba(59,130,246,0.02)');
           return g;
         },
-        pointRadius: 4,
-        pointBackgroundColor: isDark ? '#1e293b' : '#fff', // จุดสีขาวในโหมดสว่าง, สีเข้มในโหมดมืด
-        pointBorderColor: '#2563eb',
-        pointBorderWidth: 2.5,
-        pointHoverRadius: 7
+        pointRadius:5,
+        pointBackgroundColor:'#fff',
+        pointBorderColor:'#3b82f6',
+        pointBorderWidth:2,
+        pointHoverRadius:8,
+        pointHoverBackgroundColor:'#3b82f6',
+        pointHoverBorderColor:'#fff',
+        pointHoverBorderWidth:3
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        datalabels: { display: false },
-        tooltip: {
-          enabled: true,
-          backgroundColor: chartColors.tooltipBg,
-          titleFont: { family: 'Sora', size: 11, weight: '800' },
-          bodyFont: { family: 'Sora', size: 10, weight: '600' },
-          padding: { top: 10, bottom: 10, left: 14, right: 14 },
-          cornerRadius: 10,
-          borderColor: isDark ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.25)',
-          borderWidth: 1,
-          displayColors: false,
-          callbacks: {
-            title: ctx => '📅  ' + ctx[0].label,
-            label: ctx => {
-              const mi = ctx.dataIndex;
-              const qty = byMonth[mi];
-              const lot = byMonthLot[mi];
-              const qtyPct = totalAllQty > 0 ? ((qty / totalAllQty) * 100).toFixed(1) : '0.0';
-              const lotPct = totalAllLot > 0 ? ((lot / totalAllLot) * 100).toFixed(1) : '0.0';
-              return [
-                '  QTY  :  ' + qty.toLocaleString() + '   (' + qtyPct + '%)',
-                '  LOT    :  ' + lot.toLocaleString() + '   (' + lotPct + '%)'
-              ];
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        datalabels:{display:false},
+        tooltip:{
+          backgroundColor:chartColors.tooltipBg,
+          titleFont:{family:'Sora',size:12,weight:'700'},
+          bodyFont:{family:'Sora',size:11,weight:'600'},
+          padding:{top:12,bottom:12,left:16,right:16},
+          cornerRadius:12,
+          borderColor:'rgba(59,130,246,0.3)',
+          borderWidth:1,
+          displayColors:false,
+          callbacks:{
+            title:ctx=>'📅 '+ctx[0].label,
+            label:ctx=>{
+              const mi=ctx.dataIndex;
+              const qty=byMonth[mi];
+              const lot=byMonthLot[mi];
+              const qtyPct=totalAllQty>0?((qty/totalAllQty)*100).toFixed(1):'0.0';
+              return[`  PCS: ${qty.toLocaleString()} (${qtyPct}%)`,`  LOT: ${lot.toLocaleString()}`];
             }
           }
         }
       },
-      scales: {
-        x: { 
-          grid: { display: false }, 
-          border: { display: false }, 
-          ticks: { font: { size: 9.5, weight: '600', family: 'Sora' }, color: chartColors.textColor } 
-        },
-        y: { 
-          grid: { color: chartColors.gridColor, drawBorder: false }, // ★ เพิ่ม Grid line ในโหมดมืด
-          border: { display: false }, 
-          ticks: { display: true, color: chartColors.textColor, font: { family: 'DM Mono' } } 
-        }
+      scales:{
+        x:{grid:{display:false},border:{display:false},ticks:{font:{size:11,weight:'600',family:'Sora'},color:chartColors.textColor}},
+        y:{grid:{color:chartColors.gridColor,drawBorder:false},border:{display:false},ticks:{display:true,color:chartColors.textColor,font:{family:'DM Mono'}}}
       },
-      animation: { duration: 900, easing: 'easeOutQuart' }
+      animation:{duration:1000,easing:'easeOutQuart'}
     }
   });
+
+  // 2. DONUT CHART
+  const sfQ=data.filter(r=>r.judgment==='SF').reduce((s,r)=>s+r.qty,0);
+  const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
+  const ctcQ=data.filter(r=>r.judgment==='CTC').reduce((s,r)=>s+r.qty,0);
+  const okQ=data.filter(r=>r.judgment==='CAN USE').reduce((s,r)=>s+r.qty,0);
+  const totalQ=data.reduce((s,r)=>s+r.qty,0);
+  
+  $id('donutCenter').textContent=totalQ.toLocaleString();
+  
+  const dCtx=$id('donutChart');
+  if(dCtx) charts.donut=new Chart(dCtx,{
+    type:'doughnut',
+    data:{
+      labels:['SF Fault','Vendor','CTC','Can Use'],
+      datasets:[{
+        data:[sfQ,venQ,ctcQ,okQ],
+        backgroundColor:['#f97316','#ef4444','#3b82f6','#10b981'],
+        hoverBackgroundColor:['#fb923c','#f87171','#60a5fa','#34d399'],
+        borderWidth:3,
+        borderColor:'#fff',
+        hoverOffset:10
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      cutout:'72%',
+      plugins:{
+        legend:{display:true,position:'bottom',labels:{color:chartColors.textColor,font:{size:10,weight:'600',family:'Sora'},boxWidth:10,padding:12,usePointStyle:true}},
+        datalabels:{display:false},
+        tooltip:{backgroundColor:chartColors.tooltipBg,borderColor:'rgba(59,130,246,0.3)',borderWidth:1,callbacks:{label:ctx=>' '+ctx.parsed.toLocaleString()+' ('+Math.round((ctx.parsed/totalQ)*100)+'%)'}}
+      },
+      animation:{animateRotate:true,animateScale:true,duration:1000,easing:'easeOutQuart'}
+    }
+  });
+
+  // 3. TOP LINES CHART
+  const lineMap={};
+  data.forEach(r=>{if(r.line)lineMap[r.line]=(lineMap[r.line]||0)+r.qty});
+  const topLines=Object.entries(lineMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  
+  const rCtx=$id('radarChart');
+  if(rCtx && topLines.length) charts.radar=new Chart(rCtx,{
+    type:'bar',
+    data:{
+      labels:topLines.map(l=>'Line '+l[0]),
+      datasets:[{
+        label:'Qty',
+        data:topLines.map(l=>l[1]),
+        backgroundColor:ctx=>{
+          const g=ctx.chart.ctx.createLinearGradient(ctx.chart.width||300,0,0,0);
+          g.addColorStop(0,'rgba(59,130,246,1)');
+          g.addColorStop(1,'rgba(59,130,246,0.5)');
+          return g;
+        },
+        hoverBackgroundColor:'#3b82f6',
+        borderRadius:8,
+        barThickness:18
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      indexAxis:'y',
+      layout:{padding:{right:50}},
+      scales:{
+        x:{display:true,grid:{color:chartColors.gridColor,drawBorder:false},ticks:{display:true,color:chartColors.textColor}},
+        y:{grid:{display:false},border:{display:false},ticks:{color:chartColors.textColor,font:{size:11,weight:'600',family:'Sora'}}}
+      },
+      plugins:{
+        legend:{display:false},
+        datalabels:{anchor:'end',align:'end',color:chartColors.textColor,font:{size:10,weight:'600',family:'DM Mono'},formatter:v=>v.toLocaleString(),clip:false},
+        tooltip:{backgroundColor:chartColors.tooltipBg}
+      },
+      animation:{duration:1000,easing:'easeOutQuart'}
+    }
+  });
+}
 
   // --- 2. DONUT CHART ---
   const sfQ = data.filter(r => r.judgment === 'SF').reduce((s, r) => s + r.qty, 0);
@@ -2163,27 +2664,44 @@ function renderDashCharts(data) {
       }
     });
   }
-}
+
 
 function renderRankings(data){
   const totalQty=data.reduce((s,r)=>s+r.qty,0)||1;
-  const getTop=(key,n=8)=>{const m={};data.forEach(r=>{if(r[key])m[r[key]]=(m[r[key]]||0)+r.qty});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,n)};
-  const draw=(id,items,gradient,accentColor)=>{
-    const maxV=items[0]?.[1]||1;const el=$id(id);if(!el)return;
+  
+  const getTop=(key,n=5)=>{
+    const m={};
+    data.forEach(r=>{if(r[key])m[r[key]]=(m[r[key]]||0)+r.qty});
+    return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,n);
+  };
+  
+  const draw=(id,items,badgeColor,barColor)=>{
+    const maxV=items[0]?.[1]||1;
+    const el=$id(id);
+    if(!el)return;
+    
     el.innerHTML=items.map(([k,v],i)=>{
-      const pct=Math.round((v/totalQty)*100);const barW=Math.round((v/maxV)*100);
-      const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':'·';
-      return `<div class="bar-wrap" title="${k}: ${v.toLocaleString()} (${pct}%)">
-        <div class="bar-lbl"><span class="bar-k">${rank} ${k}</span>
-          <div style="display:flex;align-items:center;gap:6px"><span style="font-family:var(--font-head);font-size:.62rem;color:${accentColor};font-weight:700">${pct}%</span><span style="font-family:var(--font-head);font-size:.6rem;color:var(--text-300);font-weight:600">${v.toLocaleString()}</span></div></div>
-        <div class="bar-bg"><div class="bar-fill" style="background:${gradient}" data-w="${barW}"></div></div>
+      const pct=Math.round((v/totalQty)*100);
+      const barW=Math.round((v/maxV)*100);
+      const badge=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+      
+      return`<div class="rank-item">
+        <div class="rank-badge" style="background:${i<3?badgeColor:'#94a3b8'}">${badge}</div>
+        <div class="rank-info">
+          <div class="rank-name">${escapeHtml(k)}</div>
+          <div class="rank-bar-container"><div class="rank-bar" style="background:${barColor};width:${barW}%"></div></div>
+        </div>
+        <div class="rank-stats">
+          <div class="rank-value">${v.toLocaleString()}</div>
+          <div class="rank-pct">${pct}%</div>
+        </div>
       </div>`;
     }).join('');
-    requestAnimationFrame(()=>el.querySelectorAll('.bar-fill').forEach((b,i)=>setTimeout(()=>{b.style.width=b.dataset.w+'%'},i*55+80)));
   };
-  draw('rankSuppliers',getTop('supplier'),'linear-gradient(90deg,#f97316,#fbbf24)','#f97316');
-  draw('rankDefects',  getTop('defect'),  'linear-gradient(90deg,#ef4444,#f87171)','#ef4444');
-  draw('rankParts',    getTop('partNo'),  'linear-gradient(90deg,#2563eb,#60a5fa)','#2563eb');
+  
+  draw('rankSuppliers',getTop('supplier'),'#f97316','linear-gradient(90deg,#f97316,#fbbf24)');
+  draw('rankDefects',getTop('defect'),'#ef4444','linear-gradient(90deg,#ef4444,#f87171)');
+  draw('rankParts',getTop('partNo'),'#3b82f6','linear-gradient(90deg,#3b82f6,#60a5fa)');
 }
 
 function importExcel(input){
