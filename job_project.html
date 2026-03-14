@@ -1032,6 +1032,82 @@ tbody tr:last-child td{border-bottom:none}
   .sp-kpi-grid{grid-template-columns:1fr 1fr;}
   .attend-pct-strip{grid-template-columns:1fr;}
 }
+@media (max-width: 600px) {
+  #darkBtn {
+    padding: 4px 6px !important;
+    font-size: 0.8rem !important;
+  }
+  #darkBtn span { /* ถ้าคุณใส่ข้อความใน span */
+    display: none; 
+  }
+  #dash-timestamp {
+    font-size: 0.55rem; /* ย่อขนาดเวลาลงอีกนิดในมือถือ */
+  }
+}
+/* ─── Dark Mode Colors ─── */
+body.dark-mode {
+  --bg: #0f172a;           /* พื้นหลังหลัก (Slate 900) */
+  --bg2: #1e293b;          /* พื้นหลังรอง */
+  --bg3: #334155;          /* พื้นหลังส่วนที่ลึกขึ้น */
+  --card: #1e293b;         /* พื้นหลังการ์ด */
+  --border: rgba(255, 255, 255, 0.1);
+  --border2: rgba(255, 255, 255, 0.2);
+  
+  --txt: #f1f5f9;          /* ข้อความหลัก */
+  --txt2: #e2e8f0;         /* ข้อความรอง */
+  --txt3: #cbd5e1;         /* ข้อความรายละเอียด */
+  --txt4: #94a3b8;         /* ข้อความจางๆ */
+  
+  --navy: #020617;
+  --white: #1e293b;        /* เปลี่ยนสีขาวปกติให้มืด */
+  
+  /* ปรับแต่ง Table ในโหมดมืด */
+  --table-header: #0f172a;
+  --table-zebra: #1e293b;
+}
+
+/* ปรับปรุง CSS ส่วนที่เจาะจงเฉพาะโหมดมืด */
+body.dark-mode .sidebar { background: #111827; border-right-color: var(--border); }
+body.dark-mode .topbar { background: #111827; border-bottom-color: var(--border); }
+body.dark-mode .sb-footer { background: #111827; border-top-color: var(--border); }
+body.dark-mode thead th { background: var(--table-header); color: var(--txt3); border-bottom-color: var(--bg3); }
+body.dark-mode tbody tr:nth-child(even) td { background: var(--table-zebra); }
+body.dark-mode tbody tr:nth-child(odd) td { background: #162033; }
+body.dark-mode tbody tr:hover td { background: #24334d !important; }
+body.dark-mode .rc-box { background: #1e293b; color: var(--txt); }
+body.dark-mode input, body.dark-mode select { background: #0f172a; color: var(--txt); }
+
+/* เพิ่มในส่วน body.dark-mode ใน <style> */
+body.dark-mode .sidebar, 
+body.dark-mode .topbar,
+body.dark-mode .sb-footer,
+body.dark-mode .add-sup-footer {
+  background: #111827 !important; /* Slate 900 */
+  border-color: var(--border);
+}
+
+body.dark-mode .card, 
+body.dark-mode .rc-box {
+  background: var(--card); /* ใช้ตัวแปรที่เราประกาศใหม่ */
+  border-color: var(--border);
+}
+
+/* ปรับสีตัวอักษรใน Sidebar ให้สว่างขึ้นในโหมดมืด */
+body.dark-mode .sb-name,
+body.dark-mode .user-name,
+body.dark-mode .menu-item {
+  color: #e2e8f0;
+}
+
+/* ปรับสี Zebra Table ในโหมดมืด */
+body.dark-mode thead th {
+  background: #1e293b;
+  color: #94a3b8;
+  border-bottom-color: #334155;
+}
+body.dark-mode tbody tr:nth-child(even) td { background: #1e293b; }
+body.dark-mode tbody tr:nth-child(odd) td { background: #0f172a; }
+body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
 </style>
 </head>
 <body>
@@ -1215,6 +1291,8 @@ tbody tr:last-child td{border-bottom:none}
   <div class="sb-footer">
     <button id="syncBtn" class="sb-btn sb-btn-sync" onclick="syncWithGoogleSheets()">🔄 SYNC CLOUD</button>
     <button class="sb-btn sb-btn-home" onclick="window.location.href='index.html'">🏠 หน้าหลัก</button>
+    <div class="sb-footer">
+  </div>
   </div>
 </aside>
 
@@ -1226,6 +1304,17 @@ tbody tr:last-child td{border-bottom:none}
     <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="เมนู">☰</button>
     <div class="topbar-dot"></div>
     <div class="topbar-title" id="topbar-title">Performance Overview</div>
+    <div class="topbar">
+  <button class="hamburger" id="hbBtn" onclick="toggleSidebar()">☰</button>
+  
+  
+
+  <button onclick="toggleDarkMode()" id="darkBtn" style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:4px 10px; font-size:0.65rem; cursor:pointer; color:var(--txt2); font-family:inherit; transition:all 0.2s; display:flex; align-items:center; gap:5px;">
+    🌙 โหมดมืด
+  </button>
+
+  <div id="dash-timestamp">☁️ Cloud: 14/03/2569 09:16:59</div>
+</div>
     <div id="dash-timestamp">—</div>
   </div>
   <main class="main-container">
@@ -3325,6 +3414,32 @@ function openRecDetail(idx){
   document.getElementById('recDetailModal').classList.add('open');
 }
 function closeRecDetail(){document.getElementById('recDetailModal').classList.remove('open');}
+// ฟังก์ชันสลับโหมด
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light'); // บันทึกลงเครื่อง
+  updateDarkModeUI(isDark);
+}
+
+// ฟังก์ชันอัปเดตหน้าตาปุ่ม
+function updateDarkModeUI(isDark) {
+  const btn = document.getElementById('darkBtn');
+  if (btn) {
+    btn.innerHTML = isDark ? '☀️ Light' : '🌙 Dark';
+    btn.style.background = isDark ? '#334155' : '#f1f5f9';
+    btn.style.color = isDark ? '#fff' : '#475569';
+  }
+}
+
+// เรียกใช้ทันทีที่โหลดหน้าเว็บ (วางไว้นอกฟังก์ชันอื่น)
+(function() {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    // ใช้ timeout เล็กน้อยเพื่อให้แน่ใจว่า DOM ของปุ่มถูกสร้างเสร็จแล้ว
+    setTimeout(() => updateDarkModeUI(true), 10);
+  }
+})();
 </script>
 </body>
 </html>
