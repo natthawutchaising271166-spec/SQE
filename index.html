@@ -1586,6 +1586,17 @@ Chart.register(ChartDataLabels);
 function safeJSON(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
 const $id=id=>document.getElementById(id);
 
+// Helper function ป้องกัน XSS (จำเป็นต้องมี)
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 /* ══ DARK MODE ══ */
 function toggleDarkMode() {
   const html = document.documentElement;
@@ -1762,6 +1773,7 @@ let _searchCache=null,_searchCacheKey='';
 function getSearchCache(){const key=records.length+'_'+currentUser;if(_searchCache&&_searchCacheKey===key)return _searchCache;const myR=records.filter(r=>r.inspector===currentUser);_searchCache=new Map();myR.forEach(r=>_searchCache.set(r.id,(r.date+' '+r.shift+' '+r.ref+' '+r.line+' '+r.supplier+' '+r.partNo+' '+r.partName+' '+r.defect+' '+r.remark+' '+r.judgment).toLowerCase()));_searchCacheKey=key;return _searchCache}
 function invalidateCache(){_searchCache=null;_searchCacheKey=''}
 let _lastRenderHash='';
+
 function renderTable() {
   const tbody = $id('tableBody');
   const search = ($id('searchInput').value || '').toLowerCase();
