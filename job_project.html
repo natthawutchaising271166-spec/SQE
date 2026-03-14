@@ -1044,6 +1044,209 @@ tbody tr:last-child td{border-bottom:none}
     font-size: 0.55rem; /* ย่อขนาดเวลาลงอีกนิดในมือถือ */
   }
 }
+
+.achieve-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* จัดไอคอนกับข้อความให้อยู่กึ่งกลางปุ่ม */
+  gap: 8px;
+  width: 100%; /* ทำให้ปุ่มกว้างเท่ากับปุ่ม Sync และ Home */
+  padding: 9px 14px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  font-family: inherit;
+  font-size: .75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 3px 10px rgba(245,158,11,.3);
+  /* margin-top: 6px; -> ลบบรรทัดนี้ออก */
+}
+.achieve-btn:hover {
+  transform: translateY(-2px) scale(1.02); /* ลด scale นิดหน่อยให้พอดี */
+  box-shadow: 0 6px 20px rgba(245,158,11,.5);
+}
+
+/* Achievement Modal */
+#achieveModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  background: rgba(15,23,42,.8);
+  backdrop-filter: blur(10px);
+  align-items: center;
+  justify-content: center;
+}
+#achieveModal.show { display: flex; animation: fadeIn .3s ease; }
+
+.achieve-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 32px 36px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 30px 60px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.1);
+  animation: ach-pop .6s cubic-bezier(.34,1.56,.64,1);
+  position: relative;
+  overflow: hidden;
+}
+.achieve-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,.4), transparent 30%);
+  animation: ach-rotate 4s linear infinite;
+}
+
+@keyframes ach-pop { 
+  0% { transform: scale(0.5) translateY(40px); opacity: 0; } 
+  100% { transform: scale(1) translateY(0); opacity: 1; } 
+}
+@keyframes ach-rotate { 100% { transform: rotate(360deg); } }
+@keyframes ach-badge-bounce { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-15px) rotate(-5deg); } }
+
+.achieve-icon-wrap {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  box-shadow: 0 10px 25px rgba(37,99,235,.15);
+  position: relative;
+  z-index: 1;
+  animation: ach-badge-bounce 2s ease-in-out infinite;
+}
+
+.achieve-title {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--txt);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+  z-index: 1;
+}
+.achieve-desc {
+  font-size: .9rem;
+  color: var(--txt3);
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+.achieve-close-btn {
+  background: var(--grad);
+  color: #fff;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 99px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: .85rem;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: transform .2s;
+}
+.achieve-close-btn:hover { transform: scale(1.05); }
+
+/* Hall of Fame Modal */
+#hallOfFameModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9400;
+  background: rgba(15,23,42,.85);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+}
+#hallOfFameModal.open { display: flex; }
+
+.hof-panel {
+  background: #fff;
+  border-radius: var(--r-xl);
+  width: min(800px, 94vw);
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+.hof-header {
+  background: var(--navy);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.hof-title {
+  color: #fff;
+  font-weight: 800;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hof-body {
+  padding: 20px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+  background: var(--bg);
+}
+
+.badge-card {
+  background: #fff;
+  border-radius: var(--r);
+  padding: 16px;
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: all .3s;
+  position: relative;
+  overflow: hidden;
+}
+.badge-card.locked {
+  filter: grayscale(1);
+  opacity: .5;
+}
+.badge-card.unlocked {
+  border-color: #fbbf24;
+  box-shadow: 0 5px 15px rgba(245,158,11,.2);
+}
+.badge-card.unlocked::after {
+  content: '✓';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #22c55e;
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: .65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.badge-icon { font-size: 2.8rem; margin-bottom: 8px; }
+.badge-name { font-size: .78rem; font-weight: 700; color: var(--txt); margin-bottom: 3px; }
+.badge-hint { font-size: .62rem; color: var(--txt4); }
+.badge-date { font-size: .58rem; color: var(--green); margin-top: 5px; font-family:'DM Mono',monospace; }
+
 /* ─── Dark Mode Colors ─── */
 body.dark-mode {
   --bg: #0f172a;           /* พื้นหลังหลัก (Slate 900) */
@@ -1110,6 +1313,30 @@ body.dark-mode tbody tr:nth-child(odd) td { background: #0f172a; }
 body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
 </style>
 </head>
+<!-- ════════════════════════════════
+     ACHIEVEMENT UNLOCKED POPUP
+════════════════════════════════ -->
+<div id="achieveModal">
+  <div class="achieve-card">
+    <div class="achieve-icon-wrap" id="achieveIcon">🏆</div>
+    <div class="achieve-title" id="achieveTitle">Achievement Unlocked!</div>
+    <div class="achieve-desc" id="achieveDesc">คุณได้รับเหรียญตราใหม่</div>
+    <button class="achieve-close-btn" onclick="closeAchieveModal()">Awesome!</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     HALL OF FAME (COLLECTION)
+════════════════════════════════ -->
+<div id="hallOfFameModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="hof-panel">
+    <div class="hof-header">
+      <div class="hof-title">🏆 Hall of Fame</div>
+      <button class="sup-dash-close" onclick="document.getElementById('hallOfFameModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="hof-body" id="hofBody"></div>
+  </div>
+</div>
 <body>
 
 <!-- ════════════════════════════════
@@ -1288,11 +1515,18 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
       <div class="menu-item" onclick="nav('special',this)"><span class="menu-icon">⭐</span><span class="menu-label">Special Jobs</span></div>
     </nav>
   </div>
-  <div class="sb-footer">
-    <button id="syncBtn" class="sb-btn sb-btn-sync" onclick="syncWithGoogleSheets()">🔄 SYNC CLOUD</button>
-    <button class="sb-btn sb-btn-home" onclick="window.location.href='index.html'">🏠 หน้าหลัก</button>
-    <div class="sb-footer">
-  </div>
+<div class="sb-footer">
+  <!-- 1. ปุ่ม Sync (อยู่บนสุด) -->
+  <button id="syncBtn" class="sb-btn sb-btn-sync" onclick="syncWithGoogleSheets()">🔄 SYNC CLOUD</button>
+  
+  <!-- 2. ปุ่ม Hall of Fame (อยู่ตรงกลาง) -->
+  <button class="achieve-btn" onclick="openHallOfFame()">
+    🏆 Hall of Fame
+  </button>
+  
+  <!-- 3. ปุ่ม Home (อยู่ล่างสุด) -->
+  <button class="sb-btn sb-btn-home" onclick="window.location.href='index.html'">🏠 หน้าหลัก</button>
+</div>
   </div>
 </aside>
 
@@ -1330,13 +1564,15 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
     <!-- Date Filter Bar -->
     <div class="date-filter-bar">
       <span class="df-label">📅 ช่วงเวลา</span>
-      <div class="df-preset">
-        <button class="df-btn" onclick="setDateFilter('master-dash','today',this)">วันนี้</button>
-        <button class="df-btn" onclick="setDateFilter('master-dash','week',this)">7 วัน</button>
-        <button class="df-btn active" onclick="setDateFilter('master-dash','month',this)">เดือนนี้</button>
-        <button class="df-btn" onclick="setDateFilter('master-dash','quarter',this)">ไตรมาส</button>
-        <button class="df-btn" onclick="setDateFilter('master-dash','year',this)">ทั้งปี 2026</button>
-      </div>
+<!-- แก้จาก active ที่เดือนนี้ มาเป็นทั้งปี -->
+<div class="df-preset">
+  <button class="df-btn" onclick="setDateFilter('master-dash','today',this)">วันนี้</button>
+  <button class="df-btn" onclick="setDateFilter('master-dash','week',this)">7 วัน</button>
+  <button class="df-btn" onclick="setDateFilter('master-dash','month',this)">เดือนนี้</button>
+  <button class="df-btn" onclick="setDateFilter('master-dash','quarter',this)">ไตรมาส</button>
+  <!-- ย้าย active มาที่นี่ -->
+  <button class="df-btn active" onclick="setDateFilter('master-dash','year',this)">ทั้งปี</button>
+</div>
       <div class="df-divider"></div>
       <input type="date" id="md-from" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('master-dash')">
       <span class="df-sep">—</span>
@@ -1433,13 +1669,14 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
     <!-- Date Filter Bar -->
     <div class="date-filter-bar">
       <span class="df-label">📅 กรองข้อมูล</span>
-      <div class="df-preset">
-        <button class="df-btn" onclick="setDateFilter('daily','today',this)">วันนี้</button>
-        <button class="df-btn" onclick="setDateFilter('daily','week',this)">7 วัน</button>
-        <button class="df-btn active" onclick="setDateFilter('daily','month',this)">เดือนนี้</button>
-        <button class="df-btn" onclick="setDateFilter('daily','quarter',this)">ไตรมาส</button>
-        <button class="df-btn" onclick="setDateFilter('daily','year',this)">ทั้งปี</button>
-      </div>
+<div class="df-preset">
+  <button class="df-btn" onclick="setDateFilter('daily','today',this)">วันนี้</button>
+  <button class="df-btn" onclick="setDateFilter('daily','week',this)">7 วัน</button>
+  <button class="df-btn" onclick="setDateFilter('daily','month',this)">เดือนนี้</button>
+  <button class="df-btn" onclick="setDateFilter('daily','quarter',this)">ไตรมาส</button>
+  <!-- ย้าย active มาที่นี่ -->
+  <button class="df-btn active" onclick="setDateFilter('daily','year',this)">ทั้งปี</button>
+</div>
       <div class="df-divider"></div>
       <select id="monthFilter" onchange="onMonthFilterChange()" style="font-size:.72rem;padding:4px 8px;border-radius:8px;">
         <option value="all">📊 ทั้งปี</option>
@@ -1568,13 +1805,14 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
     <!-- Date Filter Bar -->
     <div class="date-filter-bar">
       <span class="df-label">📅 กรองวันที่</span>
-      <div class="df-preset">
-        <button class="df-btn" onclick="setDateFilter('support','today',this)">วันนี้</button>
-        <button class="df-btn" onclick="setDateFilter('support','week',this)">7 วัน</button>
-        <button class="df-btn active" onclick="setDateFilter('support','month',this)">เดือนนี้</button>
-        <button class="df-btn" onclick="setDateFilter('support','quarter',this)">ไตรมาส</button>
-        <button class="df-btn" onclick="setDateFilter('support','year',this)">ทั้งปี</button>
-      </div>
+<div class="df-preset">
+  <button class="df-btn" onclick="setDateFilter('support','today',this)">วันนี้</button>
+  <button class="df-btn" onclick="setDateFilter('support','week',this)">7 วัน</button>
+  <button class="df-btn" onclick="setDateFilter('support','month',this)">เดือนนี้</button>
+  <button class="df-btn" onclick="setDateFilter('support','quarter',this)">ไตรมาส</button>
+  <!-- ย้าย active มาที่นี่ -->
+  <button class="df-btn active" onclick="setDateFilter('support','year',this)">ทั้งปี</button>
+</div>
       <div class="df-divider"></div>
       <input type="date" id="sup-from" onchange="applyCustomFilter('support')">
       <span class="df-sep">—</span>
@@ -1919,13 +2157,14 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
     <!-- Date Filter Bar -->
     <div class="date-filter-bar">
       <span class="df-label">📅 กรองข้อมูล</span>
-      <div class="df-preset">
-        <button class="df-btn" onclick="setDateFilter('5s','today',this)">วันนี้</button>
-        <button class="df-btn" onclick="setDateFilter('5s','week',this)">7 วัน</button>
-        <button class="df-btn active" onclick="setDateFilter('5s','month',this)">เดือนนี้</button>
-        <button class="df-btn" onclick="setDateFilter('5s','quarter',this)">ไตรมาส</button>
-        <button class="df-btn" onclick="setDateFilter('5s','year',this)">ทั้งปี</button>
-      </div>
+<div class="df-preset">
+  <button class="df-btn" onclick="setDateFilter('5s','today',this)">วันนี้</button>
+  <button class="df-btn" onclick="setDateFilter('5s','week',this)">7 วัน</button>
+  <button class="df-btn" onclick="setDateFilter('5s','month',this)">เดือนนี้</button>
+  <button class="df-btn" onclick="setDateFilter('5s','quarter',this)">ไตรมาส</button>
+  <!-- ย้าย active มาที่นี่ -->
+  <button class="df-btn active" onclick="setDateFilter('5s','year',this)">ทั้งปี</button>
+</div>
       <div class="df-divider"></div>
       <input type="month" id="filter5sMonth" value="2026-03" onchange="refresh5S()" style="font-size:.72rem;padding:4px 8px;border-radius:8px;">
       <div class="df-divider"></div>
@@ -1969,12 +2208,13 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
     <!-- Date Filter Bar -->
     <div class="date-filter-bar">
       <span class="df-label">📅 ดูพัฒนาการ</span>
-      <div class="df-preset">
-        <button class="df-btn" onclick="setDateFilter('multi','month',this)">เดือนนี้</button>
-        <button class="df-btn" onclick="setDateFilter('multi','quarter',this)">ไตรมาส</button>
-        <button class="df-btn active" onclick="setDateFilter('multi','year',this)">ทั้งปี</button>
-        <button class="df-btn" onclick="setDateFilter('multi','all',this)">ทั้งหมด</button>
-      </div>
+<div class="df-preset">
+  <button class="df-btn" onclick="setDateFilter('multi','month',this)">เดือนนี้</button>
+  <button class="df-btn" onclick="setDateFilter('multi','quarter',this)">ไตรมาส</button>
+  <!-- ย้าย active มาที่นี่ -->
+  <button class="df-btn active" onclick="setDateFilter('multi','year',this)">ทั้งปี</button>
+  <button class="df-btn" onclick="setDateFilter('multi','all',this)">ทั้งหมด</button>
+</div>
       <div class="df-divider"></div>
       <input type="date" id="sk-from" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('multi')">
       <span class="df-sep">—</span>
@@ -2053,13 +2293,14 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
     <!-- Date Filter Bar -->
     <div class="date-filter-bar">
       <span class="df-label">📅 กรองโครงการ</span>
-      <div class="df-preset">
-        <button class="df-btn" onclick="setDateFilter('special','today',this)">วันนี้</button>
-        <button class="df-btn" onclick="setDateFilter('special','week',this)">7 วัน</button>
-        <button class="df-btn active" onclick="setDateFilter('special','month',this)">เดือนนี้</button>
-        <button class="df-btn" onclick="setDateFilter('special','quarter',this)">ไตรมาส</button>
-        <button class="df-btn" onclick="setDateFilter('special','year',this)">ทั้งปี</button>
-      </div>
+<div class="df-preset">
+  <button class="df-btn" onclick="setDateFilter('special','today',this)">วันนี้</button>
+  <button class="df-btn" onclick="setDateFilter('special','week',this)">7 วัน</button>
+  <button class="df-btn" onclick="setDateFilter('special','month',this)">เดือนนี้</button>
+  <button class="df-btn" onclick="setDateFilter('special','quarter',this)">ไตรมาส</button>
+  <!-- ย้าย active มาที่นี่ -->
+  <button class="df-btn active" onclick="setDateFilter('special','year',this)">ทั้งปี</button>
+</div>
       <div class="df-divider"></div>
       <input type="date" id="sp-from" style="font-size:.72rem;padding:4px 8px;border-radius:8px;" onchange="applyCustomFilter('special')">
       <span class="df-sep">—</span>
@@ -2159,6 +2400,8 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
   </div>
 </div>
 
+
+
 <script>
 /* ══════════════════════════════════
    DATE FILTER SYSTEM
@@ -2247,21 +2490,36 @@ function onMonthFilterChange(){
 
 // Initialize default date filters on load
 (function initFilters(){
-  const now=new Date();const y=now.getFullYear();const m=now.getMonth();
-  const monthFrom=`${y}-${String(m+1).padStart(2,'0')}-01`;
-  const monthTo=new Date(y,m+1,0).toISOString().split('T')[0];
-  ['daily','support','5s','special'].forEach(p=>{ pageFilters[p]={from:monthFrom,to:monthTo,label:'เดือนนี้'}; });
-  pageFilters['master-dash']={from:`${y}-01-01`,to:`${y}-12-31`,label:`ทั้งปี ${y}`};
-  pageFilters['multi']={from:null,to:null,label:'ทั้งหมด'};
-  // Set input values after DOM ready
-  setTimeout(()=>{
-    Object.keys(PAGE_FROM_IDS).forEach(page=>{
-      const f=pageFilters[page];if(!f)return;
-      const fEl=document.getElementById(PAGE_FROM_IDS[page]);const tEl=document.getElementById(PAGE_TO_IDS[page]);
-      if(fEl&&f.from)fEl.value=f.from;if(tEl&&f.to)tEl.value=f.to;
-      if(f.label)setText(PAGE_RESULT_IDS[page],f.label);
+  const now = new Date();
+  const y = now.getFullYear();
+  
+  // กำหนดช่วง "ทั้งปี" (1 ม.ค. - 31 ธ.ค.)
+  const yearFrom = `${y}-01-01`;
+  const yearTo = `${y}-12-31`;
+  const yearLabel = `ทั้งปี ${y}`;
+
+  // กำหนดให้ทุกหน้าใช้ค่า "ทั้งปี" เป็นค่าเริ่มต้น
+  const allPages = ['master-dash', 'daily', 'support', '5s', 'multi', 'special'];
+  
+  allPages.forEach(p => {
+    pageFilters[p] = { from: yearFrom, to: yearTo, label: yearLabel };
+  });
+
+  // ตั้งค่า Input วันที่ให้ตรงกับ Filter หลังจาก DOM พร้อม
+  setTimeout(() => {
+    Object.keys(PAGE_FROM_IDS).forEach(page => {
+      const f = pageFilters[page];
+      if (!f) return;
+      
+      const fEl = document.getElementById(PAGE_FROM_IDS[page]);
+      const tEl = document.getElementById(PAGE_TO_IDS[page]);
+      
+      if (fEl && f.from) fEl.value = f.from;
+      if (tEl && f.to) tEl.value = f.to;
+      
+      if (f.label) setText(PAGE_RESULT_IDS[page], f.label);
     });
-  },200);
+  }, 200);
 })();
 
 /* ══════════════════════════════════
@@ -2743,6 +3001,7 @@ window.addEventListener('load',async()=>{
 
   // Step 6: Start polling (both DB and images)
   startPolling();
+  migrateOldData(); 
 });
 
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
@@ -2764,7 +3023,7 @@ function setBtnLoading(on,txt='🔄 SYNC CLOUD'){const b=document.getElementById
 /* ══════════════════════════════════
    SAVE
 ══════════════════════════════════ */
-function save(){db._owner=currentUser;db._lastModified=Date.now();saveLocal();runAIAnalytics();if(isActive('master-dash'))refreshMasterDashboard();schedulePush();}
+function save(){db._owner=currentUser;db._lastModified=Date.now();saveLocal();runAIAnalytics();if(isActive('master-dash'))refreshMasterDashboard();schedulePush();checkAchievements();}
 function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
 function isActive(id){return document.getElementById(id)?.classList.contains('active');}
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
@@ -2839,318 +3098,695 @@ function renderGroupFullTable(tbodyId){
 }
 
 /* ══════════════════════════════════
-   MASTER DASHBOARD
+   MASTER DASHBOARD (FILTERED)
 ══════════════════════════════════ */
 function refreshMasterDashboard(){
-  const rp=db.support.filter(s=>s.report==='RP').length,vf=db.support.filter(s=>s.report==='VF').length,rec=db.support.filter(s=>s.report==='RECORDS').length;
-  const lv=db.daily.filter(d=>d.type==='leave').length;
-  const avg=db.skills.length?Math.round(db.skills.reduce((s,c)=>s+(c.value||0),0)/db.skills.length):0;
-  const aMap={};db.s5.forEach(s=>{if(s.area)aMap[s.area]=(aMap[s.area]||0)+(s.count||0);});
-  const tArea=Object.entries(aMap).sort((a,b)=>b[1]-a[1])[0];
-  setText('dash-support-count',db.support.length);setText('dash-5s-count',db.s5.reduce((s,c)=>s+(c.count||0),0));
-  setText('dash-special-count',db.special.length);setText('dash-avg-skill',avg+'%');setText('dash-avg-skill2',avg+'%');
-  setText('kpi-rp-vf',`RP: ${rp} · VF: ${vf}`);setText('kpi-5s-area',tArea?`Hot: ${tArea[0]}`:'Hot area: —');setText('kpi-skill-count',`${db.skills.length} ทักษะ`);
-  setText('dash-rp-val',rp);setText('dash-vf-val',vf);setText('dash-rp-val2',rp);setText('dash-vf-val2',vf);
-  setText('dash-off-val',lv);setText('dash-skill-count2',db.skills.length);setWidth('dash-skill-bar',avg);
-  const ins=document.getElementById('dash-insight');if(ins){ins.textContent=avg>70&&db.special.length>2?'🌟 ยอดเยี่ยม: ทักษะสูง + งานพิเศษดี':db.support.length>10?'⚠️ Support บ่อย — ตรวจ Part ที่มีปัญหาซ้ำ':'💡 บันทึกทักษะและงานพิเศษเพื่อ AI วิเคราะห์แม่นขึ้น';}
-  // Attendance %
-  const totalWorkingDays=250;const off=lv+db.daily.filter(d=>d.type==='holiday').length;
-  const wd=totalWorkingDays-off;const pctWork=Math.round((wd/totalWorkingDays)*100);const pctOff=Math.round((off/totalWorkingDays)*100);
-  setText('pct-work',pctWork+'%');setText('pct-work-sub',`${wd} / ${totalWorkingDays} วัน`);setWidth('pct-work-bar',pctWork);
-  setText('pct-off',pctOff+'%');setText('pct-off-sub',`${off} วัน`);setWidth('pct-off-bar',pctOff);
-  buildMasterChart();renderGroupBars('group-analysis-bars',8);buildDoughnut(rp,vf,rec,'statusDoughnut');
+  // 1. ดึงข้อมูลที่ผ่านการกรองวันที่แล้ว (สำคัญมาก)
+  // Support: ใช้ field 'eventDate' (YYYY-MM-DD) ในการกรอง
+  const filteredSupport = filterByDateRange(db.support, 'eventDate', 'master-dash');
+  const filteredS5 = filterByDateRange(db.s5, 'month', 'master-dash');
+  const filteredSpecial = filterByDateRange(db.special, 'date', 'master-dash');
+  const filteredDaily = filterByDateRange(db.daily, 'date', 'master-dash');
+
+  // 2. คำนวณ KPI จากข้อมูลที่กรองแล้ว
+  const rp = filteredSupport.filter(s=>s.report==='RP').length;
+  const vf = filteredSupport.filter(s=>s.report==='VF').length;
+  const rec = filteredSupport.filter(s=>s.report==='RECORDS').length;
+  
+  // 3. Skills ควรแสดงเป็น "สถานะปัจจุบัน" เสมอ (ไม่ควรกรองตามวันที่ เพราะเป็นทักษะสะสม)
+  const avg = db.skills.length ? Math.round(db.skills.reduce((s,c)=>s+(c.value||0),0)/db.skills.length) : 0;
+  
+  // 4. วิเคราะห์ Hot Area จากข้อมูลที่กรอง
+  const aMap = {};
+  filteredS5.forEach(s=>{if(s.area)aMap[s.area]=(aMap[s.area]||0)+(s.count||0);});
+  const tArea = Object.entries(aMap).sort((a,b)=>b[1]-a[1])[0];
+
+  // 5. อัปเดตตัวเลขบนหน้าจอ
+  setText('dash-support-count', filteredSupport.length);
+  setText('dash-5s-count', filteredS5.reduce((s,c)=>s+(c.count||0),0));
+  setText('dash-special-count', filteredSpecial.length);
+  setText('dash-avg-skill', avg+'%');
+  setText('dash-avg-skill2', avg+'%');
+  
+  setText('kpi-rp-vf', `RP: ${rp} · VF: ${vf}`);
+  setText('kpi-5s-area', tArea ? `Hot: ${tArea[0]}` : 'Hot area: —');
+  setText('kpi-skill-count', `${db.skills.length} ทักษะ`);
+  
+  setText('dash-rp-val', rp);
+  setText('dash-vf-val', vf);
+  setText('dash-rp-val2', rp);
+  setText('dash-vf-val2', vf);
+  
+  // วันลา/หยุด คำนวณจากช่วงเวลาที่เลือก
+  const lv = filteredDaily.filter(d=>d.type==='leave').length;
+  const hv = filteredDaily.filter(d=>d.type==='holiday').length;
+  setText('dash-off-val', lv); 
+  setText('dash-skill-count2', db.skills.length);
+  setWidth('dash-skill-bar', avg);
+  
+  // Insight Text
+  const ins = document.getElementById('dash-insight');
+  if(ins){
+    ins.textContent = avg>70 && filteredSpecial.length>2 ? '🌟 ยอดเยี่ยม: ทักษะสูง + งานพิเศษดี' : 
+                       filteredSupport.length>10 ? '⚠️ Support บ่อย — ตรวจ Part ที่มีปัญหาซ้ำ' : 
+                       '💡 บันทึกทักษะและงานพิเศษเพื่อ AI วิเคราะห์แม่นขึ้น';
+  }
+
+  // 6. Attendance % (คำนวณจากวันที่เลือก)
+  // ถ้าเลือกช่วงเวลา ให้คำนวณเปอร์เซ็นต์จากจำนวนวันในช่วงเวลานั้นๆ
+  const range = pageFilters['master-dash'];
+  let totalDaysInRange = 0;
+  if(range.from && range.to){
+      const d1 = new Date(range.from);
+      const d2 = new Date(range.to);
+      totalDaysInRange = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24)) + 1;
+  } else {
+      totalDaysInRange = 250; // Default 1 year
+  }
+  
+  const offDays = lv + hv;
+  const workDays = Math.max(0, totalDaysInRange - offDays);
+  const pctWork = totalDaysInRange > 0 ? Math.round((workDays/totalDaysInRange)*100) : 0;
+  const pctOff = totalDaysInRange > 0 ? Math.round((offDays/totalDaysInRange)*100) : 0;
+
+  setText('pct-work', pctWork+'%');
+  setText('pct-work-sub', `${workDays} / ${totalDaysInRange} วัน`);
+  setWidth('pct-work-bar', pctWork);
+  
+  setText('pct-off', pctOff+'%');
+  setText('pct-off-sub', `${offDays} วัน`);
+  setWidth('pct-off-bar', pctOff);
+
+  // 7. Render Charts โดยส่งข้อมูลที่กรองแล้วเข้าไป
+  buildMasterChart(filteredSupport, filteredS5);
+  renderGroupBars('group-analysis-bars', 8, filteredSupport);
+  buildDoughnut(rp, vf, rec, 'statusDoughnut');
 }
-function buildMasterChart(){
-  const canvas=document.getElementById('masterWorkChart');if(!canvas)return;if(masterChart)masterChart.destroy();
-  const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-  const sD=Array(12).fill(0),s5D=Array(12).fill(0);
-  db.support.forEach(s=>{const m=s.month?parseInt(s.month.split('-')[1])-1:new Date().getMonth();if(m>=0&&m<12)sD[m]++;});
-  db.s5.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12)s5D[m]+=(s.count||0);}});
-  const c=canvas.getContext('2d'),h=canvas.parentElement?.clientHeight||215;
-  const g1=c.createLinearGradient(0,0,0,h);g1.addColorStop(0,'rgba(37,99,235,.5)');g1.addColorStop(.5,'rgba(37,99,235,.1)');g1.addColorStop(1,'rgba(37,99,235,0)');
-  const g2=c.createLinearGradient(0,0,0,h);g2.addColorStop(0,'rgba(124,58,237,.5)');g2.addColorStop(.5,'rgba(124,58,237,.1)');g2.addColorStop(1,'rgba(124,58,237,0)');
-  masterChart=new Chart(c,{type:'line',data:{labels:mo,datasets:[{label:'Support',data:sD,borderColor:'#2563eb',backgroundColor:g1,tension:.45,fill:true,pointBackgroundColor:'#2563eb',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5},{label:'5S',data:s5D,borderColor:'#7c3aed',backgroundColor:g2,tension:.45,fill:true,pointBackgroundColor:'#7c3aed',pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:18,font:{size:11}}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94a3b8'}},y:{grid:{display:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94a3b8',stepSize:1}}}}});}
-function buildDoughnut(rp,vf,rec,cid){
-  const ctx=document.getElementById(cid);if(!ctx)return;
-  if(cid==='statusDoughnut'&&doughnutChart)doughnutChart.destroy();
-  if(cid==='supportStatusChart'&&supStatusChart)supStatusChart.destroy();
-  const tot=rp+vf+rec;
-  // Update center stat for dashboard modal donut
-  const cn=document.getElementById('donut-center-num');if(cn)cn.textContent=tot;
-  // Legend pills
-  const lp=document.getElementById('donut-legend-pills');
-  if(lp&&cid==='supportStatusChart'){
-    lp.innerHTML=[
-      {l:'RP',v:rp,c:'#dc2626',bg:'#fef2f2'},
-      {l:'VF',v:vf,c:'#2563eb',bg:'#eff6ff'},
-      {l:'Rec',v:rec,c:'#d97706',bg:'#fffbeb'}
+
+/* ══════════════════════════════════
+   CHART BUILDERS (UPDATED TO ACCEPT DATA)
+══════════════════════════════════ */
+function buildMasterChart(suppData, s5Data){
+  const canvas = document.getElementById('masterWorkChart');
+  if(!canvas) return;
+  if(masterChart) masterChart.destroy();
+  
+  const mo = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const sD = Array(12).fill(0);
+  const s5D = Array(12).fill(0);
+  
+  // ใช้ข้อมูลที่ส่งเข้ามา (Filtered) หรือ default เป็น db ถ้าไม่มีอะไรส่งมา
+  const sList = suppData || db.support;
+  const s5List = s5Data || db.s5;
+
+  sList.forEach(s => {
+    // พยายามดึงเดือนจาก eventDate (YYYY-MM-DD) หรือ month (YYYY-MM)
+    let m = -1;
+    if(s.eventDate) m = new Date(s.eventDate).getMonth();
+    else if(s.month) m = parseInt(s.month.split('-')[1])-1;
+    
+    if(m >= 0 && m < 12) sD[m]++;
+  });
+  
+  s5List.forEach(s => {
+    if(s.month){
+      const m = parseInt(s.month.split('-')[1])-1;
+      if(m >= 0 && m < 12) s5D[m] += (s.count||0);
+    }
+  });
+  
+  const c = canvas.getContext('2d');
+  const h = canvas.parentElement?.clientHeight || 215;
+  const g1 = c.createLinearGradient(0,0,0,h);
+  g1.addColorStop(0,'rgba(37,99,235,.5)');
+  g1.addColorStop(.5,'rgba(37,99,235,.1)');
+  g1.addColorStop(1,'rgba(37,99,235,0)');
+  
+  const g2 = c.createLinearGradient(0,0,0,h);
+  g2.addColorStop(0,'rgba(124,58,237,.5)');
+  g2.addColorStop(.5,'rgba(124,58,237,.1)');
+  g2.addColorStop(1,'rgba(124,58,237,0)');
+  
+  masterChart = new Chart(c, {
+    type: 'line',
+    data: {
+      labels: mo,
+      datasets: [
+        { label: 'Support', data: sD, borderColor: '#2563eb', backgroundColor: g1, tension: .45, fill: true, pointBackgroundColor: '#2563eb', pointBorderColor: '#fff', pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 9, borderWidth: 2.5 },
+        { label: '5S', data: s5D, borderColor: '#7c3aed', backgroundColor: g2, tension: .45, fill: true, pointBackgroundColor: '#7c3aed', pointBorderColor: '#fff', pointBorderWidth: 2.5, pointRadius: 5, pointHoverRadius: 9, borderWidth: 2.5 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyleWidth: 10, padding: 18, font: { size: 11 }}}},
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10 }, color: '#94a3b8' }},
+        y: { grid: { display: false }, border: { display: false }, beginAtZero: true, ticks: { font: { size: 10 }, color: '#94a3b8', stepSize: 1 }}
+      }
+    }
+  });
+}
+
+function buildDoughnut(rp, vf, rec, cid){
+  const ctx = document.getElementById(cid);
+  if(!ctx) return;
+  
+  if(cid === 'statusDoughnut' && doughnutChart) doughnutChart.destroy();
+  if(cid === 'supportStatusChart' && supStatusChart) supStatusChart.destroy();
+  
+  const tot = rp + vf + rec;
+  const cn = document.getElementById('donut-center-num');
+  if(cn) cn.textContent = tot;
+  
+  // Legend pills logic (เหมือนเดิม แต่ใช้ค่า rp,vf,rec ที่ส่งเข้ามา)
+  const lp = document.getElementById('donut-legend-pills');
+  if(lp && cid === 'supportStatusChart'){
+    lp.innerHTML = [
+      {l:'RP', v:rp, c:'#dc2626', bg:'#fef2f2'},
+      {l:'VF', v:vf, c:'#2563eb', bg:'#eff6ff'},
+      {l:'Rec', v:rec, c:'#d97706', bg:'#fffbeb'}
     ].map(x=>`<div style="display:flex;align-items:center;gap:5px;background:${x.bg};border:1px solid ${x.c}33;border-radius:99px;padding:3px 10px;">
       <div style="width:8px;height:8px;border-radius:50%;background:${x.c};"></div>
       <span style="font-size:.62rem;font-weight:700;color:${x.c};">${x.l} <b style="font-family:'DM Mono',monospace;">${x.v}</b></span>
     </div>`).join('');
   }
-  if(!tot)return;
-  const cfg={
-    type:'doughnut',
-    data:{labels:['RP','VF','Records'],datasets:[{
-      data:[rp,vf,rec],
-      backgroundColor:['#dc2626','#2563eb','#d97706'],
-      borderWidth:5,borderColor:'#fff',hoverOffset:20,
-      hoverBorderWidth:3,hoverBorderColor:'#fff'
-    }]},
-    options:{
-      responsive:true,maintainAspectRatio:false,cutout:'72%',
-      animation:{animateScale:true,duration:900,easing:'easeOutBounce'},
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>{const v=ctx.parsed;const pct=Math.round(v/tot*100);return` ${ctx.label}: ${v} (${pct}%)`;}}}
-      }
+  
+  if(!tot) return;
+  
+  const cfg = {
+    type: 'doughnut',
+    data: { labels: ['RP','VF','Records'], datasets: [{ data: [rp,vf,rec], backgroundColor: ['#dc2626','#2563eb','#d97706'], borderWidth: 5, borderColor: '#fff', hoverOffset: 20, hoverBorderWidth: 3, hoverBorderColor: '#fff' }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '72%',
+      animation: { animateScale: true, duration: 900, easing: 'easeOutBounce' },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx=>{ const v=ctx.parsed; const pct=Math.round(v/tot*100); return ` ${ctx.label}: ${v} (${pct}%)`; } }} }
     }
   };
-  const ch=new Chart(ctx.getContext('2d'),cfg);
-  if(cid==='statusDoughnut')doughnutChart=ch;else supStatusChart=ch;
+  
+  const ch = new Chart(ctx.getContext('2d'), cfg);
+  if(cid === 'statusDoughnut') doughnutChart = ch; else supStatusChart = ch;
 }
 
+// แก้ไข buildGroupData ให้รับ parameter เพื่อรองรับการกรอง
+function buildGroupData(supportList){
+  const data = supportList || db.support; // ถ้าไม่ส่งข้อมูลมา ให้ใช้ข้อมูลทั้งหมด
+  const map = {};
+  
+  data.forEach(s => {
+    const p = (s.part||'(ไม่ระบุ)').trim();
+    if(!map[p]) map[p] = {total:0, RP:0, VF:0, RECORDS:0, ok:0, ng:0};
+    map[p].total++;
+    if(s.report==='RP') map[p].RP++;
+    else if(s.report==='VF') map[p].VF++;
+    else if(s.report==='RECORDS') map[p].RECORDS++;
+    map[p].ok += (s.ok||0);
+    map[p].ng += (s.ng||0);
+  });
+  
+  return Object.entries(map).sort((a,b)=>b[1].total-a[1].total);
+}
+
+// แก้ไข renderGroupBars ให้ส่งข้อมูลที่กรองแล้วเข้าไปใน buildGroupData
+function renderGroupBars(elId, limit=10, supportList){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  
+  // ส่ง supportList (ข้อมูลที่กรอง) เข้าไปคำนวณ
+  const sorted = buildGroupData(supportList).slice(0, limit);
+  
+  if(!sorted.length){
+    el.innerHTML = '<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ไม่มีข้อมูลในช่วงเวลานี้</div>';
+    return;
+  }
+  
+  const max = sorted[0][1].total;
+  el.innerHTML = sorted.map(([n,d],i) => 
+    `<div class="gb-row">
+      <div class="gb-rank">${i+1}</div>
+      <div class="gb-name" title="${n}">${n}</div>
+      <div class="gb-track"><div class="gb-fill" style="width:${(d.total/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div>
+      <span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${d.total}</span>
+    </div>`
+  ).join('');
+}
 /* ══════════════════════════════════
    AI ANALYTICS
 ══════════════════════════════════ */
 function runAIAnalytics(){const avg=db.skills.length?db.skills.reduce((s,c)=>s+(c.value||0),0)/db.skills.length:0;const sc=Math.round(Math.min(Math.max((avg*.4)+(db.special.length*5)+(db.support.length*2),10),100));setText('effScore',sc+'%');setWidth('effBar',sc);const i=document.getElementById('aiInsight');if(i)i.textContent=sc>80?'🌟 High Performer: ยอดเยี่ยมมาก!':sc>50?'📈 Growing: กำลังพัฒนาดี':'⚙️ Operational: บันทึกต่อเนื่องเพื่อวิเคราะห์';}
 
 /* ══════════════════════════════════
-   DAILY REPORT
+   DAILY REPORT (FILTERED)
 ══════════════════════════════════ */
 function refreshDashboard(){
-  const fv=(document.getElementById('monthFilter')||{}).value||'all';const totalWorkingDays=250;
-  let fil=fv==='all'?db.daily:db.daily.filter(d=>{const m=new Date(d.date).getMonth();return !isNaN(m)&&m===parseInt(fv);});
-  const lv=fil.filter(d=>d.type==='leave').length,hv=fil.filter(d=>d.type==='holiday').length;
-  const off=lv+hv,wd=totalWorkingDays-off;
-  const pctWork=Math.round((wd/totalWorkingDays)*100),pctOff=Math.round((off/totalWorkingDays)*100);
-  setText('pct-work',pctWork+'%');setText('pct-work-sub',`${wd} / ${totalWorkingDays} วัน`);setWidth('pct-work-bar',pctWork);
-  setText('pct-off',pctOff+'%');setText('pct-off-sub',`${off} วัน (ลา ${lv} + หยุด ${hv})`);setWidth('pct-off-bar',pctOff);
-  setText('st-work',wd);setText('st-leave',lv);setText('st-holiday',hv);setText('st-percent',pctWork+'%');
-  const tb=document.getElementById('dailyTableBody');
+  // 1. ดึงข้อมูลที่ผ่านการกรองวันที่แล้ว
+  const filteredDaily = filterByDateRange(db.daily, 'date', 'daily');
+
+  // 2. คำนวณจำนวนวันในช่วงเวลาที่เลือก (สำหรับใช้เป็นตัวหาร %)
+  const range = pageFilters['daily'];
+  let totalDaysInRange = 0;
+
+  if(range.from && range.to){
+    const d1 = new Date(range.from);
+    const d2 = new Date(range.to);
+    // คำนวณจำนวนวัน +1 (เพราะนับวันเริ่มและวันสิ้นสุดรวมกัน)
+    totalDaysInRange = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24)) + 1;
+  } else {
+    // ถ้าไม่ได้เลือกวันที่ (เลือก "ทั้งปี") ให้ใช้ค่า Default 250 วัน
+    totalDaysInRange = 250;
+  }
+
+  // 3. คำนวณสถิติจากข้อมูลที่กรอง
+  const lv = filteredDaily.filter(d => d.type==='leave').length;
+  const hv = filteredDaily.filter(d => d.type==='holiday').length;
+  const off = lv + hv;
+  const wd = Math.max(0, totalDaysInRange - off); // วันทำงาน = วันทั้งหมด - วันหยุด
+
+  const pctWork = totalDaysInRange > 0 ? Math.round((wd/totalDaysInRange)*100) : 0;
+  const pctOff = totalDaysInRange > 0 ? Math.round((off/totalDaysInRange)*100) : 0;
+
+  // 4. อัปเดต KPI Cards
+  setText('pct-work', pctWork+'%');
+  setText('pct-work-sub', `${wd} / ${totalDaysInRange} วัน`);
+  setWidth('pct-work-bar', pctWork);
+
+  setText('pct-off', pctOff+'%');
+  setText('pct-off-sub', `${off} วัน (ลา ${lv} + หยุด ${hv})`);
+  setWidth('pct-off-bar', pctOff);
+
+  setText('st-work', wd);
+  setText('st-leave', lv);
+  setText('st-holiday', hv);
+  setText('st-percent', pctWork+'%');
+
+  // 5. Render ตาราง
+  const tb = document.getElementById('dailyTableBody');
   if(tb){
-    const rows=[...db.daily].reverse();let runLv=0,runHol=0;
-    const daily_sorted=[...db.daily].sort((a,b)=>new Date(a.date)-new Date(b.date));const cumulMap={};
-    daily_sorted.forEach(d=>{if(d.type==='leave')runLv++;else runHol++;const runOff=runLv+runHol;const runWork=totalWorkingDays-runOff;cumulMap[d.id||d.date+'_'+d.type]={pw:Math.max(0,Math.round((runWork/totalWorkingDays)*100)),po:Math.round((runOff/totalWorkingDays)*100)};});
-    tb.innerHTML=rows.map((d)=>{const key=d.id||d.date+'_'+d.type;const cm=cumulMap[key]||{pw:'-',po:'-'};return`<tr><td style="white-space:nowrap;font-size:.75rem;">${d.fullTimestamp||dateOnly(d.date)}</td><td><span class="badge ${d.type==='leave'?'badge-lv':'badge-hol'}">${d.type==='leave'?'ลางาน':'วันหยุด'}</span></td><td style="font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${cm.pw}%</td><td style="font-weight:700;color:var(--red);font-family:'DM Mono',monospace;">${cm.po}%</td><td style="font-size:.72rem;color:var(--txt3);">${d.note||'—'}</td><td style="text-align:center;"><button class="btn-del" onclick="delDailyConfirm('${d.id||d.date+'_'+d.type}')" title="ลบ">🗑</button></td></tr>`;}).join('');}
-  buildAttendChart();
-  const tip=document.getElementById('dailyTip');if(tip)tip.textContent=lv>5?'⚠️ วันลาสะสมมาก ควรวางแผนใหม่':pctWork>90?'🌟 สถิติการมาทำงานยอดเยี่ยม!':'💪 รักษาความสม่ำเสมอต่อไปนะครับ!';
-  const dynTip=document.getElementById('dynamicTip');
-  if(dynTip){const msgs=['บันทึกข้อมูลทุกวันช่วยให้ AI วิเคราะห์ได้แม่นขึ้น 3x','ยิ่งมี Support น้อย ยิ่งแสดงถึงคุณภาพ Process ที่ดี','Skill ที่ &gt;80% หมายถึงคุณพร้อมสอนผู้อื่นได้แล้ว!','ตรวจสอบ 5S ประจำสัปดาห์ช่วยลด Defect ได้ถึง 30%'];dynTip.innerHTML=`<b>💬 Today:</b> ${msgs[new Date().getDay()%msgs.length]}`;}
+    // Logic การแสดงผลตาราง:
+    // - คอลัมน์ "% งาน/หยุด" ควรเป็น Cumulative (สะสมตั้งแต่ต้นปี) เพื่อให้เห็นภาพรวม
+    // - แต่แถวที่แสดงจะ Filter เฉพาะช่วงเวลาที่เลือก
+    
+    // 5.1 คำนวณค่าสะสม (Cumulative) จากข้อมูลทั้งหมด
+    const daily_sorted = [...db.daily].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const cumulMap = {};
+    let runLv = 0, runHol = 0;
+    daily_sorted.forEach(d => {
+      if(d.type==='leave') runLv++; else runHol++;
+      const runOff = runLv+runHol;
+      // ใช้ base 250 วันสำหรับคอลัมน์สะสมในตาราง (เพื่อให้บริบทของแต่ละวันยังคงเทียบกับทั้งปีได้)
+      const baseDays = 250; 
+      const runWork = baseDays - runOff;
+      cumulMap[d.id||d.date+'_'+d.type] = {
+        pw: Math.max(0, Math.round((runWork/baseDays)*100)), 
+        po: Math.round((runOff/baseDays)*100)
+      };
+    });
+
+    // 5.2 แสดงผลเฉพาะข้อมูลในช่วง Filter (เรียงจากล่าสุดขึ้นบน)
+    tb.innerHTML = [...filteredDaily].reverse().map((d) => {
+      const key = d.id||d.date+'_'+d.type;
+      const cm = cumulMap[key]||{pw:'-', po:'-'};
+      return `<tr>
+        <td style="white-space:nowrap;font-size:.75rem;">${d.fullTimestamp||dateOnly(d.date)}</td>
+        <td><span class="badge ${d.type==='leave'?'badge-lv':'badge-hol'}">${d.type==='leave'?'ลางาน':'วันหยุด'}</span></td>
+        <td style="font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${cm.pw}%</td>
+        <td style="font-weight:700;color:var(--red);font-family:'DM Mono',monospace;">${cm.po}%</td>
+        <td style="font-size:.72rem;color:var(--txt3);">${d.note||'—'}</td>
+        <td style="text-align:center;"><button class="btn-del" onclick="delDailyConfirm('${d.id||d.date+'_'+d.type}')" title="ลบ">🗑</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // 6. Render กราฟ โดยส่งข้อมูลที่กรองแล้วเข้าไป
+  buildAttendChart(filteredDaily);
+
+  // 7. Update AI Tips
+  const tip = document.getElementById('dailyTip');
+  if(tip) tip.textContent = lv>5 ? '⚠️ วันลาสะสมในช่วงเวลานี้มาก ควรวางแผนใหม่' : pctWork>90 ? '🌟 สถิติการมาทำงานยอดเยี่ยม!' : '💪 รักษาความสม่ำเสมอต่อไปนะครับ!';
+  
+  const dynTip = document.getElementById('dynamicTip');
+  if(dynTip){
+    const msgs = ['บันทึกข้อมูลทุกวันช่วยให้ AI วิเคราะห์ได้แม่นขึ้น 3x', 'ยิ่งมี Support น้อย ยิ่งแสดงถึงคุณภาพ Process ที่ดี', 'Skill ที่ >80% หมายถึงคุณพร้อมสอนผู้อื่นได้แล้ว!', 'ตรวจสอบ 5S ประจำสัปดาห์ช่วยลด Defect ได้ถึง 30%'];
+    dynTip.innerHTML = `<b>💬 Today:</b> ${msgs[new Date().getDay()%msgs.length]}`;
+  }
+  
   runAIAnalytics();
 }
-function buildAttendChart(){const ctx=document.getElementById('attendanceChart');if(!ctx)return;if(attendChart)attendChart.destroy();const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];const lD=Array(12).fill(0),hD=Array(12).fill(0);db.daily.forEach(d=>{const m=new Date(d.date).getMonth();if(!isNaN(m)){if(d.type==='leave')lD[m]++;else hD[m]++;}});attendChart=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels:mo,datasets:[{label:'ลางาน',data:lD,backgroundColor:'rgba(220,38,38,.78)',borderRadius:7,borderSkipped:false},{label:'วันหยุด',data:hD,backgroundColor:'rgba(37,99,235,.68)',borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyleWidth:10,padding:16,font:{size:11}}}},scales:{x:{stacked:true,grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94a3b8'}},y:{stacked:true,grid:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94a3b8',stepSize:1},border:{display:false}}}}});}
-function addDaily(){const d=document.getElementById('dailyDate').value,t=document.getElementById('dailyType').value,note=document.getElementById('dailyNote').value;if(!d)return toast('❌ เลือกวันที่ก่อน');const id=Date.now().toString();db.daily.push({id,date:d,type:t,note,fullTimestamp:fullTimestamp(d)});save();toast('📅 บันทึกแล้ว');document.getElementById('dailyNote').value='';refreshDashboard();}
-function delDailyConfirm(id){robotConfirm('ลบรายการวันลา/หยุดนี้?',()=>{db.daily=db.daily.filter(d=>(d.id||d.date+'_'+d.type)!==id);save();toast('🗑 ลบแล้ว');refreshDashboard();});}
 
 /* ══════════════════════════════════
-   SUPPORT PRODUCTION
+   ATTENDANCE CHART (ACCEPTS DATA)
 ══════════════════════════════════ */
-function refreshSupport(){
-  const tb=document.getElementById('supportTableBody');if(!tb)return;
-  const filtered=filterByDateRange(db.support,'month','support');
-  const rp=filtered.filter(s=>s.report==='RP').length,
-    vf=filtered.filter(s=>s.report==='VF').length,
-    rec=filtered.filter(s=>s.report==='RECORDS').length;
-  const totalOK=filtered.reduce((s,c)=>s+(c.ok||0),0);
-  const totalNG=filtered.reduce((s,c)=>s+(c.ng||0),0);
-  const ngRate=totalOK+totalNG>0?Math.round((totalNG/(totalOK+totalNG))*100):0;
-  const tot=filtered.length;
+function buildAttendChart(dailyData){
+  const ctx = document.getElementById('attendanceChart');
+  if(!ctx) return;
+  if(attendChart) attendChart.destroy();
 
-  // Page KPIs
-  setText('sum-total',tot);setText('sum-rp',rp);setText('sum-vf',vf);setText('sum-records',rec);
-  // Modal KPIs
-  setText('md-sum-total',tot);setText('md-sum-rp',rp);setText('md-sum-vf',vf);setText('md-sum-rec',rec);
-  setText('md-total-ok',totalOK);setText('md-total-ng',totalNG);
-  setText('md-ng-rate',`${ngRate}% rate`);
-  setText('md-pct-rp',tot?`${Math.round(rp/tot*100)}% of total`:'0%');
-  setText('md-pct-vf',tot?`${Math.round(vf/tot*100)}% of total`:'0%');
-  setText('md-pct-rec',tot?`${Math.round(rec/tot*100)}% of total`:'0%');
-  // Last updated
-  const lu=document.getElementById('sdb-last-updated');if(lu)lu.textContent='Updated: '+new Date().toLocaleTimeString('th-TH');
-  // Badge labels
-  setText('sdb-donut-lbl',`${tot} cases`);
-  setText('sdb-okng-lbl',`OK:${totalOK} / NG:${totalNG}`);
+  const mo = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const lD = Array(12).fill(0);
+  const hD = Array(12).fill(0);
+
+  // ใช้ข้อมูลที่ส่งเข้ามา (ถ้ามี) ไม่งั้นใช้ข้อมูลทั้งหมด
+  const dataToUse = dailyData || db.daily;
+
+  dataToUse.forEach(d => {
+    const m = new Date(d.date).getMonth();
+    if(!isNaN(m)){
+      if(d.type==='leave') lD[m]++;
+      else hD[m]++;
+    }
+  });
+
+  attendChart = new Chart(ctx.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: mo,
+      datasets: [
+        { label: 'ลางาน', data: lD, backgroundColor: 'rgba(220,38,38,.78)', borderRadius: 7, borderSkipped: false },
+        { label: 'วันหยุด', data: hD, backgroundColor: 'rgba(37,99,235,.68)', borderRadius: 7, borderSkipped: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyleWidth: 10, padding: 16, font: { size: 11 } } } },
+      scales: {
+        x: { stacked: true, grid: { display: false }, border: { display: false }, ticks: { font: { size: 10 }, color: '#94a3b8' } },
+        y: { stacked: true, grid: { display: false }, beginAtZero: true, ticks: { font: { size: 10 }, color: '#94a3b8', stepSize: 1 }, border: { display: false } }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════
+   SUPPORT PRODUCTION - FULL FIX
+══════════════════════════════════ */
+
+// 1. แก้ไขการ Refresh ให้รองรับข้อมูลที่ยังไม่มี eventDate
+function refreshSupport(){
+  const tb = document.getElementById('supportTableBody');
+  if(!tb) return;
+  
+  // กรองข้อมูล: ใช้ eventDate เป็นหลัก ถ้าไม่มีให้ลองใช้ month (สำหรับข้อมูลเก่า)
+  const filtered = filterByDateRange(db.support, 'eventDate', 'support');
+  
+  // คำนวณค่า KPI จากข้อมูลที่กรองแล้ว
+  const rp = filtered.filter(s=>s.report==='RP').length;
+  const vf = filtered.filter(s=>s.report==='VF').length;
+  const rec = filtered.filter(s=>s.report==='RECORDS').length;
+  const totalOK = filtered.reduce((s,c)=>s+(c.ok||0),0);
+  const totalNG = filtered.reduce((s,c)=>s+(c.ng||0),0);
+  const ngRate = (totalOK+totalNG)>0 ? Math.round((totalNG/(totalOK+totalNG))*100) : 0;
+  const tot = filtered.length;
+
+  // อัปเดต KPI หน้าหลัก
+  setText('sum-total', tot); setText('sum-rp', rp); setText('sum-vf', vf); setText('sum-records', rec);
+  
+  // อัปเดต KPI ใน Modal Dashboard
+  setText('md-sum-total', tot); setText('md-sum-rp', rp); setText('md-sum-vf', vf); setText('md-sum-rec', rec);
+  setText('md-total-ok', totalOK); setText('md-total-ng', totalNG);
+  setText('md-ng-rate', `${ngRate}% rate`);
+  setText('md-pct-rp', tot ? `${Math.round(rp/tot*100)}% of total` : '0%');
+  setText('md-pct-vf', tot ? `${Math.round(vf/tot*100)}% of total` : '0%');
+  setText('md-pct-rec', tot ? `${Math.round(rec/tot*100)}% of total` : '0%');
+  
+  const lu = document.getElementById('sdb-last-updated');
+  if(lu) lu.textContent = 'Updated: '+new Date().toLocaleTimeString('th-TH');
+  setText('sdb-donut-lbl', `${tot} cases`);
+  setText('sdb-okng-lbl', `OK:${totalOK} / NG:${totalNG}`);
 
   // Smart Insights
-  const groupMap=buildGroupData();
+  const groupMap = buildGroupData(filtered);
   if(groupMap.length){
-    const topG=groupMap[0];
-    setText('md-top-group',topG[0]);
-    setText('md-top-group-sub',`${topG[1].total} cases · RP:${topG[1].RP||0} VF:${topG[1].VF||0}`);
-    // worst NG rate by group
-    const withNG=groupMap.filter(([,d])=>d.ng>0).sort((a,b)=>b[1].ng-a[1].ng);
+    const topG = groupMap[0];
+    setText('md-top-group', topG[0]);
+    setText('md-top-group-sub', `${topG[1].total} cases · RP:${topG[1].RP||0} VF:${topG[1].VF||0}`);
+    const withNG = groupMap.filter(([,d])=>d.ng>0).sort((a,b)=>b[1].ng-a[1].ng);
     if(withNG.length){
-      setText('md-worst-ng',withNG[0][0]);
-      const wr=withNG[0][1];
-      setText('md-worst-ng-sub',`NG: ${wr.ng||0} pcs · ${wr.total} cases`);
+      setText('md-worst-ng', withNG[0][0]);
+      setText('md-worst-ng-sub', `NG: ${withNG[0][1].ng||0} pcs · ${withNG[0][1].total} cases`);
     }
   }
-  // Busiest month
-  const moCounts=Array(12).fill(0);const moNames=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-  db.support.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12)moCounts[m]++;}});
-  const maxMo=Math.max(...moCounts);const busyIdx=moCounts.indexOf(maxMo);
-  if(maxMo>0){setText('md-busy-month',moNames[busyIdx]);setText('md-busy-month-sub',`${maxMo} cases บันทึกในเดือนนี้`);}
+  
+  // Busiest Month
+  const moCounts = Array(12).fill(0);
+  const moNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  filtered.forEach(s => {
+    if(s.eventDate) { 
+      const m = new Date(s.eventDate).getMonth();
+      if(!isNaN(m)) moCounts[m]++;
+    } else if(s.month) {
+      const m = parseInt(s.month.split('-')[1])-1;
+      if(m>=0 && m<12) moCounts[m]++;
+    }
+  });
+  const maxMo = Math.max(...moCounts);
+  const busyIdx = moCounts.indexOf(maxMo);
+  if(maxMo > 0) { setText('md-busy-month', moNames[busyIdx]); setText('md-busy-month-sub', `${maxMo} cases บันทึกในเดือนนี้`); }
+  else { setText('md-busy-month', '—'); setText('md-busy-month-sub', '—'); }
 
-  // Table count badge
-  setText('sup-tbl-count-badge',`${filtered.length} records`);
+  setText('sup-tbl-count-badge', `${filtered.length} records`);
 
-  // Render rows
+  // Render ตาราง
   if(!filtered.length){
-    tb.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div><div style="font-size:.72rem;margin-top:6px;">กด <b>➕ Add New Record</b> เพื่อเพิ่มข้อมูล</div></td></tr>`;
-    renderGroupBars('support-group-bars',12);renderGroupByStatus('support-group-by-status');renderGroupFullTable('group-full-tbody');buildDoughnut(rp,vf,rec,'supportStatusChart');buildSupportTrend();buildSupportOkNg();buildSupportGroupChart();buildSupportMixChart();return;
+    tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div></td></tr>`;
+  } else {
+    tb.innerHTML = [...filtered].reverse().map((s)=>{
+      const realIdx = db.support.indexOf(s);
+      const bc = s.report==='RP'?'badge-rp':s.report==='VF'?'badge-vf':'badge-rec';
+      const okCell = s.ok!==undefined && s.ok!=='' ? `<span class="ok-chip">✓ ${s.ok}</span>` : '<span style="color:var(--txt4);">—</span>';
+      const ngCell = s.ng!==undefined && s.ng!=='' ? `<span class="ng-chip">✗ ${s.ng}</span>` : '<span style="color:var(--txt4);">—</span>';
+      return `<tr>
+        <td class="td-ts" style="padding-left:14px;">${s.fullTimestamp||s.datetime||'—'}</td>
+        <td style="min-width:280px;width:32%;font-size:.79rem;line-height:1.65;word-break:break-word;white-space:normal;color:var(--txt);padding-top:10px;padding-bottom:10px;">${s.problem||'—'}</td>
+        <td style="font-size:.73rem;">${s.action||'—'}</td>
+        <td style="font-weight:700;color:var(--txt2);font-size:.76rem;">${s.part||'—'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--violet);">${s.lot||'—'}</td>
+        <td style="text-align:center;">${okCell}</td>
+        <td style="text-align:center;">${ngCell}</td>
+        <td><span class="badge ${bc}">${s.report}</span></td>
+        <td class="sup-img-cell">${getImgCell(s.id,realIdx)}</td>
+        <td style="text-align:center;white-space:nowrap;">
+          <button class="btn-detail" onclick="openRecDetail(${realIdx})" title="ดูรายละเอียด">🔍 ดู</button>
+          <button class="btn-edit" onclick="openEditSupport(${realIdx})" title="แก้ไข" style="margin-left:3px;">✏️</button>
+          <button class="btn-del" onclick="delSupportConfirm(${realIdx})" title="ลบ" style="margin-left:3px;">🗑</button>
+        </td>
+      </tr>`;
+    }).join('');
   }
-  tb.innerHTML=[...filtered].reverse().map((s)=>{
-    const realIdx=db.support.indexOf(s);
-    const bc=s.report==='RP'?'badge-rp':s.report==='VF'?'badge-vf':'badge-rec';
-    const okCell=s.ok!==undefined&&s.ok!==''?`<span class="ok-chip">✓ ${s.ok}</span>`:'<span style="color:var(--txt4);">—</span>';
-    const ngCell=s.ng!==undefined&&s.ng!==''?`<span class="ng-chip">✗ ${s.ng}</span>`:'<span style="color:var(--txt4);">—</span>';
-    return`<tr>
-      <td class="td-ts" style="padding-left:14px;">${s.fullTimestamp||s.datetime||'—'}</td>
-      <td style="min-width:280px;width:32%;font-size:.79rem;line-height:1.65;word-break:break-word;white-space:normal;color:var(--txt);padding-top:10px;padding-bottom:10px;">${s.problem||'—'}</td>
-      <td style="font-size:.73rem;">${s.action||'—'}</td>
-      <td style="font-weight:700;color:var(--txt2);font-size:.76rem;">${s.part||'—'}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--violet);">${s.lot||'—'}</td>
-      <td style="text-align:center;">${okCell}</td>
-      <td style="text-align:center;">${ngCell}</td>
-      <td><span class="badge ${bc}">${s.report}</span></td>
-      <td class="sup-img-cell">${getImgCell(s.id,realIdx)}</td>
-      <td style="text-align:center;white-space:nowrap;">
-        <button class="btn-detail" onclick="openRecDetail(${realIdx})" title="ดูรายละเอียด">🔍 ดู</button>
-        <button class="btn-edit" onclick="openEditSupport(${realIdx})" title="แก้ไข" style="margin-left:3px;">✏️</button>
-        <button class="btn-del" onclick="delSupportConfirm(${realIdx})" title="ลบ" style="margin-left:3px;">🗑</button>
+
+// Render Charts
+  renderGroupBars('support-group-bars', 12, filtered);
+  renderGroupByStatus('support-group-by-status'); 
+  renderGroupFullTable('group-full-tbody', filtered);
+  buildDoughnut(rp, vf, rec, 'supportStatusChart');
+  buildSupportTrend(filtered);
+  buildSupportOkNg(filtered);
+  buildSupportGroupChart(filtered);
+  buildSupportMixChart(filtered);
+}
+
+/* ══════════════════════════════════
+   SUPPORT CHARTS (UPDATED TO ACCEPT DATA)
+══════════════════════════════════ */
+function buildSupportTrend(suppData){
+  const ctx = document.getElementById('supportTrendChart');
+  if(!ctx) return;
+  if(supTrendChart) supTrendChart.destroy();
+
+  const mo = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const rpD = Array(12).fill(0), vfD = Array(12).fill(0), recD = Array(12).fill(0);
+
+  // ใช้ข้อมูลที่ส่งเข้ามา
+  const sList = suppData || db.support;
+
+  sList.forEach(s => {
+    let m = -1;
+    // พยายามดึงเดือนจาก eventDate ก่อน ถ้าไม่มีค่อยใช้ month
+    if(s.eventDate) m = new Date(s.eventDate).getMonth();
+    else if(s.month) m = parseInt(s.month.split('-')[1])-1;
+
+    if(m >= 0 && m < 12){
+      if(s.report==='RP') rpD[m]++;
+      else if(s.report==='VF') vfD[m]++;
+      else recD[m]++;
+    }
+  });
+
+  supTrendChart = new Chart(ctx.getContext('2d'), {
+    type: 'bar',
+    data: { labels: mo, datasets: [
+      { label: 'RP', data: rpD, backgroundColor: 'rgba(220,38,38,.85)', borderRadius: 5, borderSkipped: false },
+      { label: 'VF', data: vfD, backgroundColor: 'rgba(37,99,235,.85)', borderRadius: 5, borderSkipped: false },
+      { label: 'Records', data: recD, backgroundColor: 'rgba(217,119,6,.85)', borderRadius: 5, borderSkipped: false }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyleWidth: 9, padding: 14, font: { size: 11 }, color: '#64748b' } } },
+      scales: {
+        x: { stacked: true, grid: { display: false }, border: { display: false }, ticks: { font: { size: 10.5, weight: '600' }, color: '#94a3b8' } },
+        y: { stacked: true, grid: { color: 'rgba(37,99,235,.05)', drawBorder: false }, border: { display: false }, beginAtZero: true, ticks: { font: { size: 10.5 }, color: '#94a3b8', stepSize: 1 } }
+      }
+    }
+  });
+}
+
+function buildSupportOkNg(suppData){
+  const ctx = document.getElementById('supportOkNgChart');
+  if(!ctx) return;
+  if(supOkNgChart) supOkNgChart.destroy();
+
+  const mo = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const okD = Array(12).fill(0), ngD = Array(12).fill(0);
+
+  const sList = suppData || db.support;
+
+  sList.forEach(s => {
+    let m = -1;
+    if(s.eventDate) m = new Date(s.eventDate).getMonth();
+    else if(s.month) m = parseInt(s.month.split('-')[1])-1;
+
+    if(m >= 0 && m < 12){ okD[m] += (s.ok||0); ngD[m] += (s.ng||0); }
+  });
+
+  const gctx = ctx.getContext('2d');
+  const gOk = gctx.createLinearGradient(0,0,0,220); gOk.addColorStop(0,'rgba(5,150,105,.35)'); gOk.addColorStop(1,'rgba(5,150,105,.01)');
+  const gNg = gctx.createLinearGradient(0,0,0,220); gNg.addColorStop(0,'rgba(220,38,38,.3)'); gNg.addColorStop(1,'rgba(220,38,38,.01)');
+
+  supOkNgChart = new Chart(gctx, {
+    type: 'line',
+    data: { labels: mo, datasets: [
+      { label: 'OK', data: okD, borderColor: '#059669', backgroundColor: gOk, fill: true, tension: .45, pointRadius: 4, pointBackgroundColor: '#059669', pointBorderColor: '#fff', pointBorderWidth: 2, pointHoverRadius: 7, borderWidth: 2.5 },
+      { label: 'NG', data: ngD, borderColor: '#dc2626', backgroundColor: gNg, fill: true, tension: .45, pointRadius: 4, pointBackgroundColor: '#dc2626', pointBorderColor: '#fff', pointBorderWidth: 2, pointHoverRadius: 7, borderWidth: 2.5 }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyleWidth: 9, padding: 14, font: { size: 11 }, color: '#64748b' } } },
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10.5, weight: '600' }, color: '#94a3b8' } },
+        y: { grid: { color: 'rgba(37,99,235,.05)', drawBorder: false }, border: { display: false }, beginAtZero: true, ticks: { font: { size: 10.5 }, color: '#94a3b8' } }
+      }
+    }
+  });
+}
+
+function buildSupportGroupChart(suppData){
+  const ctx = document.getElementById('supportGroupChart');
+  if(!ctx) return;
+  if(supGroupChart) supGroupChart.destroy();
+
+  // ส่งข้อมูลที่กรองเข้าไปใน buildGroupData
+  const sorted = buildGroupData(suppData).slice(0, 10);
+  if(!sorted.length) return;
+
+  const labels = sorted.map(([n])=>n.length>18?n.slice(0,16)+'…':n);
+  const vals = sorted.map(([,d])=>d.total);
+  const colors = sorted.map((_,i)=>COLORS[i%COLORS.length]);
+
+  supGroupChart = new Chart(ctx.getContext('2d'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Cases', data: vals, backgroundColor: colors, borderRadius: 7, borderSkipped: false }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(37,99,235,.06)' }, border: { display: false }, beginAtZero: true, ticks: { font: { size: 10.5 }, color: '#94a3b8' } },
+        y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10.5, weight: '600' }, color: '#334155' } }
+      }
+    }
+  });
+  
+  const badge = document.getElementById('sdb-group-badge');
+  if(badge) badge.textContent = `${sorted.length} Groups`;
+}
+
+function buildSupportMixChart(suppData){
+  const ctx = document.getElementById('supportMixChart');
+  if(!ctx) return;
+  if(supMixChart) supMixChart.destroy();
+
+  const sorted = buildGroupData(suppData).slice(0, 10);
+  if(!sorted.length) return;
+
+  const labels = sorted.map(([n])=>n.length>16?n.slice(0,14)+'…':n);
+
+  supMixChart = new Chart(ctx.getContext('2d'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'RP', data: sorted.map(([,d])=>d.RP||0), backgroundColor: 'rgba(220,38,38,.82)', borderRadius: 5, borderSkipped: false },
+      { label: 'VF', data: sorted.map(([,d])=>d.VF||0), backgroundColor: 'rgba(37,99,235,.82)', borderRadius: 5, borderSkipped: false },
+      { label: 'Records', data: sorted.map(([,d])=>d.RECORDS||0), backgroundColor: 'rgba(217,119,6,.82)', borderRadius: 5, borderSkipped: false }
+    ]},
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyleWidth: 8, padding: 10, font: { size: 10.5 }, color: '#64748b' } } },
+      scales: {
+        x: { stacked: true, grid: { color: 'rgba(37,99,235,.06)' }, border: { display: false }, beginAtZero: true, ticks: { font: { size: 10.5 }, color: '#94a3b8' } },
+        y: { stacked: true, grid: { display: false }, border: { display: false }, ticks: { font: { size: 10.5, weight: '600' }, color: '#334155' } }
+      }
+    }
+  });
+}
+
+// Helper function ที่ใช้ร่วมกัน (อัปเดตจากครั้งก่อน)
+function renderGroupFullTable(tbodyId, supportList){
+  const el = document.getElementById(tbodyId);
+  if(!el) return;
+
+  // ถ้าไม่มี supportList ส่งมา ให้ใช้ db.support (กรณีเรียกจากที่อื่น)
+  const sorted = buildGroupData(supportList || db.support);
+  const totalAll = (supportList || db.support).length || 1;
+
+  if(!sorted.length){
+    el.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--txt4);padding:18px;">ยังไม่มีข้อมูล</td></tr>`;
+    return;
+  }
+
+  el.innerHTML = sorted.map(([n,d],i)=>{
+    const t = d.total||1;
+    const rp = d.RP||0, vf = d.VF||0, rec = d.RECORDS||0;
+    const pctRP = Math.round(rp/t*100), pctVF = Math.round(vf/t*100), pctRec = Math.round(rec/t*100);
+    const ok = d.ok||0, ng = d.ng||0;
+    const share = Math.round(d.total/totalAll*100);
+    const color = COLORS[i%COLORS.length];
+    return `<tr>
+      <td style="padding-left:14px;color:var(--txt4);font-weight:700;font-family:'DM Mono',monospace;">${i+1}</td>
+      <td style="font-weight:700;color:var(--txt);">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></div>
+          ${n}
+        </div>
+      </td>
+      <td><span style="font-weight:800;font-family:'DM Mono',monospace;font-size:.85rem;">${d.total}</span></td>
+      <td>${rp?`<span class="badge badge-rp">${rp}</span>`:'<span style="color:var(--txt4);">—</span>'}</td>
+      <td>${vf?`<span class="badge badge-vf">${vf}</span>`:'<span style="color:var(--txt4);">—</span>'}</td>
+      <td>${rec?`<span class="badge badge-rec">${rec}</span>`:'<span style="color:var(--txt4);">—</span>'}</td>
+      <td><span style="color:var(--green);font-weight:700;font-family:'DM Mono',monospace;">${ok||'—'}</span></td>
+      <td><span style="color:var(--red);font-weight:700;font-family:'DM Mono',monospace;">${ng||'—'}</span></td>
+      <td>
+        <div class="sdb-heatbar" style="width:100%;min-width:120px;">
+          <div class="sdb-heatbar-rp" style="width:${pctRP}%;" title="RP ${pctRP}%"></div>
+          <div class="sdb-heatbar-vf" style="width:${pctVF}%;" title="VF ${pctVF}%"></div>
+          <div class="sdb-heatbar-rec" style="width:${pctRec}%;" title="Rec ${pctRec}%"></div>
+        </div>
+        <div style="font-size:.55rem;color:var(--txt4);margin-top:2px;display:flex;gap:6px;">
+          <span style="color:#dc2626;">RP ${pctRP}%</span><span style="color:#2563eb;">VF ${pctVF}%</span><span style="color:#d97706;">Rec ${pctRec}%</span>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;height:6px;background:var(--bg3);border-radius:99px;min-width:50px;overflow:hidden;">
+            <div style="width:${share}%;height:100%;background:${color};border-radius:99px;"></div>
+          </div>
+          <span style="font-size:.7rem;font-weight:800;color:var(--txt3);font-family:'DM Mono',monospace;min-width:28px;">${share}%</span>
+        </div>
       </td>
     </tr>`;
   }).join('');
-  renderGroupBars('support-group-bars',12);renderGroupByStatus('support-group-by-status');renderGroupFullTable('group-full-tbody');buildDoughnut(rp,vf,rec,'supportStatusChart');buildSupportTrend();buildSupportOkNg();buildSupportGroupChart();buildSupportMixChart();
 }
 
-
-
-function buildSupportTrend(){
-  const ctx=document.getElementById('supportTrendChart');if(!ctx)return;
-  if(supTrendChart)supTrendChart.destroy();
-  const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-  const rpD=Array(12).fill(0),vfD=Array(12).fill(0),recD=Array(12).fill(0);
-  db.support.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12){if(s.report==='RP')rpD[m]++;else if(s.report==='VF')vfD[m]++;else recD[m]++;}}});
-  supTrendChart=new Chart(ctx.getContext('2d'),{
-    type:'bar',
-    data:{labels:mo,datasets:[
-      {label:'RP',data:rpD,backgroundColor:'rgba(220,38,38,.85)',borderRadius:5,borderRadiusTopLeft:5,borderRadiusTopRight:5,borderSkipped:false},
-      {label:'VF',data:vfD,backgroundColor:'rgba(37,99,235,.85)',borderRadius:5,borderSkipped:false},
-      {label:'Records',data:recD,backgroundColor:'rgba(217,119,6,.85)',borderRadius:5,borderSkipped:false}
-    ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      animation:{duration:1000,easing:'easeOutQuart'},
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',pointStyleWidth:9,padding:14,font:{size:11},color:'#64748b'}},
-        tooltip:{backgroundColor:'rgba(15,23,42,.9)',padding:10,cornerRadius:10,callbacks:{
-          title:t=>`เดือน ${t[0].label}`,
-          footer:items=>`รวม: ${items.reduce((s,i)=>s+i.parsed.y,0)} cases`
-        }}
-      },
-      scales:{
-        x:{stacked:true,grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'},color:'#94a3b8'}},
-        y:{stacked:true,grid:{color:'rgba(37,99,235,.05)',drawBorder:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10.5},color:'#94a3b8',stepSize:1}}
-      }
-    }
-  });
-}
-
-function buildSupportOkNg(){
-  const ctx=document.getElementById('supportOkNgChart');if(!ctx)return;
-  if(supOkNgChart)supOkNgChart.destroy();
-  const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-  const okD=Array(12).fill(0),ngD=Array(12).fill(0);
-  db.support.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12){okD[m]+=(s.ok||0);ngD[m]+=(s.ng||0);}}});
-  // Gradient fill helpers
-  const gctx=ctx.getContext('2d');
-  const gOk=gctx.createLinearGradient(0,0,0,220);gOk.addColorStop(0,'rgba(5,150,105,.35)');gOk.addColorStop(1,'rgba(5,150,105,.01)');
-  const gNg=gctx.createLinearGradient(0,0,0,220);gNg.addColorStop(0,'rgba(220,38,38,.3)');gNg.addColorStop(1,'rgba(220,38,38,.01)');
-  supOkNgChart=new Chart(gctx,{
-    type:'line',
-    data:{labels:mo,datasets:[
-      {label:'OK',data:okD,borderColor:'#059669',backgroundColor:gOk,fill:true,tension:.45,pointRadius:4,pointBackgroundColor:'#059669',pointBorderColor:'#fff',pointBorderWidth:2,pointHoverRadius:7,borderWidth:2.5},
-      {label:'NG',data:ngD,borderColor:'#dc2626',backgroundColor:gNg,fill:true,tension:.45,pointRadius:4,pointBackgroundColor:'#dc2626',pointBorderColor:'#fff',pointBorderWidth:2,pointHoverRadius:7,borderWidth:2.5}
-    ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      animation:{duration:1200,easing:'easeOutCubic'},
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',pointStyleWidth:9,padding:14,font:{size:11},color:'#64748b'}},
-        tooltip:{backgroundColor:'rgba(15,23,42,.9)',padding:10,cornerRadius:10,callbacks:{title:t=>`เดือน ${t[0].label}`}}
-      },
-      scales:{
-        x:{grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'},color:'#94a3b8'}},
-        y:{grid:{color:'rgba(37,99,235,.05)',drawBorder:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10.5},color:'#94a3b8'}}
-      }
-    }
-  });
-}
-
-function buildSupportGroupChart(){
-  // Horizontal bar — group ranking
-  const ctx=document.getElementById('supportGroupChart');if(!ctx)return;
-  if(supGroupChart)supGroupChart.destroy();
-  const sorted=buildGroupData().slice(0,10);
-  if(!sorted.length)return;
-  const labels=sorted.map(([n])=>n.length>18?n.slice(0,16)+'…':n);
-  const vals=sorted.map(([,d])=>d.total);
-  const colors=sorted.map((_,i)=>COLORS[i%COLORS.length]);
-  supGroupChart=new Chart(ctx.getContext('2d'),{
-    type:'bar',
-    data:{labels,datasets:[{label:'Cases',data:vals,backgroundColor:colors,borderRadius:7,borderSkipped:false}]},
-    options:{
-      indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      animation:{duration:1100,easing:'easeOutQuart'},
-      plugins:{
-        legend:{display:false},
-        tooltip:{backgroundColor:'rgba(15,23,42,.9)',padding:10,cornerRadius:10,callbacks:{label:ctx=>`Cases: ${ctx.parsed.x}`}},
-        datalabels:{display:false}
-      },
-      scales:{
-        x:{grid:{color:'rgba(37,99,235,.06)'},border:{display:false},beginAtZero:true,ticks:{font:{size:10.5},color:'#94a3b8'}},
-        y:{grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'},color:'#334155'}}
-      }
-    }
-  });
-  // Update badge
-  const badge=document.getElementById('sdb-group-badge');if(badge)badge.textContent=`${sorted.length} Groups`;
-}
-
-function buildSupportMixChart(){
-  // Stacked horizontal — RP/VF/Rec per group
-  const ctx=document.getElementById('supportMixChart');if(!ctx)return;
-  if(supMixChart)supMixChart.destroy();
-  const sorted=buildGroupData().slice(0,10);
-  if(!sorted.length)return;
-  const labels=sorted.map(([n])=>n.length>16?n.slice(0,14)+'…':n);
-  supMixChart=new Chart(ctx.getContext('2d'),{
-    type:'bar',
-    data:{labels,datasets:[
-      {label:'RP',data:sorted.map(([,d])=>d.RP||0),backgroundColor:'rgba(220,38,38,.82)',borderRadius:5,borderSkipped:false},
-      {label:'VF',data:sorted.map(([,d])=>d.VF||0),backgroundColor:'rgba(37,99,235,.82)',borderRadius:5,borderSkipped:false},
-      {label:'Records',data:sorted.map(([,d])=>d.RECORDS||0),backgroundColor:'rgba(217,119,6,.82)',borderRadius:5,borderSkipped:false}
-    ]},
-    options:{
-      indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      animation:{duration:1300,easing:'easeOutQuart'},
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',pointStyleWidth:8,padding:10,font:{size:10.5},color:'#64748b'}},
-        tooltip:{backgroundColor:'rgba(15,23,42,.9)',padding:10,cornerRadius:10}
-      },
-      scales:{
-        x:{stacked:true,grid:{color:'rgba(37,99,235,.06)'},border:{display:false},beginAtZero:true,ticks:{font:{size:10.5},color:'#94a3b8'}},
-        y:{stacked:true,grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'},color:'#334155'}}
-      }
-    }
-  });
-}
 function openAddSupModal(){
   document.getElementById('addSupModal').classList.add('open');
   ['supProblem','supPart','supLot','supOk','supNg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -3164,53 +3800,55 @@ function closeAddSupModal(){document.getElementById('addSupModal').classList.rem
 
 
 
+// 2. แก้ไขการเพิ่มข้อมูลใหม่ให้มี eventDate
 function addSupport(){
-  const prob=document.getElementById('supProblem').value,
-    act=document.getElementById('supAction').value,
-    part=document.getElementById('supPart').value,
-    rep=document.getElementById('supReport').value,
-    di=document.getElementById('supDate').value,
-    lot=document.getElementById('supLot').value,
-    ok=document.getElementById('supOk').value,
-    ng=document.getElementById('supNg').value;
-  if(!prob)return toast('❌ กรอกรายละเอียดปัญหา');
+  const prob = document.getElementById('supProblem').value,
+    act = document.getElementById('supAction').value,
+    part = document.getElementById('supPart').value,
+    rep = document.getElementById('supReport').value,
+    di = document.getElementById('supDate').value,
+    lot = document.getElementById('supLot').value,
+    ok = document.getElementById('supOk').value,
+    ng = document.getElementById('supNg').value;
+    
+  if(!prob) return toast('❌ กรอกรายละเอียดปัญหา');
   
-  // ✅ ใช้เวลาปัจจุบันสำหรับ timestamp จริง
-  const ts=fullTimestamp(); // เวลาบันทึกจริง (ไม่ใช่เวลาจาก date picker)
-  const now=new Date();
+  const ts = fullTimestamp();
+  const now = new Date();
+  // ใช้วันที่จาก Input ถ้ามี ถ้าไม่มีใช้วันปัจจุบัน
+  const d = di ? new Date(di) : now;
+  const month = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  // ***สำคัญ: สร้าง eventDate เป็น YYYY-MM-DD***
+  const eventDate = di || now.toISOString().split('T')[0];
   
-  // วันที่เหตุการณ์สำหรับ grouping/filtering
-  const d=di?new Date(di):now;
-  const month=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  
-  const newId=Date.now().toString();
+  const newId = Date.now().toString();
   db.support.push({
-    id:newId,
-    problem:prob,
-    action:act,
+    id: newId,
+    problem: prob,
+    action: act,
     part,
-    report:rep,
+    report: rep,
     lot,
-    ok:ok!==''?parseInt(ok):'',
-    ng:ng!==''?parseInt(ng):'',
-    datetime:ts,
-    fullTimestamp:ts, // ✅ เวลาบันทึกจริง
+    ok: ok!==''?parseInt(ok):'',
+    ng: ng!==''?parseInt(ng):'',
+    datetime: ts,
+    fullTimestamp: ts,
     month,
-    eventDate:di||now.toISOString().split('T')[0],
-    _user:currentUser
+    eventDate, // เพิ่ม field นี้เข้าไป
+    _user: currentUser
   });
   
-  // Save image separately (not in db) — by recordId
-  if(_pendingAddImg&&typeof _pendingAddImg==='string'&&_pendingAddImg.startsWith('data:')){
-    saveImage(newId,_pendingAddImg);
+  if(_pendingAddImg && typeof _pendingAddImg==='string' && _pendingAddImg.startsWith('data:')){
+    saveImage(newId, _pendingAddImg);
   }
-  _pendingAddImg=null;
+  _pendingAddImg = null;
   save();
   toast('🛠️ บันทึก Support แล้ว');
   closeAddSupModal();
   refreshSupport();
-  if(isActive('master-dash'))refreshMasterDashboard();
+  if(isActive('master-dash')) refreshMasterDashboard();
 }
+
 function delSupportConfirm(i){
   const s=db.support[i];
   robotConfirm('ลบ Support record นี้?',()=>{
@@ -3219,66 +3857,251 @@ function delSupportConfirm(i){
     save();toast('🗑 ลบแล้ว');refreshSupport();
   });
 }
+
+// 3. แก้ไขการเปิดหน้า Edit ให้แสดงวันที่ถูกต้อง
 function openEditSupport(i){
-  const s=db.support[i];if(!s)return;
-  document.getElementById('editIdx').value=i;
-  document.getElementById('editDate').value=s._rawDate||s.month||'';
-  document.getElementById('editProblem').value=s.problem||'';
-  document.getElementById('editAction').value=s.action||'Repair';
-  document.getElementById('editPart').value=s.part||'';
-  document.getElementById('editLot').value=s.lot||'';
-  document.getElementById('editOk').value=s.ok!==undefined&&s.ok!==''?s.ok:'';
-  document.getElementById('editNg').value=s.ng!==undefined&&s.ng!==''?s.ng:'';
-  document.getElementById('editReport').value=s.report||'VF';
-  // Load image from imageMap
-  _pendingEditImg=undefined;
-  const existImg=imageMap[s.id];
+  const s = db.support[i];
+  if(!s) return;
+  
+  document.getElementById('editIdx').value = i;
+  // ดึงวันที่จริงจาก eventDate ถ้ามี ถ้าไม่มีใช้ month
+  document.getElementById('editDate').value = s.eventDate || (s.month ? `${s.month}-01` : '');
+  document.getElementById('editProblem').value = s.problem||'';
+  document.getElementById('editAction').value = s.action||'Repair';
+  document.getElementById('editPart').value = s.part||'';
+  document.getElementById('editLot').value = s.lot||'';
+  document.getElementById('editOk').value = s.ok!==undefined && s.ok!=='' ? s.ok : '';
+  document.getElementById('editNg').value = s.ng!==undefined && s.ng!=='' ? s.ng : '';
+  document.getElementById('editReport').value = s.report||'VF';
+  
+  _pendingEditImg = undefined;
+  const existImg = imageMap[s.id];
   if(existImg){
     updateEditPreview(existImg);
-    _pendingEditImg=undefined; // reset after preview — unchanged
-  }else{
+    _pendingEditImg = undefined;
+  } else {
     resetEditImgZone('คลิกเพื่อเพิ่มรูปภาพ');
   }
-  document.getElementById('editModal').style.display='flex';
+  document.getElementById('editModal').style.display = 'flex';
 }
+
+// 4. แก้ไขการบันทึก Edit ให้ update eventDate
 function saveEditSupport(){
-  const i=parseInt(document.getElementById('editIdx').value);
-  if(isNaN(i)||!db.support[i])return toast('❌ ข้อมูลไม่ถูกต้อง');
-  const di=document.getElementById('editDate').value;
-  const d=di?new Date(di):new Date();
-  const month=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  const ok_val=document.getElementById('editOk').value;
-  const ng_val=document.getElementById('editNg').value;
-  db.support[i].problem=document.getElementById('editProblem').value;
-  db.support[i].action=document.getElementById('editAction').value;
-  db.support[i].part=document.getElementById('editPart').value;
-  db.support[i].lot=document.getElementById('editLot').value;
-  db.support[i].ok=ok_val!==''?parseInt(ok_val):'';
-  db.support[i].ng=ng_val!==''?parseInt(ng_val):'';
-  db.support[i].report=document.getElementById('editReport').value;
-  db.support[i].month=month;db.support[i]._rawDate=di;
-  db.support[i]._editedAt=fullTimestamp();db.support[i]._user=currentUser;
-  // Apply image change (undefined=keep, null=remove, string=new)
-  const recId=db.support[i].id;
+  const i = parseInt(document.getElementById('editIdx').value);
+  if(isNaN(i) || !db.support[i]) return toast('❌ ข้อมูลไม่ถูกต้อง');
+  
+  const di = document.getElementById('editDate').value;
+  const d = di ? new Date(di) : new Date();
+  const month = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  
+  const ok_val = document.getElementById('editOk').value;
+  const ng_val = document.getElementById('editNg').value;
+  
+  db.support[i].problem = document.getElementById('editProblem').value;
+  db.support[i].action = document.getElementById('editAction').value;
+  db.support[i].part = document.getElementById('editPart').value;
+  db.support[i].lot = document.getElementById('editLot').value;
+  db.support[i].ok = ok_val!=='' ? parseInt(ok_val) : '';
+  db.support[i].ng = ng_val!=='' ? parseInt(ng_val) : '';
+  db.support[i].report = document.getElementById('editReport').value;
+  db.support[i].month = month;
+  db.support[i].eventDate = di; // ***สำคัญ: อัปเดต eventDate***
+  db.support[i]._editedAt = fullTimestamp();
+  db.support[i]._user = currentUser;
+  
+  const recId = db.support[i].id;
   if(recId){
-    if(_pendingEditImg===null){removeImage(recId);refreshSupportImagesOnly();}
-    else if(typeof _pendingEditImg==='string'&&_pendingEditImg.startsWith('data:')){saveImage(recId,_pendingEditImg);refreshSupportImagesOnly();}
+    if(_pendingEditImg === null){ removeImage(recId); refreshSupportImagesOnly(); }
+    else if(typeof _pendingEditImg === 'string' && _pendingEditImg.startsWith('data:')){ saveImage(recId, _pendingEditImg); refreshSupportImagesOnly(); }
   }
-  _pendingEditImg=undefined;
-  save();toast('✅ อัปเดตข้อมูลแล้ว');
-  document.getElementById('editModal').style.display='none';
+  _pendingEditImg = undefined;
+  save();
+  toast('✅ อัปเดตข้อมูลแล้ว');
+  document.getElementById('editModal').style.display = 'none';
   refreshSupport();
 }
 function closeEditModal(e){if(!e||e.target===document.getElementById('editModal'))document.getElementById('editModal').style.display='none';}
 
 /* ══════════════════════════════════
-   5S
+   5S SYSTEM (FILTERED)
 ══════════════════════════════════ */
-function refresh5S(){const fm=(document.getElementById('filter5sMonth')||{}).value||'';const tb=document.getElementById('s5TableBody');if(!tb)return;setText('s5-total-year',db.s5.reduce((s,c)=>s+(c.count||0),0));const mf=db.s5.filter(s=>s.month===fm);setText('s5-total-month',mf.reduce((s,c)=>s+(c.count||0),0));const oM={},aM={};db.s5.forEach(s=>{if(s.owner)oM[s.owner]=(oM[s.owner]||0)+(s.count||0);if(s.area)aM[s.area]=(aM[s.area]||0)+(s.count||0);});const to=Object.entries(oM).sort((a,b)=>b[1]-a[1])[0];const ta=Object.entries(aM).sort((a,b)=>b[1]-a[1])[0];setText('top-owners',to?to[0]:'—');setText('top-areas',ta?ta[0]:'—');tb.innerHTML=mf.map(s=>`<tr><td>${s.area||'—'}</td><td style="font-family:'DM Mono',monospace;">${s.count||0}</td><td>${s.detail||'—'}</td><td>${s.owner||'—'}</td><td style="font-size:.72rem;color:var(--txt4);">${s.fullTimestamp||'—'}</td><td style="text-align:center;"><button class="btn-del" onclick="del5SConfirm('${s.id}')" title="ลบ">🗑</button></td></tr>`).join('');build5SChart();build5SAreaBars(aM);}
-function build5SAreaBars(aM){const el=document.getElementById('s5-area-bars');if(!el)return;const sorted=Object.entries(aM).sort((a,b)=>b[1]-a[1]).slice(0,8);if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}const max=sorted[0][1];el.innerHTML=sorted.map(([n,c],i)=>`<div class="gb-row"><div class="gb-rank">${i+1}</div><div class="gb-name">${n}</div><div class="gb-track"><div class="gb-fill" style="width:${(c/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div><span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${c}</span></div>`).join('');}
-function build5SChart(){const ctx=document.getElementById('s5TrendChart');if(!ctx)return;if(s5Chart)s5Chart.destroy();const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];const mD=Array(12).fill(0);db.s5.forEach(s=>{if(s.month){const m=parseInt(s.month.split('-')[1])-1;if(m>=0&&m<12)mD[m]+=(s.count||0);}});const c=ctx.getContext('2d'),h=ctx.parentElement?.clientHeight||195;const gO=c.createLinearGradient(0,0,0,h);gO.addColorStop(0,'rgba(37,99,235,.5)');gO.addColorStop(.5,'rgba(37,99,235,.1)');gO.addColorStop(1,'rgba(37,99,235,0)');s5Chart=new Chart(c,{type:'line',data:{labels:mo,datasets:[{label:'5S Findings',data:mD,borderColor:'#2563eb',backgroundColor:gO,tension:.45,fill:true,pointBackgroundColor:COLORS,pointBorderColor:'#fff',pointBorderWidth:2.5,pointRadius:5,pointHoverRadius:9,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false}},scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:10},color:'#94a3b8'}},y:{grid:{display:false},border:{display:false},beginAtZero:true,ticks:{font:{size:10},color:'#94a3b8',stepSize:1}}}}});}
-function add5S(){const area=document.getElementById('s5Area').value,count=parseInt(document.getElementById('s5Count').value)||0,detail=document.getElementById('s5Detail').value,owner=document.getElementById('s5Owner').value,month=document.getElementById('filter5sMonth').value;if(!area)return toast('❌ ระบุพื้นที่');db.s5.push({id:Date.now().toString(),area,count,detail,owner,month,fullTimestamp:fullTimestamp(),_user:currentUser});save();toast('🧹 บันทึก 5S แล้ว');['s5Area','s5Count','s5Detail','s5Owner'].forEach(id=>document.getElementById(id).value='');refresh5S();}
-function del5SConfirm(id){robotConfirm('ลบรายการ 5S นี้?',()=>{db.s5=db.s5.filter(s=>s.id!==id);save();toast('🗑 ลบแล้ว');refresh5S();});}
+function refresh5S(){
+  const tb = document.getElementById('s5TableBody');
+  if(!tb) return;
+
+  // 1. กรองข้อมูล: ใช้ field 'date' เป็นหลัก
+  // ถ้าข้อมูลเก่าไม่มี date ให้ fallback ไปใช้ month + '-01' เพื่อให้กรองช่วงเวลากว้างๆ ได้
+  const range = pageFilters['5s'];
+  const filtered = db.s5.filter(s => {
+    // ถ้าไม่มีการกำหนดช่วงเวลา ให้แสดงทั้งหมด
+    if(!range || (!range.from && !range.to)) return true;
+    
+    // กำหนดวันที่ของ record (Priority: date > month > default)
+    let dStr = s.date;
+    if(!dStr && s.month) dStr = s.month + '-01'; // ถ้ามีแค่เดือน ให้ถือว่าเป็นวันที่ 1
+    if(!dStr) return false; // ถ้าไม่มีข้อมูลวันที่เลย ให้ซ่อนเมื่อมีการกรอง
+
+    if(range.from && dStr < range.from) return false;
+    if(range.to && dStr > range.to) return false;
+    return true;
+  });
+
+  // 2. คำนวณ KPI
+  // "สะสมทั้งปี" ควรเป็นข้อมูลทั้งหมดในระบบ (db.s5)
+  setText('s5-total-year', db.s5.reduce((s,c)=>s+(c.count||0),0));
+  
+  // "เดือนที่เลือก/ช่วงเวลา" คำนวณจากข้อมูลที่กรอง (filtered)
+  setText('s5-total-month', filtered.reduce((s,c)=>s+(c.count||0),0));
+
+  // 3. คำนวณ Top Auditor และ Hot Area (จากข้อมูลที่กรอง)
+  const oM = {}, aM = {};
+  filtered.forEach(s => {
+    if(s.owner) oM[s.owner] = (oM[s.owner]||0) + (s.count||0);
+    if(s.area) aM[s.area] = (aM[s.area]||0) + (s.count||0);
+  });
+  
+  const to = Object.entries(oM).sort((a,b)=>b[1]-a[1])[0];
+  const ta = Object.entries(aM).sort((a,b)=>b[1]-a[1])[0];
+  
+  setText('top-owners', to ? to[0] : '—');
+  setText('top-areas', ta ? ta[0] : '—');
+
+  // 4. Render ตาราง (เรียงจากล่าสุดขึ้นบน)
+  if(!filtered.length){
+    tb.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--txt4);padding:24px;">ไม่มีข้อมูลในช่วงเวลานี้</td></tr>`;
+  } else {
+    tb.innerHTML = [...filtered].reverse().map(s => 
+      `<tr>
+        <td>${s.area||'—'}</td>
+        <td style="font-family:'DM Mono',monospace;">${s.count||0}</td>
+        <td>${s.detail||'—'}</td>
+        <td>${s.owner||'—'}</td>
+        <td style="font-size:.72rem;color:var(--txt4);">${s.fullTimestamp||'—'}</td>
+        <td style="text-align:center;"><button class="btn-del" onclick="del5SConfirm('${s.id}')" title="ลบ">🗑</button></td>
+      </tr>`
+    ).join('');
+  }
+
+  // 5. Charts
+  // กราฟเส้นควรแสดงเฉพาะช่วงที่กรองหรือแสดงตลอดปีเพื่อดูเทรนด์? 
+  // เพื่อให้ตรงกับ Logic หน้าอื่น เราจะส่ง filtered data เข้าไป
+  build5SChart(filtered);
+  build5SAreaBars(aM); // ส่ง Map ที่คำนวณไว้แล้วเข้าไป เพื่อประหยัด performance
+}
+
+function build5SChart(s5Data){
+  const ctx = document.getElementById('s5TrendChart');
+  if(!ctx) return;
+  if(s5Chart) s5Chart.destroy();
+
+  const mo = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const mD = Array(12).fill(0);
+  
+  // ใช้ข้อมูลที่ส่งเข้ามา
+  const sList = s5Data || db.s5;
+
+  sList.forEach(s => {
+    if(s.month){
+      const m = parseInt(s.month.split('-')[1])-1;
+      if(m >= 0 && m < 12) mD[m] += (s.count||0);
+    }
+  });
+
+  const c = ctx.getContext('2d');
+  const h = ctx.parentElement?.clientHeight || 195;
+  const gO = c.createLinearGradient(0,0,0,h);
+  gO.addColorStop(0,'rgba(37,99,235,.5)');
+  gO.addColorStop(.5,'rgba(37,99,235,.1)');
+  gO.addColorStop(1,'rgba(37,99,235,0)');
+
+  s5Chart = new Chart(c, {
+    type: 'line',
+    data: {
+      labels: mo,
+      datasets: [{
+        label: '5S Findings',
+        data: mD,
+        borderColor: '#2563eb',
+        backgroundColor: gO,
+        tension: .45,
+        fill: true,
+        pointBackgroundColor: COLORS,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2.5,
+        pointRadius: 5,
+        pointHoverRadius: 9,
+        borderWidth: 2.5
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10 }, color: '#94a3b8' }},
+        y: { grid: { display: false }, border: { display: false }, beginAtZero: true, ticks: { font: { size: 10 }, color: '#94a3b8', stepSize: 1 }}
+      }
+    }
+  });
+}
+
+function build5SAreaBars(areaMap){
+  const el = document.getElementById('s5-area-bars');
+  if(!el) return;
+  
+  // แปลง Object เป็น Array และเรียงลำดับ
+  const sorted = Object.entries(areaMap).sort((a,b)=>b[1]-a[1]).slice(0, 8);
+  
+  if(!sorted.length){
+    el.innerHTML = '<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';
+    return;
+  }
+  
+  const max = sorted[0][1];
+  el.innerHTML = sorted.map(([n,c],i) => 
+    `<div class="gb-row">
+      <div class="gb-rank">${i+1}</div>
+      <div class="gb-name">${n}</div>
+      <div class="gb-track"><div class="gb-fill" style="width:${(c/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div>
+      <span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${c}</span>
+    </div>`
+  ).join('');
+}
+
+/* ══════════════════════════════════
+   ADD 5S (ADD DATE FIELD)
+══════════════════════════════════ */
+function add5S(){
+  const area = document.getElementById('s5Area').value;
+  const count = parseInt(document.getElementById('s5Count').value)||0;
+  const detail = document.getElementById('s5Detail').value;
+  const owner = document.getElementById('s5Owner').value;
+  const month = document.getElementById('filter5sMonth').value; // YYYY-MM
+  
+  if(!area) return toast('❌ ระบุพื้นที่');
+  
+  const now = new Date();
+  const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  // ถ้าไม่มีเดือนใน input ให้ใช้เดือนปัจจุบัน
+  const finalMonth = month || `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  
+  db.s5.push({
+    id: Date.now().toString(),
+    area,
+    count,
+    detail,
+    owner,
+    month: finalMonth,
+    date: today, // *** เพิ่ม field date เพื่อรองรับการกรองแบบวันต่อวัน ***
+    fullTimestamp: fullTimestamp(),
+    _user: currentUser
+  });
+  
+  save();
+  toast('🧹 บันทึก 5S แล้ว');
+  ['s5Area','s5Count','s5Detail','s5Owner'].forEach(id=>document.getElementById(id).value='');
+  refresh5S();
+}
 
 /* ══════════════════════════════════
    SKILL MATRIX
@@ -3318,30 +4141,205 @@ const assignorColors=['#2563eb','#dc2626','#7c3aed','#059669','#0891b2','#d97706
 const _colorMap={};let _colorIdx=0;
 function getAssignorColor(name){if(!name)return'#94a3b8';if(!_colorMap[name]){_colorMap[name]=assignorColors[_colorIdx%assignorColors.length];_colorIdx++;}return _colorMap[name];}
 function animateCount(el,from,to,dur=700){if(!el)return;const start=performance.now();const step=ts=>{const p=Math.min((ts-start)/dur,1);const v=from+(to-from)*(1-Math.pow(1-p,3));el.textContent=Math.round(v);if(p<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
-function deriveStatus(result){if(!result||result.trim()==='')return{cls:'sp-status-pending',txt:'Pending'};const r=result.toLowerCase();if(r.includes('เสร็จ')||r.includes('done')||r.includes('complete')||r.includes('สำเร็จ')||r.includes('ok')||r.includes('ผ่าน'))return{cls:'sp-status-done',txt:'Done'};if(r.includes('กำลัง')||r.includes('wip')||r.includes('progress')||r.includes('ดำเนิน'))return{cls:'sp-status-wip',txt:'In Progress'};return{cls:'sp-status-done',txt:'Done'};}
+/* ══════════════════════════════════
+   SPECIAL JOBS (FILTERED)
+══════════════════════════════════ */
 function refreshSpecial(){
-  const tb=document.getElementById('specialTableBody');if(!tb)return;const total=db.special.length;
-  const filtered=filterByDateRange(db.special,'date','special');
-  const now=new Date();const thisMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const monthEntries=filtered.length;
-  const withResult=filtered.filter(s=>s.result&&s.result.trim()).length;
-  const rate=filtered.length>0?Math.round((withResult/filtered.length)*100):0;
-  const assignorMap={};filtered.forEach(s=>{const k=s.by||'(ไม่ระบุ)';assignorMap[k]=(assignorMap[k]||0)+1;});
-  const sortedAssignors=Object.entries(assignorMap).sort((a,b)=>b[1]-a[1]);const topAssignor=sortedAssignors[0];
-  animateCount(document.getElementById('sp-kpi-total'),0,total);animateCount(document.getElementById('sp-kpi-month'),0,monthEntries);
-  setTimeout(()=>{const el=document.getElementById('sp-kpi-rate');if(el)el.textContent=rate+'%';},200);
-  setText('sp-kpi-total-delta',`All ${total} jobs`);setText('sp-kpi-month-lbl',now.toLocaleDateString('th-TH',{month:'long',year:'numeric'}));
-  setText('sp-kpi-top-by',topAssignor?topAssignor[0]:'—');setText('sp-kpi-top-by-n',topAssignor?`${topAssignor[1]} jobs`:'0 jobs');
-  setText('sp-total-badge',`${filtered.length} Projects`);setText('sp-table-count',`${filtered.length} records`);setText('dash-special-count',total);
-  renderAssignorBars(sortedAssignors);renderMonthlyTimeline();buildResultChart(withResult,filtered.length-withResult);
-  if(!filtered.length){tb.innerHTML=`<tr><td colspan="7"><div class="sp-empty"><div class="sp-empty-icon">⭐</div><div class="sp-empty-txt">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div></div></td></tr>`;return;}
-  tb.innerHTML=[...filtered].reverse().map((s,i)=>{const idx=db.special.indexOf(s);const st=deriveStatus(s.result);const aColor=getAssignorColor(s.by);const dateDisplay=s.fullTimestamp||s.date||'—';return`<tr class="sp-row-new" style="animation-delay:${i*0.04}s"><td><div class="sp-row-num">${filtered.length-i}</div></td><td><div style="font-weight:700;font-size:.8rem;color:var(--txt);">${s.project||s.job||'—'}</div></td><td><div class="sp-date-pill" title="${dateDisplay}">📅 ${dateDisplay}</div></td><td><div class="sp-assignor-tag" style="color:${aColor};background:${aColor}15;border-color:${aColor}30;"><span style="width:7px;height:7px;border-radius:50%;background:${aColor};flex-shrink:0;"></span>${s.by||'—'}</div></td><td><div class="sp-status ${st.cls}">${st.txt}</div></td><td><div class="sp-result-txt">${s.result||'—'}</div></td><td style="text-align:center;"><button class="sp-del-btn" onclick="delSpecialConfirm(${idx})" title="ลบ">🗑</button></td></tr>`;}).join('');
+  const tb = document.getElementById('specialTableBody');
+  if(!tb) return;
+
+  // 1. กรองข้อมูลตามช่วงเวลาที่เลือก
+  const filtered = filterByDateRange(db.special, 'date', 'special');
+  
+  // 2. คำนวณ KPIs
+  // KPI หลัก (Total Projects) ให้แสดงตามช่วงเวลาที่กรอง
+  const totalFiltered = filtered.length;
+  
+  // KPI รอง (This Month) ให้แสดงเดือนปัจจุบันเสมอ (เพื่อเป็น Reference)
+  const now = new Date();
+  const thisMonthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const thisMonthData = db.special.filter(s => s.date && s.date.startsWith(thisMonthStr));
+  const thisMonthCount = thisMonthData.length;
+
+  // คำนวณ Top Assignor และ Result Rate จากข้อมูลที่กรอง
+  const withResult = filtered.filter(s=>s.result && s.result.trim()).length;
+  const rate = filtered.length > 0 ? Math.round((withResult/filtered.length)*100) : 0;
+  
+  const assignorMap = {};
+  filtered.forEach(s => {
+    const k = s.by || '(ไม่ระบุ)';
+    assignorMap[k] = (assignorMap[k]||0) + 1;
+  });
+  
+  const sortedAssignors = Object.entries(assignorMap).sort((a,b)=>b[1]-a[1]);
+  const topAssignor = sortedAssignors[0];
+
+  // 3. อัปเดตตัวเลขบนหน้าจอ
+  animateCount(document.getElementById('sp-kpi-total'), 0, totalFiltered);
+  document.getElementById('sp-kpi-total-delta').textContent = 'Selected Period'; // เปลี่ยนข้อความใต้ตัวเลขให้รู้ว่าเป็นช่วงที่เลือก
+  
+  animateCount(document.getElementById('sp-kpi-month'), 0, thisMonthCount);
+  // ข้อความใต้ KPI เดือนนี้ ให้แสดงชื่อเดือนปัจจุบัน
+  document.getElementById('sp-kpi-month-lbl').textContent = now.toLocaleDateString('th-TH',{month:'long',year:'numeric'});
+  
+  setTimeout(()=>{ const el=document.getElementById('sp-kpi-rate'); if(el) el.textContent=rate+'%'; }, 200);
+  
+  setText('sp-kpi-top-by', topAssignor ? topAssignor[0] : '—');
+  setText('sp-kpi-top-by-n', topAssignor ? `${topAssignor[1]} jobs` : '0 jobs');
+  setText('sp-total-badge', `${filtered.length} Projects`);
+  setText('sp-table-count', `${filtered.length} records`);
+  
+  // 4. Render กราฟและตาราง
+  renderAssignorBars(sortedAssignors);
+  renderMonthlyTimeline(filtered); // ส่งข้อมูลที่กรองเข้าไป
+  buildResultChart(withResult, filtered.length-withResult);
+  
+  // ตาราง
+  if(!filtered.length){
+    tb.innerHTML = `<tr><td colspan="7"><div class="sp-empty"><div class="sp-empty-icon">⭐</div><div class="sp-empty-txt">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div></div></td></tr>`;
+    return;
+  }
+  
+  tb.innerHTML = [...filtered].reverse().map((s, i) => {
+    const idx = db.special.indexOf(s);
+    const st = deriveStatus(s.result);
+    const aColor = getAssignorColor(s.by);
+    const dateDisplay = s.fullTimestamp || s.date || '—';
+    return `<tr class="sp-row-new" style="animation-delay:${i*0.04}s">
+      <td><div class="sp-row-num">${filtered.length-i}</div></td>
+      <td><div style="font-weight:700;font-size:.8rem;color:var(--txt);">${s.project||s.job||'—'}</div></td>
+      <td><div class="sp-date-pill" title="${dateDisplay}">📅 ${dateDisplay}</div></td>
+      <td><div class="sp-assignor-tag" style="color:${aColor};background:${aColor}15;border-color:${aColor}30;"><span style="width:7px;height:7px;border-radius:50%;background:${aColor};flex-shrink:0;"></span>${s.by||'—'}</div></td>
+      <td><div class="sp-status ${st.cls}">${st.txt}</div></td>
+      <td><div class="sp-result-txt">${s.result||'—'}</div></td>
+      <td style="text-align:center;"><button class="sp-del-btn" onclick="delSpecialConfirm(${idx})" title="ลบ">🗑</button></td>
+    </tr>`;
+  }).join('');
 }
-function renderAssignorBars(sorted){const el=document.getElementById('sp-assignor-bars');if(!el)return;if(!sorted.length){el.innerHTML='<div class="sp-empty" style="padding:20px 0;"><div class="sp-empty-icon" style="font-size:1.8rem;">👤</div><div class="sp-empty-txt">ยังไม่มีข้อมูล</div></div>';return;}const max=sorted[0][1];el.innerHTML=sorted.slice(0,10).map(([name,count],i)=>{const color=getAssignorColor(name);return`<div class="sp-hbar-item" style="animation-delay:${i*0.06}s"><div class="sp-hbar-rank">${i+1}</div><div class="sp-hbar-name" title="${name}">${name}</div><div class="sp-hbar-track"><div class="sp-hbar-fill" style="width:0%;background:linear-gradient(90deg,${color},${color}cc);" data-w="${(count/max)*100}"></div></div><div class="sp-hbar-val" style="color:${color};">${count}</div></div>`;}).join('');setTimeout(()=>{el.querySelectorAll('.sp-hbar-fill').forEach(f=>{f.style.width=f.dataset.w+'%';});},80);}
-function renderMonthlyTimeline(){const el=document.getElementById('sp-monthly-timeline');if(!el)return;const mo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];const counts=Array(12).fill(0);db.special.forEach(s=>{if(s.date){const m=new Date(s.date).getMonth();if(!isNaN(m))counts[m]++;}});const max=Math.max(...counts)||1;el.innerHTML=`<div class="sp-timeline">${counts.map((c,i)=>`<div class="sp-tl-row"><div class="sp-tl-mo">${mo[i]}</div><div class="sp-tl-track"><div class="sp-tl-fill" data-w="${(c/max)*100}" style="width:0%;background:${COLORS[i]};"></div></div><div class="sp-tl-num" style="color:${c>0?COLORS[i]:'var(--txt4)'};">${c||''}</div></div>`).join('')}</div>`;setTimeout(()=>{el.querySelectorAll('.sp-tl-fill').forEach(f=>{f.style.width=f.dataset.w+'%';});},120);}
-function buildResultChart(withR,withoutR){const ctx=document.getElementById('spResultChart');if(!ctx)return;if(spResultChart)spResultChart.destroy();const total=withR+withoutR;if(!total){const leg=document.getElementById('sp-result-legend');if(leg)leg.innerHTML='';return;}spResultChart=new Chart(ctx.getContext('2d'),{type:'doughnut',data:{labels:['มีผลลัพธ์','รอผลลัพธ์'],datasets:[{data:[withR,withoutR],backgroundColor:['#059669','#e2e8f0'],borderWidth:3,borderColor:'#fff',hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/total*100)}%)`}}}}});const leg=document.getElementById('sp-result-legend');if(leg)leg.innerHTML=`<div class="sp-leg-item"><div class="sp-leg-dot" style="background:#059669;"></div>มีผลลัพธ์: ${withR}</div><div class="sp-leg-item"><div class="sp-leg-dot" style="background:#cbd5e1;"></div>รอผล: ${withoutR}</div>`;}
-function addSpecial(){const project=document.getElementById('specProject').value,date=document.getElementById('specDate').value,by=document.getElementById('specBy').value,result=document.getElementById('specResult').value;if(!project)return toast('❌ กรอกชื่อโครงการ');const ts=date?fullTimestamp(date):fullTimestamp();db.special.push({id:Date.now().toString(),project,date,by,result,fullTimestamp:ts,_user:currentUser});save();toast('⭐ บันทึกงานพิเศษแล้ว!');['specProject','specDate','specBy','specResult'].forEach(id=>document.getElementById(id).value='');refreshSpecial();const btn=document.querySelector('.sp-submit-btn .btn-spark');if(btn){btn.style.transform='rotate(360deg) scale(1.6)';setTimeout(()=>{btn.style.transform='';},500);}}
-function delSpecialConfirm(i){robotConfirm('ลบงานพิเศษนี้?',()=>{db.special.splice(i,1);save();toast('🗑 ลบแล้ว');refreshSpecial();});}
+
+/* ══════════════════════════════════
+   CHART RENDERERS (UPDATED)
+══════════════════════════════════ */
+function renderAssignorBars(sortedData){
+  const el = document.getElementById('sp-assignor-bars');
+  if(!el) return;
+  
+  // รับข้อมูลที่จัดกลุ่มแล้วมาจาก refreshSpecial
+  const sorted = sortedData || [];
+  
+  if(!sorted.length){
+    el.innerHTML = '<div class="sp-empty" style="padding:20px 0;"><div class="sp-empty-icon" style="font-size:1.8rem;">👤</div><div class="sp-empty-txt">ยังไม่มีข้อมูล</div></div>';
+    return;
+  }
+  
+  const max = sorted[0][1];
+  el.innerHTML = sorted.slice(0, 10).map(([name, count], i) => {
+    const color = getAssignorColor(name);
+    return `<div class="sp-hbar-item" style="animation-delay:${i*0.06}s">
+      <div class="sp-hbar-rank">${i+1}</div>
+      <div class="sp-hbar-name" title="${name}">${name}</div>
+      <div class="sp-hbar-track">
+        <div class="sp-hbar-fill" style="width:0%;background:linear-gradient(90deg,${color},${color}cc);" data-w="${(count/max)*100}"></div>
+      </div>
+      <div class="sp-hbar-val" style="color:${color};">${count}</div>
+    </div>`;
+  }).join('');
+  
+  // Animation trigger
+  setTimeout(()=>{
+    el.querySelectorAll('.sp-hbar-fill').forEach(f => { f.style.width = f.dataset.w+'%'; });
+  }, 80);
+}
+
+function renderMonthlyTimeline(data){
+  const el = document.getElementById('sp-monthly-timeline');
+  if(!el) return;
+  
+  const mo = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const counts = Array(12).fill(0);
+  
+  // ใช้ข้อมูลที่ส่งเข้ามา (filtered)
+  const sList = data || db.special;
+  
+  sList.forEach(s => {
+    if(s.date){
+      const m = new Date(s.date).getMonth();
+      if(!isNaN(m)) counts[m]++;
+    }
+  });
+  
+  const max = Math.max(...counts) || 1;
+  
+  el.innerHTML = `<div class="sp-timeline">${
+    counts.map((c, i) => 
+      `<div class="sp-tl-row">
+        <div class="sp-tl-mo">${mo[i]}</div>
+        <div class="sp-tl-track">
+          <div class="sp-tl-fill" data-w="${(c/max)*100}" style="width:0%;background:${COLORS[i]};"></div>
+        </div>
+        <div class="sp-tl-num" style="color:${c>0?COLORS[i]:'var(--txt4)'};">${c||''}</div>
+      </div>`
+    ).join('')
+  }</div>`;
+  
+  // Animation trigger
+  setTimeout(()=>{
+    el.querySelectorAll('.sp-tl-fill').forEach(f => { f.style.width = f.dataset.w+'%'; });
+  }, 120);
+}
+
+function buildResultChart(withR, withoutR){
+  const ctx = document.getElementById('spResultChart');
+  if(!ctx) return;
+  
+  if(spResultChart) spResultChart.destroy();
+  
+  const total = withR + withoutR;
+  if(!total){
+    const leg = document.getElementById('sp-result-legend');
+    if(leg) leg.innerHTML = '';
+    return;
+  }
+  
+  spResultChart = new Chart(ctx.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['มีผลลัพธ์','รอผลลัพธ์'],
+      datasets: [{
+        data: [withR, withoutR],
+        backgroundColor: ['#059669','#e2e8f0'],
+        borderWidth: 3,
+        borderColor: '#fff',
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '72%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/total*100)}%)`
+          }
+        }
+      }
+    }
+  });
+  
+  const leg = document.getElementById('sp-result-legend');
+  if(leg) leg.innerHTML = `<div class="sp-leg-item"><div class="sp-leg-dot" style="background:#059669;"></div>มีผลลัพธ์: ${withR}</div><div class="sp-leg-item"><div class="sp-leg-dot" style="background:#cbd5e1;"></div>รอผล: ${withoutR}</div>`;
+}
+
+// Helper function สำหรับหาสถานะ
+function deriveStatus(result){
+  if(!result || result.trim()==='') return {cls:'sp-status-pending', txt:'Pending'};
+  const r = result.toLowerCase();
+  if(r.includes('เสร็จ') || r.includes('done') || r.includes('complete') || r.includes('สำเร็จ') || r.includes('ok') || r.includes('ผ่าน')) return {cls:'sp-status-done', txt:'Done'};
+  if(r.includes('กำลัง') || r.includes('wip') || r.includes('progress') || r.includes('ดำเนิน')) return {cls:'sp-status-wip', txt:'In Progress'};
+  return {cls:'sp-status-done', txt:'Done'};
+}
 
 /* ══════════════════════════════════
    RESPONSIVE SKILL GRID
@@ -3440,6 +4438,165 @@ function updateDarkModeUI(isDark) {
     setTimeout(() => updateDarkModeUI(true), 10);
   }
 })();
+
+/* ══════════════════════════════════
+   ACHIEVEMENTS ENGINE
+══════════════════════════════════ */
+
+// 1. Definition of all badges
+const BADGES = [
+  {
+    id: 'first_step',
+    name: 'First Step',
+    icon: '👣',
+    desc: 'เริ่มต้นบันทึกข้อมูลครั้งแรก',
+    condition: (d) => (d.support.length + d.s5.length + d.special.length + d.skills.length) >= 1
+  },
+  {
+    id: 'support_10',
+    name: 'Bronze Wrench',
+    icon: '🔧',
+    desc: 'บันทึก Support ครบ 10 รายการ',
+    condition: (d) => d.support.length >= 10
+  },
+  {
+    id: 'support_50',
+    name: 'Problem Solver',
+    icon: '🛠️',
+    desc: 'บันทึก Support ครบ 50 รายการ',
+    condition: (d) => d.support.length >= 50
+  },
+  {
+    id: 's5_30days',
+    name: '5S Master',
+    icon: '🧹',
+    desc: 'ตรวจ 5S ครบ 30 วัน (Unique Days)',
+    condition: (d) => new Set(d.s5.map(s => s.date)).size >= 30
+  },
+  {
+    id: 'skill_avg80',
+    name: 'Skill Master',
+    icon: '🎓',
+    desc: 'ทักษะเฉลี่ยสูงกว่า 80%',
+    condition: (d) => {
+      if(d.skills.length === 0) return false;
+      const avg = d.skills.reduce((s,c)=>s+(c.value||0),0)/d.skills.length;
+      return avg >= 80;
+    }
+  },
+  {
+    id: 'multi_skill',
+    name: 'Multi-Talented',
+    icon: '🤹',
+    desc: 'มีทักษะมากกว่า 5 อย่าง',
+    condition: (d) => d.skills.length >= 5
+  },
+  {
+    id: 'special_10',
+    name: 'Special Agent',
+    icon: '🌟',
+    desc: 'ทำ Special Jobs ครบ 10 งาน',
+    condition: (d) => d.special.length >= 10
+  },
+  {
+    id: 'no_ng',
+    name: 'Zero Defect',
+    icon: '✨',
+    desc: 'บันทึก Support 10 รายการ โดยไม่มี NG เลย',
+    condition: (d) => d.support.length >= 10 && d.support.every(s => !s.ng || s.ng === 0)
+  }
+];
+
+// 2. Load/Save Achievements
+function getAchievements() {
+  if (!db.badges) db.badges = {};
+  return db.badges;
+}
+
+function saveAchievements() {
+  saveLocal(); // Save main DB
+}
+
+// 3. Logic to check achievements
+function checkAchievements() {
+  const current = getAchievements();
+  let newUnlock = null;
+
+  BADGES.forEach(b => {
+    if (!current[b.id]) {
+      // Check if condition met
+      if (b.condition(db)) {
+        // UNLOCK!
+        current[b.id] = {
+          unlocked: true,
+          unlockedAt: new Date().toISOString()
+        };
+        newUnlock = b; // Capture the last unlocked one to show modal
+      }
+    }
+  });
+
+  if (newUnlock) {
+    saveAchievements();
+    showAchievementModal(newUnlock);
+  }
+}
+
+// 4. Show Modal
+function showAchievementModal(badge) {
+  const m = document.getElementById('achieveModal');
+  document.getElementById('achieveIcon').textContent = badge.icon;
+  document.getElementById('achieveTitle').textContent = badge.name;
+  document.getElementById('achieveDesc').textContent = badge.desc;
+  m.classList.add('show');
+  
+  // Play sound (optional - requires sound file)
+  // const audio = new Audio('unlock.mp3'); audio.play();
+}
+
+function closeAchieveModal() {
+  document.getElementById('achieveModal').classList.remove('show');
+}
+
+// 5. Hall of Fame UI
+function openHallOfFame() {
+  const container = document.getElementById('hofBody');
+  const unlocked = getAchievements();
+
+  container.innerHTML = BADGES.map(b => {
+    const isUnlocked = unlocked[b.id] && unlocked[b.id].unlocked;
+    const date = isUnlocked ? new Date(unlocked[b.id].unlockedAt).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '';
+    
+    return `
+      <div class="badge-card ${isUnlocked ? 'unlocked' : 'locked'}">
+        <div class="badge-icon">${b.icon}</div>
+        <div class="badge-name">${b.name}</div>
+        <div class="badge-hint">${b.desc}</div>
+        ${isUnlocked ? `<div class="badge-date">🔓 ${date}</div>` : '<div class="badge-date" style="color:var(--txt4);">🔒 ยังไม่ปลดล็อก</div>'}
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('hallOfFameModal').classList.add('open');
+}
+
+// 6. Hook into existing save() function
+// Find the existing save() function and add checkAchievements() at the end.
+/* 
+   Example modification in your existing code:
+   
+   function save(){ 
+     db._owner=currentUser;
+     db._lastModified=Date.now();
+     saveLocal();
+     runAIAnalytics();
+     if(isActive('master-dash'))refreshMasterDashboard();
+     schedulePush();
+     
+     // ADD THIS LINE:
+     checkAchievements(); 
+   }
+*/
 </script>
 </body>
 </html>
