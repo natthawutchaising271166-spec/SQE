@@ -2650,6 +2650,7 @@ async function pushImageToCloud(recordId, base64){
   }
 }
 
+
 /* Delete image from Images sheet */
 async function deleteImageFromCloud(recordId){
   if(!recordId)return;
@@ -2706,6 +2707,329 @@ function getImgCell(id, idx){
     <div class="ni-lbl">เพิ่มรูป</div>
   </div>`;
 }
+
+/* ══════════════════════════════════
+   1. DAILY REPORT (วันลา/หยุด)
+   - เพิ่ม Function addDaily ที่หายไป
+   - แก้ไข delDailyConfirm ให้หา Index จาก ID ได้ถูกต้อง
+   - เพิ่มการ Refresh หน้าจอหลังบันทึก/ลบ
+══════════════════════════════════ */
+
+/* ══════════════════════════════════
+   REALTIME UPDATE SYSTEM
+   - อัปเดตทุกหน้าทันทีที่มีการเปลี่ยนแปลงข้อมูล
+══════════════════════════════════ */
+
+/* ─────────────────────────────────
+   1. DAILY REPORT (วันลา/หยุด)
+───────────────────────────────── */
+function addDaily() {
+    const dateVal = document.getElementById('dailyDate').value;
+    const typeVal = document.getElementById('dailyType').value;
+    const noteVal = document.getElementById('dailyNote').value;
+
+    if (!dateVal) return toast('❌ กรุณาเลือกวันที่');
+
+    const now = new Date();
+    const newEntry = {
+        id: Date.now().toString(),
+        date: dateVal,
+        type: typeVal,
+        note: noteVal,
+        fullTimestamp: fullTimestamp(),
+        _user: currentUser
+    };
+
+    db.daily.push(newEntry);
+    save();
+    
+    document.getElementById('dailyDate').value = now.toISOString().split('T')[0];
+    document.getElementById('dailyNote').value = '';
+    
+    toast('✅ บันทึกข้อมูลแล้ว');
+    
+    // Refresh หน้าปัจจุบัน + Dashboard หลัก
+    refreshDashboard();
+    refreshMasterDashboard();
+}
+
+function delDailyConfirm(id) {
+    robotConfirm('ยืนยันลบรายการนี้?', () => {
+        const idx = db.daily.findIndex(d => (d.id || d.date + '_' + d.type) === id);
+        if (idx > -1) {
+            db.daily.splice(idx, 1);
+            save();
+            toast('🗑 ลบข้อมูลแล้ว');
+            
+            refreshDashboard();
+            refreshMasterDashboard();
+        } else {
+            toast('⚠️ ไม่พบข้อมูล');
+        }
+    });
+}
+
+/* ─────────────────────────────────
+   2. SUPPORT PRODUCTION
+───────────────────────────────── */
+function addSupport() {
+    const prob = document.getElementById('supProblem').value;
+    const act = document.getElementById('supAction').value;
+    const part = document.getElementById('supPart').value;
+    const rep = document.getElementById('supReport').value;
+    const di = document.getElementById('supDate').value;
+    const lot = document.getElementById('supLot').value;
+    const ok = document.getElementById('supOk').value;
+    const ng = document.getElementById('supNg').value;
+
+    if (!prob) return toast('❌ กรอกรายละเอียดปัญหา');
+
+    const ts = fullTimestamp();
+    const now = new Date();
+    const d = di ? new Date(di) : now;
+    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const eventDate = di || now.toISOString().split('T')[0];
+
+    const newId = Date.now().toString();
+    db.support.push({
+        id: newId,
+        problem: prob,
+        action: act,
+        part,
+        report: rep,
+        lot,
+        ok: ok !== '' ? parseInt(ok) : '',
+        ng: ng !== '' ? parseInt(ng) : '',
+        datetime: ts,
+        fullTimestamp: ts,
+        month,
+        eventDate,
+        _user: currentUser
+    });
+
+    if (_pendingAddImg && typeof _pendingAddImg === 'string' && _pendingAddImg.startsWith('data:')) {
+        saveImage(newId, _pendingAddImg);
+    }
+    _pendingAddImg = null;
+    
+    save();
+    toast('🛠️ บันทึก Support แล้ว');
+    closeAddSupModal();
+    
+    refreshSupport();
+    refreshMasterDashboard();
+}
+
+function delSupportConfirm(i) {
+    robotConfirm('ลบ Support record นี้?', () => {
+        const s = db.support[i];
+        if (s && s.id) removeImage(s.id);
+        db.support.splice(i, 1);
+        save();
+        toast('🗑 ลบแล้ว');
+        
+        refreshSupport();
+        refreshMasterDashboard();
+    });
+}
+
+function saveEditSupport() {
+    const i = parseInt(document.getElementById('editIdx').value);
+    if (isNaN(i) || !db.support[i]) return toast('❌ ข้อมูลไม่ถูกต้อง');
+
+    const di = document.getElementById('editDate').value;
+    const d = di ? new Date(di) : new Date();
+    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const ok_val = document.getElementById('editOk').value;
+    const ng_val = document.getElementById('editNg').value;
+
+    db.support[i].problem = document.getElementById('editProblem').value;
+    db.support[i].action = document.getElementById('editAction').value;
+    db.support[i].part = document.getElementById('editPart').value;
+    db.support[i].lot = document.getElementById('editLot').value;
+    db.support[i].ok = ok_val !== '' ? parseInt(ok_val) : '';
+    db.support[i].ng = ng_val !== '' ? parseInt(ng_val) : '';
+    db.support[i].report = document.getElementById('editReport').value;
+    db.support[i].month = month;
+    db.support[i].eventDate = di;
+    db.support[i]._editedAt = fullTimestamp();
+    db.support[i]._user = currentUser;
+
+    const recId = db.support[i].id;
+    if (recId) {
+        if (_pendingEditImg === null) {
+            removeImage(recId);
+            refreshSupportImagesOnly();
+        } else if (typeof _pendingEditImg === 'string' && _pendingEditImg.startsWith('data:')) {
+            saveImage(recId, _pendingEditImg);
+            refreshSupportImagesOnly();
+        }
+    }
+    _pendingEditImg = undefined;
+    
+    save();
+    toast('✅ อัปเดตข้อมูลแล้ว');
+    document.getElementById('editModal').style.display = 'none';
+    
+    refreshSupport();
+    refreshMasterDashboard();
+}
+
+/* ─────────────────────────────────
+   3. 5S SYSTEM
+───────────────────────────────── */
+function add5S() {
+    const area = document.getElementById('s5Area').value;
+    const count = parseInt(document.getElementById('s5Count').value) || 0;
+    const detail = document.getElementById('s5Detail').value;
+    const owner = document.getElementById('s5Owner').value;
+    const month = document.getElementById('filter5sMonth').value;
+
+    if (!area) return toast('❌ ระบุพื้นที่');
+
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const finalMonth = month || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+    db.s5.push({
+        id: Date.now().toString(),
+        area,
+        count,
+        detail,
+        owner,
+        month: finalMonth,
+        date: today,
+        fullTimestamp: fullTimestamp(),
+        _user: currentUser
+    });
+
+    save();
+    toast('🧹 บันทึก 5S แล้ว');
+    ['s5Area', 's5Count', 's5Detail', 's5Owner'].forEach(id => document.getElementById(id).value = '');
+
+    refresh5S();
+    refreshMasterDashboard();
+}
+
+async function del5SConfirm(id) {
+    robotConfirm('ลบรายการ 5S นี้? ข้อมูลจะถูกลบจาก Cloud ด้วย', async () => {
+        // 1. หาและลบข้อมูลใน Local Database
+        const idx = db.s5.findIndex(s => s.id === id);
+        
+        if (idx > -1) {
+            db.s5.splice(idx, 1); // ลบออกจาก Array
+            
+            // 2. บันทึกลง LocalStorage
+            db._lastModified = Date.now(); 
+            saveLocal(); 
+            
+            // 3. Sync ขึ้น Google Sheet ทันที (Force Sync)
+            // เรียก pushToCloud โดยตรงแทนการใช้ schedulePush
+            await pushToCloud(); 
+            
+            toast('🗑 ลบข้อมูล 5S แล้ว (Synced)');
+            
+            // 4. Refresh หน้าจอทั้งหมด
+            refresh5S();
+            refreshMasterDashboard();
+        } else {
+            toast('⚠️ ไม่พบข้อมูล');
+        }
+    });
+}
+
+/* ─────────────────────────────────
+   4. SKILL MATRIX
+───────────────────────────────── */
+function addSkill() {
+    const n = document.getElementById('skillName');
+    const v = document.getElementById('skillValue');
+    const val = parseInt(v.value);
+    if (!n.value || isNaN(val)) return toast('❌ กรอกชื่อและคะแนน');
+    if (val < 0 || val > 100) return toast('❌ คะแนน 0–100');
+
+    const idx = db.skills.findIndex(s => s.name === n.value);
+    if (idx > -1) db.skills[idx].value = val;
+    else db.skills.push({ name: n.value, value: val, _user: currentUser, updatedAt: fullTimestamp() });
+
+    save();
+    toast('📈 อัปเดต Skill Matrix');
+    n.value = '';
+    v.value = '';
+    
+    refreshSkills();
+    refreshMasterDashboard(); // อัปเดต Avg Skill ใน Dashboard หลักด้วย
+}
+
+function delSkillConfirm(name) {
+    robotConfirm(`ลบทักษะ "${name}"?`, () => {
+        db.skills = db.skills.filter(s => s.name !== name);
+        save();
+        toast('🗑 ลบทักษะแล้ว');
+        
+        refreshSkills();
+        refreshMasterDashboard();
+    });
+}
+
+function clearAllSkills() {
+    robotConfirm('ล้างทักษะทั้งหมด? จะถูกลบถาวร', () => {
+        db.skills = [];
+        save();
+        toast('🗑 ล้างทักษะทั้งหมด');
+        
+        refreshSkills();
+        refreshMasterDashboard();
+    });
+}
+
+/* ─────────────────────────────────
+   5. SPECIAL JOBS
+───────────────────────────────── */
+function addSpecial() {
+    const proj = document.getElementById('specProject').value;
+    const dt = document.getElementById('specDate').value;
+    const by = document.getElementById('specBy').value;
+    const res = document.getElementById('specResult').value;
+
+    if (!proj) return toast('❌ กรุณากรอกชื่อโครงการ');
+
+    const now = new Date();
+    const finalDate = dt || now.toISOString().split('T')[0];
+
+    db.special.push({
+        id: Date.now().toString(),
+        project: proj,
+        job: proj, // Save both for compatibility
+        date: finalDate,
+        by: by,
+        result: res,
+        fullTimestamp: fullTimestamp(),
+        _user: currentUser
+    });
+
+    save();
+    toast('⭐ บันทึก Special Job แล้ว');
+    
+    document.getElementById('specProject').value = '';
+    document.getElementById('specBy').value = '';
+    document.getElementById('specResult').value = '';
+
+    refreshSpecial();
+    refreshMasterDashboard();
+}
+
+function delSpecialConfirm(i) {
+    robotConfirm('ลบโครงการพิเศษนี้?', () => {
+        db.special.splice(i, 1);
+        save();
+        toast('🗑 ลบโครงการแล้ว');
+
+        refreshSpecial();
+        refreshMasterDashboard();
+    });
+}
+
 function getImgCellHTML(id,idx){return getImgCell(id,idx);}
 
 /* Zoom modal + change on double click */
@@ -2883,6 +3207,7 @@ function schedulePush(){clearTimeout(pushTimer);pushTimer=setTimeout(()=>pushToC
 async function pushToCloud(){db._owner=currentUser;db._lastModified=Date.now();saveLocal();try{await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:currentUser,data:db})});showSyncStatus('☁️ บันทึกขึ้น Cloud แล้ว','#22c55e');}catch(e){showSyncStatus('⚠️ Cloud push ล้มเหลว','#f59e0b');}}
 async function pullFromCloud(silent=false){try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();if(r.status==='success'&&r.data){const cloud=r.data;if(cloud._owner&&cloud._owner!==currentUser){if(!silent)console.warn('Wrong user data');return false;}const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);if(cloudMod>localMod||cloudLen>localLen){cloud._owner=currentUser;db=cloud;saveLocal();return true;}}}catch(e){}return false;}
 function saveLocal(){db._owner=currentUser;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}
+
 
 /* ══════════════════════════════════
    GOOGLE SHEETS CONNECTION TEST
