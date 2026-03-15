@@ -2805,9 +2805,35 @@ function importExcel(input){
   const file=input.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=async e=>{
-    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+    // ★★★ แก้ไขตรงนี้: ลบ cellDates: true ออก หรือเซ็ตเป็น false ★★★
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array', cellDates: false}); 
+    
     const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    const pd=v=>{if(!v)return'';if(v instanceof Date)return new Date(v.getTime()-(v.getTimezoneOffset()*60000)).toISOString().split('T')[0];if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return`${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`}return String(v)};
+    
+    // ★★★ แก้ไข Function pd ให้รองรับตัวเลข (Serial Number) เป็นหลัก ★★★
+    const pd=v=>{
+      if(!v) return '';
+      
+      // ถ้าเป็นตัวเลข (Excel Serial Date) ให้แปลงโดยตรงโดยไม่ยุ่งกับ Timezone
+      if(typeof v === 'number'){
+        const d = XLSX.SSF.parse_date_code(v);
+        // จัดรูปแบบเป็น YYYY-MM-DD
+        return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+      }
+      
+      // ถ้าเป็น Date Object (กรณีที่มีการส่งมาแบบอื่น) ให้ดึงเฉพาะปี-เดือน-วันแบบ UTC เพื่อความปลอดภัย
+      if(v instanceof Date) {
+        const y = v.getUTCFullYear();
+        const m = String(v.getUTCMonth() + 1).padStart(2, '0');
+        const d = String(v.getUTCDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+      
+      // ถ้าเป็น String อยู่แล้ว ก็ส่งคืนเลย
+      return String(v);
+    };
+
+    // ... โค้ดส่วนที่เหลือเหมือนเดิม ...
     let skippedDupe=0,skippedInvalid=0;const items=[];
     for(const r of json){const ref=String(r.ref||r.Reference||'').trim(),supp=String(r.supplier||r.Supplier||'').trim(),qty=parseInt(r.qty||r.Qty||0);if(!ref||!supp||qty<=0){skippedInvalid++;continue}if(isDuplicate(ref)){skippedDupe++;continue}items.push({id:Date.now()+Math.random(),date:pd(r.date||r.Date||r.DATE),shift:r.shift||r.Shift||'SHIFT A',inspector:currentUser,ref,line:String(r.line||r.Line||''),supplier:supp,partNo:String(r.partNo||r.PartNo||''),partName:String(r.partName||r.PartName||''),qty,defect:String(r.defect||r.Defect||''),remark:String(r.remark||r.Remark||''),judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase()})}
     if(!items.length){toast(`⚠️ ไม่มีข้อมูลใหม่ (ซ้ำ:${skippedDupe} / Invalid:${skippedInvalid})`);input.value='';return}
