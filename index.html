@@ -2,6 +2,15 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+    <!-- ✅ เพิ่ม 2 บรรทัดนี้ -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1d4ed8">
+    
+    <!-- iOS Support -->
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    
+    <!-- ...โค้ดส่วนอื่นๆ... -->
+</head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SQE Support V4 · Intelligence Platform</title>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -2142,67 +2151,43 @@ async function initApp(inspector) {
   currentUser = inspector;
   $id('currentUserDisp').textContent = inspector;
 
-  showInitOverlay('กำลังโหลดข้อมูล…', 'เชื่อมต่อ Google Sheets…', '');
+  // ★ ไม่เรียก showInitOverlay เพื่อให้มองเห็นหน้าจอได้ทันที
   setSyncBtn(true);
-  setSyncPulse('syncing', 'Loading…');
+  setSyncPulse('syncing', 'Syncing…');
 
-  // ── 1. PUSH LOCAL DATA FIRST ──
-  // ดึงข้อมูลที่ยังไม่ได้ Sync ในเครื่องขึ้น Cloud ก่อนเสมอ
   const myLocalRecs = getMyRecords();
   const unsync = myLocalRecs.filter(r => !syncedHas(r.ref));
 
+  // Push local data
   if (unsync.length > 0) {
-    showInitOverlay('กำลังส่งข้อมูลที่ค้างอยู่…', `อัพโหลด ${unsync.length} รายการ…`, unsync.length);
+    setSyncPulse('syncing', `Uploading ${unsync.length}...`);
     try {
       await pushToCloud(unsync);
-      // หลัง Push สำเร็จ ให้เก็บสถานะว่า Sync แล้ว
       unsync.forEach(r => {
         syncedAdd(r.ref);
         cloudRefAdd(r.ref, inspector);
       });
-      saveLocal(); // บันทึกสถานะ synced ทันที
-    } catch (e) {
-      toast('⚠️ Push failed (Network)');
-    }
+      saveLocal();
+    } catch (e) { toast('⚠️ Push failed'); }
   }
 
-  // ── 2. FETCH & HARD SYNC ──
-  // ดึงข้อมูลล่าสุดจาก Cloud มาทับข้อมูลในเครื่อง (เพื่อให้ตัวเลขตรง)
-  showInitOverlay('กำลังโหลดข้อมูล…', 'ดาวน์โหลดข้อมูลล่าสุด…', '');
+  // Fetch cloud
+  setSyncPulse('syncing', 'Fetching...');
   try {
     const fetchResult = await fetchFromCloud(inspector, FETCH_TIMEOUT);
-    
     if (fetchResult.ok) {
-      // ★ HARD SYNC: ลบข้อมูลเก่าของ User นี้ในเครื่องทิ้งทั้งหมด
       records = records.filter(r => r.inspector !== inspector);
-      
-      // ★ แล้วใส่ข้อมูลจาก Cloud ที่ได้มาลงไปใหม่
-      if (fetchResult.rows.length > 0) {
-        records.push(...fetchResult.rows);
-      }
-
-      // Reset สถานะ Sync ให้ตรงกับข้อมูลปัจจุบัน
+      if (fetchResult.rows.length > 0) records.push(...fetchResult.rows);
       syncedReset(fetchResult.rows.map(r => r.ref));
-      
       saveLocal();
-      refreshAll();
-      
-      await sleep(80);
-      hideInitOverlay();
-      toast(`✅ พร้อมใช้งาน: ${fetchResult.rows.length} รายการ`);
-      showSyncBadge('☁️ Cloud synced', '#10b981');
+      refreshAll(); // ★ Render ใหม่เมื่อ Cloud ตอบ
       setSyncPulse('live', 'LIVE SYNC');
+      showSyncBadge('☁️ Sync Complete', '#10b981');
     } else {
-      // ถ้าดึงไม่ได้ ให้ใช้ข้อมูลในเครื่องต่อ
-      hideInitOverlay();
       setSyncPulse('offline', 'Offline');
-      toast(`⚠️ ไม่สามารถเชื่อมต่อ Cloud (โหมดออฟไลน์)`);
-      refreshAll();
     }
-  } catch (err) {
-    hideInitOverlay();
+  } catch (e) {
     setSyncPulse('offline', 'Offline');
-    toast('⚠️ Connection error');
   } finally {
     setSyncBtn(false);
     _isInitializing = false;
@@ -2305,73 +2290,78 @@ function renderTable() {
   // Hash check ป้องกันการ render ซ้ำซ้อน
   const hash = filterType + '|' + search + '|' + filtered.map(r => r.id + '_' + r.judgment + '_' + r.qty).join(',');
   
-  // ★ ถ้าข้อมูลเหมือนเดิม ไม่ต้องทำอะไร ประหยัดทรัพยากร
+  // ★ ถ้าข้อมูลเหมือนเดิม ไม่ต้องทำอะไร
   if (hash === _lastRenderHash) return;
   _lastRenderHash = hash;
 
   const empty = $id('emptyState');
   
-  // ★ Animation: Fade out ก่อนเปลี่ยนข้อมูล
+  // ★ เช็คว่าเป็นการ Render ครั้งแรกไหม (ตารางยังว่าง)
+  const isFirstLoad = !tbody.innerHTML.trim();
+
+  // Helper: ฟังก์ชันสำหรับ Render HTML
+  const buildHTML = () => {
+    if (empty) empty.style.display = filtered.length === 0 ? 'flex' : 'none';
+    let html = '';
+    filtered.forEach(r => {
+      const s = SM[r.judgment] || SM['SF'];
+      const synced = _syncedSet.has(r.ref);
+      const safeId = String(r.id).replace(/"/g, '&quot;');
+      
+      html += `<tr class="group" data-rid="${safeId}">
+        <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">${r.date}</td>
+        <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${r.shift}</div><div style="font-size:.65rem;color:var(--text-400);margin-top:1px;font-family:var(--font-head);font-weight:600">L: ${escapeHtml(r.line) || '—'}</div></td>
+        <td><span style="font-family:var(--font-head);font-size:.68rem;color:${synced ? 'var(--accent-grn)' : 'var(--text-200)'};margin-right:4px" title="${synced ? 'Synced' : 'Pending'}">●</span><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">#${escapeHtml(r.ref)}</span></td>
+        <td><div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${escapeHtml(r.supplier)}</div><div style="font-size:.65rem;color:var(--text-400);font-family:var(--font-head);font-weight:600;margin-top:1px">${escapeHtml(r.partNo)} · ${escapeHtml(r.partName)}</div></td>
+        <td style="text-align:center"><span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900);letter-spacing:-.03em">${r.qty.toLocaleString()}</span></td>
+        <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${escapeHtml(r.defect)}</td>
+        <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(r.remark || '')}">${escapeHtml(r.remark) || '—'}</td>
+        <td style="text-align:center">
+          <span class="status-badge" style="${s.s};animation:none">
+            <span style="width:5px;height:5px;border-radius:50%;background:${s.dot};flex-shrink:0;animation:pulse 1.4s ease-in-out infinite;display:inline-block"></span>
+            ${r.judgment}
+          </span>
+        </td>
+        <td style="padding-right:1.2rem;text-align:right;white-space:nowrap">
+          <button data-action="clone" class="btn" style="opacity:0;color:var(--blue-500);font-size:.75rem;padding:.22rem .55rem;border-radius:8px;background:var(--blue-50);border:1px solid var(--blue-200);transition:opacity .15s;margin-right:.3rem" title="Clone">📑</button>
+          <button data-action="delete" class="btn" style="opacity:0;color:var(--accent-red);font-size:.75rem;padding:.22rem .55rem;border-radius:8px;background:#fef2f2;border:1px solid #fecaca;transition:opacity .15s" title="Delete">✕</button>
+        </td>
+      </tr>`;
+    });
+    tbody.innerHTML = html;
+
+    // Event listeners สำหรับปุ่ม
+    tbody.querySelectorAll('tr').forEach(tr => {
+      const btns = tr.querySelectorAll('[data-action]');
+      tr.addEventListener('mouseenter', () => btns.forEach(b => b.style.opacity = '1'));
+      tr.addEventListener('mouseleave', () => btns.forEach(b => b.style.opacity = '0'));
+    });
+  };
+
+  // ★ ถ้าเป็นการโหลดครั้งแรก: แสดงทันที (Snap) ไม่ต้อง Fade
+  if (isFirstLoad) {
+    buildHTML();
+    gsap.fromTo(tbody.children, 
+      { opacity: 0, y: 10 }, 
+      { opacity: 1, y: 0, duration: 0.3, stagger: 0.015, ease: 'power2.out' }
+    );
+    return; // จบการทำงานทันที
+  }
+
+  // ★ ถ้าไม่ใช่ครั้งแรก: ทำ Animation Fade Out -> Render -> Fade In ตามปกติ
   gsap.to(tbody, { 
     opacity: 0, 
     duration: 0.15, 
     ease: 'power2.in', 
     onComplete: () => {
-      
-      // Empty state toggle
-      if (empty) empty.style.display = filtered.length === 0 ? 'flex' : 'none';
-
-      let html = '';
-      filtered.forEach(r => {
-        const s = SM[r.judgment] || SM['SF'];
-        const synced = _syncedSet.has(r.ref);
-        const safeId = String(r.id).replace(/"/g, '&quot;');
-        
-        html += `<tr class="group" data-rid="${safeId}">
-          <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">${r.date}</td>
-          <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${r.shift}</div><div style="font-size:.65rem;color:var(--text-400);margin-top:1px;font-family:var(--font-head);font-weight:600">L: ${escapeHtml(r.line) || '—'}</div></td>
-          <td><span style="font-family:var(--font-head);font-size:.68rem;color:${synced ? 'var(--accent-grn)' : 'var(--text-200)'};margin-right:4px" title="${synced ? 'Synced' : 'Pending'}">●</span><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">#${escapeHtml(r.ref)}</span></td>
-          <td><div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${escapeHtml(r.supplier)}</div><div style="font-size:.65rem;color:var(--text-400);font-family:var(--font-head);font-weight:600;margin-top:1px">${escapeHtml(r.partNo)} · ${escapeHtml(r.partName)}</div></td>
-          <td style="text-align:center"><span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900);letter-spacing:-.03em">${r.qty.toLocaleString()}</span></td>
-          <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${escapeHtml(r.defect)}</td>
-          <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(r.remark || '')}">${escapeHtml(r.remark) || '—'}</td>
-          <td style="text-align:center">
-            <span class="status-badge" style="${s.s};animation:none">
-              <span style="width:5px;height:5px;border-radius:50%;background:${s.dot};flex-shrink:0;animation:pulse 1.4s ease-in-out infinite;display:inline-block"></span>
-              ${r.judgment}
-            </span>
-          </td>
-          <td style="padding-right:1.2rem;text-align:right;white-space:nowrap">
-            <button data-action="clone" class="btn" style="opacity:0;color:var(--blue-500);font-size:.75rem;padding:.22rem .55rem;border-radius:8px;background:var(--blue-50);border:1px solid var(--blue-200);transition:opacity .15s;margin-right:.3rem" title="Clone">📑</button>
-            <button data-action="delete" class="btn" style="opacity:0;color:var(--accent-red);font-size:.75rem;padding:.22rem .55rem;border-radius:8px;background:#fef2f2;border:1px solid #fecaca;transition:opacity .15s" title="Delete">✕</button>
-          </td>
-        </tr>`;
-      });
-
-      tbody.innerHTML = html;
-
-      // Event listeners สำหรับปุ่ม
-      tbody.querySelectorAll('tr').forEach(tr => {
-        const btns = tr.querySelectorAll('[data-action]');
-        tr.addEventListener('mouseenter', () => btns.forEach(b => b.style.opacity = '1'));
-        tr.addEventListener('mouseleave', () => btns.forEach(b => b.style.opacity = '0'));
-      });
-
-      // ★ Animation: Fade in & Stagger rows หลัง Render
+      buildHTML();
       gsap.fromTo(tbody.children, 
         { opacity: 0, y: 10 }, 
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 0.3, 
-          stagger: 0.02, // แต่ละแถวตามกันมา 0.02 วินาที
-          ease: 'power2.out' 
-        }
+        { opacity: 1, y: 0, duration: 0.3, stagger: 0.02, ease: 'power2.out' }
       );
     }
   });
 }
-
 
 
 document.addEventListener('click',e=>{const btn=e.target.closest('[data-action]');if(!btn)return;const tr=btn.closest('tr[data-rid]');if(!tr)return;const rid=tr.dataset.rid;if(btn.dataset.action==='clone')cloneRecord(rid);if(btn.dataset.action==='delete')showDeleteModal(rid,tr)});
@@ -2833,17 +2823,21 @@ function openJobProject(){window.location.href='job_project.html'}
 
 // เรียกใช้งานตอนโหลดหน้าเว็บ
 window.addEventListener('load', async () => {
-  // ★ ลบ forceViewportReset ออก ให้ CSS จัดการเอง
+  // ลบ forceViewportReset ออกเพื่อป้องกันการกระพริบ
   $id('inputDate').valueAsDate = new Date();
   startClock();
   
   const saved = sessionStorage.getItem('currentUser');
   if (saved) {
     $id('loginOverlay').style.display = 'none';
-    $id('appShell').classList.add('visible'); // ★ แค่เปิด visibility ธรรมดา
+    $id('appShell').classList.add('visible');
     currentUser = saved;
     $id('currentUserDisp').textContent = saved;
-    refreshAll(); // Render ครั้งแรกเลย
+    
+    // ★ 1. Refresh จาก Local Storage ก่อน (แสดงผลทันที!)
+    refreshAll(); 
+    
+    // ★ 2. แล้วค่อย Init/Sync กับ Cloud (ใน Background)
     await initApp(saved);
   }
 });
