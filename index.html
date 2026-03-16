@@ -2,15 +2,6 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-    <!-- ✅ เพิ่ม 2 บรรทัดนี้ -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1d4ed8">
-    
-    <!-- iOS Support -->
-    <link rel="apple-touch-icon" href="icon-192x192.png">
-    
-    <!-- ...โค้ดส่วนอื่นๆ... -->
-</head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SQE Support V4 · Intelligence Platform</title>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -21,10 +12,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@300;400;500&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* ═══════════════════════════════════════════════════
-   DESIGN SYSTEM — Power BI / Enterprise Light Theme
-   Fluid · Breathable · World-class Reporting UI
-═══════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════
    DESIGN SYSTEM — Power BI / Enterprise Light Theme
    Fluid · Breathable · World-class Reporting UI
@@ -95,24 +82,15 @@
   --r-2xl:  36px;
 }
 
-/* ★ ใช้ dvh (Dynamic Viewport Height) เพื่อแก้ปัญหามือถือ URL Bar กระตุก */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 html, body {
-  height: 100dvh; 
-  height: 100%; /* Fallback */
-  overflow: hidden;
+  height: 100%; overflow: hidden;
   font-family: var(--font-body);
   background: var(--bg-mesh);
   color: var(--text-700);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* ★ เพิ่ม Smooth Scrolling ทั้งระบบ */
-  scroll-behavior: smooth;
-}
-
-/* ★ เพิ่ม Hardware Acceleration ให้ Elements สำคัญ */
-#appShell, #sidebar, #mainPanel, .card, tbody tr {
-  transform: translateZ(0);
-  backface-visibility: hidden;
 }
 
 /* ── Scrollbar ── */
@@ -125,6 +103,7 @@ html, body {
 .sora   { font-family: var(--font-head); }
 .mono   { font-family: var(--font-mono); }
 .jakarta { font-family: var(--font-body); }
+
 /* ═══════════════════════════════════════════════════
    AMBIENT BACKGROUND ORBS
 ═══════════════════════════════════════════════════ */
@@ -1956,7 +1935,6 @@ html.dark-mode .dash-chart-card[style*="linear-gradient(145deg, var(--blue-900)"
 <datalist id="lotList"></datalist><datalist id="defectList"></datalist>
 <datalist id="inspectorList"></datalist>
 
-
 <script>
 /* ══════════════════════════════════════════════════════════
    CONFIG  (unchanged from original)
@@ -2029,29 +2007,6 @@ function loadTheme() {
   }
 }
 
-/* ═══════════════════════════════════════════════════
-   ENHANCEMENTS: Fluid Form Interactions
-═══════════════════════════════════════════════════ */
-document.querySelectorAll('.neon-in, #judgmentSelect').forEach(el => {
-  // เพิ่ม Animation ตอน Focus
-  el.addEventListener('focus', () => {
-    gsap.to(el, { scale: 1.01, duration: 0.2, ease: 'power1.out' });
-  });
-  el.addEventListener('blur', () => {
-    gsap.to(el, { scale: 1, duration: 0.2, ease: 'power1.out' });
-  });
-});
-
-// ปรับให้ปุ่ม Submit มี Animation ตอน Hover แบบ Smooth ขึ้น
-const submitBtn = $id('submitBtn');
-if(submitBtn) {
-  submitBtn.addEventListener('mouseenter', () => {
-    gsap.to(submitBtn, { y: -2, duration: 0.2, ease: 'power2.out' });
-  });
-  submitBtn.addEventListener('mouseleave', () => {
-    gsap.to(submitBtn, { y: 0, duration: 0.2, ease: 'power2.out' });
-  });
-}
 
 let _myRecCache=null,_myRecUser='',_myRecLen=-1;
 function getMyRecords(){if(_myRecCache&&_myRecUser===currentUser&&_myRecLen===records.length)return _myRecCache;_myRecCache=records.filter(r=>r.inspector===currentUser);_myRecUser=currentUser;_myRecLen=records.length;return _myRecCache}
@@ -2151,43 +2106,67 @@ async function initApp(inspector) {
   currentUser = inspector;
   $id('currentUserDisp').textContent = inspector;
 
-  // ★ ไม่เรียก showInitOverlay เพื่อให้มองเห็นหน้าจอได้ทันที
+  showInitOverlay('กำลังโหลดข้อมูล…', 'เชื่อมต่อ Google Sheets…', '');
   setSyncBtn(true);
-  setSyncPulse('syncing', 'Syncing…');
+  setSyncPulse('syncing', 'Loading…');
 
+  // ── 1. PUSH LOCAL DATA FIRST ──
+  // ดึงข้อมูลที่ยังไม่ได้ Sync ในเครื่องขึ้น Cloud ก่อนเสมอ
   const myLocalRecs = getMyRecords();
   const unsync = myLocalRecs.filter(r => !syncedHas(r.ref));
 
-  // Push local data
   if (unsync.length > 0) {
-    setSyncPulse('syncing', `Uploading ${unsync.length}...`);
+    showInitOverlay('กำลังส่งข้อมูลที่ค้างอยู่…', `อัพโหลด ${unsync.length} รายการ…`, unsync.length);
     try {
       await pushToCloud(unsync);
+      // หลัง Push สำเร็จ ให้เก็บสถานะว่า Sync แล้ว
       unsync.forEach(r => {
         syncedAdd(r.ref);
         cloudRefAdd(r.ref, inspector);
       });
-      saveLocal();
-    } catch (e) { toast('⚠️ Push failed'); }
+      saveLocal(); // บันทึกสถานะ synced ทันที
+    } catch (e) {
+      toast('⚠️ Push failed (Network)');
+    }
   }
 
-  // Fetch cloud
-  setSyncPulse('syncing', 'Fetching...');
+  // ── 2. FETCH & HARD SYNC ──
+  // ดึงข้อมูลล่าสุดจาก Cloud มาทับข้อมูลในเครื่อง (เพื่อให้ตัวเลขตรง)
+  showInitOverlay('กำลังโหลดข้อมูล…', 'ดาวน์โหลดข้อมูลล่าสุด…', '');
   try {
     const fetchResult = await fetchFromCloud(inspector, FETCH_TIMEOUT);
+    
     if (fetchResult.ok) {
+      // ★ HARD SYNC: ลบข้อมูลเก่าของ User นี้ในเครื่องทิ้งทั้งหมด
       records = records.filter(r => r.inspector !== inspector);
-      if (fetchResult.rows.length > 0) records.push(...fetchResult.rows);
+      
+      // ★ แล้วใส่ข้อมูลจาก Cloud ที่ได้มาลงไปใหม่
+      if (fetchResult.rows.length > 0) {
+        records.push(...fetchResult.rows);
+      }
+
+      // Reset สถานะ Sync ให้ตรงกับข้อมูลปัจจุบัน
       syncedReset(fetchResult.rows.map(r => r.ref));
+      
       saveLocal();
-      refreshAll(); // ★ Render ใหม่เมื่อ Cloud ตอบ
+      refreshAll();
+      
+      await sleep(80);
+      hideInitOverlay();
+      toast(`✅ พร้อมใช้งาน: ${fetchResult.rows.length} รายการ`);
+      showSyncBadge('☁️ Cloud synced', '#10b981');
       setSyncPulse('live', 'LIVE SYNC');
-      showSyncBadge('☁️ Sync Complete', '#10b981');
     } else {
+      // ถ้าดึงไม่ได้ ให้ใช้ข้อมูลในเครื่องต่อ
+      hideInitOverlay();
       setSyncPulse('offline', 'Offline');
+      toast(`⚠️ ไม่สามารถเชื่อมต่อ Cloud (โหมดออฟไลน์)`);
+      refreshAll();
     }
-  } catch (e) {
+  } catch (err) {
+    hideInitOverlay();
     setSyncPulse('offline', 'Offline');
+    toast('⚠️ Connection error');
   } finally {
     setSyncBtn(false);
     _isInitializing = false;
@@ -2289,80 +2268,51 @@ function renderTable() {
 
   // Hash check ป้องกันการ render ซ้ำซ้อน
   const hash = filterType + '|' + search + '|' + filtered.map(r => r.id + '_' + r.judgment + '_' + r.qty).join(',');
-  
-  // ★ ถ้าข้อมูลเหมือนเดิม ไม่ต้องทำอะไร
   if (hash === _lastRenderHash) return;
   _lastRenderHash = hash;
 
+  // Empty state
   const empty = $id('emptyState');
-  
-  // ★ เช็คว่าเป็นการ Render ครั้งแรกไหม (ตารางยังว่าง)
-  const isFirstLoad = !tbody.innerHTML.trim();
+  if (empty) empty.style.display = filtered.length === 0 ? 'flex' : 'none';
 
-  // Helper: ฟังก์ชันสำหรับ Render HTML
-  const buildHTML = () => {
-    if (empty) empty.style.display = filtered.length === 0 ? 'flex' : 'none';
-    let html = '';
-    filtered.forEach(r => {
-      const s = SM[r.judgment] || SM['SF'];
-      const synced = _syncedSet.has(r.ref);
-      const safeId = String(r.id).replace(/"/g, '&quot;');
-      
-      html += `<tr class="group" data-rid="${safeId}">
-        <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">${r.date}</td>
-        <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${r.shift}</div><div style="font-size:.65rem;color:var(--text-400);margin-top:1px;font-family:var(--font-head);font-weight:600">L: ${escapeHtml(r.line) || '—'}</div></td>
-        <td><span style="font-family:var(--font-head);font-size:.68rem;color:${synced ? 'var(--accent-grn)' : 'var(--text-200)'};margin-right:4px" title="${synced ? 'Synced' : 'Pending'}">●</span><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">#${escapeHtml(r.ref)}</span></td>
-        <td><div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${escapeHtml(r.supplier)}</div><div style="font-size:.65rem;color:var(--text-400);font-family:var(--font-head);font-weight:600;margin-top:1px">${escapeHtml(r.partNo)} · ${escapeHtml(r.partName)}</div></td>
-        <td style="text-align:center"><span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900);letter-spacing:-.03em">${r.qty.toLocaleString()}</span></td>
-        <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${escapeHtml(r.defect)}</td>
-        <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(r.remark || '')}">${escapeHtml(r.remark) || '—'}</td>
-        <td style="text-align:center">
-          <span class="status-badge" style="${s.s};animation:none">
-            <span style="width:5px;height:5px;border-radius:50%;background:${s.dot};flex-shrink:0;animation:pulse 1.4s ease-in-out infinite;display:inline-block"></span>
-            ${r.judgment}
-          </span>
-        </td>
-        <td style="padding-right:1.2rem;text-align:right;white-space:nowrap">
-          <button data-action="clone" class="btn" style="opacity:0;color:var(--blue-500);font-size:.75rem;padding:.22rem .55rem;border-radius:8px;background:var(--blue-50);border:1px solid var(--blue-200);transition:opacity .15s;margin-right:.3rem" title="Clone">📑</button>
-          <button data-action="delete" class="btn" style="opacity:0;color:var(--accent-red);font-size:.75rem;padding:.22rem .55rem;border-radius:8px;background:#fef2f2;border:1px solid #fecaca;transition:opacity .15s" title="Delete">✕</button>
-        </td>
-      </tr>`;
-    });
-    tbody.innerHTML = html;
+  let html = '';
+  filtered.forEach(r => {
+    const s = SM[r.judgment] || SM['SF'];
+    const synced = _syncedSet.has(r.ref);
+    const safeId = String(r.id).replace(/"/g, '&quot;');
+    
+    // --- เพิ่มการใช้ escapeHtml เพื่อความปลอดภัย ---
+    html += `<tr class="group" data-rid="${safeId}">
+      <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">${r.date}</td>
+      <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${r.shift}</div><div style="font-size:.65rem;color:var(--text-400);margin-top:1px;font-family:var(--font-head);font-weight:600">L: ${escapeHtml(r.line) || '—'}</div></td>
+      <td><span style="font-family:var(--font-head);font-size:.68rem;color:${synced ? 'var(--accent-grn)' : 'var(--text-200)'};margin-right:4px" title="${synced ? 'Synced' : 'Pending'}">●</span><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">#${escapeHtml(r.ref)}</span></td>
+      <td><div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${escapeHtml(r.supplier)}</div><div style="font-size:.65rem;color:var(--text-400);font-family:var(--font-head);font-weight:600;margin-top:1px">${escapeHtml(r.partNo)} · ${escapeHtml(r.partName)}</div></td>
+      <td style="text-align:center"><span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900);letter-spacing:-.03em">${r.qty.toLocaleString()}</span></td>
+      <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${escapeHtml(r.defect)}</td>
+      <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(r.remark || '')}">${escapeHtml(r.remark) || '—'}</td>
+      <td style="text-align:center">
+        <span class="status-badge" style="${s.s};animation:none">
+          <span style="width:5px;height:5px;border-radius:50%;background:${s.dot};flex-shrink:0;animation:pulse 1.4s ease-in-out infinite;display:inline-block"></span>
+          ${r.judgment}
+        </span>
+      </td>
+      <td style="padding-right:1.2rem;text-align:right;white-space:nowrap">
+        <button data-action="clone" class="btn" style="opacity:0;color:var(--blue-500);font-size:.75rem;padding:.22rem .55rem;border-radius:8px;background:var(--blue-50);border:1px solid var(--blue-200);transition:opacity .15s;margin-right:.3rem" title="Clone">📑</button>
+        <button data-action="delete" class="btn" style="opacity:0;color:var(--accent-red);font-size:.75rem;padding:.22rem .55rem;border-radius:8px;background:#fef2f2;border:1px solid #fecaca;transition:opacity .15s" title="Delete">✕</button>
+      </td>
+    </tr>`;
+  });
 
-    // Event listeners สำหรับปุ่ม
-    tbody.querySelectorAll('tr').forEach(tr => {
-      const btns = tr.querySelectorAll('[data-action]');
-      tr.addEventListener('mouseenter', () => btns.forEach(b => b.style.opacity = '1'));
-      tr.addEventListener('mouseleave', () => btns.forEach(b => b.style.opacity = '0'));
-    });
-  };
+  tbody.innerHTML = html;
 
-  // ★ ถ้าเป็นการโหลดครั้งแรก: แสดงทันที (Snap) ไม่ต้อง Fade
-  if (isFirstLoad) {
-    buildHTML();
-    gsap.fromTo(tbody.children, 
-      { opacity: 0, y: 10 }, 
-      { opacity: 1, y: 0, duration: 0.3, stagger: 0.015, ease: 'power2.out' }
-    );
-    return; // จบการทำงานทันที
-  }
-
-  // ★ ถ้าไม่ใช่ครั้งแรก: ทำ Animation Fade Out -> Render -> Fade In ตามปกติ
-  gsap.to(tbody, { 
-    opacity: 0, 
-    duration: 0.15, 
-    ease: 'power2.in', 
-    onComplete: () => {
-      buildHTML();
-      gsap.fromTo(tbody.children, 
-        { opacity: 0, y: 10 }, 
-        { opacity: 1, y: 0, duration: 0.3, stagger: 0.02, ease: 'power2.out' }
-      );
-    }
+  // Event listeners สำหรับปุ่ม
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const btns = tr.querySelectorAll('[data-action]');
+    tr.addEventListener('mouseenter', () => btns.forEach(b => b.style.opacity = '1'));
+    tr.addEventListener('mouseleave', () => btns.forEach(b => b.style.opacity = '0'));
+    tr.classList.add('vis');
   });
 }
-
 
 document.addEventListener('click',e=>{const btn=e.target.closest('[data-action]');if(!btn)return;const tr=btn.closest('tr[data-rid]');if(!tr)return;const rid=tr.dataset.rid;if(btn.dataset.action==='clone')cloneRecord(rid);if(btn.dataset.action==='delete')showDeleteModal(rid,tr)});
 
@@ -2383,7 +2333,56 @@ $id('delConfirmBtn').addEventListener('click',async()=>{
   try{const result=await deleteFromCloud(id,ref,inspector);if(result.method==='cors'&&result.ok===true){showDelProgress('ลบสำเร็จ!','Cloud ยืนยันแล้ว',100);toast('🗑 ลบสำเร็จ ✓');showSyncBadge('✅ Deleted','#10b981')}else if(result.ok===null){showDelProgress('ส่งคำสั่งลบแล้ว','กำลังประมวลผล…',80);$id('delProgIcon').textContent='📤';toast('🗑 ลบ Local ✓ · Cloud: pending…')}else{showDelProgress('ลบ Local แล้ว','Cloud มีปัญหา',60);$id('delProgIcon').textContent='⚠️';toast('⚠️ ลบ Local แล้ว')}}catch(err){$id('delProgIcon').textContent='⚠️';toast('⚠️ Network Error')}finally{setTimeout(hideDelProgress,1800)}
 });
 
-function clearAllData(){const myCount=getMyRecords().length;if(myCount===0){toast('⚠️ ไม่มีข้อมูลให้ลบ');return}const proceed=window.confirm(`⚠️ ลบข้อมูลทั้งหมดของ ${currentUser}?\nจำนวน ${myCount} รายการ`);if(!proceed)return;const inspector=currentUser;records=records.filter(r=>r.inspector!==inspector);clearInspectorCloudRefs(inspector);syncedReset([]);invalidateMyRecCache();invalidateCache();_lastRenderHash='';localStorage.setItem(STORAGE_KEY,JSON.stringify(records));localStorage.setItem(SYNCED_KEY,JSON.stringify([]));localStorage.removeItem(REFS_KEY);_allCloudRefs=new Set();refreshAll();clearAllFromCloud(inspector);setTimeout(()=>{toast(`🧹 ลบทั้งหมด ${myCount} รายการ`)},400)}
+async function clearAllData() {
+  const myCount = getMyRecords().length;
+  if (myCount === 0) {
+    toast('⚠️ ไม่มีข้อมูลให้ลบ');
+    return;
+  }
+
+  // 1. ยืนยันการลบ
+  const proceed = window.confirm(`⚠️ ลบข้อมูลทั้งหมดของ ${currentUser}?\nจำนวน ${myCount} รายการ`);
+  if (!proceed) return;
+
+  // ★ 2. หยุด Polling ทันที เพื่อป้องกันการดึงข้อมูลเก่ากลับมาขณะลบ
+  if (pollingTimer) clearInterval(pollingTimer);
+
+  // ★ 3. แสดง Popup Progress (อนิเมชั่น)
+  showDelProgress('กำลังลบข้อมูลทั้งหมด...', 'กรุณารอสักครู่', 10);
+
+  const inspector = currentUser;
+
+  // 4. ลบข้อมูลในเครื่อง (Local) ทันที
+  records = records.filter(r => r.inspector !== inspector);
+  clearInspectorCloudRefs(inspector);
+  syncedReset([]);
+  invalidateMyRecCache();
+  invalidateCache();
+  _lastRenderHash = '';
+  saveLocalImmediate(); // บันทึกทับทันที
+  refreshAll(); // อัพเดทหน้าจอให้ว่าง
+
+  // ★ 5. ส่งคำสั่งลบไปที่ Cloud และรอให้เสร็จสิ้น (Await)
+  showDelProgress('กำลังลบบน Cloud...', 'ห้ามปิดหน้าจอ', 40);
+  await clearAllFromCloud(inspector);
+
+  // ★ 6. รอ Buffer เพิ่มอีก 2.5 วินาที (เพราะ Google Script ต้องใช้เวลา Sync)
+  // ช่วงนี้คือจุดสำคัญที่ป้องกันไม่ให้ข้อมูลดึงกลับมา
+  showDelProgress('ระบบกำลังปรับปรุง...', 'กรุณารอ', 80);
+  await sleep(2500);
+
+  // ★ 7. เสร็จสิ้นกระบวนการ
+  showDelProgress('ลบข้อมูลเรียบร้อย', 'กำลังเปิดระบบใหม่', 100);
+  await sleep(600);
+  
+  hideDelProgress();
+  
+  // ★ 8. เริ่มระบบ Polling ใหม่อีกครั้ง
+  startPolling();
+
+  toast(`🧹 ลบทั้งหมด ${myCount} รายการ`);
+}
+
 function cloneRecord(id){const r=findRecord(id);if(!r){toast('⚠️ ไม่พบข้อมูล');return}$id('inputDate').value=$id('inputDate').value||r.date||'';$id('shift').value=r.shift||'SHIFT A';$id('lineNo').value=r.line||'';$id('refNo').value=r.ref||'';$id('supplier').value=r.supplier||'';$id('qty').value=r.qty||'';$id('partNo').value=r.partNo||'';$id('partOn').value=r.partName||'';$id('defectName').value=r.defect||'';$id('remark').value=r.remark||'';$id('judgmentSelect').value=r.judgment||'';handleJudgment(r.judgment||'');const sidebar=$id('sidebar');if(sidebar)sidebar.scrollTo({top:0,behavior:'smooth'});requestAnimationFrame(()=>{const refEl=$id('refNo');if(refEl){refEl.focus();refEl.select()}});toast('📑 Clone สำเร็จ — ตรวจ REF แล้วกด Commit')}
 function findRecord(id){return records.find(x=>String(x.id)===String(id))}
 let _dlTimer=null;
@@ -2805,41 +2804,9 @@ function importExcel(input){
   const file=input.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=async e=>{
-    // ★★★ แก้ไขตรงนี้: ลบ cellDates: true ออก หรือเซ็ตเป็น false ★★★
-    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array', cellDates: false}); 
-    
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
     const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    
-    // ★★★ ใช้สูตรคำนวณแบบ UTC โดยตรง (Magic Number 25569) เพื่อตัดปัญหา Timezone ทั้งหมด ★★★
-    const pd=v=>{
-      if(!v) return '';
-      
-      // ถ้าเป็นตัวเลข (Excel Serial Number)
-      if(typeof v === 'number'){
-        // สูตรแปลง Excel Serial Number เป็น UTC Date (เลข 25569 คือตัวชดเชย Epoch ของ Excel)
-        const utc_days = Math.floor(v - 25569);
-        const utc_value = utc_days * 86400; // แปลงเป็นวินาที
-        const date_info = new Date(utc_value * 1000);
-        
-        const y = date_info.getUTCFullYear();
-        const m = String(date_info.getUTCMonth() + 1).padStart(2, '0');
-        const d = String(date_info.getUTCDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-      }
-      
-      // ถ้าเป็น Date Object
-      if(v instanceof Date) {
-        const y = v.getUTCFullYear();
-        const m = String(v.getUTCMonth() + 1).padStart(2, '0');
-        const d = String(v.getUTCDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-      }
-      
-      // ถ้าเป็น String
-      return String(v);
-    };
-
-    // ... โค้ดส่วนที่เหลือเหมือนเดิม ...
+    const pd=v=>{if(!v)return'';if(v instanceof Date)return new Date(v.getTime()-(v.getTimezoneOffset()*60000)).toISOString().split('T')[0];if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return`${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`}return String(v)};
     let skippedDupe=0,skippedInvalid=0;const items=[];
     for(const r of json){const ref=String(r.ref||r.Reference||'').trim(),supp=String(r.supplier||r.Supplier||'').trim(),qty=parseInt(r.qty||r.Qty||0);if(!ref||!supp||qty<=0){skippedInvalid++;continue}if(isDuplicate(ref)){skippedDupe++;continue}items.push({id:Date.now()+Math.random(),date:pd(r.date||r.Date||r.DATE),shift:r.shift||r.Shift||'SHIFT A',inspector:currentUser,ref,line:String(r.line||r.Line||''),supplier:supp,partNo:String(r.partNo||r.PartNo||''),partName:String(r.partName||r.PartName||''),qty,defect:String(r.defect||r.Defect||''),remark:String(r.remark||r.Remark||''),judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase()})}
     if(!items.length){toast(`⚠️ ไม่มีข้อมูลใหม่ (ซ้ำ:${skippedDupe} / Invalid:${skippedInvalid})`);input.value='';return}
@@ -2854,35 +2821,7 @@ function openJobProject(){window.location.href='job_project.html'}
 
 
 // เรียกใช้งานตอนโหลดหน้าเว็บ
-window.addEventListener('load', async () => {
-  // ลบ forceViewportReset ออกเพื่อป้องกันการกระพริบ
-  $id('inputDate').valueAsDate = new Date();
-  startClock();
-  
-  const saved = sessionStorage.getItem('currentUser');
-  if (saved) {
-    $id('loginOverlay').style.display = 'none';
-    $id('appShell').classList.add('visible');
-    currentUser = saved;
-    $id('currentUserDisp').textContent = saved;
-    
-    // ★ 1. Refresh จาก Local Storage ก่อน (แสดงผลทันที!)
-    refreshAll(); 
-    
-    // ★ 2. แล้วค่อย Init/Sync กับ Cloud (ใน Background)
-    await initApp(saved);
-  }
-});
-
-window.addEventListener('pageshow', e => {
-  // ★ ลบ forceViewportReset ออก
-  if (e.persisted && currentUser) {
-    setTimeout(() => {
-      refreshAll();
-      // ไม่ต้อง toggle class visible ซ้ำเพราะอาจกระพริบ
-    }, 50);
-  }
-});
+window.addEventListener('load', loadTheme);
 
 </script>
 
