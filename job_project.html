@@ -6,6 +6,8 @@
 <title>WAP Pearl & Sunset 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=DM+Mono:wght@400;500&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- SheetJS for Excel Export -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <style>
 :root{
   /* ─── Azure Blue Design System ─── */
@@ -1834,6 +1836,14 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
           <span class="sup-tbl-count" id="sup-tbl-count-badge">0 records</span>
         </div>
         <div class="sup-tbl-actions">
+          <!-- 1. ช่องค้นหา -->
+          <input type="text" id="supSearchInput" placeholder="🔍 ค้นหา (ปัญหา, Part, LOT...)" style="flex:1; min-width: 180px; padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--border); font-size: .75rem; font-family: inherit; outline: none; transition: all .2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">
+          
+          <!-- 2. ปุ่ม Export Excel -->
+          <button id="supExportBtn" onclick="exportSupportToExcel()" style="display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #059669, #047857); color: #fff; border: none; border-radius: var(--r); padding: 8px 16px; font-size: .75rem; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 2px 8px rgba(5,150,105,.3); transition: all .2s;">
+            📥 Export Excel
+          </button>
+
           <button class="btn-dash-open" onclick="document.getElementById('supDashModal').classList.add('open')">
             📊 Dashboard Charts
           </button>
@@ -2570,6 +2580,21 @@ let db=loadLocalDB();
 let skillChart=null,masterChart=null,doughnutChart=null,supStatusChart=null,supTrendChart=null,attendChart=null,s5Chart=null,skillLvChart=null,skillCmpChart=null,skillPolarChart=null,spResultChart=null,supOkNgChart=null,supGroupChart=null,supMixChart=null;
 let currentSkillSort='val';let pushTimer=null;
 /* ══════════════════════════════════
+   SEARCH & EXPORT (Support)
+══════════════════════════════════ */
+let supportSearchTerm = ""; // เก็บคำค้นหาปัจจุบัน
+
+// ผูก Event กับช่องค้นหาหลังจากหน้าเว็บโหลดเสร็จ
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('supSearchInput');
+    if(searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            supportSearchTerm = e.target.value.toLowerCase();
+            refreshSupport(); // เรียก refresh ใหม่ทุกครั้งที่พิมพ์
+        });
+    }
+});
+/* ══════════════════════════════════
    IMAGE MAP — SEPARATE STORAGE
    Images stored by recordId, never inside main db
    Separate Google Sheet: "Images"
@@ -3208,6 +3233,57 @@ async function pushToCloud(){db._owner=currentUser;db._lastModified=Date.now();s
 async function pullFromCloud(silent=false){try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();if(r.status==='success'&&r.data){const cloud=r.data;if(cloud._owner&&cloud._owner!==currentUser){if(!silent)console.warn('Wrong user data');return false;}const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);if(cloudMod>localMod||cloudLen>localLen){cloud._owner=currentUser;db=cloud;saveLocal();return true;}}}catch(e){}return false;}
 function saveLocal(){db._owner=currentUser;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}
 
+function exportSupportToExcel() {
+    // 1. กรองข้อมูลเหมือนที่แสดงในตาราง (กรองวันที่ + ค้นหา)
+    let filtered = filterByDateRange(db.support, 'eventDate', 'support');
+    
+    if (supportSearchTerm) {
+        filtered = filtered.filter(s => {
+            const term = supportSearchTerm;
+            return (s.problem && s.problem.toLowerCase().includes(term)) ||
+                   (s.part && s.part.toLowerCase().includes(term)) ||
+                   (s.lot && s.lot.toLowerCase().includes(term)) ||
+                   (s.report && s.report.toLowerCase().includes(term)) ||
+                   (s.action && s.action.toLowerCase().includes(term));
+        });
+    }
+
+    if (!filtered.length) {
+        return toast('⚠️ ไม่มีข้อมูลสำหรับ Export');
+    }
+
+    // 2. แปลงข้อมูลให้เหมาะกับ Excel (Clean Format)
+    const dataForExcel = filtered.map(s => ({
+        "วันที่": s.fullTimestamp || s.datetime || s.eventDate || '',
+        "รายละเอียดปัญหา": s.problem || '',
+        "การแก้ไข": s.action || '',
+        "Group Part": s.part || '',
+        "LOT": s.lot || '',
+        "OK (ชิ้นดี)": s.ok || 0,
+        "NG (ของเสีย)": s.ng || 0,
+        "ประเภท Report": s.report || '',
+        "หมายเหตุ/ผู้บันทึก": s._user || ''
+    }));
+
+    // 3. สร้าง Worksheet และ Workbook
+    const ws = XLSX.utils.json_to_sheet(dataForExcel);
+    
+    // ปรับความกว้างคอลัมน์ให้สวยงาม (Optional)
+    ws['!cols'] = [
+        {wch: 20}, {wch: 40}, {wch: 15}, {wch: 15}, 
+        {wch: 12}, {wch: 10}, {wch: 10}, {wch: 10}, {wch: 15}
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Support Data");
+
+    // 4. Download File
+    const now = new Date();
+    const filename = `Support_Report_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate()}.xlsx`;
+    
+    XLSX.writeFile(wb, filename);
+    toast(`📥 Export สำเร็จ: ${filtered.length} รายการ`);
+}
 
 /* ══════════════════════════════════
    GOOGLE SHEETS CONNECTION TEST
@@ -3243,6 +3319,7 @@ function animateCounter(el, target, duration=900, suffix=''){
   }
   requestAnimationFrame(step);
 }
+
 
 function runDashboardEntrance(){
   // Animate all KPI number elements on master-dash
@@ -3802,19 +3879,35 @@ function buildAttendChart(dailyData){
   });
 }
 
-/* ══════════════════════════════════
-   SUPPORT PRODUCTION - FULL FIX
-══════════════════════════════════ */
-
-// 1. แก้ไขการ Refresh ให้รองรับข้อมูลที่ยังไม่มี eventDate
 function refreshSupport(){
   const tb = document.getElementById('supportTableBody');
   if(!tb) return;
   
-  // กรองข้อมูล: ใช้ eventDate เป็นหลัก ถ้าไม่มีให้ลองใช้ month (สำหรับข้อมูลเก่า)
-  const filtered = filterByDateRange(db.support, 'eventDate', 'support');
+  // --- 1. กรองข้อมูล (Date & Search) ---
   
-  // คำนวณค่า KPI จากข้อมูลที่กรองแล้ว
+  // กรองด้วยวันที่
+  let filtered = filterByDateRange(db.support, 'eventDate', 'support');
+  
+  // กรองด้วยคำค้นหา (ถ้ามี)
+  if (supportSearchTerm) {
+      const term = supportSearchTerm;
+      filtered = filtered.filter(s => {
+          // ตรวจสอบ Field ต่างๆ ว่ามีคำค้นหาหรือไม่ (ป้องกัน Error กรณีข้อมูลเป็น null)
+          const pProblem = s.problem ? s.problem.toLowerCase() : '';
+          const pPart = s.part ? s.part.toLowerCase() : '';
+          const pLot = s.lot ? s.lot.toLowerCase() : '';
+          const pReport = s.report ? s.report.toLowerCase() : '';
+          const pAction = s.action ? s.action.toLowerCase() : '';
+          
+          return pProblem.includes(term) || 
+                 pPart.includes(term) || 
+                 pLot.includes(term) || 
+                 pReport.includes(term) || 
+                 pAction.includes(term);
+      });
+  }
+
+  // --- 2. คำนวณค่า KPI จากข้อมูลที่กรองแล้ว ---
   const rp = filtered.filter(s=>s.report==='RP').length;
   const vf = filtered.filter(s=>s.report==='VF').length;
   const rec = filtered.filter(s=>s.report==='RECORDS').length;
@@ -3823,12 +3916,20 @@ function refreshSupport(){
   const ngRate = (totalOK+totalNG)>0 ? Math.round((totalNG/(totalOK+totalNG))*100) : 0;
   const tot = filtered.length;
 
-  // อัปเดต KPI หน้าหลัก
-  setText('sum-total', tot); setText('sum-rp', rp); setText('sum-vf', vf); setText('sum-records', rec);
+  // --- 3. อัปเดตตัวเลขบนหน้าจอ (KPI Cards & Modal) ---
+  // KPI หน้าหลัก
+  setText('sum-total', tot); 
+  setText('sum-rp', rp); 
+  setText('sum-vf', vf); 
+  setText('sum-records', rec);
   
-  // อัปเดต KPI ใน Modal Dashboard
-  setText('md-sum-total', tot); setText('md-sum-rp', rp); setText('md-sum-vf', vf); setText('md-sum-rec', rec);
-  setText('md-total-ok', totalOK); setText('md-total-ng', totalNG);
+  // KPI ใน Modal Dashboard
+  setText('md-sum-total', tot); 
+  setText('md-sum-rp', rp); 
+  setText('md-sum-vf', vf); 
+  setText('md-sum-rec', rec);
+  setText('md-total-ok', totalOK); 
+  setText('md-total-ng', totalNG);
   setText('md-ng-rate', `${ngRate}% rate`);
   setText('md-pct-rp', tot ? `${Math.round(rp/tot*100)}% of total` : '0%');
   setText('md-pct-vf', tot ? `${Math.round(vf/tot*100)}% of total` : '0%');
@@ -3838,17 +3939,21 @@ function refreshSupport(){
   if(lu) lu.textContent = 'Updated: '+new Date().toLocaleTimeString('th-TH');
   setText('sdb-donut-lbl', `${tot} cases`);
   setText('sdb-okng-lbl', `OK:${totalOK} / NG:${totalNG}`);
-
-  // Smart Insights
+  
+  // Smart Insights (Top Group, Worst NG)
   const groupMap = buildGroupData(filtered);
   if(groupMap.length){
     const topG = groupMap[0];
     setText('md-top-group', topG[0]);
     setText('md-top-group-sub', `${topG[1].total} cases · RP:${topG[1].RP||0} VF:${topG[1].VF||0}`);
+    
     const withNG = groupMap.filter(([,d])=>d.ng>0).sort((a,b)=>b[1].ng-a[1].ng);
     if(withNG.length){
       setText('md-worst-ng', withNG[0][0]);
       setText('md-worst-ng-sub', `NG: ${withNG[0][1].ng||0} pcs · ${withNG[0][1].total} cases`);
+    } else {
+      setText('md-worst-ng', '—');
+      setText('md-worst-ng-sub', 'ไม่มีข้อมูล NG');
     }
   }
   
@@ -3869,14 +3974,15 @@ function refreshSupport(){
   if(maxMo > 0) { setText('md-busy-month', moNames[busyIdx]); setText('md-busy-month-sub', `${maxMo} cases บันทึกในเดือนนี้`); }
   else { setText('md-busy-month', '—'); setText('md-busy-month-sub', '—'); }
 
+  // Update Badge บน Toolbar
   setText('sup-tbl-count-badge', `${filtered.length} records`);
 
-  // Render ตาราง
+  // --- 4. Render ตารางหลัก ---
   if(!filtered.length){
-    tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div></td></tr>`;
+    tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก หรือไม่ตรงกับคำค้นหา</div></td></tr>`;
   } else {
     tb.innerHTML = [...filtered].reverse().map((s)=>{
-      const realIdx = db.support.indexOf(s);
+      const realIdx = db.support.indexOf(s); // หา Index จริงใน Database เพื่อใช้กับปุ่ม Edit/Delete
       const bc = s.report==='RP'?'badge-rp':s.report==='VF'?'badge-vf':'badge-rec';
       const okCell = s.ok!==undefined && s.ok!=='' ? `<span class="ok-chip">✓ ${s.ok}</span>` : '<span style="color:var(--txt4);">—</span>';
       const ngCell = s.ng!==undefined && s.ng!=='' ? `<span class="ng-chip">✗ ${s.ng}</span>` : '<span style="color:var(--txt4);">—</span>';
@@ -3899,7 +4005,7 @@ function refreshSupport(){
     }).join('');
   }
 
-// Render Charts
+  // --- 5. Render Charts (ส่งข้อมูล filtered เข้าไป) ---
   renderGroupBars('support-group-bars', 12, filtered);
   renderGroupByStatus('support-group-by-status'); 
   renderGroupFullTable('group-full-tbody', filtered);
