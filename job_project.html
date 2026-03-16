@@ -1311,6 +1311,63 @@ body.dark-mode thead th {
 body.dark-mode tbody tr:nth-child(even) td { background: #1e293b; }
 body.dark-mode tbody tr:nth-child(odd) td { background: #0f172a; }
 body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
+
+/* ══════════════════════════════════
+   EXPORT & SEARCH CONTROLS
+══════════════════════════════════ */
+.search-input {
+  padding: 6px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-xs);
+  font-size: .75rem;
+  outline: none;
+  background: var(--bg);
+  color: var(--txt);
+  transition: border-color .2s;
+}
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #059669;
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: var(--r-xs);
+  font-size: .72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+.btn-export:hover {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════
+   PRINT STYLES
+══════════════════════════════════ */
+@media print {
+  body { background: #fff; -webkit-print-color-adjust: exact; }
+  .sidebar, .topbar, .hamburger, .sb-overlay, .sb-footer, 
+  .btn-save, .btn-del, .btn-edit, .btn-export, .search-input, 
+  .date-filter-bar, #syncBtn, .rc-box, #loadingOverlay, #toast, .img-zone {
+    display: none !important;
+  }
+  .main-wrap { width: 100%; height: auto; overflow: visible; }
+  .main-container { height: auto; overflow: visible; padding: 0; }
+  table { page-break-inside: auto; }
+  tr { page-break-inside: avoid; page-break-after: auto; }
+  thead { display: table-header-group; }
+  .card, .kpi, .stat-c { box-shadow: none !important; border: 1px solid #eee; break-inside: avoid; }
+}
+
 </style>
 </head>
 <!-- ════════════════════════════════
@@ -1826,22 +1883,29 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
       <div class="kpi" style="--arc-clr:rgba(37,99,235,.08)"><div class="kpi-top" style="background:var(--b600);"></div><div class="kpi-icon" style="background:var(--blue-l);">🔵</div><div class="kpi-lbl">VF Cases</div><div class="kpi-val" id="sum-vf" style="color:var(--b600);">0</div></div>
       <div class="kpi" style="--arc-clr:rgba(217,119,6,.08)"><div class="kpi-top" style="background:var(--amber);"></div><div class="kpi-icon" style="background:var(--amber-l);">📋</div><div class="kpi-lbl">Records</div><div class="kpi-val" id="sum-records" style="color:var(--amber);">0</div></div>
     </div>
-    <!-- Support Table with Toolbar -->
-    <div class="sup-tbl-wrap">
-      <div class="sup-tbl-toolbar">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="sup-tbl-title">📋 Support Records</div>
-          <span class="sup-tbl-count" id="sup-tbl-count-badge">0 records</span>
-        </div>
-        <div class="sup-tbl-actions">
-          <button class="btn-dash-open" onclick="document.getElementById('supDashModal').classList.add('open')">
-            📊 Dashboard Charts
-          </button>
-          <button class="btn-add-record" onclick="openAddSupModal()">
-            ➕ Add New Record
-          </button>
-        </div>
-      </div>
+<div class="sup-tbl-toolbar">
+  <div style="display:flex;align-items:center;gap:10px;flex:1;">
+    <div class="sup-tbl-title">📋 Support Records</div>
+    <span class="sup-tbl-count" id="sup-tbl-count-badge">0 records</span>
+  </div>
+  
+  <!-- เพิ่มส่วนนี้: Search และ Export -->
+  <div class="sup-tbl-actions" style="gap:8px;">
+     <input type="text" id="supSearchInput" class="search-input" placeholder="🔍 ค้นหาปัญหา, Part, LOT..." oninput="handleSupportSearch()">
+     <button class="btn-export" onclick="exportSupportCSV()">
+       📥 Export CSV
+     </button>
+  </div>
+
+  <div class="sup-tbl-actions">
+    <button class="btn-dash-open" onclick="document.getElementById('supDashModal').classList.add('open')">
+      📊 Dashboard
+    </button>
+    <button class="btn-add-record" onclick="openAddSupModal()">
+      ➕ Add New
+    </button>
+  </div>
+</div>
       <div class="sup-tbl-scroll">
         <table class="sup-tbl">
           <thead><tr>
@@ -2567,6 +2631,61 @@ const GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbz70CFhXJGk1Q6m
 function emptyDB(){return{daily:[],s5:[],skills:[],special:[],support:[],_owner:currentUser,_lastModified:0};}
 function loadLocalDB(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return emptyDB();const p=JSON.parse(raw);if(p._owner&&p._owner!==currentUser)return emptyDB();p._owner=currentUser;return p;}catch(e){return emptyDB();}}
 let db=loadLocalDB();
+
+/* ══════════════════════════════════
+   SEARCH STATE & EXPORT FUNCTION
+══════════════════════════════════ */
+let supportSearchTerm = ''; 
+
+function handleSupportSearch() {
+  const input = document.getElementById('supSearchInput');
+  if (!input) return;
+  supportSearchTerm = input.value.toLowerCase().trim();
+  refreshSupport(); 
+}
+
+function exportSupportCSV() {
+  // 1. ดึงข้อมูลที่กรองตามวันที่
+  let dataToExport = filterByDateRange(db.support, 'eventDate', 'support');
+  
+  // 2. กรองตามคำค้นหา (ถ้ามี)
+  if (supportSearchTerm) {
+    dataToExport = dataToExport.filter(s => {
+      const prob = (s.problem || '').toLowerCase();
+      const part = (s.part || '').toLowerCase();
+      const lot = (s.lot || '').toLowerCase();
+      return prob.includes(supportSearchTerm) || part.includes(supportSearchTerm) || lot.includes(supportSearchTerm);
+    });
+  }
+
+  if (!dataToExport.length) return toast('❌ ไม่มีข้อมูลสำหรับ Export');
+
+  const headers = ["Date", "Problem", "Action", "Part", "LOT", "OK", "NG", "Type", "User"];
+  const rows = dataToExport.map(s => [
+    `"${s.fullTimestamp || s.eventDate || ''}"`,
+    `"${(s.problem || '').replace(/"/g, '""')}"`,
+    `"${s.action || ''}"`,
+    `"${s.part || ''}"`,
+    `"${s.lot || ''}"`,
+    s.ok || 0, s.ng || 0,
+    s.report || '',
+    s._user || ''
+  ]);
+
+  const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  const now = new Date();
+  link.setAttribute("href", url);
+  link.setAttribute("download", `Support_Report_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate()}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('✅ Export สำเร็จ!');
+}
+
 let skillChart=null,masterChart=null,doughnutChart=null,supStatusChart=null,supTrendChart=null,attendChart=null,s5Chart=null,skillLvChart=null,skillCmpChart=null,skillPolarChart=null,spResultChart=null,supOkNgChart=null,supGroupChart=null,supMixChart=null;
 let currentSkillSort='val';let pushTimer=null;
 /* ══════════════════════════════════
@@ -3372,52 +3491,79 @@ function refreshAllPages(){refreshMasterDashboard();refreshDashboard();refresh5S
 /* ══════════════════════════════════
    GROUP HELPERS
 ══════════════════════════════════ */
-function buildGroupData(){const map={};db.support.forEach(s=>{const p=(s.part||'(ไม่ระบุ)').trim();if(!map[p])map[p]={total:0,RP:0,VF:0,RECORDS:0,ok:0,ng:0};map[p].total++;if(s.report==='RP')map[p].RP++;else if(s.report==='VF')map[p].VF++;else if(s.report==='RECORDS')map[p].RECORDS++;map[p].ok+=(s.ok||0);map[p].ng+=(s.ng||0);});return Object.entries(map).sort((a,b)=>b[1].total-a[1].total);}
-function renderGroupBars(elId,limit=10){const el=document.getElementById(elId);if(!el)return;const sorted=buildGroupData().slice(0,limit);if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}const max=sorted[0][1].total;el.innerHTML=sorted.map(([n,d],i)=>`<div class="gb-row"><div class="gb-rank">${i+1}</div><div class="gb-name" title="${n}">${n}</div><div class="gb-track"><div class="gb-fill" style="width:${(d.total/max)*100}%;background:${COLORS[i%COLORS.length]};"></div></div><span class="gb-badge" style="background:${COLORS[i%COLORS.length]};">${d.total}</span></div>`).join('');}
-function renderGroupByStatus(elId){const el=document.getElementById(elId);if(!el)return;const sorted=buildGroupData().slice(0,8);if(!sorted.length){el.innerHTML='<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';return;}el.innerHTML=sorted.map(([n,d])=>{const t=d.total||1;return`<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:.72rem;font-weight:600;color:var(--txt2);">${n}</span><span style="font-size:.63rem;color:var(--txt4);">${d.total}</span></div><div style="height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;display:flex;">${d.RP?`<div style="width:${(d.RP/t)*100}%;background:#dc2626;"></div>`:''} ${d.VF?`<div style="width:${(d.VF/t)*100}%;background:#2563eb;"></div>`:''} ${d.RECORDS?`<div style="width:${(d.RECORDS/t)*100}%;background:#d97706;"></div>`:''}</div></div>`;}).join('');}
-function renderGroupFullTable(tbodyId){
-  const el=document.getElementById(tbodyId);if(!el)return;
-  const sorted=buildGroupData();const totalAll=db.support.length||1;
-  if(!sorted.length){el.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--txt4);padding:18px;">ยังไม่มีข้อมูล</td></tr>`;return;}
-  el.innerHTML=sorted.map(([n,d],i)=>{
-    const t=d.total||1;
-    const rp=d.RP||0,vf=d.VF||0,rec=d.RECORDS||0;
-    const pctRP=Math.round(rp/t*100),pctVF=Math.round(vf/t*100),pctRec=Math.round(rec/t*100);
-    const ok=d.ok||0,ng=d.ng||0;
-    const share=Math.round(d.total/totalAll*100);
-    const color=COLORS[i%COLORS.length];
-    return`<tr>
+// 1. Helper หลัก: รับข้อมูลมาประมวลผล
+function buildGroupData(supportList){
+  const data = supportList || db.support; 
+  const map = {};
+  data.forEach(s => {
+    const p = (s.part||'(ไม่ระบุ)').trim();
+    if(!map[p]) map[p] = {total:0, RP:0, VF:0, RECORDS:0, ok:0, ng:0};
+    map[p].total++;
+    if(s.report==='RP') map[p].RP++;
+    else if(s.report==='VF') map[p].VF++;
+    else if(s.report==='RECORDS') map[p].RECORDS++;
+    map[p].ok += (s.ok||0);
+    map[p].ng += (s.ng||0);
+  });
+  return Object.entries(map).sort((a,b)=>b[1].total-a[1].total);
+}
+
+// 2. Render Status Bars (ใน Modal)
+function renderGroupByStatus(elId, supportList) {
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const sorted = buildGroupData(supportList).slice(0, 8);
+  if(!sorted.length){
+    el.innerHTML = '<div style="color:var(--txt4);font-size:.76rem;padding:14px 0;text-align:center;">ยังไม่มีข้อมูล</div>';
+    return;
+  }
+  el.innerHTML = sorted.map(([n,d]) => {
+    const t = d.total||1;
+    return `<div style="margin-bottom:9px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+        <span style="font-size:.72rem;font-weight:600;color:var(--txt2);">${n}</span>
+        <span style="font-size:.63rem;color:var(--txt4);">${d.total}</span>
+      </div>
+      <div style="height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;display:flex;">
+        ${d.RP?`<div style="width:${(d.RP/t)*100}%;background:#dc2626;"></div>`:''}
+        ${d.VF?`<div style="width:${(d.VF/t)*100}%;background:#2563eb;"></div>`:''}
+        ${d.RECORDS?`<div style="width:${(d.RECORDS/t)*100}%;background:#d97706;"></div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// 3. Render Full Table (ใน Modal)
+function renderGroupFullTable(tbodyId, supportList){
+  const el = document.getElementById(tbodyId);
+  if(!el) return;
+  const sorted = buildGroupData(supportList);
+  const totalAll = (supportList || db.support).length || 1;
+  if(!sorted.length){
+    el.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--txt4);padding:18px;">ยังไม่มีข้อมูล</td></tr>`;
+    return;
+  }
+  el.innerHTML = sorted.map(([n,d],i)=>{
+    const t = d.total||1;
+    const rp = d.RP||0, vf = d.VF||0, rec = d.RECORDS||0;
+    const pctRP = Math.round(rp/t*100), pctVF = Math.round(vf/t*100), pctRec = Math.round(rec/t*100);
+    const ok = d.ok||0, ng = d.ng||0;
+    const share = Math.round(d.total/totalAll*100);
+    const color = COLORS[i%COLORS.length];
+    return `<tr>
       <td style="padding-left:14px;color:var(--txt4);font-weight:700;font-family:'DM Mono',monospace;">${i+1}</td>
-      <td style="font-weight:700;color:var(--txt);">
-        <div style="display:flex;align-items:center;gap:7px;">
-          <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></div>
-          ${n}
-        </div>
-      </td>
-      <td><span style="font-weight:800;font-family:'DM Mono',monospace;font-size:.85rem;">${d.total}</span></td>
-      <td>${rp?`<span class="badge badge-rp">${rp}</span>`:'<span style="color:var(--txt4);">—</span>'}</td>
-      <td>${vf?`<span class="badge badge-vf">${vf}</span>`:'<span style="color:var(--txt4);">—</span>'}</td>
-      <td>${rec?`<span class="badge badge-rec">${rec}</span>`:'<span style="color:var(--txt4);">—</span>'}</td>
-      <td><span style="color:var(--green);font-weight:700;font-family:'DM Mono',monospace;">${ok||'—'}</span></td>
-      <td><span style="color:var(--red);font-weight:700;font-family:'DM Mono',monospace;">${ng||'—'}</span></td>
+      <td style="font-weight:700;color:var(--txt);"><div style="display:flex;align-items:center;gap:7px;"><div style="width:8px;height:8px;border-radius:50%;background:${color};"></div>${n}</div></td>
+      <td><span style="font-weight:800;font-family:'DM Mono',monospace;">${d.total}</span></td>
+      <td>${rp?`<span class="badge badge-rp">${rp}</span>`:'—'}</td>
+      <td>${vf?`<span class="badge badge-vf">${vf}</span>`:'—'}</td>
+      <td>${rec?`<span class="badge badge-rec">${rec}</span>`:'—'}</td>
+      <td><span style="color:var(--green);font-weight:700;">${ok||'—'}</span></td>
+      <td><span style="color:var(--red);font-weight:700;">${ng||'—'}</span></td>
       <td>
-        <div class="sdb-heatbar" style="width:100%;min-width:120px;">
-          <div class="sdb-heatbar-rp" style="width:${pctRP}%;" title="RP ${pctRP}%"></div>
-          <div class="sdb-heatbar-vf" style="width:${pctVF}%;" title="VF ${pctVF}%"></div>
-          <div class="sdb-heatbar-rec" style="width:${pctRec}%;" title="Rec ${pctRec}%"></div>
-        </div>
-        <div style="font-size:.55rem;color:var(--txt4);margin-top:2px;display:flex;gap:6px;">
-          <span style="color:#dc2626;">RP ${pctRP}%</span><span style="color:#2563eb;">VF ${pctVF}%</span><span style="color:#d97706;">Rec ${pctRec}%</span>
-        </div>
+        <div class="sdb-heatbar"><div class="sdb-heatbar-rp" style="width:${pctRP}%;"></div><div class="sdb-heatbar-vf" style="width:${pctVF}%;"></div><div class="sdb-heatbar-rec" style="width:${pctRec}%;"></div></div>
+        <div style="font-size:.55rem;color:var(--txt4);display:flex;gap:6px;"><span style="color:#dc2626;">RP ${pctRP}%</span><span style="color:#2563eb;">VF ${pctVF}%</span></div>
       </td>
-      <td>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <div style="flex:1;height:6px;background:var(--bg3);border-radius:99px;min-width:50px;overflow:hidden;">
-            <div style="width:${share}%;height:100%;background:${color};border-radius:99px;"></div>
-          </div>
-          <span style="font-size:.7rem;font-weight:800;color:var(--txt3);font-family:'DM Mono',monospace;min-width:28px;">${share}%</span>
-        </div>
-      </td>
+      <td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:6px;background:var(--bg3);border-radius:99px;overflow:hidden;"><div style="width:${share}%;height:100%;background:${color};"></div></div><span style="font-size:.7rem;font-weight:800;">${share}%</span></div></td>
     </tr>`;
   }).join('');
 }
@@ -3802,107 +3948,106 @@ function buildAttendChart(dailyData){
   });
 }
 
-/* ══════════════════════════════════
-   SUPPORT PRODUCTION - FULL FIX
-══════════════════════════════════ */
-
-// 1. แก้ไขการ Refresh ให้รองรับข้อมูลที่ยังไม่มี eventDate
-function refreshSupport(){
+function refreshSupport() {
   const tb = document.getElementById('supportTableBody');
-  if(!tb) return;
-  
-  // กรองข้อมูล: ใช้ eventDate เป็นหลัก ถ้าไม่มีให้ลองใช้ month (สำหรับข้อมูลเก่า)
-  const filtered = filterByDateRange(db.support, 'eventDate', 'support');
-  
-  // คำนวณค่า KPI จากข้อมูลที่กรองแล้ว
-  const rp = filtered.filter(s=>s.report==='RP').length;
-  const vf = filtered.filter(s=>s.report==='VF').length;
-  const rec = filtered.filter(s=>s.report==='RECORDS').length;
-  const totalOK = filtered.reduce((s,c)=>s+(c.ok||0),0);
-  const totalNG = filtered.reduce((s,c)=>s+(c.ng||0),0);
-  const ngRate = (totalOK+totalNG)>0 ? Math.round((totalNG/(totalOK+totalNG))*100) : 0;
+  if (!tb) return;
+
+  // 1. กรองข้อมูลตามวันที่
+  let filtered = filterByDateRange(db.support, 'eventDate', 'support');
+
+  // 2. กรองข้อมูลตามคำค้นหา (ถ้ามี)
+  if (supportSearchTerm) {
+    filtered = filtered.filter(s => {
+      const prob = (s.problem || '').toLowerCase();
+      const part = (s.part || '').toLowerCase();
+      const lot = (s.lot || '').toLowerCase();
+      const report = (s.report || '').toLowerCase();
+      
+      return prob.includes(supportSearchTerm) ||
+             part.includes(supportSearchTerm) ||
+             lot.includes(supportSearchTerm) ||
+             report.includes(supportSearchTerm);
+    });
+  }
+
+  // 3. คำนวณ KPI
+  const rp = filtered.filter(s => s.report === 'RP').length;
+  const vf = filtered.filter(s => s.report === 'VF').length;
+  const rec = filtered.filter(s => s.report === 'RECORDS').length;
+  const totalOK = filtered.reduce((s, c) => s + (c.ok || 0), 0);
+  const totalNG = filtered.reduce((s, c) => s + (c.ng || 0), 0);
+  const ngRate = (totalOK + totalNG) > 0 ? Math.round((totalNG / (totalOK + totalNG)) * 100) : 0;
   const tot = filtered.length;
 
-  // อัปเดต KPI หน้าหลัก
+  // อัปเดต Text
   setText('sum-total', tot); setText('sum-rp', rp); setText('sum-vf', vf); setText('sum-records', rec);
-  
-  // อัปเดต KPI ใน Modal Dashboard
   setText('md-sum-total', tot); setText('md-sum-rp', rp); setText('md-sum-vf', vf); setText('md-sum-rec', rec);
-  setText('md-total-ok', totalOK); setText('md-total-ng', totalNG);
-  setText('md-ng-rate', `${ngRate}% rate`);
-  setText('md-pct-rp', tot ? `${Math.round(rp/tot*100)}% of total` : '0%');
-  setText('md-pct-vf', tot ? `${Math.round(vf/tot*100)}% of total` : '0%');
-  setText('md-pct-rec', tot ? `${Math.round(rec/tot*100)}% of total` : '0%');
+  setText('md-total-ok', totalOK); setText('md-total-ng', totalNG); setText('md-ng-rate', ngRate + '% rate');
+  setText('md-pct-rp', tot ? Math.round(rp / tot * 100) + '% of total' : '0%');
+  setText('md-pct-vf', tot ? Math.round(vf / tot * 100) + '% of total' : '0%');
+  setText('md-pct-rec', tot ? Math.round(rec / tot * 100) + '% of total' : '0%');
   
   const lu = document.getElementById('sdb-last-updated');
-  if(lu) lu.textContent = 'Updated: '+new Date().toLocaleTimeString('th-TH');
-  setText('sdb-donut-lbl', `${tot} cases`);
+  if (lu) lu.textContent = 'Updated: ' + new Date().toLocaleTimeString('th-TH');
+  setText('sdb-donut-lbl', tot + ' cases');
   setText('sdb-okng-lbl', `OK:${totalOK} / NG:${totalNG}`);
 
   // Smart Insights
   const groupMap = buildGroupData(filtered);
-  if(groupMap.length){
+  if (groupMap.length) {
     const topG = groupMap[0];
     setText('md-top-group', topG[0]);
-    setText('md-top-group-sub', `${topG[1].total} cases · RP:${topG[1].RP||0} VF:${topG[1].VF||0}`);
-    const withNG = groupMap.filter(([,d])=>d.ng>0).sort((a,b)=>b[1].ng-a[1].ng);
-    if(withNG.length){
-      setText('md-worst-ng', withNG[0][0]);
-      setText('md-worst-ng-sub', `NG: ${withNG[0][1].ng||0} pcs · ${withNG[0][1].total} cases`);
-    }
+    setText('md-top-group-sub', `${topG[1].total} cases · RP:${topG[1].RP || 0} VF:${topG[1].VF || 0}`);
+    const withNG = groupMap.filter(([, d]) => d.ng > 0).sort((a, b) => b[1].ng - a[1].ng);
+    if (withNG.length) { setText('md-worst-ng', withNG[0][0]); setText('md-worst-ng-sub', `NG: ${withNG[0][1].ng || 0} pcs`); }
   }
-  
+
   // Busiest Month
   const moCounts = Array(12).fill(0);
-  const moNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const moNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
   filtered.forEach(s => {
-    if(s.eventDate) { 
-      const m = new Date(s.eventDate).getMonth();
-      if(!isNaN(m)) moCounts[m]++;
-    } else if(s.month) {
-      const m = parseInt(s.month.split('-')[1])-1;
-      if(m>=0 && m<12) moCounts[m]++;
-    }
+    if (s.eventDate) { const m = new Date(s.eventDate).getMonth(); if (!isNaN(m)) moCounts[m]++; }
+    else if (s.month) { const m = parseInt(s.month.split('-')[1]) - 1; if (m >= 0 && m < 12) moCounts[m]++; }
   });
   const maxMo = Math.max(...moCounts);
   const busyIdx = moCounts.indexOf(maxMo);
-  if(maxMo > 0) { setText('md-busy-month', moNames[busyIdx]); setText('md-busy-month-sub', `${maxMo} cases บันทึกในเดือนนี้`); }
+  if (maxMo > 0) { setText('md-busy-month', moNames[busyIdx]); setText('md-busy-month-sub', maxMo + ' cases'); } 
   else { setText('md-busy-month', '—'); setText('md-busy-month-sub', '—'); }
 
   setText('sup-tbl-count-badge', `${filtered.length} records`);
 
-  // Render ตาราง
-  if(!filtered.length){
-    tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div></td></tr>`;
+  // Render Table
+  if (!filtered.length) {
+    tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่พบข้อมูลที่ค้นหา</div></td></tr>`;
   } else {
-    tb.innerHTML = [...filtered].reverse().map((s)=>{
+    tb.innerHTML = [...filtered].reverse().map((s) => {
       const realIdx = db.support.indexOf(s);
-      const bc = s.report==='RP'?'badge-rp':s.report==='VF'?'badge-vf':'badge-rec';
-      const okCell = s.ok!==undefined && s.ok!=='' ? `<span class="ok-chip">✓ ${s.ok}</span>` : '<span style="color:var(--txt4);">—</span>';
-      const ngCell = s.ng!==undefined && s.ng!=='' ? `<span class="ng-chip">✗ ${s.ng}</span>` : '<span style="color:var(--txt4);">—</span>';
+      const bc = s.report === 'RP' ? 'badge-rp' : s.report === 'VF' ? 'badge-vf' : 'badge-rec';
+      const okCell = s.ok !== undefined && s.ok !== '' ? `<span class="ok-chip">✓ ${s.ok}</span>` : '<span style="color:var(--txt4);">—</span>';
+      const ngCell = s.ng !== undefined && s.ng !== '' ? `<span class="ng-chip">✗ ${s.ng}</span>` : '<span style="color:var(--txt4);">—</span>';
       return `<tr>
-        <td class="td-ts" style="padding-left:14px;">${s.fullTimestamp||s.datetime||'—'}</td>
-        <td style="min-width:280px;width:32%;font-size:.79rem;line-height:1.65;word-break:break-word;white-space:normal;color:var(--txt);padding-top:10px;padding-bottom:10px;">${s.problem||'—'}</td>
-        <td style="font-size:.73rem;">${s.action||'—'}</td>
-        <td style="font-weight:700;color:var(--txt2);font-size:.76rem;">${s.part||'—'}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--violet);">${s.lot||'—'}</td>
+        <td class="td-ts" style="padding-left:14px;">${s.fullTimestamp || s.datetime || '—'}</td>
+        <td style="min-width:280px;width:32%;font-size:.79rem;word-break:break-word;white-space:normal;">${s.problem || '—'}</td>
+        <td style="font-size:.73rem;">${s.action || '—'}</td>
+        <td style="font-weight:700;font-size:.76rem;">${s.part || '—'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--violet);">${s.lot || '—'}</td>
         <td style="text-align:center;">${okCell}</td>
         <td style="text-align:center;">${ngCell}</td>
         <td><span class="badge ${bc}">${s.report}</span></td>
-        <td class="sup-img-cell">${getImgCell(s.id,realIdx)}</td>
+        <td class="sup-img-cell">${getImgCell(s.id, realIdx)}</td>
         <td style="text-align:center;white-space:nowrap;">
-          <button class="btn-detail" onclick="openRecDetail(${realIdx})" title="ดูรายละเอียด">🔍 ดู</button>
-          <button class="btn-edit" onclick="openEditSupport(${realIdx})" title="แก้ไข" style="margin-left:3px;">✏️</button>
-          <button class="btn-del" onclick="delSupportConfirm(${realIdx})" title="ลบ" style="margin-left:3px;">🗑</button>
+          <button class="btn-detail" onclick="openRecDetail(${realIdx})">🔍 ดู</button>
+          <button class="btn-edit" onclick="openEditSupport(${realIdx})" style="margin-left:3px;">✏️</button>
+          <button class="btn-del" onclick="delSupportConfirm(${realIdx})" style="margin-left:3px;">🗑</button>
         </td>
       </tr>`;
     }).join('');
   }
 
-// Render Charts
+  // Render Charts (ส่ง filtered เข้าไปทุกตัว)
   renderGroupBars('support-group-bars', 12, filtered);
-  renderGroupByStatus('support-group-by-status'); 
-  renderGroupFullTable('group-full-tbody', filtered);
+  renderGroupByStatus('support-group-by-status', filtered); // Updated
+  renderGroupFullTable('group-full-tbody', filtered); // Updated
   buildDoughnut(rp, vf, rec, 'supportStatusChart');
   buildSupportTrend(filtered);
   buildSupportOkNg(filtered);
