@@ -2810,18 +2810,24 @@ function importExcel(input){
     
     const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
     
-    // ★★★ แก้ไข Function pd ให้รองรับตัวเลข (Serial Number) เป็นหลัก ★★★
+    // ★★★ ใช้สูตรคำนวณแบบ UTC โดยตรง (Magic Number 25569) เพื่อตัดปัญหา Timezone ทั้งหมด ★★★
     const pd=v=>{
       if(!v) return '';
       
-      // ถ้าเป็นตัวเลข (Excel Serial Date) ให้แปลงโดยตรงโดยไม่ยุ่งกับ Timezone
+      // ถ้าเป็นตัวเลข (Excel Serial Number)
       if(typeof v === 'number'){
-        const d = XLSX.SSF.parse_date_code(v);
-        // จัดรูปแบบเป็น YYYY-MM-DD
-        return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+        // สูตรแปลง Excel Serial Number เป็น UTC Date (เลข 25569 คือตัวชดเชย Epoch ของ Excel)
+        const utc_days = Math.floor(v - 25569);
+        const utc_value = utc_days * 86400; // แปลงเป็นวินาที
+        const date_info = new Date(utc_value * 1000);
+        
+        const y = date_info.getUTCFullYear();
+        const m = String(date_info.getUTCMonth() + 1).padStart(2, '0');
+        const d = String(date_info.getUTCDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
       }
       
-      // ถ้าเป็น Date Object (กรณีที่มีการส่งมาแบบอื่น) ให้ดึงเฉพาะปี-เดือน-วันแบบ UTC เพื่อความปลอดภัย
+      // ถ้าเป็น Date Object
       if(v instanceof Date) {
         const y = v.getUTCFullYear();
         const m = String(v.getUTCMonth() + 1).padStart(2, '0');
@@ -2829,7 +2835,7 @@ function importExcel(input){
         return `${y}-${m}-${d}`;
       }
       
-      // ถ้าเป็น String อยู่แล้ว ก็ส่งคืนเลย
+      // ถ้าเป็น String
       return String(v);
     };
 
