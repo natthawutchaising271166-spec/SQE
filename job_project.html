@@ -1313,7 +1313,53 @@ body.dark-mode thead th {
 body.dark-mode tbody tr:nth-child(even) td { background: #1e293b; }
 body.dark-mode tbody tr:nth-child(odd) td { background: #0f172a; }
 body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
+
+/* ────────────────────────────────────
+   TOPBAR ACTION BUTTONS (Unified Style)
+──────────────────────────────────── */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding-left: 10px;
+}
+
+.tb-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--txt2);
+  font-family: inherit;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.tb-btn:hover {
+  background: var(--bg3);
+  border-color: var(--b300);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.tb-btn:active { transform: scale(0.96); }
+
+@media (max-width: 600px) {
+  .tb-btn {
+    padding: 6px;
+    font-size: 1rem;
+  }
+  .tb-btn span { display: none; }
+}
 </style>
+
 </head>
 <!-- ════════════════════════════════
      ACHIEVEMENT UNLOCKED POPUP
@@ -1536,23 +1582,50 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
      MAIN
 ════════════════════════════════ -->
 <div class="main-wrap">
+  <!-- ... ส่วนบนของ Sidebar ... -->
+</aside>
+
+<!-- ════════════════════════════════
+     MAIN (ส่วนนี้แหละที่ต้องแก้)
+════════════════════════════════ -->
+<div class="main-wrap">
+
+  <!-- ▼▼▼ วางโค้ดใหม่ตรงนี้ (แทนที่ของเก่าทั้งก้อน) ▼▼▼ -->
   <div class="topbar">
-    <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="เมนู">☰</button>
+    <!-- ซ้ายสุด: Hamburger -->
+    <button class="hamburger" id="hbBtn" onclick="toggleSidebar()">☰</button>
+    
+    <!-- ตรงกลาง: Title -->
     <div class="topbar-dot"></div>
     <div class="topbar-title" id="topbar-title">Performance Overview</div>
-    <div class="topbar">
-  <button class="hamburger" id="hbBtn" onclick="toggleSidebar()">☰</button>
-  
-  
+    
+    <!-- ขวาสุด: กลุ่มปุ่ม Action -->
+    <div class="topbar-actions">
+      <!-- 1. ปุ่ม Dark Mode -->
+      <button id="darkBtn" class="tb-btn" onclick="toggleDarkMode()">
+        🌙 <span>Dark</span>
+      </button>
 
-  <button onclick="toggleDarkMode()" id="darkBtn" style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:4px 10px; font-size:0.65rem; cursor:pointer; color:var(--txt2); font-family:inherit; transition:all 0.2s; display:flex; align-items:center; gap:5px;">
-    🌙 โหมดมืด
-  </button>
+      <!-- 2. ปุ่ม Backup -->
+      <button class="tb-btn" onclick="exportDB()" title="สำรองข้อมูล (JSON)">
+        💾 <span>Backup</span>
+      </button>
 
-  <div id="dash-timestamp">☁️ Cloud: 14/03/2569 09:16:59</div>
-</div>
-    <div id="dash-timestamp">—</div>
+      <!-- 3. ปุ่ม Restore -->
+      <button class="tb-btn" onclick="document.getElementById('importFile').click()" title="กู้คืนข้อมูล (JSON)">
+        📂 <span>Restore</span>
+      </button>
+      <!-- Hidden Input สำหรับ Restore -->
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importDB(event)">
+    </div>
+
+    <!-- Timestamp (แสดงเฉพาะหน้าจอใหญ่) -->
+    <div id="dash-timestamp" style="margin-left:8px;">—</div>
   </div>
+  <!-- ▲▲▲ จบส่วนที่ต้องวาง ▲▲▲ -->
+
+
+    <!-- ... โค้ดหน้าต่างๆ ด้านใน ... -->
   <main class="main-container">
 
   <!-- ── OVERVIEW ── -->
@@ -2413,6 +2486,42 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
 
 
 <script>
+/* ══════════════════════════════════
+   BACKUP & RESTORE SYSTEM
+══════════════════════════════════ */
+function exportDB() {
+  const dataStr = JSON.stringify(db, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `WAP_Backup_${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('💾 สำรองข้อมูลสำเร็จ!');
+}
+
+function importDB(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const importedData = JSON.parse(e.target.result);
+      if (!importedData._owner || !importedData.support) return toast('❌ ไฟล์ไม่ถูกต้อง');
+      if (confirm('⚠️ การกู้คืนจะเขียนทับข้อมูลปัจจุบันทั้งหมด\nยืนยันการกู้คืนไฟล์นี้ใช่หรือไม่?')) {
+        db = importedData;
+        db._owner = currentUser;
+        db._lastModified = Date.now();
+        saveLocal();
+        refreshAllPages();
+        toast('✅ กู้คืนข้อมูลสำเร็จ!');
+      }
+    } catch (err) { toast('❌ ไฟล์ข้อมูลเสียหาย'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
 /* ══════════════════════════════════
    DATE FILTER SYSTEM
 ══════════════════════════════════ */
