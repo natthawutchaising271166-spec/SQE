@@ -2723,17 +2723,18 @@ function importExcel(input) {
 
     // 2. Define Mapping Rules
     const mappingRules = {
-      date:     ['inspection date'],
-      ref:      ['claim no'],
-      supplier: ['vendor name'],
-      partNo:   ['part no'],
-      partName: ['part name'],
-      qty:      ['qty'],
-      defect:   ['trouble claim'],
-      shift:    ['shift'],
-      line:     ['line'],
-      judgment: ['judgment'],
-      remark:   ['remark']
+      date:     ['inspection date', 'date', 'วันที่', 'inspected date'],
+      ref:      ['claim no', 'reference no', 'ref no', 'claim number'],
+      // ★ ปรับ keywords สำหรับ Supplier ให้หาชื่อเจอง่ายขึ้น
+      supplier: ['vendor name', 'supplier name', 'supplier', 'vendor'],
+      partNo:   ['part no', 'part number', 'p/n'],
+      partName: ['part name', 'part name (eng)', 'part description'],
+      qty:      ['qty', 'quantity', 'จำนวน'],
+      defect:   ['trouble claim', 'defect', 'defect type', 'trouble'],
+      shift:    ['shift', '_shift'],
+      line:     ['line', 'line no'],
+      judgment: ['judgment', 'result', 'status'],
+      remark:   ['remark', 'remarks', 'note', 'หมายเหตุ']
     };
 
     // 3. Helper: Find Header Row
@@ -2756,14 +2757,32 @@ function importExcel(input) {
       return -1;
     }
     
-    // 4. Helper: Create Column Map
+    // 4. Helper: Create Column Map (มีการปรับ Logic การจับคู่)
     function createColMap(headerRow, rules) {
       const map = {};
       for (let j = 0; j < headerRow.length; j++) {
         const cellText = String(headerRow[j]).toLowerCase().trim();
+        
         for (const [field, keywords] of Object.entries(rules)) {
-          if (keywords.some(kw => cellText.includes(kw))) {
-            if (!map[field]) map[field] = j;
+          
+          // ★ LOGIC FIX: แก้ไขปัญหาอ่าน Vendor Code แทน Vendor Name
+          if (field === 'supplier') {
+            // 1. ถ้าเจอคำว่า 'code' ในหัวคอลัมน์ -> ข้ามทันที (ป้องกันจับ Vendor Code)
+            if (cellText.includes('code')) continue;
+            
+            // 2. ถ้าเจอคำว่า 'name' -> บังคับใช้คอลัมน์นี้เลย (Priority สูงสุด)
+            if (keywords.some(kw => cellText.includes(kw))) {
+               if (cellText.includes('name')) {
+                   map[field] = j; // บังคับเขียนทับถ้าเจอคำว่า name
+               } else if (!map[field]) {
+                   map[field] = j; // ใช้ตัวแรกที่เจอถ้ายังไม่มี
+               }
+            }
+          } else {
+            // Logic ปกติสำหรับ field อื่นๆ
+            if (keywords.some(kw => cellText.includes(kw))) {
+              if (!map[field]) map[field] = j;
+            }
           }
         }
       }
@@ -2774,7 +2793,7 @@ function importExcel(input) {
     const headerRowIndex = findHeaderRow(rawData, mappingRules);
     
     if (headerRowIndex === -1) {
-      toast('❌ ไม่พบหัวตาราง (ต้องมี Claim No, Vendor Name, Inspection Date)');
+      toast('❌ ไม่พบหัวตาราง (ต้องมี Claim No, Vendor Name, หรือ Date)');
       input.value = '';
       return;
     }
@@ -2782,6 +2801,7 @@ function importExcel(input) {
     const colMap = createColMap(rawData[headerRowIndex], mappingRules);
     const dataRows = rawData.slice(headerRowIndex + 1);
     
+    // ★ ฟังก์ชันแปลงวันที่ (รองรับทุก Format)
     const pd = v => {
       if (!v) return '';
       if (v instanceof Date) {
@@ -2791,8 +2811,20 @@ function importExcel(input) {
         return `${y}-${m}-${d}`;
       }
       if (typeof v === 'number') {
-        const d = XLSX.SSF.parse_date_code(v);
-        return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
+        try {
+          const d = XLSX.SSF.parse_date_code(v);
+          return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
+        } catch(e) { return ''; }
+      }
+      if (typeof v === 'string') {
+        const parts = v.split(/[\/\-\.]/);
+        if (parts.length === 3) {
+           let [d, m, y] = parts;
+           if (y.length === 2) y = (parseInt(y) > 50 ? '19' : '20') + y; 
+           if(parseInt(d) > 12) { [d, m] = [m, d]; }
+           return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+        }
+        if (/^\d{4}-\d{2}-\d{2}/.test(v)) return v.substring(0, 10);
       }
       return String(v);
     };
@@ -2821,7 +2853,9 @@ function importExcel(input) {
         continue;
       }
 
-      const dateVal = pd(getVal(r, 'date'));
+      // ★ อ่านค่าวันที่
+      const dateVal = pd(getVal(r, 'date')) || pd(new Date());
+      
       let shiftVal = String(getVal(r, 'shift')).trim();
       let lineVal = String(getVal(r, 'line')).trim();
 
