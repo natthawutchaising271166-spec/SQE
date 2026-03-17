@@ -2708,7 +2708,8 @@ function importExcel(input) {
   
   const reader = new FileReader();
   reader.onload = async e => {
-    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: true });
+    // ★ เปลี่ยนเป็น false เพื่อให้ได้ตัวเลข Serial Number แทน Date Object (แก้ปัญหา Timezone)
+    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: false });
     
     // 1. Find 'Daily Report' sheet
     const sheetName = wb.SheetNames.find(name => name.trim().toLowerCase() === 'daily report');
@@ -2725,7 +2726,6 @@ function importExcel(input) {
     const mappingRules = {
       date:     ['inspection date', 'date', 'วันที่', 'inspected date'],
       ref:      ['claim no', 'reference no', 'ref no', 'claim number'],
-      // ★ ปรับ keywords สำหรับ Supplier ให้หาชื่อเจอง่ายขึ้น
       supplier: ['vendor name', 'supplier name', 'supplier', 'vendor'],
       partNo:   ['part no', 'part number', 'p/n'],
       partName: ['part name', 'part name (eng)', 'part description'],
@@ -2742,7 +2742,6 @@ function importExcel(input) {
       for (let i = 0; i < Math.min(20, data.length); i++) {
         const row = data[i];
         let foundCount = 0;
-        
         for (let j = 0; j < row.length; j++) {
           const cellText = String(row[j]).toLowerCase().trim();
           for (const keywords of Object.values(rules)) {
@@ -2757,29 +2756,24 @@ function importExcel(input) {
       return -1;
     }
     
-    // 4. Helper: Create Column Map (มีการปรับ Logic การจับคู่)
+    // 4. Helper: Create Column Map
     function createColMap(headerRow, rules) {
       const map = {};
       for (let j = 0; j < headerRow.length; j++) {
         const cellText = String(headerRow[j]).toLowerCase().trim();
-        
         for (const [field, keywords] of Object.entries(rules)) {
           
-          // ★ LOGIC FIX: แก้ไขปัญหาอ่าน Vendor Code แทน Vendor Name
+          // Logic Fix Vendor Code/Name
           if (field === 'supplier') {
-            // 1. ถ้าเจอคำว่า 'code' ในหัวคอลัมน์ -> ข้ามทันที (ป้องกันจับ Vendor Code)
             if (cellText.includes('code')) continue;
-            
-            // 2. ถ้าเจอคำว่า 'name' -> บังคับใช้คอลัมน์นี้เลย (Priority สูงสุด)
             if (keywords.some(kw => cellText.includes(kw))) {
                if (cellText.includes('name')) {
-                   map[field] = j; // บังคับเขียนทับถ้าเจอคำว่า name
+                   map[field] = j; 
                } else if (!map[field]) {
-                   map[field] = j; // ใช้ตัวแรกที่เจอถ้ายังไม่มี
+                   map[field] = j; 
                }
             }
           } else {
-            // Logic ปกติสำหรับ field อื่นๆ
             if (keywords.some(kw => cellText.includes(kw))) {
               if (!map[field]) map[field] = j;
             }
@@ -2801,31 +2795,56 @@ function importExcel(input) {
     const colMap = createColMap(rawData[headerRowIndex], mappingRules);
     const dataRows = rawData.slice(headerRowIndex + 1);
     
-    // ★ ฟังก์ชันแปลงวันที่ (รองรับทุก Format)
+    // ★ ฟังก์ชันแปลงวันที่ใหม่ (แก้ปัญหา Timezone ถาวร)
     const pd = v => {
       if (!v) return '';
-      if (v instanceof Date) {
-        const y = v.getFullYear();
-        const m = String(v.getMonth() + 1).padStart(2, '0');
-        const d = String(v.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-      }
+      
+      // Case 1: เป็นตัวเลข (Excel Serial Number) -> ใช้ XLSX.SSF แปลงโดยตรง (ไม่ผ่าน Timezone)
       if (typeof v === 'number') {
         try {
           const d = XLSX.SSF.parse_date_code(v);
+          // d.y, d.m, d.d เป็นตัวเลขจริงๆ จาก Excel
           return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
         } catch(e) { return ''; }
       }
+      
+      // Case 2: เป็นข้อความ (String)
       if (typeof v === 'string') {
+        // ลองแปลง format dd/mm/yyyy หรือ dd-mm-yyyy
         const parts = v.split(/[\/\-\.]/);
         if (parts.length === 3) {
-           let [d, m, y] = parts;
-           if (y.length === 2) y = (parseInt(y) > 50 ? '19' : '20') + y; 
+           let [p1, p2, p3] = parts;
+           let y, m, d;
+           
+           // เช็คว่าปีอยู่ตัวแรก (yyyy-mm-dd) หรือตัวสุดท้าย (dd-mm-yyyy)
+           if (p1.length === 4) { 
+             y = p1; m = p2; d = p3; 
+           } else { 
+             d = p1; m = p2; y = p3; 
+           }
+           
+           // แก้ปี ค.ศ./พ.ศ.
+           if (y.length === 2) y = (parseInt(y) > 50 ? '19' : '20') + y;
+           
+           // Swap วัน/เดือน (สมมติฐาน: ถ้าตัวแรก > 12 แสดงว่าเป็นวัน)
            if(parseInt(d) > 12) { [d, m] = [m, d]; }
-           return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+           
+           return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         }
+        // เป็น ISO format อยู่แล้ว
         if (/^\d{4}-\d{2}-\d{2}/.test(v)) return v.substring(0, 10);
       }
+      
+      // Case 3: เป็น Date Object (กันไว้กรณีพิเศษ แต่พยายามหลีกเลี่ยงการใช้ getHours)
+      if (v instanceof Date) {
+         const y = v.getFullYear();
+         const m = String(v.getMonth() + 1).padStart(2, '0');
+         const d = String(v.getDate()).padStart(2, '0');
+         // เช็คก่อนว่ามันกลางคืนหรือเปล่า (Trick สำหรับ Timezone Offset)
+         // แต่วิธีที่ดีที่สุดคือใช้ Serial Number จาก Case 1
+         return `${y}-${m}-${d}`;
+      }
+      
       return String(v);
     };
 
@@ -2853,7 +2872,6 @@ function importExcel(input) {
         continue;
       }
 
-      // ★ อ่านค่าวันที่
       const dateVal = pd(getVal(r, 'date')) || pd(new Date());
       
       let shiftVal = String(getVal(r, 'shift')).trim();
