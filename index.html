@@ -2656,111 +2656,7 @@ function renderDashCharts(data) {
       animation:{duration:1000,easing:'easeOutQuart'}
     }
   });
-}
-
-  // --- 3. TOP LINES CHART (BAR) ---
-  const lineMap = {};
-  data.forEach(r => { if (r.line) lineMap[r.line] = (lineMap[r.line] || 0) + r.qty; });
-  const topLines = Object.entries(lineMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
-
-  const rCtx = $id('radarChart');
-  if (rCtx && topLines.length) charts.radar = new Chart(rCtx, {
-    type: 'bar',
-    data: {
-      labels: topLines.map(l => l[0]),
-      datasets: [{
-        label: 'Qty',
-        data: topLines.map(l => l[1]),
-        backgroundColor: ctx => {
-          const g = ctx.chart.ctx.createLinearGradient(ctx.chart.width || 300, 0, 0, 0);
-          // ★ ปรับสี Gradient ของ Bar
-          if (isDark) {
-            g.addColorStop(0, 'rgba(59, 130, 246, 1)');
-            g.addColorStop(1, 'rgba(59, 130, 246, 0.4)');
-          } else {
-            g.addColorStop(0, 'rgba(37, 99, 235, 0.9)');
-            g.addColorStop(1, 'rgba(99, 150, 246, 0.35)');
-          }
-          return g;
-        },
-        hoverBackgroundColor: '#3b82f6',
-        borderRadius: 6,
-        barThickness: 14
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: 'y',
-      layout: { padding: { right: 44 } },
-      scales: {
-        x: { 
-          display: true, 
-          grid: { color: chartColors.gridColor, drawBorder: false }, 
-          ticks: { display: true, color: chartColors.textColor } 
-        },
-        y: { 
-          grid: { display: false }, 
-          border: { display: false }, 
-          ticks: { color: chartColors.textColor, font: { size: 10, weight: '600', family: 'Sora' } } 
-        }
-      },
-      plugins: {
-        legend: { display: false },
-        datalabels: {
-          anchor: 'end',
-          align: 'end',
-          color: chartColors.textColor, // ★ เปลี่ยนสีตัวเลขให้เข้ากับ Theme
-          font: { size: 9, weight: '500', family: 'DM Mono' },
-          formatter: v => v.toLocaleString(),
-          clip: false
-        },
-        tooltip: {
-          backgroundColor: chartColors.tooltipBg,
-        }
-      },
-      animation: { duration: 900, easing: 'easeOutQuart' }
-    }
-  });
-  // Fallback ถ้าไม่มีข้อมูล Top Lines (แสดง Shift Summary)
-  else if (rCtx) {
-    const sm = { 'A': 0, 'B': 0, 'C': 0 };
-    data.forEach(r => { const k = r.shift?.replace('SHIFT ', ''); if (sm[k] !== undefined) sm[k] += r.qty; });
-    charts.radar = new Chart(rCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Shift A', 'Shift B', 'Shift C'],
-        datasets: [{
-          data: Object.values(sm),
-          backgroundColor: ['rgba(37,99,235,.85)', 'rgba(99,102,241,.85)', 'rgba(16,185,129,.85)'],
-          borderRadius: 10,
-          barPercentage: .55
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: { grid: { display: false }, border: { display: false }, ticks: { color: chartColors.textColor } },
-          y: { display: false }
-        },
-        plugins: {
-          legend: { display: false },
-          datalabels: {
-            anchor: 'end',
-            align: 'top',
-            color: chartColors.textColor,
-            font: { size: 9, weight: '500', family: 'DM Mono' },
-            formatter: v => v > 0 ? v.toLocaleString() : ''
-          },
-          tooltip: { backgroundColor: chartColors.tooltipBg }
-        },
-        animation: { duration: 900, easing: 'easeOutBounce' }
-      }
-    });
-  }
-
-
+} 
 function renderRankings(data){
   const totalQty=data.reduce((s,r)=>s+r.qty,0)||1;
   
@@ -2804,30 +2700,9 @@ function importExcel(input){
   const file=input.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=async e=>{
-    // --- แก้ไขตรงนี้: ตัด cellDates:true ออก เพื่อให้อ่านวันที่เป็นตัวเลข ---
-    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}); 
-    
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
     const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    
-    // --- แก้ไข Function pd: จัดการเฉพาะตัวเลข (Serial) และ String ---
-    const pd=v=>{
-      if(!v)return'';
-      // ถ้าเป็นตัวเลข (Excel Serial Number) ให้แปลงเองเพื่อไม่ให้เพี้ยน
-      if(typeof v==='number'){
-        const d=XLSX.SSF.parse_date_code(v);
-        return`${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`
-      }
-      // ถ้าเป็น Date Object (กรณีที่มาจากที่อื่น) ให้ดึงตาม Local Date โดยตรง
-      if(v instanceof Date){
-         const y = v.getFullYear();
-         const m = String(v.getMonth() + 1).padStart(2, '0');
-         const d = String(v.getDate()).padStart(2, '0');
-         return `${y}-${m}-${d}`;
-      }
-      // ถ้าเป็น String ก็ส่งคืนเลย
-      return String(v)
-    };
-
+    const pd=v=>{if(!v)return'';if(v instanceof Date)return new Date(v.getTime()-(v.getTimezoneOffset()*60000)).toISOString().split('T')[0];if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return`${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`}return String(v)};
     let skippedDupe=0,skippedInvalid=0;const items=[];
     for(const r of json){const ref=String(r.ref||r.Reference||'').trim(),supp=String(r.supplier||r.Supplier||'').trim(),qty=parseInt(r.qty||r.Qty||0);if(!ref||!supp||qty<=0){skippedInvalid++;continue}if(isDuplicate(ref)){skippedDupe++;continue}items.push({id:Date.now()+Math.random(),date:pd(r.date||r.Date||r.DATE),shift:r.shift||r.Shift||'SHIFT A',inspector:currentUser,ref,line:String(r.line||r.Line||''),supplier:supp,partNo:String(r.partNo||r.PartNo||''),partName:String(r.partName||r.PartName||''),qty,defect:String(r.defect||r.Defect||''),remark:String(r.remark||r.Remark||''),judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase()})}
     if(!items.length){toast(`⚠️ ไม่มีข้อมูลใหม่ (ซ้ำ:${skippedDupe} / Invalid:${skippedInvalid})`);input.value='';return}
