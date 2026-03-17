@@ -2695,22 +2695,208 @@ function renderRankings(data){
   draw('rankParts',getTop('partNo'),'#3b82f6','linear-gradient(90deg,#3b82f6,#60a5fa)');
 }
 
-function importExcel(input){
-  if(_isInitializing){toast('⏳ กรุณารอให้ระบบโหลดเสร็จก่อน');input.value='';return}
-  const file=input.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=async e=>{
-    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
-    const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    const pd=v=>{if(!v)return'';if(v instanceof Date)return new Date(v.getTime()-(v.getTimezoneOffset()*60000)).toISOString().split('T')[0];if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return`${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`}return String(v)};
-    let skippedDupe=0,skippedInvalid=0;const items=[];
-    for(const r of json){const ref=String(r.ref||r.Reference||'').trim(),supp=String(r.supplier||r.Supplier||'').trim(),qty=parseInt(r.qty||r.Qty||0);if(!ref||!supp||qty<=0){skippedInvalid++;continue}if(isDuplicate(ref)){skippedDupe++;continue}items.push({id:Date.now()+Math.random(),date:pd(r.date||r.Date||r.DATE),shift:r.shift||r.Shift||'SHIFT A',inspector:currentUser,ref,line:String(r.line||r.Line||''),supplier:supp,partNo:String(r.partNo||r.PartNo||''),partName:String(r.partName||r.PartName||''),qty,defect:String(r.defect||r.Defect||''),remark:String(r.remark||r.Remark||''),judgment:String(r.judgment||'SF').toUpperCase().includes('OK')?'CAN USE':String(r.judgment||'SF').toUpperCase()})}
-    if(!items.length){toast(`⚠️ ไม่มีข้อมูลใหม่ (ซ้ำ:${skippedDupe} / Invalid:${skippedInvalid})`);input.value='';return}
-    items.forEach(r=>cloudRefAdd(r.ref,currentUser));records=[...records,...items];_lastRenderHash='';saveLocal();refreshAll();
-    showInitOverlay('กำลัง Import…','อัพโหลด…',items.length);
-    try{await pushToCloud(items);items.forEach(r=>syncedAdd(r.ref));saveLocal()}catch(e){}
-    hideInitOverlay();toast(`📥 Imported ${items.length}${skippedDupe?` (${skippedDupe} ซ้ำข้าม)`:''}${skippedInvalid?` (${skippedInvalid} invalid)`:''}`);input.value='';
-  };reader.readAsArrayBuffer(file);
+// Use this code to replace your existing importExcel function
+function importExcel(input) {
+  if (_isInitializing) {
+    toast('⏳ กรุณารอให้ระบบโหลดเสร็จก่อน');
+    input.value = '';
+    return;
+  }
+  
+  const file = input.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: true });
+    
+    // 1. Find 'Daily Report' sheet
+    const sheetName = wb.SheetNames.find(name => name.trim().toLowerCase() === 'daily report');
+    if (!sheetName) {
+      toast('❌ ไม่พบชีทชื่อ "Daily Report"');
+      input.value = '';
+      return;
+    }
+    
+    const sheet = wb.Sheets[sheetName];
+    const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+    // 2. Define Mapping Rules
+    const mappingRules = {
+      date:     ['inspection date'],
+      ref:      ['claim no'],
+      supplier: ['vendor name'],
+      partNo:   ['part no'],
+      partName: ['part name'],
+      qty:      ['qty'],
+      defect:   ['trouble claim'],
+      shift:    ['shift'],
+      line:     ['line'],
+      judgment: ['judgment'],
+      remark:   ['remark']
+    };
+
+    // 3. Helper: Find Header Row
+    function findHeaderRow(data, rules) {
+      for (let i = 0; i < Math.min(20, data.length); i++) {
+        const row = data[i];
+        let foundCount = 0;
+        
+        for (let j = 0; j < row.length; j++) {
+          const cellText = String(row[j]).toLowerCase().trim();
+          for (const keywords of Object.values(rules)) {
+            if (keywords.some(kw => cellText.includes(kw))) {
+              foundCount++;
+              break;
+            }
+          }
+        }
+        if (foundCount >= 3) return i;
+      }
+      return -1;
+    }
+    
+    // 4. Helper: Create Column Map
+    function createColMap(headerRow, rules) {
+      const map = {};
+      for (let j = 0; j < headerRow.length; j++) {
+        const cellText = String(headerRow[j]).toLowerCase().trim();
+        for (const [field, keywords] of Object.entries(rules)) {
+          if (keywords.some(kw => cellText.includes(kw))) {
+            if (!map[field]) map[field] = j;
+          }
+        }
+      }
+      return map;
+    }
+
+    // 5. Process Data
+    const headerRowIndex = findHeaderRow(rawData, mappingRules);
+    
+    if (headerRowIndex === -1) {
+      toast('❌ ไม่พบหัวตาราง (ต้องมี Claim No, Vendor Name, Inspection Date)');
+      input.value = '';
+      return;
+    }
+    
+    const colMap = createColMap(rawData[headerRowIndex], mappingRules);
+    const dataRows = rawData.slice(headerRowIndex + 1);
+    
+    const pd = v => {
+      if (!v) return '';
+      if (v instanceof Date) {
+        const y = v.getFullYear();
+        const m = String(v.getMonth() + 1).padStart(2, '0');
+        const d = String(v.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+      if (typeof v === 'number') {
+        const d = XLSX.SSF.parse_date_code(v);
+        return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
+      }
+      return String(v);
+    };
+
+    let skippedDupe = 0, skippedInvalid = 0;
+    const items = [];
+
+    const getVal = (row, key) => {
+      const idx = colMap[key];
+      return idx !== undefined ? row[idx] : '';
+    };
+
+    for (const r of dataRows) {
+      if (r.every(cell => cell === '' || cell === null || cell === undefined)) continue;
+
+      const ref = String(getVal(r, 'ref')).trim();
+      const supp = String(getVal(r, 'supplier')).trim();
+      const qty = parseInt(getVal(r, 'qty')) || 0;
+
+      if (!ref || !supp || qty <= 0) {
+        skippedInvalid++;
+        continue;
+      }
+      if (isDuplicate(ref)) {
+        skippedDupe++;
+        continue;
+      }
+
+      const dateVal = pd(getVal(r, 'date'));
+      let shiftVal = String(getVal(r, 'shift')).trim();
+      let lineVal = String(getVal(r, 'line')).trim();
+
+      if (colMap.shift === colMap.line && shiftVal.includes('/')) {
+        const parts = shiftVal.split('/');
+        shiftVal = parts[0] ? parts[0].trim() : 'SHIFT A';
+        lineVal = parts[1] ? parts[1].trim() : '';
+      } else if (!shiftVal && !lineVal) {
+        shiftVal = 'SHIFT A';
+      }
+
+      const partNoVal = String(getVal(r, 'partNo'));
+      const partNameVal = String(getVal(r, 'partName'));
+      const defectVal = String(getVal(r, 'defect'));
+      const remarkVal = String(getVal(r, 'remark'));
+      
+      let rawJudge = String(getVal(r, 'judgment')).toUpperCase();
+      let finalJudge = 'SF';
+      if (rawJudge.includes('OK') || rawJudge.includes('PASS') || rawJudge.includes('CAN USE')) finalJudge = 'CAN USE';
+      else if (rawJudge.includes('VENDOR')) finalJudge = 'VENDOR FAULT';
+      else if (rawJudge.includes('CTC')) finalJudge = 'CTC';
+      else if (rawJudge.includes('SF')) finalJudge = 'SF';
+
+      items.push({
+        id: Date.now() + '_' + Math.random(),
+        date: dateVal,
+        shift: shiftVal || 'SHIFT A',
+        inspector: currentUser,
+        ref: ref,
+        line: lineVal,
+        supplier: supp,
+        partNo: partNoVal,
+        partName: partNameVal,
+        qty: qty,
+        defect: defectVal,
+        remark: remarkVal,
+        judgment: finalJudge
+      });
+    }
+
+    if (!items.length) {
+      toast(`⚠️ ไม่มีข้อมูลที่ถูกต้อง (ข้าม ${skippedInvalid} แถว)`);
+      input.value = '';
+      return;
+    }
+
+    items.forEach(r => cloudRefAdd(r.ref, currentUser));
+    records.push(...items);
+    _lastRenderHash = '';
+    saveLocal();
+    refreshAll();
+    
+    showInitOverlay('กำลัง Import...', `อัพโหลด ${items.length} รายการ...`, items.length);
+    
+    try {
+      await pushToCloud(items);
+      items.forEach(r => {
+        syncedAdd(r.ref);
+        cloudRefAdd(r.ref, currentUser);
+      });
+      saveLocal();
+      showSyncBadge('☁️ Auto-synced', '#10b981');
+      setSyncPulse('live', 'LIVE SYNC');
+    } catch (e) {
+      console.error('Push error:', e);
+    } finally {
+      _pushInFlight = false;
+    }
+    
+    hideInitOverlay();
+    toast(`📥 Imported ${items.length} records successfully!`);
+    input.value = '';
+  };
+  
+  reader.readAsArrayBuffer(file);
 }
 function exportToExcel(){const d=getMyRecords();if(!d.length)return toast('⚠️ No data to export');const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Records');XLSX.writeFile(wb,'SQE_'+currentUser+'_'+Date.now()+'.xlsx')}
 function openJobProject(){window.location.href='job_project.html'}
