@@ -3457,7 +3457,37 @@ function runDashboardEntrance(){
   setTimeout(()=>showSyncStatus('✅ พร้อมใช้งาน — ข้อมูล Real-time','#22c55e'),600);
 }
 
-window.addEventListener('load',async()=>{
+window.addEventListener('load', async () => {
+  
+  // ═══════════════════════════════════════════════════
+  // ★ เพิ่มโค้ดตรงนี้: บังคับ Fullscreen สำหรับ PC/Notebook
+  // ═══════════════════════════════════════════════════
+  
+  // 1. ปิดการคลิกขวา (เพิ่มความรู้สึกเหมือนแอปแท้)
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // 2. สั่งเข้า Fullscreen เมื่อผู้ใช้มีการกดครั้งแรก (Browser จะ Block ถ้าไม่มี User Interaction)
+  const tryFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+        showSyncStatus('🖥️ Fullscreen Mode Activated', '#22c55e');
+      }
+    } catch (err) {
+      console.log('Fullscreen blocked or failed:', err);
+    }
+    // เอา Event นี้ออกหลังทำงานครั้งแรก
+    document.removeEventListener('click', tryFullscreen);
+    document.removeEventListener('keydown', tryFullscreen);
+  };
+  
+  // รอ User กดคลิกหรือกดปุ่มคีย์บอร์ดครั้งแรก แล้วสั่ง Fullscreen
+  document.addEventListener('click', tryFullscreen, { once: true });
+  document.addEventListener('keydown', tryFullscreen, { once: true });
+
+  // ═══════════════════════════════════════════════════
+  // (โค้ดเดิมด้านล่างนี้)
+  // ═══════════════════════════════════════════════════
   setLoading('🔌 กำลังเชื่อมต่อ Google Sheets...','ตรวจสอบการเชื่อมต่อ Cloud',10);
   setBtnLoading(true,'⏳ โหลด...');
 
@@ -3514,7 +3544,6 @@ window.addEventListener('load',async()=>{
   startPolling();
   migrateOldData(); 
 });
-
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 async function syncWithGoogleSheets(){if(document.getElementById('syncBtn').classList.contains('loading'))return;setBtnLoading(true,'⏳ SYNCING...');showSyncStatus('🔄 กำลัง Sync...','#f59e0b');try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();if(r.status==='success'&&r.data){const cloud=r.data;if(!cloud._owner||cloud._owner===currentUser){const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);if(cloudMod>localMod||cloudLen>localLen){cloud._owner=currentUser;db=cloud;saveLocal();refreshAllPages();showSyncStatus('✅ ดึงข้อมูลจาก Cloud','#22c55e');toast('✅ Sync: โหลดจาก Cloud');}else{await pushToCloud();showSyncStatus('☁️ อัปโหลดขึ้น Cloud','#22c55e');toast('✅ Sync: อัปโหลดขึ้น Cloud');}}}else{await pushToCloud();}setText('dash-timestamp','Sync: '+fullTimestamp());}catch(e){showSyncStatus('❌ Sync ล้มเหลว','#dc2626');toast('❌ Sync ล้มเหลว');}finally{setBtnLoading(false);}}
 function startPolling(){
