@@ -1232,62 +1232,132 @@ html.dark-mode .lo-in { background: #0f172a; border-color: #334155; color: #f8fa
 html.dark-mode .lo-in:focus { border-color: var(--blue-500); background: #0f172a; }
 
 /* ═══════════════════════════════════════════════════
-   DASHBOARD DARK MODE SPECIFICS
+   DASHBOARD DARK MODE SPECIFICS (FIXED)
 ═══════════════════════════════════════════════════ */
 
-/* Dark Mode Dashboard Background */
+/* 1. Dashboard Container & Topbar */
 html.dark-mode .glass-dash {
   background: var(--bg-canvas);
 }
-
-/* Topbar */
 html.dark-mode .dash-topbar {
   background: var(--bg-card);
   border-bottom-color: rgba(59, 130, 246, 0.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* KPI Cards (ตัวเลข) */
-html.dark-mode .dkpi, 
-html.dark-mode .d-stat {
-  background: var(--bg-card);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+/* 2. Dashboard Controls (Inputs/Selects) */
+html.dark-mode .dash-filter-group {
+  background: var(--bg-input);
+  border-color: var(--border);
 }
-/* ปรับสีพื้นหลัง Tag ใน KPI */
-html.dark-mode .dkpi span:not([style*="color:"]) { 
-  background: rgba(255, 255, 255, 0.1); 
-  border-color: rgba(255, 255, 255, 0.15);
+html.dark-mode .dash-date-input,
+html.dark-mode .dash-select {
+  background: transparent;
+  border-color: transparent; /* Inputs inside group usually transparent */
+  color: var(--text-900);
+}
+/* Topbar Reset Button */
+html.dark-mode .dash-controls > button {
+    background: var(--bg-input);
+    border-color: var(--border);
+    color: var(--text-400);
 }
 
-/* Chart Cards */
+/* 3. KPI Cards - HERO (Big Cards) */
+html.dark-mode .kpi-main-card {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+html.dark-mode .kpi-main-card .kpi-title {
+  color: var(--text-500);
+}
+html.dark-mode .kpi-main-card .kpi-value-hero {
+  color: var(--text-900);
+}
+html.dark-mode .kpi-main-card .kpi-details {
+  color: var(--text-400);
+}
+html.dark-mode .kpi-detail-value {
+  color: var(--text-700) !important;
+}
+
+/* 4. KPI Cards - MINI (Small Grid) */
+html.dark-mode .kpi-mini-card {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+html.dark-mode .kpi-mini-card .kpi-label {
+  color: var(--text-500);
+}
+html.dark-mode .kpi-mini-card .kpi-value {
+  color: var(--text-900);
+}
+html.dark-mode .kpi-mini-card .kpi-unit {
+  color: var(--text-400);
+}
+html.dark-mode .kpi-mini-card .kpi-meta {
+  color: var(--text-500);
+}
+html.dark-mode .kpi-mini-card .kpi-lot strong {
+  color: var(--text-700);
+}
+
+/* 5. Chart Cards */
 html.dark-mode .dash-chart-card {
   background: var(--bg-card);
   border-color: rgba(255, 255, 255, 0.08);
 }
+html.dark-mode .chart-title {
+  color: var(--text-900);
+}
+html.dark-mode .chart-subtitle {
+  color: var(--text-500);
+}
 
-/* Ranking Cards */
-html.dark-mode .dash-rank-card {
+/* 5.1 Donut Chart Center Text */
+html.dark-mode .donut-center-text .total-value {
+  color: var(--text-900);
+}
+html.dark-mode .donut-center-text .total-label {
+  color: var(--text-400);
+}
+
+/* 6. Trend Insight Badge */
+html.dark-mode #trendInsight {
+  background: var(--bg-input);
+  color: var(--text-400);
+  border-color: var(--border);
+}
+
+/* 7. Rankings Section */
+html.dark-mode .rank-card {
   background: var(--bg-card);
   border-color: rgba(255, 255, 255, 0.08);
 }
-
-/* ปรับสี Bar ในหน้า Dashboard */
-html.dark-mode .bar-bg { background: rgba(255, 255, 255, 0.1); }
-
-/* ปรับสี Input และ Select ใน Dashboard Topbar */
-html.dark-mode .dash-date-input, 
-html.dark-mode .dash-select {
-  background: var(--bg-input);
-  border-color: var(--border);
+html.dark-mode .rank-header {
+  border-bottom-color: var(--border);
+}
+html.dark-mode .rank-title {
   color: var(--text-900);
 }
-
-/* Donut Chart Background Adjustment */
-html.dark-mode .dash-chart-card[style*="linear-gradient(145deg, var(--blue-900)"] {
-  /* ทำให้กราฟโดนัทยังคงสวยงามในโหมดมืด โดยไม่เปลี่ยนสีพื้นหลังมากนัก */
-  background: linear-gradient(145deg, #0f172a, #1e293b) !important;
-  border-color: rgba(59, 130, 246, 0.3);
+html.dark-mode .rank-subtitle {
+  color: var(--text-500);
+}
+html.dark-mode .rank-item:hover {
+  background: var(--bg-hover);
+}
+html.dark-mode .rank-item .rank-name {
+  color: var(--text-700);
+}
+html.dark-mode .rank-bar-container {
+  background: var(--text-200);
+}
+html.dark-mode .rank-item .rank-value {
+  color: var(--text-900);
+}
+html.dark-mode .rank-item .rank-pct {
+  color: var(--text-400);
 }
 </style>
 </head>
@@ -2976,4 +3046,4 @@ window.addEventListener('load', loadTheme);
 </script>
 
 </body>
-</html>
+</html> 
