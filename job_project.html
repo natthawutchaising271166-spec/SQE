@@ -1314,6 +1314,132 @@ body.dark-mode tbody tr:nth-child(even) td { background: #1e293b; }
 body.dark-mode tbody tr:nth-child(odd) td { background: #0f172a; }
 body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
 
+/* ═══════════════════════════════════════════════════
+   DARK MODE FIXES — SPECIAL JOBS & ALL TABLES
+═══════════════════════════════════════════════════ */
+
+/* 1. Header Band & Actions */
+body.dark-mode .sp-header-band {
+  background: linear-gradient(90deg, #0f172a, #1e293b 55%, #312e81);
+  border-color: rgba(255,255,255,.1);
+}
+body.dark-mode .sp-band-title { color: #fff; }
+body.dark-mode .sp-band-sub { color: rgba(255,255,255,.4); }
+body.dark-mode .sp-live-badge { background: rgba(34,197,94,.15); color: #4ade80; border-color: rgba(34,197,94,.3); }
+body.dark-mode #sp-total-badge { background: rgba(59,130,246,.15); color: #93c5fd; border-color: rgba(59,130,246,.3); }
+
+/* 2. KPI Cards (Special Jobs) */
+body.dark-mode .sp-kpi-card {
+  background: var(--card);
+  border-color: rgba(255,255,255,.08);
+}
+body.dark-mode .sp-kpi-lbl { color: var(--txt4); }
+body.dark-mode .sp-kpi-num { color: var(--txt); }
+body.dark-mode .sp-kpi-delta { background: rgba(255,255,255,.05); color: var(--txt3); border-color: rgba(255,255,255,.1); }
+body.dark-mode .sp-kpi-delta.up { background: rgba(16,185,129,.1); color: #34d399; }
+
+/* 3. Chart Cards & Forms */
+body.dark-mode .sp-chart-card,
+body.dark-mode .sp-form-card {
+  background: var(--card);
+  border-color: rgba(255,255,255,.08);
+}
+body.dark-mode .sp-chart-title { color: var(--txt); }
+body.dark-mode .sp-chart-sub { color: var(--txt4); }
+body.dark-mode .sp-form-htitle { color: #fff; }
+body.dark-mode .sp-form-badge { background: rgba(59,130,246,.15); color: #93c5fd; border-color: rgba(59,130,246,.3); }
+
+/* 4. Form Inputs in Special Jobs */
+body.dark-mode .sp-input {
+  background: var(--bg2);
+  border-color: var(--border);
+  color: var(--txt);
+}
+body.dark-mode .sp-input:focus {
+  border-color: var(--primary);
+  background: var(--bg);
+}
+body.dark-mode .sp-label { color: var(--txt3); }
+
+/* 5. Table Card (Special Jobs) */
+body.dark-mode .sp-table-card {
+  background: var(--card);
+  border-color: rgba(255,255,255,.08);
+}
+body.dark-mode .sp-table-header {
+  background: rgba(15,23,42,.5);
+  border-bottom-color: rgba(255,255,255,.1);
+}
+body.dark-mode .sp-table-title { color: var(--txt); }
+body.dark-mode .sp-table-count { background: var(--bg3); color: var(--txt2); }
+
+/* 6. THE TABLE (sp-tbl) - Critical Fixes */
+body.dark-mode .sp-tbl thead th {
+  background: linear-gradient(180deg, #1e293b, #0f172a);
+  color: var(--txt3);
+  border-bottom-color: rgba(59,130,246,.3);
+}
+body.dark-mode .sp-tbl tbody tr { border-bottom-color: rgba(255,255,255,.05); }
+body.dark-mode .sp-tbl tbody tr:nth-child(odd) td { background: var(--card); }
+body.dark-mode .sp-tbl tbody tr:nth-child(even) td { background: #1a202c; }
+body.dark-mode .sp-tbl tbody tr:hover td { background: rgba(30,58,138,.35) !important; }
+body.dark-mode .sp-tbl tbody td { color: var(--txt2); }
+
+/* 7. Elements inside Table */
+body.dark-mode .sp-row-num {
+  background: var(--bg3);
+  color: var(--txt4);
+}
+body.dark-mode .sp-status-done { background: rgba(16,185,129,.15); color: #34d399; border: 1px solid rgba(16,185,129,.3); }
+body.dark-mode .sp-status-wip { background: rgba(245,158,11,.15); color: #fbbf24; border: 1px solid rgba(245,158,11,.3); }
+body.dark-mode .sp-status-pending { background: rgba(59,130,246,.15); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+body.dark-mode .sp-date-pill { background: var(--bg3); color: var(--txt2); }
+body.dark-mode .sp-assignor-tag { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.15); color: var(--txt); }
+body.dark-mode .sp-result-txt { color: var(--txt2); }
+body.dark-mode .sp-del-btn { color: var(--txt4); background: transparent; }
+body.dark-mode .sp-del-btn:hover { background: rgba(239,68,68,.15); color: #f87171; }
+
+/* 8. Chart Visuals (Timeline & Bars) */
+body.dark-mode .sp-hbar-item { border-bottom-color: rgba(255,255,255,.05); }
+body.dark-mode .sp-hbar-track { background: rgba(255,255,255,.1); }
+body.dark-mode .sp-tl-track { background: rgba(255,255,255,.1); }
+body.dark-mode .sp-tl-mo { color: var(--txt4); }
+body.dark-mode .sp-empty { background: transparent; }
+body.dark-mode .sp-empty-txt { color: var(--txt4); }
+
+/* 9. Date Filter Bar (ในหน้า Special Jobs) */
+body.dark-mode .date-filter-bar {
+  background: var(--card);
+  border-color: rgba(255,255,255,.08);
+}
+body.dark-mode .df-label { color: var(--txt4); }
+body.dark-mode .df-btn { 
+  background: var(--bg3); 
+  color: var(--txt3); 
+  border-color: rgba(255,255,255,.1); 
+}
+body.dark-mode .df-btn:hover { 
+  background: var(--bg); 
+  color: var(--blue-400); 
+  border-color: var(--blue-400); 
+}
+body.dark-mode .df-btn.active { 
+  background: var(--blue-600); 
+  color: #fff; 
+  border-color: transparent; 
+  box-shadow: 0 2px 8px rgba(37,99,235,.3); 
+}
+body.dark-mode .df-divider { background: rgba(255,255,255,.1); }
+body.dark-mode .df-result { color: var(--txt4); }
+
+/* Fix Date Input inside Filter Bar */
+body.dark-mode .date-filter-bar input[type="date"],
+body.dark-mode .date-filter-bar input[type="month"],
+body.dark-mode .date-filter-bar select {
+  background: var(--bg2);
+  border-color: rgba(255,255,255,.15);
+  color: var(--txt);
+}
 /* ────────────────────────────────────
    TOPBAR ACTION BUTTONS (Unified Style)
 ──────────────────────────────────── */
@@ -1357,6 +1483,119 @@ body.dark-mode tbody tr:hover td { background: #1e3a8a !important; }
     font-size: 1rem;
   }
   .tb-btn span { display: none; }
+}
+/* ═══════════════════════════════════════════════════
+   DARK MODE FIXES — ALL FORM INPUTS & MODALS
+   (Support, 5S, Skill Matrix, Special Jobs)
+═══════════════════════════════════════════════════ */
+
+/* 1. กล่อง Form ทั่วไป (5S, Skill, Daily, Special) */
+body.dark-mode .form-row,
+body.dark-mode .form-5s,
+body.dark-mode .form-skill,
+body.dark-mode .form-special,
+body.dark-mode .form-daily {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Input และ Select ภายใน Form Row */
+body.dark-mode .form-row input,
+body.dark-mode .form-row select,
+body.dark-mode .form-row textarea,
+body.dark-mode .form-5s input,
+body.dark-mode .form-5s select,
+body.dark-mode .form-skill input,
+body.dark-mode .form-skill select,
+body.dark-mode .form-special input,
+body.dark-mode .form-special select {
+  background: var(--bg2) !important;
+  border-color: var(--border) !important;
+  color: var(--txt) !important;
+}
+
+/* Placeholder */
+body.dark-mode .form-row input::placeholder,
+body.dark-mode .form-skill input::placeholder,
+body.dark-mode .form-5s input::placeholder,
+body.dark-mode .form-special input::placeholder {
+  color: var(--txt4) !important;
+  opacity: 1;
+}
+
+/* Focus State (ตอนกำลังพิมพ์) */
+body.dark-mode .form-row input:focus,
+body.dark-mode .form-row select:focus,
+body.dark-mode .form-5s input:focus,
+body.dark-mode .form-skill input:focus,
+body.dark-mode .form-special input:focus {
+  border-color: var(--blue-400) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+  background: var(--bg) !important;
+}
+
+/* 2. Support Modal (หน้าต่าง Add/Edit Record) */
+body.dark-mode .add-sup-panel,
+body.dark-mode .edit-modal {
+  background: var(--card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .add-sup-hd {
+  background: var(--navy);
+  border-color: var(--border);
+}
+
+body.dark-mode .add-sup-body input,
+body.dark-mode .add-sup-body select,
+body.dark-mode .add-sup-body textarea,
+body.dark-mode .edit-input {
+  background: var(--bg2) !important;
+  border-color: var(--border) !important;
+  color: var(--txt) !important;
+}
+
+body.dark-mode .add-sup-body input:focus,
+body.dark-mode .add-sup-body select:focus,
+body.dark-mode .edit-input:focus {
+  background: var(--bg) !important;
+  border-color: var(--blue-400) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+body.dark-mode .add-sup-footer {
+  background: var(--card);
+  border-top-color: var(--border);
+}
+
+/* 3. Support Toolbar (ช่องค้นหาด้านบนตาราง) */
+body.dark-mode .sup-tbl-toolbar {
+  background: var(--card);
+  border-bottom-color: var(--border);
+}
+
+body.dark-mode .sup-tbl-toolbar input {
+  background: var(--bg2) !important;
+  border-color: var(--border) !important;
+  color: var(--txt) !important;
+}
+
+body.dark-mode .sup-tbl-toolbar input::placeholder {
+  color: var(--txt4) !important;
+}
+
+/* 4. Image Upload Zone (จัดการสีให้เข้ากับ Dark Mode) */
+body.dark-mode .img-zone {
+  border-color: var(--border);
+  background: var(--bg2);
+}
+
+body.dark-mode .img-zone-lbl {
+  color: var(--txt2);
+}
+
+body.dark-mode .img-zone-sub {
+  color: var(--txt4);
 }
 </style>
 
