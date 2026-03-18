@@ -1936,6 +1936,8 @@ html.dark-mode .dash-chart-card[style*="linear-gradient(145deg, var(--blue-900)"
 <datalist id="inspectorList"></datalist>
 
 <script>
+// ปิดการคลิกขวาบนหน้าเว็บ (ป้องกันเมนู Browser ขึ้นมารบกวน)
+document.addEventListener('contextmenu', e => e.preventDefault());
 /* ══════════════════════════════════════════════════════════
    CONFIG  (unchanged from original)
 ══════════════════════════════════════════════════════════ */
@@ -2185,6 +2187,20 @@ async function login(){
     setTimeout(()=>$id('loginPass').style.borderColor='var(--border)',1500);
     toast('⛔ รหัสผ่านไม่ถูกต้อง');return
   }
+
+  // ═══════════════════════════════════════════════════
+  // ★ เพิ่มโค้ดตรงนี้: บังคับ Fullscreen สำหรับ PC/Notebook
+  // ═══════════════════════════════════════════════════
+  try {
+    // ถ้ายังไม่อยู่ในโหมด Fullscreen ให้สั่งขยายเต็มจอทันที
+    // การกดปุ่ม Login ถือเป็น "User Interaction" ทำให้ Browser อนุญาต Fullscreen ได้
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    }
+  } catch(err) {
+    console.warn('Fullscreen not allowed:', err);
+  }
+
   $id('loginBtn').disabled=true;$id('loginForm').style.display='none';$id('loProgress').style.display='flex';
   await setStep(1,'active');await sleep(200);await setStep(1,'done');
   await setStep(2,'active');$id('loBar').style.width='40%';
