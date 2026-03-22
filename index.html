@@ -3631,6 +3631,25 @@ tbody tr {
 canvas {
   transition: none !important;
 }
+/* ═══════════════════════════════════════════════════════════
+   FIX: HIDE ALL SCROLLBARS GLOBALLY (SEAMLESS UI)
+   - ซ่อน Scrollbar ทุกจุดแต่ยังคงฟังก์ชันการเลื่อนได้
+══════════════════════════════════════════════════════════ */
+
+/* 1. ซ่อน Scrollbar สำหรับ Chrome, Safari และ Opera (Webkit Engine) */
+*::-webkit-scrollbar {
+  display: none; /* ซ่อนทั้งหมด */
+}
+
+/* 2. ซ่อน Scrollbar สำหรับ Firefox */
+* {
+  scrollbar-width: none; /* ใช้ค่า 'none' แทน 'thin' */
+}
+
+/* 3. ซ่อน Scrollbar สำหรับ IE และ Edge เวอร์เก่า */
+* {
+  -ms-overflow-style: none; 
+}
 </style>
 </head>
 <body>
