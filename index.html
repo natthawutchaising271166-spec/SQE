@@ -1450,6 +1450,2187 @@ tbody tr {
 tbody tr {
   transition: none !important; 
 }
+/* ═══════════════════════════════════════════════════════════
+   DASHBOARD V5 — FLUID RESPONSIVE LAYOUT (FIX OVERFLOW)
+   - ใช้ Minmax ป้องกันการล้น
+   - รองรับการย่อหน้าจอเมื่อออกจาก Fullscreen
+══════════════════════════════════════════════════════════ */
+
+/* 1. Container หลัก - บังคับให้ชิดขอบ ไม่มี Scrollbar ภายนอก */
+.cockpit-dash {
+  width: 100%;
+  height: 100vh; /* ใช้ vh แทน dvh เพื่อความเสถียร */
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* ★ สำคัญ: ตัดส่วนเกินออก */
+  font-family: var(--font-body);
+  position: relative;
+}
+
+/* Ambient background */
+.cockpit-dash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 2. Topbar - คงที่ */
+.dash-topbar-cockpit {
+  flex: 0 0 auto;
+  height: 64px;
+  padding: 0 1.5rem;
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  backdrop-filter: blur(20px);
+  position: relative;
+  z-index: 10;
+}
+
+.dash-topbar-cockpit::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.3), rgba(59, 130, 246, 0.3), transparent);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-glow {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.1));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: brandPulse 3s ease-in-out infinite;
+}
+
+@keyframes brandPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); }
+}
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brand-title {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.brand-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ── TICKER TAPE ── */
+.topbar-ticker {
+  flex: 1;
+  height: 32px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.ticker-content {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  animation: tickerScroll 30s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.ticker-item .label {
+  color: #64748b;
+}
+
+.ticker-item .value {
+  color: #f8fafc;
+  font-weight: 800;
+}
+
+.ticker-item .change {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.ticker-item .change.up {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.ticker-item .change.down {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* ── TOPBAR CONTROLS ── */
+.topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(30, 41, 59, 0.6);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.control-input {
+  background: transparent;
+  border: none;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  font-family: var(--font-mono);
+  outline: none;
+  cursor: pointer;
+  width: 100px;
+}
+
+.control-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+
+.control-select {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 8px;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  min-width: 120px;
+}
+
+.control-select option {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.control-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.control-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+.control-btn.close {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.control-btn.close:hover {
+  background: rgba(239, 68, 68);
+}
+
+/* 3. Main Body - ใช้ Grid แบบ Fluid */
+.cockpit-body {
+  flex: 1;
+  display: grid;
+  /* ★ กำหนดคอลัมน์แบบยืดหยุ่น: ซ้าย-ขวา กว้าง max 320px, กลางขยายเต็มที่ */
+  grid-template-columns: minmax(200px, 320px) minmax(0, 1fr) minmax(200px, 300px);
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  min-height: 0; /* สำคัญมาก: บังคับให้ Grid อยู่ในขอบ */
+  position: relative;
+  z-index: 1;
+}
+
+/* 4. Panels - ป้องกันการล้นภายใน */
+.cockpit-left, .cockpit-center, .cockpit-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 0; /* บังคับให้ลูกย่อมพ่อ */
+  overflow: hidden; /* ตัดส่วนเกินของ Panel */
+}
+
+/* Main Gauge */
+.gauge-cluster {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 20px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.main-gauge {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-ring {
+  position: relative;
+  width: 220px;
+  height: 220px;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.3));
+}
+
+.gauge-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-value {
+  font-family: var(--font-head);
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #f8fafc;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+.gauge-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.15em;
+  margin-top: 4px;
+}
+
+.gauge-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 99px;
+}
+
+.trend-arrow {
+  color: #10b981;
+  font-size: 0.7rem;
+}
+
+.trend-value {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.gauge-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.6rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Mini Gauges Row */
+.gauge-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.mini-gauge {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-gauge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gauge-color, #3b82f6);
+  opacity: 0.5;
+}
+
+.mini-gauge[data-type="sf"] { --gauge-color: #f97316; }
+.mini-gauge[data-type="vendor"] { --gauge-color: #ef4444; }
+.mini-gauge[data-type="ctc"] { --gauge-color: #3b82f6; }
+
+.mini-gauge:hover {
+  transform: translateY(-3px);
+  border-color: var(--gauge-color, #3b82f6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.mini-gauge-display {
+  position: relative;
+  width: 70px;
+  height: 70px;
+}
+
+.mini-gauge-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.mini-gauge-value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-head);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.mini-gauge-value .unit {
+  font-size: 0.6rem;
+  color: #64748b;
+  margin-left: 2px;
+}
+
+.mini-gauge-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mini-gauge-sparkline {
+  width: 100%;
+  height: 24px;
+  margin-top: auto;
+}
+
+.cockpit-center {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+  
+  /* ★ เพิ่มบรรทัดนี้ เพื่อให้เลื่อนหน้าจอได้ถ้าข้อมูลยาวเกิน */
+  overflow-y: auto; 
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════
+       CHART PANEL (FIXED ASPECT RATIO)
+══════════════════════════════════════════════════════ */
+
+/* 5. Chart Panel - จำกัดความสูงและกว้าง */
+.chart-panel {
+  flex: 1;
+  min-height: 200px; /* ความสูงขั้นต่ำ */
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* ส่วนหัวของกราฟ */
+.chart-header {
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.05), transparent);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-shrink: 0; /* ไม่ให้หัวข้อหด */
+}
+
+.chart-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chart-title {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: 0.02em;
+}
+
+.chart-subtitle {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.chart-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 0.55rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.stat-value.high { color: #10b981; }
+.stat-value.low { color: #ef4444; }
+
+.chart-body {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  min-height: 0;
+}
+
+/* ★ บังคับ Canvas ให้พอดีกับ Container เสมอ */
+.chart-body canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HERO KPI CARD (Top Left - Expanded)
+══════════════════════════════════════════════════════════ */
+.hero-kpi-card {
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.18) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 16px;
+  padding: 1.5rem 1.25rem;
+  margin-bottom: 0.75rem;
+  min-height: 160px; /* ความสูงที่โดดเด่น */
+  display: flex;
+  flex-direction: column; /* เรียงแนวตั้ง */
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
+}
+
+.hero-kpi-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 15%; right: 15%;
+  height: 4px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  border-radius: 4px 4px 0 0;
+}
+
+.hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.hero-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6ee7b7;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.hero-icon {
+  font-size: 1.5rem;
+}
+
+.hero-value {
+  font-family: var(--font-head);
+  font-size: 3.2rem; /* ตัวเลขใหญ่มาก */
+  font-weight: 900;
+  color: #f8fafc;
+  line-height: 1;
+  margin: 0.5rem 0;
+}
+
+.hero-sparkline {
+  width: 100%;
+  height: 30px;
+  margin-top: auto;
+}
+/* Hero Footer Styles */
+.hero-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.hero-footer .stat-sub {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.hero-footer .stat-pct {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #6ee7b7; /* สีเขียวสด */
+}
+/* ═══════════════════════════════════════════════════════════
+   STATS ROW — 4 COLUMNS WITH CUSTOM COLORS
+   SF=ส้ม, CTC=แดง, CAN USE=เขียว, VENDOR=น้ำเงิน
+══════════════════════════════════════════════════════════ */
+
+.cockpit-center .stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  border-radius: 14px;
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+/* เส้นสีด้านซ้ายมือ */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--card-accent, #3b82f6);
+}
+
+/* Color Mapping ตาม Requirement */
+.stat-card.sf { --card-accent: #f97316; }      /* ส้ม */
+.stat-card.ctc { --card-accent: #ef4444; }      /* แดง */
+.stat-card.canuse { --card-accent: #10b981; }   /* เขียว */
+.stat-card.vendor { --card-accent: #3b82f6; }   /* น้ำเงิน */
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--card-accent);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card .stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-card .stat-icon { font-size: 1.2rem; }
+
+.stat-card .stat-title {
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--card-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-card .stat-number {
+  font-family: var(--font-head);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.1;
+}
+
+.stat-card .stat-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.stat-card .stat-sub {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.stat-card .stat-pct {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--card-accent);
+}
+
+@keyframes indicatorPulse {
+  0%, 100% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { opacity: 1; box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RIGHT PANEL — NO SCROLL, PERFECT FIT (5 ITEMS)
+   - แสดงรายการครบ 5 อันดับ ไม่มี Scrollbar
+   - จัด Layout ให้สมดุลกับกรอบ
+══════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════
+   RIGHT PANEL — UNIFIED COMPACT STYLE (NO OVERFLOW)
+   - ทุกกล่องมีขนาดเท่ากัน (Compact)
+   - กล่องไม่ล้นออกมาด้านล่าง
+══════════════════════════════════════════════════════════ */
+
+/* ── RIGHT PANEL CONTAINER ── */
+.cockpit-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem; /* ลด Gap ระหว่างกล่อง */
+  overflow: hidden; /* ป้องกันการล้นออกมาด้านล่าง */
+  height: 100%; /* ยึดความสูงเต็มพื้นที่ */
+  justify-content: space-between; /* กระจายพื้นที่เท่าๆ กัน */
+}
+
+/* ── MARKET PANEL (UNIFORM HEIGHT) ── */
+.market-panel {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  border-radius: 16px;
+  padding: 0.75rem 1rem; /* ลด Padding เพื่อความกะทัดรัด */
+  backdrop-filter: blur(10px);
+  
+  /* ★ บังคับให้ทุกกล่องสูงเท่ากัน (Flex: 1) ★ */
+  flex: 1; 
+  min-height: 0; /* สำคัญ: ป้องกัน Flex Bug ที่ทำให้ล้น */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ไม่ต้องการให้ TOP PARTS แตกต่าง ให้เท่ากับอันอื่น */
+.market-panel.compact {
+  flex: 1;
+}
+
+/* ── HEADER (COMPACT) ── */
+.market-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem; /* ลด Margin ล่าง */
+  padding-bottom: 0.5rem; /* ลด Padding ล่าง */
+  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  flex-shrink: 0;
+  line-height: 1; /* ปรับ Line Height ให้แน่น */
+}
+
+.market-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-head);
+  font-size: 0.7rem; /* ลด Font เล็กน้อย */
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: 0.03em;
+}
+
+/* ★ Badge ตัวดูดซับพื้นที่ ★ */
+.market-badge {
+  font-size: 0.5rem; /* ลดขนาด Font Badge */
+  font-weight: 800;
+  padding: 2px 6px; /* ลด Padding Badge */
+  border-radius: 99px;
+  letter-spacing: 0.03em;
+  white-space: nowrap; /* บังคับไม่ให้ขึ้นบรรทัดใหม่ */
+}
+
+/* Badge Colors */
+.market-badge.green {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+.market-badge.orange {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* ── LIST CONTAINER (FILL REMAINING SPACE) ── */
+.market-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem; /* ลด Gap ระหว่างไอเทม */
+  flex: 1; /* กินพื้นที่ที่เหลือ */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LIST ITEM — UNIFORM SIZE & RICH CONTENT
+   ทำขนาดรายการเท่ากัน พร้อมเส้นสถานะด้านซ้าย
+══════════════════════════════════════════════════════════ */
+
+/* ── LIST ITEM CONTAINER ── */
+.market-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.6rem; /* กำหนด Padding ที่สม่ำเสมอ */
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 10px;
+  border: 1px solid rgba(59, 130, 246, 0.05);
+  transition: all 0.2s;
+  cursor: pointer;
+  
+  /* ★ บังคับความสูงให้เท่ากันทุกแถว ★ */
+  min-height: 44px; 
+  position: relative; /* เพื่อให้ใช้ absolute กับ pseudo-element ได้ */
+}
+
+/* เพิ่มเส้นสถานะด้านซ้าย (Gradient Bar) */
+.market-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #60a5fa, #3b82f6);
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* แสดงเส้นสถานะเมื่อ Hover */
+.market-item:hover::before {
+  opacity: 1;
+}
+
+/* เพิ่ม Padding ซ้ายเพื่อเว้นระยะจากเส้น */
+.market-item .market-rank {
+  margin-left: 6px; /* เว้นระยะจากเส้นด้านซ้าย */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GRADIENT COLORS BY PANEL TYPE
+   สีเส้นตามประเภทของ Panel (Suppliers/Defects/Parts)
+══════════════════════════════════════════════════════════ */
+/* 3. ทำให้ List ในแต่ละ Panel ยืดหยุ่นและเลื่อนได้เมื่อพื้นที่ไม่พอ */
+.market-panel {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  border-radius: 16px;
+  padding: 0.75rem 1rem;
+  backdrop-filter: blur(10px);
+  
+  flex: 1; /* แบ่งพื้นที่เท่าๆ กัน */
+  min-height: 0; /* สำคัญมาก: อนุญาตให้ย่อเล็กกว่าขนาด content เพื่อให้เลื่อนได้ */
+  display: flex;
+  flex-direction: column;
+}
+
+.market-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1; /* กินพื้นที่ที่เหลือในกล่อง */
+  overflow-y: auto; /* ถ้าพื้นที่ไม่พอให้มี Scrollbar */
+  padding-right: 2px;
+}
+
+/* 4. ปรับความสูงของแต่ละ Item ให้พอดี (ไม่บังคับความสูงตายตัว) */
+.market-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.6rem;
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 10px;
+  border: 1px solid rgba(59, 130, 246, 0.05);
+  transition: all 0.2s;
+  cursor: pointer;
+  /* เอา min-height ออกเพื่อให้มันพอดีกับเนื้อหา หรือจะคงไว้ที่ 44px ก็ได้ */
+}
+
+/* 5. สำหรับอุปกรณ์ที่ไม่รองรับ dvh (Fallback) */
+@supports not (height: 100dvh) {
+  .cockpit-dash {
+    height: 100vh; /* กลับไปใช้ vh เดิมถ้า browser เก่า */
+  }
+}
+/* 1. TOP SUPPLIERS - สีเขียว (Green) */
+.market-panel:nth-child(1) .market-item::before {
+  background: linear-gradient(180deg, #34d399, #10b981);
+}
+
+/* 2. TOP DEFECTS - สีส้ม (Orange) */
+.market-panel:nth-child(2) .market-item::before {
+  background: linear-gradient(180deg, #fbbf24, #f59e0b);
+}
+
+/* 3. TOP PARTS - สีม่วง (Violet) */
+.market-panel:nth-child(3) .market-item::before {
+  background: linear-gradient(180deg, #a78bfa, #8b5cf6);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HOVER EFFECT ENHANCEMENT
+══════════════════════════════════════════════════════════ */
+
+.market-item:hover {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.15);
+  transform: translateX(4px);
+}
+
+/* ── RANK BADGE ── */
+.market-rank {
+  width: 20px; /* ลดขนาดลงเล็กน้อย */
+  height: 20px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+.market-rank.gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+.market-rank.silver { background: linear-gradient(135deg, #64748b, #475569); color: #fff; }
+.market-rank.bronze { background: linear-gradient(135deg, #92400e, #78350f); color: #fff; }
+.market-rank.default { background: rgba(100, 116, 139, 0.2); color: #94a3b8; }
+
+/* ── INFO & STATS ── */
+.market-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.market-name {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.market-bar-bg {
+  height: 3px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 99px;
+  margin-top: 3px;
+  overflow: hidden;
+}
+
+.market-bar {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.market-stats {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.market-value {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.market-change {
+  font-size: 0.55rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.market-change.up { color: #10b981; }
+.market-change.down { color: #ef4444; }
+
+/* ── RESPONSIVE FIX ── */
+@media (max-width: 1400px) {
+  .cockpit-right {
+    /* ลด Gap บนหน้าจอกลาง */
+    gap: 0.5rem;
+  }
+  
+  .market-panel {
+    padding: 0.65rem 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dash-topbar-cockpit {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+  
+  .topbar-ticker {
+    order: -1;
+    flex: 1 1 100%;
+  }
+  
+  .cockpit-body {
+    grid-template-columns: 1fr;
+    padding: 0.75rem;
+  }
+  
+  .cockpit-left {
+    flex-direction: column;
+  }
+  
+  .gauge-cluster.main-gauge {
+    flex: none;
+  }
+  
+  .gauge-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .cockpit-right {
+    flex-direction: column;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   LIVE INCIDENT FEED (Below Trend Chart)
+══════════════════════════════════════════════════════════ */
+.incident-feed-panel {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  border-radius: 16px;
+  padding: 1rem;
+  
+  /* ★ ลบบรรทัดนี้ออก เพราะ gap ของ cockpit-center จัดการให้แล้ว */
+  /* margin-top: 1rem; */ 
+  
+  backdrop-filter: blur(10px);
+  
+  /* เพิ่มเติม: ใส่ Shadow ใต้กล่องเพื่อให้ดูลอยตัวแยกจากกราฟด้านบน */
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1); 
+  
+  /* ★ เพิ่มบรรทัดนี้เพื่อป้องกันไม่ให้ตารางยุบตัวเมื่อหน้าจอเล็ก */
+  flex-shrink: 0;
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.feed-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #f8fafc;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.live-indicator {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #10b981;
+  animation: liveBlink 1.5s infinite;
+}
+
+@keyframes liveBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.feed-filters {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.feed-filter-btn {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #64748b;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-mono);
+}
+
+.feed-filter-btn:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #e2e8f0;
+}
+
+.feed-filter-btn.active {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+.incident-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.incident-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.incident-item:hover {
+  background: rgba(30, 41, 59, 0.8);
+  transform: translateX(3px);
+}
+
+/* Status Colors for Border Left */
+.incident-item.critical { border-left-color: #ef4444; } /* Vendor Fault */
+.incident-item.warning { border-left-color: #f97316; } /* SF */
+.incident-item.info { border-left-color: #3b82f6; }    /* CTC */
+.incident-item.success { border-left-color: #10b981; } /* Can Use */
+
+.incident-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.incident-item.critical .incident-icon { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.incident-item.warning .incident-icon { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+.incident-item.info .incident-icon { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.incident-item.success .incident-icon { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+
+.incident-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.incident-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.incident-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  color: #64748b;
+  font-family: var(--font-mono);
+}
+
+.incident-tag {
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.incident-time {
+  margin-left: auto;
+  font-size: 0.6rem;
+  color: #475569;
+  white-space: nowrap;
+}
+
+/* Scrollbar for Feed */
+.incident-list::-webkit-scrollbar { width: 4px; }
+.incident-list::-webkit-scrollbar-track { background: transparent; }
+.incident-list::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.3); border-radius: 10px; }
+
+/* ═══════════════════════════════════════════════════════════
+   LIVE INCIDENT FEED — COMPACT & PERFECT FIT LAYOUT
+   - จัด Layout แบบ Gap System ให้ระยะห่างสม่ำเสมอ
+   - ปรับ Padding ให้พอดีกับขอบกล่อง
+══════════════════════════════════════════════════════════ */
+
+/* 1. Panel Container */
+.incident-feed-panel {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  border-radius: 16px;
+  
+  /* ★ ปรับ Padding ให้เท่ากันทุกด้าน เพื่อให้พอดีกับขอบ */
+  padding: 1rem; 
+  
+  backdrop-filter: blur(10px);
+  
+  /* ใช้ Flex เพื่อจัดการความสูง */
+  flex: 0 0 auto; 
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; 
+  margin-top: 1rem; 
+  
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1); 
+  flex-shrink: 0;
+}
+
+/* 2. Header */
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem; /* ระยะห่างจาก List */
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+  flex-shrink: 0;
+}
+
+.feed-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #f8fafc;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* 3. List Container (ใช้ Gap แทน Margin ของ Item) */
+.incident-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px; /* เว้นที่ให้ Scrollbar */
+  
+  /* ★ ใช้ Flex Column + Gap เพื่อระยะห่างที่สม่ำเสมอ */
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem; /* ระยะห่างระหว่างการ์ด */
+}
+
+/* 4. Individual Item (Card) */
+.incident-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem; /* ระยะห่างภายในการ์ด */
+  
+  /* ★ ปรับ Padding ให้กะทัดรัดขึ้น */
+  padding: 0.75rem 0.85rem; 
+  
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 10px;
+  border-left: 4px solid #ef4444; /* แดง = Vendor Fault */
+  transition: all 0.2s;
+  cursor: pointer;
+  
+  /* ลบ Margin ออก เพราะใช้ Gap ของ Container แล้ว */
+}
+
+.incident-item:hover {
+  background: rgba(30, 41, 59, 0.9);
+  transform: translateX(3px);
+}
+
+/* --- Internal Rows Styling --- */
+
+/* แถวบน */
+.incident-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* ลบ margin-bottom ออก เพราะใช้ gap ของ parent แล้ว */
+}
+
+.incident-ref-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #f8fafc;
+  background: rgba(239, 68, 68, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.incident-date-info {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-family: var(--font-mono);
+}
+
+/* แถวข้อมูลหลัก */
+.incident-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.incident-supplier {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.incident-part {
+  font-size: 0.72rem;
+  color: #cbd5e1;
+}
+
+/* แถวรายละเอียด */
+.incident-detail-row {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  /* ลด margin-top ออก ให้ gap จัดการ */
+}
+
+.incident-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.incident-detail-label {
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* แถวล่าง */
+.incident-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem; /* เว้นระยะนิดหน่อย */
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.incident-qty-display {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+/* Scrollbar Custom */
+.incident-list::-webkit-scrollbar { width: 4px; }
+.incident-list::-webkit-scrollbar-track { background: transparent; }
+.incident-list::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.3); border-radius: 10px; }
+/* ═══════════════════════════════════════════════════════════
+   COCKPIT BOTTOM ROW LAYOUT
+   Incident Feed (Left) + TOP LINE (Right)
+══════════════════════════════════════════════════════════ */
+
+/* 1. Container หลักสำหรับแถวล่าง (ใช้ Grid 2 คอลัมน์) */
+.cockpit-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* 2. ปรับ Incident Feed Panel ให้เล็กลง */
+.cockpit-bottom-row .incident-feed-panel {
+  max-height: 320px;
+  margin-top: 0; /* ลบ margin-top เดิมออก เพราะ gap ของ grid จัดการแล้ว */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOP LINE PANEL — PRODUCTION LINE RANKING WITH TREND
+══════════════════════════════════════════════════════════ */
+
+/* 3. Panel หลัก */
+.top-line-panel {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.92));
+  border: 1px solid rgba(139, 92, 246, 0.18);
+  border-radius: 18px;
+  padding: 1.1rem;
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  
+  /* Glow Effect */
+  box-shadow: 
+    0 4px 20px rgba(139, 92, 246, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* 4. Top Accent Bar */
+.top-line-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #6366f1);
+  border-radius: 18px 18px 0 0;
+}
+
+/* 5. Header */
+.top-line-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+  position: relative;
+  z-index: 1;
+}
+
+.top-line-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #f8fafc;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.top-line-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: rgba(236, 72, 153, 0.15);
+  border: 1px solid rgba(236, 72, 153, 0.25);
+  color: #f472b6;
+  letter-spacing: 0.05em;
+}
+
+.pulse-dot {
+  width: 5px;
+  height: 5px;
+  background: #f472b6;
+  border-radius: 50%;
+  animation: pulseDot 1.8s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* 6. Line Items Container */
+.top-line-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 3px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX: TOP LINES CENTERED & COMPACT NUMBERS
+   จัดให้อยู่กึ่งกลางแนวตั้ง และลดขนาดตัวเลขให้พอดีสวยงาม
+══════════════════════════════════════════════════════════ */
+
+/* 1. ตัวกล่องหลัก (Grid Container) */
+.line-item {
+  display: grid;
+  /* กำหนดคอลัมน์: Rank | ชื่อ+แถบ | ตัวเลข | Trend */
+  grid-template-columns: 32px 1fr 70px 22px; 
+  align-items: center; /* ★ สำคัญมาก: บังคับให้ทุกอย่างอยู่กึ่งกลางแนวตั้ง */
+  gap: 0.6rem;
+  
+  padding: 0.55rem 0.7rem; /* ลด Padding ให้พอดีตัว */
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 10px;
+  border-left: 3px solid transparent;
+  transition: background 0.2s;
+  cursor: pointer;
+  min-height: 42px; /* ความสูงขั้นต่ำ */
+}
+
+/* 2. ส่วน Rank (อันดับ) */
+.line-rank {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+}
+
+/* 3. ส่วน Info (ชื่อและแถบ) */
+.line-info-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  align-self: center; /* ยืนยันการจัดกึ่งกลาง */
+}
+
+.line-name {
+  font-size: 0.72rem; /* ลดขนาดนิดหน่อย */
+  font-weight: 700;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.line-bar-container {
+  height: 3px; /* ลดความสูงแถบ */
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+/* 4. ส่วน Stats (ตัวเลข Qty และ Lots) — ปรับให้เล็กลงและชิดขวา */
+.line-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* ชิดขวา */
+  justify-content: center;
+  gap: 1px;
+  text-align: right;
+  align-self: center; /* ยืนยันการจัดกึ่งกลาง */
+}
+
+/* ตัวเลข Qty */
+.line-qty {
+  font-family: var(--font-head);
+  font-size: 0.85rem; /* ลดขนาดลงจาก 1rem */
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.1;
+}
+
+/* ตัวเลข Lots */
+.line-lots {
+  font-size: 0.6rem; /* ลดขนาดลงจาก 0.7rem */
+  color: #94a3b8; /* สีจางลงเล็กน้อย */
+  font-weight: 600;
+  opacity: 1;
+}
+
+/* 5. Trend Arrow */
+.line-trend-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  padding: 0;
+  background: transparent;
+  opacity: 0.8;
+}
+
+/* Hover Effect */
+.line-item:hover {
+  background: rgba(139, 92, 246, 0.12);
+}
+
+/* สีอันดับ */
+.line-item.rank-1 { border-left-color: #f472b6; }
+.line-item.rank-2 { border-left-color: #a78bfa; }
+.line-item.rank-3 { border-left-color: #60a5fa; }
+.line-item.rank-4 { border-left-color: #34d399; }
+.line-item.rank-5 { border-left-color: #fbbf24; }
+
+/* 8. Top Row: Rank + Name + Stats */
+.line-top-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  position: relative;
+  z-index: 1;
+}
+
+.line-rank {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+.line-rank.r1 { background: linear-gradient(135deg, #ec4899, #db2777); color: #fff; }
+.line-rank.r2 { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: #fff; }
+.line-rank.r3 { background: linear-gradient(135deg, #60a5fa, #3b82f6); color: #fff; }
+.line-rank.r4 { background: linear-gradient(135deg, #34d399, #10b981); color: #fff; }
+.line-rank.r5 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
+.line-rank.r-default { background: rgba(100, 116, 139, 0.3); color: #94a3b8; }
+
+.line-name {
+  flex: 1;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.line-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.line-qty {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1;
+}
+
+.line-lots {
+  font-size: 0.58rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* 9. Progress Bar */
+.line-bar-container {
+  height: 4px;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.line-bar {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.line-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Bar Colors by Rank */
+.line-item.rank-1 .line-bar { background: linear-gradient(90deg, #ec4899, #f472b6); }
+.line-item.rank-2 .line-bar { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.line-item.rank-3 .line-bar { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.line-item.rank-4 .line-bar { background: linear-gradient(90deg, #10b981, #34d399); }
+.line-item.rank-5 .line-bar { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+/* 10. Trend Sparkline Container */
+.line-trend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.line-sparkline {
+  flex: 1;
+  height: 24px;
+}
+
+.line-trend-indicator {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.line-trend-indicator.up {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.line-trend-indicator.down {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.line-trend-indicator.stable {
+  background: rgba(100, 116, 139, 0.15);
+  color: #94a3b8;
+}
+
+/* 11. Scrollbar */
+.top-line-list::-webkit-scrollbar { width: 3px; }
+.top-line-list::-webkit-scrollbar-track { background: transparent; }
+.top-line-list::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 10px; }
+
+/* 12. Empty State */
+.top-line-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.top-line-empty-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+.top-line-empty-text {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE ADJUSTMENTS
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 1200px) {
+  /* ย่อ Grid เป็น 2 คอลัมน์: ซ้าย + (กลาง+ขวา) */
+  .cockpit-body {
+    grid-template-columns: minmax(200px, 300px) 1fr;
+  }
+  
+  /* ซ่อน Panel ขวาสุดไปก่อน (หรือจะย้ายไว้ด้านล่างก็ได้) */
+  .cockpit-right {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  /* ย่อเป็น 1 คอลัมน์: เรียงจากบนลงล่าง */
+  .cockpit-body {
+    grid-template-columns: 1fr;
+    overflow-y: auto; /* เปิดให้เลื่อนได้ถ้าสูงเกิน */
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  /* เปิด Panel ขวากลับมา (แต่อยู่ด้านล่าง) */
+  .cockpit-right {
+    display: flex;
+    flex-direction: row; /* จัดแนวนอน */
+    overflow-x: auto;
+    gap: 0.5rem;
+  }
+  
+  .market-panel {
+    min-width: 250px;
+    flex: 1;
+  }
+}
+
+/* ปรับ Topbar บนมือถือ */
+@media (max-width: 768px) {
+  .dash-topbar-cockpit {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+  .topbar-ticker {
+    order: -1;
+    width: 100%;
+  }
+  .topbar-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   FIX: UNIFIED HEADER LAYOUT (TOP PARTS BADGE)
+   เพิ่ม Badge ให้ TOP PARTS เพื่อให้เท่ากับอันอื่น
+══════════════════════════════════════════════════════════ */
+
+/* เพิ่ม Badge "COMPONENTS" เข้าไปใน TOP PARTS Header */
+.market-panel:last-child .market-header::after {
+  content: "COMPONENTS";
+  font-size: 0.5rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 99px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  
+  /* สีม่วง เข้ากับธีมของ Top Parts */
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  
+  /* Flex item properties */
+  flex-shrink: 0;
+  align-self: center;
+}
+/* ═══════════════════════════════════════════════════════════
+   ENHANCEMENT: ODOMETER & GLOW EFFECTS
+══════════════════════════════════════════════════════════ */
+/* 1. ใส่ Transition ให้ตัวเลข เวลาเปลี่ยนจะได้ไม่ดับเบิ้ลทันที */
+.kpi-value, .stat-number, .hero-value {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-property: color, text-shadow;
+}
+
+/* 2. Effect เวลาตัวเลขอัพเดท (ต้องเพิ่ม class 'pulse-update' ใน JS ตอนเปลี่ยนค่า) */
+.pulse-update {
+  animation: numPulse 0.6s ease-out;
+}
+
+@keyframes numPulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); text-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 3. Critical Glow: กระพริบถ้าค่าเสียเยอะเกินไป */
+.stat-card.critical-alert {
+  animation: criticalPulse 2s infinite;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+}
+
+@keyframes criticalPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  50% { box-shadow: 0 0 20px 5px rgba(239, 68, 68, 0.15); }
+}
+/* ═══════════════════════════════════════════════════════════
+   ADVANCED DASHBOARD ANIMATIONS
+══════════════════════════════════════════════════════════ */
+
+/* 1. Effect ตอนเปิด Dashboard (Fade In Scale) */
+.dash-animate-in {
+  opacity: 0;
+  transform: translateY(30px) scale(0.96);
+  animation: dashSlideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes dashSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 2. Effect สำหรับตัวเลข KPI เมื่ออัพเดท (Glow & Pop) */
+.pulse-glow {
+  animation: pulseGlowKey 0.6s ease-out;
+}
+
+@keyframes pulseGlowKey {
+  0% { transform: scale(1); color: inherit; }
+  50% { transform: scale(1.15); text-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+  100% { transform: scale(1); }
+}
+
+/* 3. Effect สำหรับ List Items (Stagger Slide) */
+.list-item-animate {
+  opacity: 0;
+  transform: translateX(20px);
+  animation: listItemSlide 0.4s ease-out forwards;
+}
+
+@keyframes listItemSlide {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 4. Shimmer Effect สำหรับ Loading */
+.shimmer-bg {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmerMove 1.5s infinite;
+}
+
+@keyframes shimmerMove {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+/* ═══════════════════════════════════════════════════════════
+   DASHBOARD: FORCE "LOTS" TEXT TO WHITE
+   บังคับตัวเลข Lot ใน Dashboard ให้เป็นสีขาวทุกจุด
+══════════════════════════════════════════════════════════ */
+
+/* 1. Hero KPI (กล่องใหญ่ด้านบนซ้าย - Total PCS) */
+.hero-kpi-card #heroLot {
+  color: #ffffff !important;
+  font-size: 1.4rem !important; /* ขยายให้ใหญ่โตด้วย */
+  font-weight: 900;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* เพิ่มเงาให้อ่านง่าย */
+}
+
+/* 2. Stats Row (การ์ด 4 ใบตรงกลาง: SF, CTC, Vendor, Can Use) */
+/* ใช้ Selector จำเพาะเจาะจง เพื่อบังคับสีขาว */
+.stat-card .stat-sub span[id*="Lot"] {
+  color: #ffffff !important;
+  font-size: 1.1rem !important;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* 3. Top Line Panel (ตารางด้านล่าง) */
+.line-item .line-lots {
+  color: #ffffff !important;
+  font-size: 0.85rem !important; /* ขยายให้ใหญ่ขึ้นจากเดิม */
+  font-weight: 700;
+  opacity: 1; /* ปิดความโปร่งใส เพื่อความชัดเจน */
+}
+/* ═══════════════════════════════════════════════════════════
+   FIX: TOP LINES ORGANIZED & COMPACT LAYOUT
+   จัดระเบียบ Top Lines ให้กระชับ ไม่ล้น จัดตารางสวยงาม
+══════════════════════════════════════════════════════════ */
+
+/* 1. ปรับ Container หลักให้ยืดหยุ่น และกำหนดความสูงสูงสุด */
+.top-line-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* ยึดความสูงตามพื้นที่ที่มี */
+  max-height: 100%;
+  overflow: hidden; /* ป้องกันการล้นออกมาด้านล่าง */
+}
+
+/* 2. กำหนดพื้นที่แสดงรายการให้เลื่อนได้ถ้าข้อมูลเยอะ */
+.top-line-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px; /* เว้นระยะ Scrollbar */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* ระยะห่างระหว่างแถว */
+}
+
+/* 3. จัด Layout ภายในแถวใหม่ (แบบ Grid ให้ตรงแถว) */
+.line-item {
+  display: grid;
+  /* กำหนดคอลัมน์: อันดับ | ชื่อ & แถบ | ตัวเลข | Trend */
+  grid-template-columns: 35px 1fr auto auto; 
+  align-items: center;
+  gap: 0.75rem;
+  
+  padding: 0.65rem 0.85rem;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 10px;
+  border-left: 3px solid transparent; /* เก็บขอบซ้ายไว้ */
+  transition: all 0.2s;
+  cursor: pointer;
+  
+  /* ลบ Transform เดิมออกเพื่อให้จัดตารางง่ายขึ้น */
+}
+
+/* 4. ปรับแต่งส่วนประกอบภายใน */
+.line-item .line-top-row {
+  display: contents; /* ทำให้ลูกๆ ขึ้นไปอยู่ level เดียวกับ Grid แม่ */
+}
+
+/* ซ่อนแถว Trend เดิม (ที่มี Sparkline) เพื่อลดความสูง */
+.line-item .line-trend-row {
+  display: none; 
+}
+
+/* Rank Badge */
+.line-rank {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+/* ส่วนแสดงชื่อและแถบ Progress (Column 2) */
+.line-item .line-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0; /* ป้องกันการขยายเกิน */
+}
+
+.line-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.line-bar-container {
+  height: 4px;
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 99px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.line-bar {
+  height: 100%;
+  border-radius: 99px;
+}
+
+/* ส่วนแสดงตัวเลข (Column 3) */
+.line-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0px;
+  min-width: 50px;
+}
+
+.line-qty {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.1;
+}
+
+.line-lots {
+  font-size: 0.7rem;
+  color: #ffffff; /* ใช้สีขาวตามที่ต้องการ */
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+/* Trend Arrow (Column 4) - แสดงแค่ไอคอนเล็กๆ */
+.line-trend-indicator {
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  background: transparent;
+  margin-left: 2px;
+}
+
+/* Hover Effect */
+.line-item:hover {
+  background: rgba(139, 92, 246, 0.12);
+  transform: none; /* ยกเลิกการเลื่อนเพื่อให้ตารางไม่ขยับ */
+}
+
+/* ปรับสีขอบซ้ายตามอันดับ */
+.line-item.rank-1 { border-left-color: #f472b6; }
+.line-item.rank-2 { border-left-color: #a78bfa; }
+.line-item.rank-3 { border-left-color: #60a5fa; }
+.line-item.rank-4 { border-left-color: #34d399; }
+.line-item.rank-5 { border-left-color: #fbbf24; }
+/* ═══════════════════════════════════════════════════════════
+   FIX: ALL CHARTS RESPONSIVE (INCLUDE SPARKLINES)
+   บังคับให้กราฟทุกชนิดใน Dashboard ปรับขนาดอัตโนมัติ
+══════════════════════════════════════════════════════════ */
+
+/* 1. Hero Sparkline (กล่องใหญ่สุด Total PCS) */
+.hero-sparkline canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 2. Mini Gauge Sparklines (กราฟเล็กๆ ใต้วงกลม) */
+.mini-gauge-sparkline canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 3. ปิด Animation ตอน Resize เพื่อป้องกันการกระตุก */
+canvas {
+  transition: none !important;
+}
 </style>
 </head>
 <body>
@@ -1894,210 +4075,320 @@ tbody tr {
   </div>
 </div>
 
-<!-- ════════════════════════════════
-     DASHBOARD MODAL — REDESIGNED
-════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════
+     DASHBOARD MODAL — STOCK MARKET × CAR COCKPIT HYBRID
+     Premium Financial Dashboard with Automotive Gauges
+═══════════════════════════════════════════════════════════ -->
 <div id="dashboardModal" onclick="closeDashboard()">
-<div class="glass-dash" onclick="event.stopPropagation()">
-  <!-- Topbar -->
-  <div class="dash-topbar">
-    <div style="display:flex;align-items:center;gap:1rem">
-      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue-700),var(--blue-500));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(37,99,235,.25)">
-        <svg width="18" height="18" viewBox="0 0 50 50" fill="none">
-          <circle stroke="#fff" stroke-width="5" cx="25" cy="25" r="17"/>
-          <line stroke="#fff" stroke-width="5" stroke-linecap="round" x1="35" y1="35" x2="44" y2="44"/>
+<div class="cockpit-dash" onclick="event.stopPropagation()">
+  
+  <!-- ═══════════════════════════════════════════════════════
+       TOP BAR — TRADING TERMINAL STYLE
+  ═══════════════════════════════════════════════════════ -->
+  <div class="dash-topbar-cockpit">
+    <div class="topbar-left">
+      <div class="brand-glow">
+        <svg width="28" height="28" viewBox="0 0 50 50" fill="none">
+          <circle stroke="#10b981" stroke-width="3" cx="25" cy="25" r="17" stroke-dasharray="100" stroke-dashoffset="100" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
+          <line stroke="#10b981" stroke-width="3" stroke-linecap="round" x1="35" y1="35" x2="44" y2="44" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
         </svg>
       </div>
-      <div>
-        <!-- ★ Modified: Removed inline color style -->
-        <h2 style="font-family:var(--font-head);font-weight:800;font-size:1.35rem;letter-spacing:-.02em">Analytics Dashboard</h2>
-        <p style="font-size:.75rem;color:#64748b;font-weight:500"><span id="dashUser" style="color:var(--blue-600);font-weight:700"></span> · <span id="dashTime"></span></p>
+      <div class="brand-info">
+        <div class="brand-title">SQE <span style="color:#10b981">ANALYTICS</span></div>
+        <div class="brand-subtitle">
+          <span id="dashUser" style="color:#f59e0b;font-weight:800"></span>
+          <span class="live-dot"></span>
+          <span id="dashTime">--:--:--</span>
+        </div>
       </div>
     </div>
     
-    <div class="dash-controls">
-      <div class="dash-filter-group">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#94a3b8"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-        <input type="date" id="dashStart" onchange="refreshDash()" class="dash-date-input">
-        <span style="color:#cbd5e1;font-weight:600">→</span>
-        <input type="date" id="dashEnd" onchange="refreshDash()" class="dash-date-input">
+    <div class="topbar-ticker" id="tickerTape">
+      <!-- Ticker items will be injected by JS -->
+    </div>
+    
+    <div class="topbar-controls">
+      <div class="control-group">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#64748b"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <input type="date" id="dashStart" onchange="refreshDash()" class="control-input">
+        <span style="color:#475569">→</span>
+        <input type="date" id="dashEnd" onchange="refreshDash()" class="control-input">
       </div>
-      <select id="dashVendor" onchange="refreshDash()" class="dash-select" style="min-width:140px"></select>
-      <button onclick="resetDashFilters()" title="Reset" style="padding:.5rem .75rem;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.35rem;font-weight:600;font-size:.75rem">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Reset
+      <select id="dashVendor" onchange="refreshDash()" class="control-select"></select>
+      <button onclick="resetDashFilters()" class="control-btn" title="Reset">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
       </button>
-      <button onclick="closeDashboard()" style="width:36px;height:36px;border-radius:10px;background:#ef4444;color:#fff;font-weight:800;font-size:1.1rem;border:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(239,68,68,.3)">✕</button>
+      <button onclick="closeDashboard()" class="control-btn close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
     </div>
   </div>
 
-  <!-- Body -->
-  <div class="dash-body">
-    <!-- ═══ KPI HERO SECTION ═══ -->
-    <div class="dash-kpi-hero">
-      <!-- Total Production -->
-      <div class="kpi-main-card animate-in" style="--kpi-color:#3b82f6;--kpi-bg:rgba(59,130,246,0.1);animation-delay:0.1s">
-        <div class="kpi-icon">📦</div>
-        <div class="kpi-title">Total Production</div>
-        <div class="kpi-value-hero" id="dHeroQty">0</div>
-        <div class="kpi-details">
-          <div class="kpi-detail-item"><span>📦</span><span class="kpi-detail-value" id="dHeroLot">0</span> Lots</div>
-          <div class="kpi-detail-item"><span>📅</span><span class="kpi-detail-value" id="dHeroDays">0</span> Days</div>
+  <!-- ═══════════════════════════════════════════════════════
+       MAIN BODY — COCKPIT LAYOUT
+  ═══════════════════════════════════════════════════════ -->
+  <div class="cockpit-body">
+    
+        <!-- ═══════════════════════════════════════════════════════
+         LEFT PANEL — HERO KPI + PASS RATE
+    ═══════════════════════════════════════════════════════ -->
+    <div class="cockpit-left">
+      
+      <!-- ★ HERO KPI: TOTAL PCS (ด้านบนซ้ายสุด ขยายใหญ่) ★ -->
+      <div class="hero-kpi-card">
+        <div class="hero-header">
+          <span class="hero-title">Total PCS</span>
+          <span class="hero-icon">📦</span>
+        </div>
+        <div class="hero-value" id="heroTotalQty">0</div>
+        <!-- เพิ่มส่วนแสดง Lot และ % -->
+        <div class="hero-footer">
+          <span class="stat-sub"><span id="heroLot">0</span> Lots</span>
+          <span class="stat-pct" id="heroPct">100%</span>
+        </div>
+        <div class="hero-sparkline" id="heroSparkline"></div>
+      </div>
+      
+      <!-- MAIN SPEEDOMETER — PASS RATE -->
+      <div class="gauge-cluster main-gauge">
+        <div class="gauge-ring" id="mainGaugeRing">
+          <svg viewBox="0 0 200 200" class="gauge-svg">
+            <path d="M 30 170 A 80 80 0 1 1 170 170" fill="none" stroke="#1e293b" stroke-width="12" stroke-linecap="round"/>
+            <path id="mainGaugeArc" d="M 30 170 A 80 80 0 0 1 170 170" fill="none" stroke="url(#gaugeGradient)" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 400" style="transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1)"/>
+            <defs>
+              <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#ef4444"/>
+                <stop offset="50%" style="stop-color:#f59e0b"/>
+                <stop offset="100%" style="stop-color:#10b981"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="gauge-center">
+            <div class="gauge-value" id="mainGaugeValue">0%</div>
+            <div class="gauge-label">PASS RATE</div>
+            <div class="gauge-trend" id="mainGaugeTrend">
+              <span class="trend-arrow">▲</span>
+              <span class="trend-value">0%</span>
+            </div>
+          </div>
+        </div>
+        <div class="gauge-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:#ef4444"></span><span>Critical</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span><span>Warning</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span><span>Good</span></div>
         </div>
       </div>
       
-      <!-- Quality Score -->
-      <div class="kpi-main-card animate-in" style="--kpi-color:#10b981;--kpi-bg:rgba(16,185,129,0.1);animation-delay:0.15s">
-        <div class="kpi-icon">✅</div>
-        <div class="kpi-title">Pass Rate (Can Use)</div>
-        <div class="kpi-value-hero" id="dHeroPass">0%</div>
-        <div class="kpi-details">
-          <div class="kpi-detail-item"><span>📊</span>Rejection: <span class="kpi-detail-value" style="color:#ef4444" id="dHeroRej">0%</span></div>
-          <div class="kpi-detail-item"><span>⚡</span>Avg/Lot: <span class="kpi-detail-value" id="dHeroAvg">0</span></div>
+      <!-- MINI GAUGES ROW -->
+      <div class="gauge-row">
+        <div class="mini-gauge" data-type="sf">
+          <div class="mini-gauge-display">
+            <svg viewBox="0 0 100 100" class="mini-gauge-svg">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="8"/>
+              <circle id="sfGaugeArc" cx="50" cy="50" r="40" fill="none" stroke="#f97316" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 251" transform="rotate(-90 50 50)"/>
+            </svg>
+            <div class="mini-gauge-value"><span id="sfGaugeValue">0</span><span class="unit">%</span></div>
+          </div>
+          <div class="mini-gauge-label">SF FAULT</div>
+          <div class="mini-gauge-sparkline" id="sfSparkline"></div>
+        </div>
+        
+        <div class="mini-gauge" data-type="vendor">
+          <div class="mini-gauge-display">
+            <svg viewBox="0 0 100 100" class="mini-gauge-svg">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="8"/>
+              <circle id="vendorGaugeArc" cx="50" cy="50" r="40" fill="none" stroke="#ef4444" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 251" transform="rotate(-90 50 50)"/>
+            </svg>
+            <div class="mini-gauge-value"><span id="vendorGaugeValue">0</span><span class="unit">%</span></div>
+          </div>
+          <div class="mini-gauge-label">VENDOR</div>
+          <div class="mini-gauge-sparkline" id="vendorSparkline"></div>
+        </div>
+        
+        <div class="mini-gauge" data-type="ctc">
+          <div class="mini-gauge-display">
+            <svg viewBox="0 0 100 100" class="mini-gauge-svg">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="8"/>
+              <circle id="ctcGaugeArc" cx="50" cy="50" r="40" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 251" transform="rotate(-90 50 50)"/>
+            </svg>
+            <div class="mini-gauge-value"><span id="ctcGaugeValue">0</span><span class="unit">%</span></div>
+          </div>
+          <div class="mini-gauge-label">CTC</div>
+          <div class="mini-gauge-sparkline" id="ctcSparkline"></div>
         </div>
       </div>
+      
     </div>
-
-    <!-- Mini KPI Grid -->
-    <div class="kpi-mini-grid animate-in" style="animation-delay:0.2s">
-      <div class="kpi-mini-card" style="--kpi-color:#f97316">
-        <div class="kpi-accent"></div>
-        <div class="kpi-content">
-          <div class="kpi-label">SF Fault</div>
-          <div class="kpi-value-row">
-            <span class="kpi-value" id="dMiniSF">0</span>
-            <span class="kpi-unit">PCS</span>
+    
+    <!-- ═══════════════════════════════════════════════════════
+         CENTER PANEL — STATS + CHART
+    ═══════════════════════════════════════════════════════ -->
+    <div class="cockpit-center">
+      
+            <!-- ★ STATS ROW: SF, CTC, CAN USE, VENDOR ★ -->
+      <div class="stats-row">
+        
+        <!-- 1. SF FAULT (ส้ม) -->
+        <div class="stat-card sf">
+          <div class="stat-header">
+            <span class="stat-title">SF Fault</span>
+            <span class="stat-icon">🔶</span>
           </div>
-          <div class="kpi-meta">
-            <span class="kpi-lot"><strong id="dMiniSFLot">0</strong> Lots</span>
-            <span class="kpi-pct" id="dMiniSFPct">0%</span>
+          <div class="stat-number" id="dashStatSF">0</div>
+          <div class="stat-footer">
+            <span class="stat-sub"><span id="dashLotSF">0</span> Lots</span>
+            <span class="stat-pct" id="dashPctSF">0%</span>
           </div>
         </div>
+        
+        <!-- 2. CTC FAULT (แดง) -->
+        <div class="stat-card ctc">
+          <div class="stat-header">
+            <span class="stat-title">CTC Fault</span>
+            <span class="stat-icon">🔴</span>
+          </div>
+          <div class="stat-number" id="dashStatCTC">0</div>
+          <div class="stat-footer">
+            <span class="stat-sub"><span id="dashLotCTC">0</span> Lots</span>
+            <span class="stat-pct" id="dashPctCTC">0%</span>
+          </div>
+        </div>
+        
+        <!-- 3. CAN USE (เขียว) -->
+        <div class="stat-card canuse">
+          <div class="stat-header">
+            <span class="stat-title">Can Use</span>
+            <span class="stat-icon">🟢</span>
+          </div>
+          <div class="stat-number" id="dashStatCanUse">0</div>
+          <div class="stat-footer">
+            <span class="stat-sub"><span id="dashLotCanUse">0</span> Lots</span>
+            <span class="stat-pct" id="dashPctCanUse">0%</span>
+          </div>
+        </div>
+        
+        <!-- 4. VENDOR FAULT (น้ำเงิน) -->
+        <div class="stat-card vendor">
+          <div class="stat-header">
+            <span class="stat-title">Vendor Fault</span>
+            <span class="stat-icon">🔵</span>
+          </div>
+          <div class="stat-number" id="dashStatVendor">0</div>
+          <div class="stat-footer">
+            <span class="stat-sub"><span id="dashLotVendor">0</span> Lots</span>
+            <span class="stat-pct" id="dashPctVendor">0%</span>
+          </div>
+        </div>
+        
       </div>
       
-      <div class="kpi-mini-card" style="--kpi-color:#ef4444">
-        <div class="kpi-accent"></div>
-        <div class="kpi-content">
-          <div class="kpi-label">Vendor Fault</div>
-          <div class="kpi-value-row">
-            <span class="kpi-value" id="dMiniVen">0</span>
-            <span class="kpi-unit">PCS</span>
-          </div>
-          <div class="kpi-meta">
-            <span class="kpi-lot"><strong id="dMiniVenLot">0</strong> Lots</span>
-            <span class="kpi-pct" id="dMiniVenPct">0%</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="kpi-mini-card" style="--kpi-color:#3b82f6">
-        <div class="kpi-accent"></div>
-        <div class="kpi-content">
-          <div class="kpi-label">CTC Fault</div>
-          <div class="kpi-value-row">
-            <span class="kpi-value" id="dMiniCTC">0</span>
-            <span class="kpi-unit">PCS</span>
-          </div>
-          <div class="kpi-meta">
-            <span class="kpi-lot"><strong id="dMiniCTCLot">0</strong> Lots</span>
-            <span class="kpi-pct" id="dMiniCTCPct">0%</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="kpi-mini-card" style="--kpi-color:#10b981">
-        <div class="kpi-accent"></div>
-        <div class="kpi-content">
-          <div class="kpi-label">Can Use (OK)</div>
-          <div class="kpi-value-row">
-            <span class="kpi-value" id="dMiniOK">0</span>
-            <span class="kpi-unit">PCS</span>
-          </div>
-          <div class="kpi-meta">
-            <span class="kpi-lot"><strong id="dMiniOKLot">0</strong> Lots</span>
-            <span class="kpi-pct" id="dMiniOKPct">0%</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ CHARTS SECTION ═══ -->
-    <div class="dash-charts-section animate-in" style="animation-delay:0.25s">
-      <!-- Trend Chart -->
-      <div class="dash-chart-card">
+      <!-- MAIN CHART -->
+      <div class="chart-panel main-chart">
         <div class="chart-header">
-          <div>
-            <div class="chart-title">Production Trend</div>
-            <div class="chart-subtitle">Monthly performance overview</div>
+          <div class="chart-title-group">
+            <div class="chart-title">PRODUCTION TREND</div>
+            <div class="chart-subtitle">Monthly Performance Analysis</div>
           </div>
-          <div id="trendInsight" style="padding:.35rem .85rem;background:#eff6ff;border-radius:99px;font-size:.7rem;font-weight:700;color:#1e40af;border:1px solid #bfdbfe">Peak: —</div>
-        </div>
-        <div class="chart-body"><canvas id="trendChart"></canvas></div>
-      </div>
-      
-      <!-- Donut Chart -->
-      <div class="dash-chart-card">
-        <div class="chart-header">
-          <div>
-            <div class="chart-title">Fault Distribution</div>
-            <div class="chart-subtitle">Judgment breakdown</div>
+          <div class="chart-stats" id="chartStats">
+            <div class="stat-item"><span class="stat-label">High</span><span class="stat-value high" id="statHigh">0</span></div>
+            <div class="stat-item"><span class="stat-label">Low</span><span class="stat-value low" id="statLow">0</span></div>
+            <div class="stat-item"><span class="stat-label">Avg</span><span class="stat-value" id="statAvg">0</span></div>
           </div>
         </div>
-        <div class="donut-container">
-          <canvas id="donutChart"></canvas>
-          <div class="donut-center-text">
-            <div class="total-value" id="donutCenter">0</div>
-            <div class="total-label">Total PCS</div>
-          </div>
+        <div class="chart-body">
+          <canvas id="mainTrendChart"></canvas>
         </div>
       </div>
-      
-      <!-- Top Lines Chart -->
-      <div class="dash-chart-card">
-        <div class="chart-header">
-          <div>
-            <div class="chart-title">Top Production Lines</div>
-            <div class="chart-subtitle">By quantity output</div>
-          </div>
+<!-- ★ NEW: BOTTOM ROW — INCIDENT + TOP LINE ★ -->
+  <div class="cockpit-bottom-row">
+    
+    <!-- LIVE INCIDENT FEED (ย่อเล็กลง) -->
+    <div class="incident-feed-panel">
+      <div class="feed-header">
+        <div class="feed-title">
+          <span class="live-indicator"></span>
+          LIVE INCIDENT FEED
         </div>
-        <div class="chart-body"><canvas id="radarChart"></canvas></div>
-      </div>
-    </div>
 
-    <!-- ═══ RANKINGS SECTION ═══ -->
-    <div class="dash-rankings-section animate-in" style="animation-delay:0.3s">
-      <div class="rank-card">
-        <div class="rank-header">
-          <span class="rank-title">🏆 Top Suppliers</span>
-          <span class="rank-subtitle">By QTY</span>
-        </div>
-        <div class="rank-list" id="rankSuppliers"></div>
       </div>
-      
-      <div class="rank-card">
-        <div class="rank-header">
-          <span class="rank-title">⚠️ Top Defects</span>
-          <span class="rank-subtitle">By QTY</span>
-        </div>
-        <div class="rank-list" id="rankDefects"></div>
-      </div>
-      
-      <div class="rank-card">
-        <div class="rank-header">
-          <span class="rank-title">📦 Top Parts</span>
-          <span class="rank-subtitle">By QTY</span>
-        </div>
-        <div class="rank-list" id="rankParts"></div>
+      <div class="incident-list" id="incidentList">
+        <!-- Injected by JS -->
       </div>
     </div>
+    
+    <!-- ★ NEW: TOP LINE PANEL ★ -->
+    <div class="top-line-panel">
+      <div class="top-line-header">
+        <div class="top-line-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2">
+            <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+          TOP LINES
+        </div>
+        <div class="top-line-badge">
+          <span class="pulse-dot"></span>
+          TRENDING
+        </div>
+      </div>
+      <div class="top-line-list" id="topLineList">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+    
   </div>
+
+</div>
+    
+    <!-- RIGHT PANEL — MARKET LEADERS -->
+    <div class="cockpit-right">
+      
+      <!-- TOP SUPPLIERS (MARKET LEADERS) -->
+      <div class="market-panel">
+        <div class="market-header">
+          <div class="market-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>
+            TOP SUPPLIERS
+          </div>
+          <div class="market-badge green">MARKET LEADERS</div>
+        </div>
+        <div class="market-list" id="supplierList">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+      
+      <!-- TOP DEFECTS (MARKET MOVERS) -->
+      <div class="market-panel">
+        <div class="market-header">
+          <div class="market-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            TOP DEFECTS
+          </div>
+          <div class="market-badge orange">RISK AREAS</div>
+        </div>
+        <div class="market-list" id="defectList">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+      
+      <!-- TOP PARTS -->
+      <div class="market-panel compact">
+        <div class="market-header">
+          <div class="market-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+            TOP PARTS
+          </div>
+        </div>
+        <div class="market-list mini" id="partList">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+      
+    </div>
+    
+  </div>
+  
 </div>
 </div>
-
-<datalist id="refList"></datalist><datalist id="lineList"></datalist>
-<datalist id="supList"></datalist><datalist id="ptList"></datalist>
-<datalist id="lotList"></datalist><datalist id="defectList"></datalist>
-<datalist id="inspectorList"></datalist>
-
 <script>
 document.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -2271,7 +4562,41 @@ function shake(el){if(!el)return;gsap.fromTo(el,{x:-7},{x:7,repeat:5,yoyo:true,d
 function setSyncBtn(s){const btn=$id('syncBtnMain'),icon=$id('syncIcon');if(!btn||!icon)return;btn.disabled=s;if(s)icon.classList.add('spin');else icon.classList.remove('spin')}
 document.addEventListener('click',e=>{const btn=e.target.closest('.btn');if(!btn)return;const r=btn.getBoundingClientRect();btn.style.setProperty('--rx',((e.clientX-r.left)/r.width*100)+'%');btn.style.setProperty('--ry',((e.clientY-r.top)/r.height*100)+'%');btn.classList.remove('ripple');void btn.offsetWidth;btn.classList.add('ripple');setTimeout(()=>btn.classList.remove('ripple'),480)});
 function updateFilterBtns(type){const map={'ALL':'btn-ALL','SF':'btn-SF','VENDOR FAULT':'btn-VENDOR','CTC':'btn-CTC','CAN USE':'btn-CANUSE'};Object.values(map).forEach(id=>{const el=$id(id);if(el)el.classList.remove('active-filter')});const key=type==='CAN USE'?'CANUSE':type==='VENDOR FAULT'?'VENDOR':type;const t=$id(map[key]||'btn-ALL');if(t)t.classList.add('active-filter')}
-function animNum(id,target){const el=$id(id);if(!el)return;const cur=parseInt(el.textContent.replace(/,/g,''))||0;if(cur===target){el.textContent=target.toLocaleString();return}gsap.killTweensOf(el);const obj={v:cur};const dur=Math.abs(target-cur)<10?.2:Math.abs(target-cur)<100?.4:.7;gsap.to(obj,{v:target,duration:dur,ease:'power2.out',onUpdate:()=>{el.textContent=Math.round(obj.v).toLocaleString()}})}
+function animNum(id, target) {
+  const el = $id(id);
+  if (!el) return;
+  
+  const cur = parseInt(el.textContent.replace(/,/g, '')) || 0;
+  
+  // ถ้าค่าเปลี่ยน ให้ trigger animation class
+  if (cur !== target) {
+    // เพิ่ม class animation
+    el.classList.add('pulse-update');
+    
+    // ลบ class ออกหลังจบ animation
+    setTimeout(() => {
+      el.classList.remove('pulse-update');
+    }, 600);
+  }
+
+  if (cur === target) {
+    el.textContent = target.toLocaleString();
+    return;
+  }
+
+  gsap.killTweensOf(el);
+  const obj = { v: cur };
+  const dur = Math.abs(target - cur) < 10 ? .2 : Math.abs(target - cur) < 100 ? .4 : .7;
+  
+  gsap.to(obj, {
+    v: target,
+    duration: dur,
+    ease: 'power2.out',
+    onUpdate: () => {
+      el.textContent = Math.round(obj.v).toLocaleString();
+    }
+  });
+}
 
 /* ══ NETWORK ══ */
 function normalizeRow(d,inspector){return{id:d.id||(Date.now()+'_'+Math.random()),date:d.date||'',shift:d.shift||'SHIFT A',inspector:d.inspector||inspector,ref:String(d.ref||''),line:d.line||'',supplier:d.supplier||'',partNo:d.partNo||'',partName:d.partName||'',qty:parseInt(d.qty)||0,defect:d.defect||'',remark:d.remark||'',judgment:d.judgment||'SF'}}
@@ -2640,557 +4965,866 @@ function refreshAll(){
     if('requestIdleCallback' in window)requestIdleCallback(updateDataLists,{timeout:2000});else setTimeout(updateDataLists,300);
   });
 }
+/* ═══════════════════════════════════════════════════════════
+   DASHBOARD JAVASCRIPT — COMPLETE ANIMATED VERSION
+══════════════════════════════════════════════════════════ */
 
-/* ══ DASHBOARD ══ */
-function openDashboard(){
-  $id('dashboardModal').style.display='flex';
-  $id('dashUser').textContent=currentUser;
-  
-  // Set current time
+let dashCharts = {
+  mainTrend: null,
+  sfSpark: null,
+  vendorSpark: null,
+  ctcSpark: null,
+  prodSpark: null
+};
+
+// ── HELPER: TIME UPDATE ──
+function updateDashTime() {
   const now = new Date();
-  $id('dashTime').textContent = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+  const el = $id('dashTime');
+  if (el) {
+    el.textContent = now.toLocaleTimeString('en-GB', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' 
+    });
+  }
+}
+
+// ── HELPER: ANIMATE VALUE WITH GLOW (Enhanced) ──
+function animNum(id, target) {
+  const el = $id(id);
+  if (!el) return;
+  
+  const cur = parseInt(el.textContent.replace(/,/g, '')) || 0;
+  const diff = target - cur;
+  
+  // ถ้าค่าเปลี่ยนแปลง ให้เพิ่ม Effect "Pulse Glow"
+  if (diff !== 0) {
+    el.classList.remove('pulse-glow');
+    void el.offsetWidth; // Trigger reflow to restart animation
+    el.classList.add('pulse-glow');
+  }
+
+  if (cur === target) {
+    el.textContent = target.toLocaleString();
+    return;
+  }
+
+  gsap.killTweensOf(el);
+  const obj = { v: cur };
+  const dur = Math.abs(diff) < 10 ? .2 : Math.abs(diff) < 100 ? .4 : .7;
+  
+  gsap.to(obj, {
+    v: target,
+    duration: dur,
+    ease: 'power2.out',
+    onUpdate: () => {
+      el.textContent = Math.round(obj.v).toLocaleString();
+    }
+  });
+}
+
+// ── OPEN DASHBOARD (Cinematic Entrance) ──
+function openDashboard() {
+  const modal = $id('dashboardModal');
+  modal.style.display = 'flex';
+  
+  // Reset animations
+  gsap.set(['.dash-topbar-cockpit', '.cockpit-left', '.cockpit-center', '.cockpit-right'], {clearProps: 'all'});
+  gsap.set(['.hero-kpi-card', '.gauge-cluster', '.stat-card', '.market-panel', '.incident-feed-panel', '.top-line-panel'], {opacity: 0, y: 20, scale: 0.98});
+
+  // Set user/time
+  $id('dashUser').textContent = currentUser;
+  updateDashTime();
+  setInterval(updateDashTime, 1000);
   
   // Populate vendor dropdown
-  const vendors=[...new Set(getMyRecords().map(r=>r.supplier))].filter(Boolean).sort();
-  $id('dashVendor').innerHTML='<option value="ALL">All Vendors</option>'+vendors.map(v=>`<option value="${v}">${v}</option>`).join('');
+  const vendors = [...new Set(getMyRecords().map(r => r.supplier))].filter(Boolean).sort();
+  $id('dashVendor').innerHTML = '<option value="ALL">All Vendors</option>' + 
+    vendors.map(v => `<option value="${v}">${v}</option>`).join('');
   
   resetDashFilters();
   
-  gsap.fromTo('#dashboardModal',{opacity:0},{opacity:1,duration:.3,ease:'power2.out'});
-  gsap.fromTo('.glass-dash',{opacity:0,y:20},{opacity:1,y:0,duration:.4,ease:'back.out(1.4)',delay:.05});
+  // ★ ANIMATION TIMELINE ★
+  const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+  
+  // 1. Background Fade
+  tl.fromTo('#dashboardModal', { opacity: 0 }, { opacity: 1, duration: 0.3 })
+  
+  // 2. Top Bar Slide Down
+    .fromTo('.dash-topbar-cockpit', { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, "-=0.1")
+  
+  // 3. Panels Slide In (Left/Right/Center)
+    .fromTo('.cockpit-left', { x: -100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8 }, "-=0.4")
+    .fromTo('.cockpit-right', { x: 100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8 }, "-=0.8")
+    .fromTo('.cockpit-center', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.6")
+  
+  // 4. Cards Pop In (Stagger)
+    .to(['.hero-kpi-card', '.gauge-cluster', '.stat-card', '.market-panel', '.incident-feed-panel', '.top-line-panel'], {
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      stagger: 0.08, // เวลาหน่วงระหว่างการ์ด
+      duration: 0.5,
+      ease: "back.out(1.4)" // Springy effect
+    }, "-=0.4");
 }
-function closeDashboard(){gsap.to('.glass-dash',{opacity:0,y:8,duration:.18,ease:'power2.in',onComplete:()=>{$id('dashboardModal').style.display='none';gsap.set(['.glass-dash','#dashboardModal'],{clearProps:'all'})}})}
-function resetDashFilters(){$id('dashStart').value='';$id('dashEnd').value='';$id('dashVendor').value='ALL';refreshDash()}
-function refreshDash(){
-  const start=$id('dashStart').value, end=$id('dashEnd').value, ven=$id('dashVendor').value;
-  let data=getMyRecords();
-  if(start) data=data.filter(r=>r.date>=start);
-  if(end) data=data.filter(r=>r.date<=end);
-  if(ven!=='ALL') data=data.filter(r=>r.supplier===ven);
+
+function closeDashboard() {
+  // ★ ANIMATION OUT ★
+  gsap.to('.cockpit-dash', { 
+    opacity: 0, 
+    scale: 0.98, 
+    y: 30,
+    duration: 0.35, 
+    ease: 'power2.in',
+    onComplete: () => {
+      $id('dashboardModal').style.display = 'none';
+      gsap.set(['.cockpit-dash', '#dashboardModal'], { clearProps: 'all' });
+    }
+  });
+}
+
+function resetDashFilters() {
+  $id('dashStart').value = '';
+  $id('dashEnd').value = '';
+  $id('dashVendor').value = 'ALL';
+  refreshDash();
+}
+
+// ── REFRESH DASHBOARD (Main Logic) ──
+function refreshDash() {
+  const start = $id('dashStart').value;
+  const end = $id('dashEnd').value;
+  const vendor = $id('dashVendor').value;
   
-  let tQ=0, sf=0, ven2=0, ctc=0, ok=0;
-  let sfL=0, venL=0, ctcL=0, okL=0;
+  let data = getMyRecords();
   
-  data.forEach(r=>{
-    tQ+=r.qty;
-    if(r.judgment==='SF'){sf+=r.qty;sfL++}
-    else if(r.judgment==='VENDOR FAULT'){ven2+=r.qty;venL++}
-    else if(r.judgment==='CTC'){ctc+=r.qty;ctcL++}
-    else if(r.judgment==='CAN USE'){ok+=r.qty;okL++}
+  // Apply Filters
+  if (start) data = data.filter(r => r.date >= start);
+  if (end) data = data.filter(r => r.date <= end);
+  if (vendor !== 'ALL') data = data.filter(r => r.supplier === vendor);
+  
+  // ═══ CALCULATE KPIs ═══
+  let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
+  let sfL = 0, venL = 0, ctcL = 0, okL = 0;
+  
+  data.forEach(r => {
+    tQ += r.qty;
+    if (r.judgment === 'SF') { sf += r.qty; sfL++; }
+    else if (r.judgment === 'VENDOR FAULT') { ven += r.qty; venL++; }
+    else if (r.judgment === 'CTC') { ctc += r.qty; ctcL++; }
+    else if (r.judgment === 'CAN USE') { ok += r.qty; okL++; }
   });
   
   const totalLot = data.length;
-  const activeDays = new Set(data.map(r=>r.date)).size;
-  const rejQ = sf + ven2 + ctc;
-  const rejPct = tQ>0 ? Math.round((rejQ/tQ)*100) : 0;
-  const passPct = tQ>0 ? Math.round((ok/tQ)*100) : 0;
-  const avgPerLot = totalLot>0 ? Math.round(tQ/totalLot) : 0;
+  const activeDays = new Set(data.map(r => r.date)).size;
+  const rejQ = sf + ven + ctc;
+  const rejPct = tQ > 0 ? Math.round((rejQ / tQ) * 100) : 0;
+  const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
+  const avgPerDay = activeDays > 0 ? Math.round(tQ / activeDays) : 0;
   
-  // Hero Cards
-  animNum('dHeroQty', tQ);
-  $id('dHeroLot').textContent = totalLot.toLocaleString();
-  $id('dHeroDays').textContent = activeDays;
-  $id('dHeroPass').textContent = passPct + '%';
-  $id('dHeroRej').textContent = rejPct + '%';
-  $id('dHeroAvg').textContent = avgPerLot.toLocaleString();
-  
-  // Mini KPI Cards
-  const pct = (v,t) => t>0 ? Math.round((v/t)*100) : 0;
-  
-  animNum('dMiniSF', sf);
-  $id('dMiniSFLot').textContent = sfL;
-  $id('dMiniSFPct').textContent = pct(sf,tQ) + '%';
-  
-  animNum('dMiniVen', ven2);
-  $id('dMiniVenLot').textContent = venL;
-  $id('dMiniVenPct').textContent = pct(ven2,tQ) + '%';
-  
-  animNum('dMiniCTC', ctc);
-  $id('dMiniCTCLot').textContent = ctcL;
-  $id('dMiniCTCPct').textContent = pct(ctc,tQ) + '%';
-  
-  animNum('dMiniOK', ok);
-  $id('dMiniOKLot').textContent = okL;
-  $id('dMiniOKPct').textContent = pct(ok,tQ) + '%';
-  
-  // Trend Insight
-  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  if(data.length>1){
-    const cnt=new Array(12).fill(0);
-    data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m))cnt[m]+=r.qty});
-    const peak=mo[cnt.indexOf(Math.max(...cnt))];
-    const topFault=sf>=ven2&&sf>=ctc?'SF':ven2>=ctc?'Vendor':'CTC';
-    $id('trendInsight').innerHTML='Peak: <b>'+peak+'</b> · Top Fault: <span style="color:#ef4444">'+topFault+'</span>';
-  }else{
-    $id('trendInsight').textContent='Peak: —';
-  }
-  
-  renderDashCharts(data);
-  renderRankings(data);
-}
+  // ═══ TREND CALCULATION (Month over Month) ═══
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+  const thisYear = now.getFullYear();
+  const lastYear = thisMonth === 0 ? thisYear - 1 : thisYear;
 
-function renderDashCharts(data) {
-  // Destroy old charts
-  ['trend', 'donut', 'radar'].forEach(k => {
-    if (charts[k]) { charts[k].destroy(); charts[k] = null; }
+  const currentMonthData = data.filter(r => {
+    const d = new Date(r.date);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  });
+  const lastMonthData = data.filter(r => {
+    const d = new Date(r.date);
+    return d.getMonth() === lastMonth && d.getFullYear() === lastYear;
   });
 
-  const isDark = document.documentElement.classList.contains('dark-mode');
-  const chartColors = {
-    gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
-    textColor: isDark ? 'rgba(255, 255, 255, 0.7)' : '#64748b',
-    tooltipBg: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(15, 23, 42, 0.9)',
-  };
+  const currentTotal = currentMonthData.reduce((s, r) => s + r.qty, 0);
+  const lastTotal = lastMonthData.reduce((s, r) => s + r.qty, 0);
 
-  // 1. TREND CHART
-  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const byMonth=new Array(12).fill(0);
-  const byMonthLot=new Array(12).fill(0);
-  data.forEach(r=>{const m=new Date(r.date).getMonth();if(!isNaN(m)){byMonth[m]+=r.qty;byMonthLot[m]++}});
+  let trendPct = 0;
+  let trendIcon = '→';
+  let trendColor = '#94a3b8';
+
+  if (lastTotal > 0) {
+    const diff = currentTotal - lastTotal;
+    trendPct = Math.round((diff / lastTotal) * 100);
+    if (diff > 0) { trendIcon = '▲'; trendColor = '#10b981'; }
+    else if (diff < 0) { trendIcon = '▼'; trendColor = '#ef4444'; }
+  } else if (currentTotal > 0) {
+    trendIcon = '▲'; trendPct = 100; trendColor = '#10b981';
+  }
+
+  const heroTrendEl = $id('heroPct');
+  if (heroTrendEl) {
+    heroTrendEl.innerHTML = `${trendIcon} ${Math.abs(trendPct)}%`;
+    heroTrendEl.style.color = trendColor;
+    heroTrendEl.title = `vs Last Month (${lastTotal.toLocaleString()} PCS)`;
+  }
   
-  const totalAllQty=data.reduce((s,r)=>s+r.qty,0)||1;
-  const tCtx=$id('trendChart');
-  if(tCtx) charts.trend=new Chart(tCtx,{
-    type:'line',
-    data:{
-      labels:mo,
-      datasets:[{
-        label:'Qty',
-        data:byMonth,
-        borderColor:'#3b82f6',
-        borderWidth:3,
-        tension:.4,
-        fill:true,
-        backgroundColor:ctx=>{
-          const g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height||200);
-          g.addColorStop(0,'rgba(59,130,246,0.2)');
-          g.addColorStop(1,'rgba(59,130,246,0.02)');
-          return g;
-        },
-        pointRadius:5,
-        pointBackgroundColor:'#fff',
-        pointBorderColor:'#3b82f6',
-        pointBorderWidth:2,
-        pointHoverRadius:8,
-        pointHoverBackgroundColor:'#3b82f6',
-        pointHoverBorderColor:'#fff',
-        pointHoverBorderWidth:3
+  // Update ticker
+  renderTicker(tQ, totalLot, passPct, rejPct, sf, ven, ctc, ok);
+  
+  // Update main gauge
+  updateMainGauge(passPct);
+  
+  // Update mini gauges
+  updateMiniGauge('sf', sf, tQ, sfL);
+  updateMiniGauge('vendor', ven, tQ, venL);
+  updateMiniGauge('ctc', ctc, tQ, ctcL);
+  
+  // ═══ UPDATE HERO KPI ═══
+  animNum('heroTotalQty', tQ);
+  $id('heroLot').textContent = totalLot;
+  renderSparkline('heroSparkline', data, '#10b981');
+  
+  // ═══ UPDATE STATS ROW ═══
+  const totalQ = sf + ven + ctc + ok;
+  const calcPct = (val) => totalQ > 0 ? Math.round((val / totalQ) * 100) : 0;
+
+  animNum('dashStatSF', sf);
+  $id('dashLotSF').textContent = sfL;
+  $id('dashPctSF').textContent = calcPct(sf) + '%';
+
+  animNum('dashStatCTC', ctc);
+  $id('dashLotCTC').textContent = ctcL;
+  $id('dashPctCTC').textContent = calcPct(ctc) + '%';
+
+  animNum('dashStatCanUse', ok);
+  $id('dashLotCanUse').textContent = okL;
+  $id('dashPctCanUse').textContent = calcPct(ok) + '%';
+
+  animNum('dashStatVendor', ven);
+  $id('dashLotVendor').textContent = venL;
+  $id('dashPctVendor').textContent = calcPct(ven) + '%';
+  
+  // Update chart stats
+  const byMonth = aggregateByMonth(data);
+  const maxVal = Math.max(...byMonth.map(d => d.qty));
+  const minVal = Math.min(...byMonth.filter(d => d.qty > 0).map(d => d.qty)) || 0;
+  const avgVal = byMonth.reduce((s, d) => s + d.qty, 0) / 12;
+  
+  $id('statHigh').textContent = maxVal.toLocaleString();
+  $id('statLow').textContent = minVal.toLocaleString();
+  $id('statAvg').textContent = Math.round(avgVal).toLocaleString();
+  
+  renderMainTrendChart(byMonth);
+  renderSparklines(data);
+  renderMarketLists(data);
+  
+  // Render Top Line & Incident Feed
+  renderTopLine(data);
+  renderIncidentFeed(data);
+}
+
+// ── RENDER TICKER TAPE ──
+function renderTicker(tQ, lots, pass, rej, sf, ven, ctc, ok) {
+  const ticker = $id('tickerTape');
+  const items = [
+    { label: 'TOTAL', value: tQ.toLocaleString() + ' PCS', change: '+' + lots + ' Lots', up: true },
+    { label: 'PASS', value: pass + '%', change: '▲', up: true },
+    { label: 'REJECTION', value: rej + '%', change: rej > 20 ? '⚠️' : '✓', up: rej <= 20 },
+    { label: 'SF', value: sf.toLocaleString(), change: 'PCS', up: false },
+    { label: 'VENDOR', value: ven.toLocaleString(), change: 'PCS', up: false },
+    { label: 'CTC', value: ctc.toLocaleString(), change: 'PCS', up: false },
+    { label: 'OK', value: ok.toLocaleString(), change: '✓', up: true }
+  ];
+  
+  const html = items.map(i => `
+    <div class="ticker-item">
+      <span class="label">${i.label}</span>
+      <span class="value">${i.value}</span>
+      <span class="change ${i.up ? 'up' : 'down'}">${i.change}</span>
+    </div>
+  `).join('');
+  
+  ticker.innerHTML = `<div class="ticker-content">${html}${html}</div>`;
+}
+
+// ── MAIN GAUGE ──
+function updateMainGauge(passPct) {
+  const circumference = 400;
+  const arcLength = (passPct / 100) * circumference;
+  
+  const arc = $id('mainGaugeArc');
+  if (arc) {
+    arc.style.strokeDasharray = `${arcLength} ${circumference}`;
+  }
+  
+  const valueEl = $id('mainGaugeValue');
+  if (valueEl) {
+    animateValue(valueEl, passPct, '%');
+  }
+  
+  const trendEl = $id('mainGaugeTrend');
+  if (trendEl) {
+    const status = passPct >= 80 ? 'good' : passPct >= 60 ? 'warning' : 'critical';
+    trendEl.className = 'gauge-trend ' + status;
+    trendEl.style.background = status === 'good' ? 'rgba(16, 185, 129, 0.1)' : 
+                                status === 'warning' ? 'rgba(245, 158, 11, 0.1)' : 
+                                'rgba(239, 68, 68, 0.1)';
+    trendEl.style.borderColor = status === 'good' ? 'rgba(16, 185, 129, 0.2)' : 
+                                 status === 'warning' ? 'rgba(245, 158, 11, 0.2)' : 
+                                 'rgba(239, 68, 68, 0.2)';
+    trendEl.querySelector('.trend-arrow').style.color = 
+      status === 'good' ? '#10b981' : status === 'warning' ? '#f59e0b' : '#ef4444';
+    trendEl.querySelector('.trend-value').style.color = 
+      status === 'good' ? '#10b981' : status === 'warning' ? '#f59e0b' : '#ef4444';
+    trendEl.querySelector('.trend-value').textContent = 
+      status === 'good' ? 'Good' : status === 'warning' ? 'Warning' : 'Critical';
+  }
+}
+
+// ── MINI GAUGE ──
+function updateMiniGauge(type, value, total, lots) {
+  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+  const circumference = 251;
+  const arcLength = (pct / 100) * circumference;
+  
+  const arc = $id(type + 'GaugeArc');
+  if (arc) {
+    arc.style.strokeDasharray = `${arcLength} ${circumference}`;
+  }
+  
+  const valueEl = $id(type + 'GaugeValue');
+  if (valueEl) {
+    animateValue(valueEl, pct);
+  }
+}
+
+// ── AGGREGATE BY MONTH ──
+function aggregateByMonth(data) {
+  const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const qtyByMonth = new Array(12).fill(0);
+  const lotByMonth = new Array(12).fill(0);
+  
+  data.forEach(r => {
+    const m = new Date(r.date).getMonth();
+    if (!isNaN(m)) {
+      qtyByMonth[m] += r.qty;
+      lotByMonth[m]++;
+    }
+  });
+  
+  const totalYear = qtyByMonth.reduce((a, b) => a + b, 0);
+  
+  return mo.map((label, i) => ({
+    month: label,
+    qty: qtyByMonth[i],
+    lots: lotByMonth[i],
+    pct: totalYear > 0 ? Math.round((qtyByMonth[i] / totalYear) * 100) : 0
+  }));
+}
+
+// ── MAIN TREND CHART ──
+function renderMainTrendChart(data) {
+  if (dashCharts.mainTrend) {
+    dashCharts.mainTrend.destroy();
+  }
+  
+  const ctx = $id('mainTrendChart');
+  if (!ctx) return;
+  
+  const chartCtx = ctx.getContext('2d');
+  const gradient = chartCtx.createLinearGradient(0, 0, 0, 280);
+  gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
+  gradient.addColorStop(0.5, 'rgba(59, 130, 246, 0.25)');
+  gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)');
+  
+  dashCharts.mainTrend = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map(d => d.month),
+      datasets: [{
+        label: 'Total Claim (PCS)',
+        data: data.map(d => d.qty),
+        borderColor: '#3b82f6',
+        borderWidth: 3,
+        backgroundColor: gradient,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 6,
+        pointHoverRadius: 10,
+        pointBackgroundColor: '#3b82f6',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 3,
+        pointHoverBackgroundColor: '#ffffff',
+        pointHoverBorderColor: '#3b82f6',
+        pointHoverBorderWidth: 4,
+        customData: data.map(d => ({ lots: d.lots, pct: d.pct }))
       }]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        datalabels:{display:false},
-        tooltip:{
-          backgroundColor:chartColors.tooltipBg,
-          titleFont:{family:'Sora',size:12,weight:'700'},
-          bodyFont:{family:'Sora',size:11,weight:'600'},
-          padding:{top:12,bottom:12,left:16,right:16},
-          cornerRadius:12,
-          borderColor:'rgba(59,130,246,0.3)',
-          borderWidth:1,
-          displayColors:false,
-          callbacks:{
-            title:ctx=>'📅 '+ctx[0].label,
-            label:ctx=>{
-              const mi=ctx.dataIndex;
-              const qty=byMonth[mi];
-              const lot=byMonthLot[mi];
-              const qtyPct=totalAllQty>0?((qty/totalAllQty)*100).toFixed(1):'0.0';
-              return[`  PCS: ${qty.toLocaleString()} (${qtyPct}%)`,`  LOT: ${lot.toLocaleString()}`];
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true, position: 'top', align: 'end',
+          labels: { color: '#94a3b8', font: { size: 10, weight: '600', family: 'Sora' }, boxWidth: 12, boxHeight: 12, borderRadius: 3, usePointStyle: true }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(59, 130, 246, 0.5)', borderWidth: 1,
+          titleFont: { family: 'Sora', size: 13, weight: '700' },
+          bodyFont: { family: 'DM Mono', size: 11 },
+          padding: { top: 12, bottom: 12, left: 16, right: 16 }, cornerRadius: 12, displayColors: false,
+          callbacks: {
+            title: (items) => `📅 ${data[items[0].dataIndex].month}`,
+            label: (ctx) => {
+              const d = data[ctx.dataIndex];
+              return [`📦 PCS: ${d.qty.toLocaleString()}`, `📊 Lots: ${d.lots}`, `📈 %: ${d.pct}%`];
             }
           }
         }
       },
-      scales:{
-        x:{grid:{display:false},border:{display:false},ticks:{font:{size:11,weight:'600',family:'Sora'},color:chartColors.textColor}},
-        y:{grid:{color:chartColors.gridColor,drawBorder:false},border:{display:false},ticks:{display:true,color:chartColors.textColor,font:{family:'DM Mono'}}}
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#64748b', font: { size: 10, weight: '600', family: 'Sora' } } },
+        y: { beginAtZero: true, grid: { display: false }, border: { display: false }, ticks: { color: '#64748b', font: { family: 'DM Mono', size: 10 }, callback: v => v >= 1000 ? (v/1000) + 'k' : v } }
       },
-      animation:{duration:1000,easing:'easeOutQuart'}
+      interaction: { intersect: false, mode: 'index' },
+      animation: { duration: 1500, easing: 'easeOutQuart' }
     }
   });
-
-  // 2. DONUT CHART
-  const sfQ=data.filter(r=>r.judgment==='SF').reduce((s,r)=>s+r.qty,0);
-  const venQ=data.filter(r=>r.judgment==='VENDOR FAULT').reduce((s,r)=>s+r.qty,0);
-  const ctcQ=data.filter(r=>r.judgment==='CTC').reduce((s,r)=>s+r.qty,0);
-  const okQ=data.filter(r=>r.judgment==='CAN USE').reduce((s,r)=>s+r.qty,0);
-  const totalQ=data.reduce((s,r)=>s+r.qty,0);
-  
-  $id('donutCenter').textContent=totalQ.toLocaleString();
-  
-  const dCtx=$id('donutChart');
-  if(dCtx) charts.donut=new Chart(dCtx,{
-    type:'doughnut',
-    data:{
-      labels:['SF Fault','Vendor','CTC','Can Use'],
-      datasets:[{
-        data:[sfQ,venQ,ctcQ,okQ],
-        backgroundColor:['#f97316','#ef4444','#3b82f6','#10b981'],
-        hoverBackgroundColor:['#fb923c','#f87171','#60a5fa','#34d399'],
-        borderWidth:3,
-        borderColor:'#fff',
-        hoverOffset:10
-      }]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      cutout:'72%',
-      plugins:{
-        legend:{display:true,position:'bottom',labels:{color:chartColors.textColor,font:{size:10,weight:'600',family:'Sora'},boxWidth:10,padding:12,usePointStyle:true}},
-        datalabels:{display:false},
-        tooltip:{backgroundColor:chartColors.tooltipBg,borderColor:'rgba(59,130,246,0.3)',borderWidth:1,callbacks:{label:ctx=>' '+ctx.parsed.toLocaleString()+' ('+Math.round((ctx.parsed/totalQ)*100)+'%)'}}
-      },
-      animation:{animateRotate:true,animateScale:true,duration:1000,easing:'easeOutQuart'}
-    }
-  });
-
-  // 3. TOP LINES CHART
-  const lineMap={};
-  data.forEach(r=>{if(r.line)lineMap[r.line]=(lineMap[r.line]||0)+r.qty});
-  const topLines=Object.entries(lineMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
-  
-  const rCtx=$id('radarChart');
-  if(rCtx && topLines.length) charts.radar=new Chart(rCtx,{
-    type:'bar',
-    data:{
-      labels:topLines.map(l=>'Line '+l[0]),
-      datasets:[{
-        label:'Qty',
-        data:topLines.map(l=>l[1]),
-        backgroundColor:ctx=>{
-          const g=ctx.chart.ctx.createLinearGradient(ctx.chart.width||300,0,0,0);
-          g.addColorStop(0,'rgba(59,130,246,1)');
-          g.addColorStop(1,'rgba(59,130,246,0.5)');
-          return g;
-        },
-        hoverBackgroundColor:'#3b82f6',
-        borderRadius:8,
-        barThickness:18
-      }]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      indexAxis:'y',
-      layout:{padding:{right:50}},
-      scales:{
-        x:{display:true,grid:{color:chartColors.gridColor,drawBorder:false},ticks:{display:true,color:chartColors.textColor}},
-        y:{grid:{display:false},border:{display:false},ticks:{color:chartColors.textColor,font:{size:11,weight:'600',family:'Sora'}}}
-      },
-      plugins:{
-        legend:{display:false},
-        datalabels:{anchor:'end',align:'end',color:chartColors.textColor,font:{size:10,weight:'600',family:'DM Mono'},formatter:v=>v.toLocaleString(),clip:false},
-        tooltip:{backgroundColor:chartColors.tooltipBg}
-      },
-      animation:{duration:1000,easing:'easeOutQuart'}
-    }
-  });
-} 
-function renderRankings(data){
-  const totalQty=data.reduce((s,r)=>s+r.qty,0)||1;
-  
-  const getTop=(key,n=5)=>{
-    const m={};
-    data.forEach(r=>{if(r[key])m[r[key]]=(m[r[key]]||0)+r.qty});
-    return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,n);
-  };
-  
-  const draw=(id,items,badgeColor,barColor)=>{
-    const maxV=items[0]?.[1]||1;
-    const el=$id(id);
-    if(!el)return;
-    
-    el.innerHTML=items.map(([k,v],i)=>{
-      const pct=Math.round((v/totalQty)*100);
-      const barW=Math.round((v/maxV)*100);
-      const badge=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-      
-      return`<div class="rank-item">
-        <div class="rank-badge" style="background:${i<3?badgeColor:'#94a3b8'}">${badge}</div>
-        <div class="rank-info">
-          <div class="rank-name">${escapeHtml(k)}</div>
-          <div class="rank-bar-container"><div class="rank-bar" style="background:${barColor};width:${barW}%"></div></div>
-        </div>
-        <div class="rank-stats">
-          <div class="rank-value">${v.toLocaleString()}</div>
-          <div class="rank-pct">${pct}%</div>
-        </div>
-      </div>`;
-    }).join('');
-  };
-  
-  draw('rankSuppliers',getTop('supplier'),'#f97316','linear-gradient(90deg,#f97316,#fbbf24)');
-  draw('rankDefects',getTop('defect'),'#ef4444','linear-gradient(90deg,#ef4444,#f87171)');
-  draw('rankParts',getTop('partNo'),'#3b82f6','linear-gradient(90deg,#3b82f6,#60a5fa)');
 }
 
-// Use this code to replace your existing importExcel function
-function importExcel(input) {
-  if (_isInitializing) {
-    toast('⏳ กรุณารอให้ระบบโหลดเสร็จก่อน');
-    input.value = '';
+// ── SPARKLINES ──
+function renderSparklines(data) {
+  renderSparkline('sfSparkline', data.filter(r => r.judgment === 'SF'), '#f97316');
+  renderSparkline('vendorSparkline', data.filter(r => r.judgment === 'VENDOR FAULT'), '#ef4444');
+  renderSparkline('ctcSparkline', data.filter(r => r.judgment === 'CTC'), '#3b82f6');
+  renderSparkline('prodSparkline', data, '#10b981');
+}
+
+function renderSparkline(containerId, data, color) {
+  const container = $id(containerId);
+  if (!container || !data.length) return;
+  
+  const key = containerId.replace('Sparkline', '') + 'Spark';
+  if (dashCharts[key]) dashCharts[key].destroy();
+  
+  const byDate = {};
+  data.forEach(r => { byDate[r.date] = (byDate[r.date] || 0) + r.qty; });
+  
+  const dates = Object.keys(byDate).sort();
+  const values = dates.map(d => byDate[d]);
+  
+  const canvas = document.createElement('canvas');
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  container.innerHTML = '';
+  container.appendChild(canvas);
+  
+  dashCharts[key] = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: dates,
+      datasets: [{
+        data: values,
+        borderColor: color,
+        borderWidth: 1.5,
+        fill: true,
+        backgroundColor: color.replace(')', ', 0.15)').replace('rgb', 'rgba'),
+        tension: 0.4,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } },
+      animation: { duration: 0 }
+    }
+  });
+}
+
+// ── MARKET LISTS (Animated) ──
+function renderMarketLists(data) {
+  renderSupplierList(data);
+  renderDefectList(data);
+  renderPartList(data);
+}
+
+function renderSupplierList(data) {
+  const bySupplier = {};
+  data.forEach(r => {
+    bySupplier[r.supplier] = (bySupplier[r.supplier] || { qty: 0, ok: 0 });
+    bySupplier[r.supplier].qty += r.qty;
+    if (r.judgment === 'CAN USE') bySupplier[r.supplier].ok += r.qty;
+  });
+  
+  const sorted = Object.entries(bySupplier)
+    .map(([name, stats]) => ({ name, ...stats, rate: Math.round((stats.ok / stats.qty) * 100) }))
+    .sort((a, b) => b.qty - a.qty)
+    .slice(0, 5);
+  
+  const maxQty = sorted[0]?.qty || 1;
+  
+  const html = sorted.map((item, i) => `
+    <div class="market-item" style="opacity: 0; transform: translateX(-20px);">
+      <div class="market-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'default'}">${i + 1}</div>
+      <div class="market-info">
+        <div class="market-name">${escapeHtml(item.name)}</div>
+        <div class="market-bar-bg">
+          <div class="market-bar" style="background: linear-gradient(90deg, #10b981, #34d399); width: ${(item.qty / maxQty) * 100}%"></div>
+        </div>
+      </div>
+      <div class="market-stats">
+        <div class="market-value">${item.qty.toLocaleString()}</div>
+        <div class="market-change ${item.rate >= 80 ? 'up' : 'down'}">${item.rate}%</div>
+      </div>
+    </div>
+  `).join('');
+  
+  $id('supplierList').innerHTML = html || '<div style="text-align:center;color:#64748b;padding:1rem">No data</div>';
+  
+  // Animation
+  gsap.to('#supplierList .market-item', { opacity: 1, x: 0, duration: 0.4, stagger: 0.05, ease: "power2.out", delay: 0.1 });
+}
+
+function renderDefectList(data) {
+  const totalQty = data.reduce((s, r) => s + r.qty, 0);
+  const byDefect = {};
+  data.forEach(r => {
+    if (r.defect) byDefect[r.defect] = (byDefect[r.defect] || 0) + r.qty;
+  });
+  
+  const sorted = Object.entries(byDefect)
+    .map(([name, qty]) => ({ name, qty, pct: totalQty > 0 ? Math.round((qty / totalQty) * 100) : 0 }))
+    .sort((a, b) => b.qty - a.qty)
+    .slice(0, 5);
+  
+  const maxQty = sorted[0]?.qty || 1;
+  
+  const html = sorted.map((item, i) => `
+    <div class="market-item" style="opacity: 0; transform: translateX(-20px);">
+      <div class="market-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'default'}">${i + 1}</div>
+      <div class="market-info">
+        <div class="market-name">${escapeHtml(item.name)}</div>
+        <div class="market-bar-bg">
+          <div class="market-bar" style="background: linear-gradient(90deg, #f59e0b, #fbbf24); width: ${(item.qty / maxQty) * 100}%"></div>
+        </div>
+      </div>
+      <div class="market-stats">
+        <div class="market-value">${item.qty.toLocaleString()}</div>
+        <div class="market-change down">${item.pct}%</div>
+      </div>
+    </div>
+  `).join('');
+  
+  $id('defectList').innerHTML = html || '<div style="text-align:center;color:#64748b;padding:1rem">No defects</div>';
+  
+  // Animation
+  gsap.to('#defectList .market-item', { opacity: 1, x: 0, duration: 0.4, stagger: 0.05, ease: "power2.out", delay: 0.1 });
+}
+
+function renderPartList(data) {
+  const totalQty = data.reduce((s, r) => s + r.qty, 0);
+  const byPart = {};
+  data.forEach(r => {
+    if (r.partNo) {
+      byPart[r.partNo] = (byPart[r.partNo] || { qty: 0, name: r.partName || '' });
+      byPart[r.partNo].qty += r.qty;
+    }
+  });
+
+  const sorted = Object.entries(byPart)
+    .map(([no, stats]) => ({ no, ...stats, pct: totalQty > 0 ? Math.round((stats.qty / totalQty) * 100) : 0 }))
+    .sort((a, b) => b.qty - a.qty)
+    .slice(0, 5);
+
+  const maxQty = sorted[0]?.qty || 1;
+
+  const html = sorted.map((item, i) => `
+    <div class="market-item" style="opacity: 0; transform: translateX(-20px);">
+      <div class="market-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'default'}">${i + 1}</div>
+      <div class="market-info">
+        <div class="market-name">${escapeHtml(item.no)}</div>
+        <div class="market-bar-bg">
+          <div class="market-bar" style="background: linear-gradient(90deg, #8b5cf6, #a78bfa); width: ${(item.qty / maxQty) * 100}%"></div>
+        </div>
+      </div>
+      <div class="market-stats">
+        <div class="market-value">${item.qty.toLocaleString()}</div>
+        <div class="market-change down">${item.pct}%</div>
+      </div>
+    </div>
+  `).join('');
+
+  $id('partList').innerHTML = html || '<div style="text-align:center;color:#64748b;padding:1rem">No parts</div>';
+  
+  // Animation
+  gsap.to('#partList .market-item', { opacity: 1, x: 0, duration: 0.4, stagger: 0.05, ease: "power2.out", delay: 0.1 });
+}
+
+// ── RENDER INCIDENT FEED (Animated) ──
+let currentIncidentFilter = 'VENDOR FAULT';
+
+function filterIncidents(type) {
+  currentIncidentFilter = type;
+  document.querySelectorAll('.feed-filter-btn').forEach(btn => {
+    btn.classList.remove('active');
+    const text = btn.textContent.trim();
+    if (type === 'VENDOR FAULT' && text === 'VENDOR') btn.classList.add('active');
+    else if (text === type) btn.classList.add('active');
+  });
+  refreshDash();
+}
+
+function renderIncidentFeed(data) {
+  const container = $id('incidentList');
+  if (!container) return;
+
+  let filtered = data.filter(r => r.judgment === 'VENDOR FAULT').reverse();
+  const items = filtered.slice(0, 50);
+
+  if (items.length === 0) {
+    container.innerHTML = `<div style="text-align:center;color:#475569;padding:1.5rem;font-size:0.75rem">ไม่มีข้อมูล VENDOR FAULT</div>`;
+    return;
+  }
+
+  const html = items.map(r => {
+    const dateStr = r.date || '-';
+    return `
+      <div class="incident-item critical" style="opacity: 0; transform: translateY(15px);">
+        <div class="incident-top-row">
+          <div class="incident-date-info">${dateStr} · ${r.shift || '-'} · Line ${r.line || '-'}</div>
+          <div class="incident-ref-badge"># ${r.ref}</div>
+        </div>
+        <div class="incident-main-info">
+          <div class="incident-supplier">${r.supplier}</div>
+          <div class="incident-part">${r.partNo} · ${r.partName}</div>
+        </div>
+        <div class="incident-detail-row">
+          <div class="incident-detail-item"><span class="incident-detail-label">Defect:</span><span>${r.defect || '-'}</span></div>
+          <div class="incident-detail-item"><span class="incident-detail-label">Remark:</span><span>${r.remark || '-'}</span></div>
+        </div>
+        <div class="incident-footer-row">
+          <div class="incident-qty-display">${r.qty.toLocaleString()} <span style="font-size:0.7rem;color:#94a3b8;font-weight:600">PCS</span></div>
+          <div style="font-size:0.65rem;font-weight:700;color:#f87171;background:rgba(239,68,68,0.15);padding:4px 10px;border-radius:99px;">VENDOR FAULT</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = html;
+
+  // Animation
+  gsap.to('.incident-item', { opacity: 1, y: 0, duration: 0.5, stagger: 0.04, ease: "power2.out" });
+}
+
+// ── RENDER TOP LINE PANEL (COMPACT VERSION) ──
+function renderTopLine(data) {
+  const container = $id('topLineList');
+  if (!container) return;
+  
+  // 1. Aggregate Data
+  const byLine = {};
+  data.forEach(r => {
+    const lineName = r.line || 'Unknown';
+    if (!byLine[lineName]) byLine[lineName] = { qty: 0, lots: 0, trend: {} };
+    byLine[lineName].qty += r.qty;
+    byLine[lineName].lots++;
+    
+    // Trend data (ยังเก็บไว้คำนวณ แต่ไม่แสดงกราฟ)
+    const dateKey = r.date || 'unknown';
+    byLine[lineName].trend[dateKey] = (byLine[lineName].trend[dateKey] || 0) + r.qty;
+  });
+  
+  // 2. Sort and get top 5
+  const sorted = Object.entries(byLine)
+    .map(([name, stats]) => ({ name, ...stats }))
+    .sort((a, b) => b.qty - a.qty)
+    .slice(0, 5);
+  
+  // 3. Empty state
+  if (sorted.length === 0) {
+    container.innerHTML = `
+      <div class="top-line-empty">
+        <div class="top-line-empty-icon">📊</div>
+        <div class="top-line-empty-text">ยังไม่มีข้อมูล Line</div>
+      </div>
+    `;
     return;
   }
   
-  const file = input.files[0];
-  if (!file) return;
+  const maxQty = sorted[0]?.qty || 1;
   
-  const reader = new FileReader();
-  reader.onload = async e => {
-    // ★ เปลี่ยนเป็น false เพื่อให้ได้ตัวเลข Serial Number แทน Date Object (แก้ปัญหา Timezone)
-    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: false });
+  // 4. Render Items (New Structure)
+  const html = sorted.map((item, i) => {
+    const rank = i + 1;
+    const pct = Math.round((item.qty / maxQty) * 100);
     
-    // 1. Find 'Daily Report' sheet
-    const sheetName = wb.SheetNames.find(name => name.trim().toLowerCase() === 'daily report');
-    if (!sheetName) {
-      toast('❌ ไม่พบชีทชื่อ "Daily Report"');
-      input.value = '';
-      return;
+    // Calculate Trend Direction
+    const dates = Object.keys(item.trend).sort();
+    const midPoint = Math.floor(dates.length / 2);
+    const firstHalf = dates.slice(0, midPoint).reduce((sum, d) => sum + item.trend[d], 0);
+    const secondHalf = dates.slice(midPoint).reduce((sum, d) => sum + item.trend[d], 0);
+    
+    let trendDirection = 'stable';
+    let trendArrow = '→';
+    if (secondHalf > firstHalf && firstHalf > 0) {
+      trendDirection = 'up'; trendArrow = '▲';
+    } else if (firstHalf > secondHalf && secondHalf > 0) {
+      trendDirection = 'down'; trendArrow = '▼';
     }
     
-    const sheet = wb.Sheets[sheetName];
-    const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-
-    // 2. Define Mapping Rules
-    const mappingRules = {
-      date:     ['inspection date', 'date', 'วันที่', 'inspected date'],
-      ref:      ['claim no', 'reference no', 'ref no', 'claim number'],
-      supplier: ['vendor name', 'supplier name', 'supplier', 'vendor'],
-      partNo:   ['part no', 'part number', 'p/n'],
-      partName: ['part name', 'part name (eng)', 'part description'],
-      qty:      ['qty', 'quantity', 'จำนวน'],
-      defect:   ['trouble claim', 'defect', 'defect type', 'trouble'],
-      shift:    ['shift', '_shift'],
-      line:     ['line', 'line no'],
-      judgment: ['judgment', 'result', 'status'],
-      remark:   ['remark', 'remarks', 'note', 'หมายเหตุ']
-    };
-
-    // 3. Helper: Find Header Row
-    function findHeaderRow(data, rules) {
-      for (let i = 0; i < Math.min(20, data.length); i++) {
-        const row = data[i];
-        let foundCount = 0;
-        for (let j = 0; j < row.length; j++) {
-          const cellText = String(row[j]).toLowerCase().trim();
-          for (const keywords of Object.values(rules)) {
-            if (keywords.some(kw => cellText.includes(kw))) {
-              foundCount++;
-              break;
-            }
-          }
-        }
-        if (foundCount >= 3) return i;
-      }
-      return -1;
-    }
-    
-    // 4. Helper: Create Column Map
-    function createColMap(headerRow, rules) {
-      const map = {};
-      for (let j = 0; j < headerRow.length; j++) {
-        const cellText = String(headerRow[j]).toLowerCase().trim();
-        for (const [field, keywords] of Object.entries(rules)) {
-          
-          // Logic Fix Vendor Code/Name
-          if (field === 'supplier') {
-            if (cellText.includes('code')) continue;
-            if (keywords.some(kw => cellText.includes(kw))) {
-               if (cellText.includes('name')) {
-                   map[field] = j; 
-               } else if (!map[field]) {
-                   map[field] = j; 
-               }
-            }
-          } else {
-            if (keywords.some(kw => cellText.includes(kw))) {
-              if (!map[field]) map[field] = j;
-            }
-          }
-        }
-      }
-      return map;
-    }
-
-    // 5. Process Data
-    const headerRowIndex = findHeaderRow(rawData, mappingRules);
-    
-    if (headerRowIndex === -1) {
-      toast('❌ ไม่พบหัวตาราง (ต้องมี Claim No, Vendor Name, หรือ Date)');
-      input.value = '';
-      return;
-    }
-    
-    const colMap = createColMap(rawData[headerRowIndex], mappingRules);
-    const dataRows = rawData.slice(headerRowIndex + 1);
-    
-    // ★ ฟังก์ชันแปลงวันที่ใหม่ (แก้ปัญหา Timezone ถาวร)
-    const pd = v => {
-      if (!v) return '';
-      
-      // Case 1: เป็นตัวเลข (Excel Serial Number) -> ใช้ XLSX.SSF แปลงโดยตรง (ไม่ผ่าน Timezone)
-      if (typeof v === 'number') {
-        try {
-          const d = XLSX.SSF.parse_date_code(v);
-          // d.y, d.m, d.d เป็นตัวเลขจริงๆ จาก Excel
-          return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
-        } catch(e) { return ''; }
-      }
-      
-      // Case 2: เป็นข้อความ (String)
-      if (typeof v === 'string') {
-        // ลองแปลง format dd/mm/yyyy หรือ dd-mm-yyyy
-        const parts = v.split(/[\/\-\.]/);
-        if (parts.length === 3) {
-           let [p1, p2, p3] = parts;
-           let y, m, d;
-           
-           // เช็คว่าปีอยู่ตัวแรก (yyyy-mm-dd) หรือตัวสุดท้าย (dd-mm-yyyy)
-           if (p1.length === 4) { 
-             y = p1; m = p2; d = p3; 
-           } else { 
-             d = p1; m = p2; y = p3; 
-           }
-           
-           // แก้ปี ค.ศ./พ.ศ.
-           if (y.length === 2) y = (parseInt(y) > 50 ? '19' : '20') + y;
-           
-           // Swap วัน/เดือน (สมมติฐาน: ถ้าตัวแรก > 12 แสดงว่าเป็นวัน)
-           if(parseInt(d) > 12) { [d, m] = [m, d]; }
-           
-           return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        }
-        // เป็น ISO format อยู่แล้ว
-        if (/^\d{4}-\d{2}-\d{2}/.test(v)) return v.substring(0, 10);
-      }
-      
-      // Case 3: เป็น Date Object (กันไว้กรณีพิเศษ แต่พยายามหลีกเลี่ยงการใช้ getHours)
-      if (v instanceof Date) {
-         const y = v.getFullYear();
-         const m = String(v.getMonth() + 1).padStart(2, '0');
-         const d = String(v.getDate()).padStart(2, '0');
-         // เช็คก่อนว่ามันกลางคืนหรือเปล่า (Trick สำหรับ Timezone Offset)
-         // แต่วิธีที่ดีที่สุดคือใช้ Serial Number จาก Case 1
-         return `${y}-${m}-${d}`;
-      }
-      
-      return String(v);
-    };
-
-    let skippedDupe = 0, skippedInvalid = 0;
-    const items = [];
-
-    const getVal = (row, key) => {
-      const idx = colMap[key];
-      return idx !== undefined ? row[idx] : '';
-    };
-
-    for (const r of dataRows) {
-      if (r.every(cell => cell === '' || cell === null || cell === undefined)) continue;
-
-      const ref = String(getVal(r, 'ref')).trim();
-      const supp = String(getVal(r, 'supplier')).trim();
-      const qty = parseInt(getVal(r, 'qty')) || 0;
-
-      if (!ref || !supp || qty <= 0) {
-        skippedInvalid++;
-        continue;
-      }
-      if (isDuplicate(ref)) {
-        skippedDupe++;
-        continue;
-      }
-
-      const dateVal = pd(getVal(r, 'date')) || pd(new Date());
-      
-      let shiftVal = String(getVal(r, 'shift')).trim();
-      let lineVal = String(getVal(r, 'line')).trim();
-
-      if (colMap.shift === colMap.line && shiftVal.includes('/')) {
-        const parts = shiftVal.split('/');
-        shiftVal = parts[0] ? parts[0].trim() : 'SHIFT A';
-        lineVal = parts[1] ? parts[1].trim() : '';
-      } else if (!shiftVal && !lineVal) {
-        shiftVal = 'SHIFT A';
-      }
-
-      const partNoVal = String(getVal(r, 'partNo'));
-      const partNameVal = String(getVal(r, 'partName'));
-      const defectVal = String(getVal(r, 'defect'));
-      const remarkVal = String(getVal(r, 'remark'));
-      
-      let rawJudge = String(getVal(r, 'judgment')).toUpperCase();
-      let finalJudge = 'SF';
-      if (rawJudge.includes('OK') || rawJudge.includes('PASS') || rawJudge.includes('CAN USE')) finalJudge = 'CAN USE';
-      else if (rawJudge.includes('VENDOR')) finalJudge = 'VENDOR FAULT';
-      else if (rawJudge.includes('CTC')) finalJudge = 'CTC';
-      else if (rawJudge.includes('SF')) finalJudge = 'SF';
-
-      items.push({
-        id: Date.now() + '_' + Math.random(),
-        date: dateVal,
-        shift: shiftVal || 'SHIFT A',
-        inspector: currentUser,
-        ref: ref,
-        line: lineVal,
-        supplier: supp,
-        partNo: partNoVal,
-        partName: partNameVal,
-        qty: qty,
-        defect: defectVal,
-        remark: remarkVal,
-        judgment: finalJudge
-      });
-    }
-
-    if (!items.length) {
-      toast(`⚠️ ไม่มีข้อมูลที่ถูกต้อง (ข้าม ${skippedInvalid} แถว)`);
-      input.value = '';
-      return;
-    }
-
-    items.forEach(r => cloudRefAdd(r.ref, currentUser));
-    records.push(...items);
-    _lastRenderHash = '';
-    saveLocal();
-    refreshAll();
-    
-    showInitOverlay('กำลัง Import...', `อัพโหลด ${items.length} รายการ...`, items.length);
-    
-    try {
-      await pushToCloud(items);
-      items.forEach(r => {
-        syncedAdd(r.ref);
-        cloudRefAdd(r.ref, currentUser);
-      });
-      saveLocal();
-      showSyncBadge('☁️ Auto-synced', '#10b981');
-      setSyncPulse('live', 'LIVE SYNC');
-    } catch (e) {
-      console.error('Push error:', e);
-    } finally {
-      _pushInFlight = false;
-    }
-    
-    hideInitOverlay();
-    toast(`📥 Imported ${items.length} records successfully!`);
-    input.value = '';
-  };
+    return `
+      <div class="line-item rank-${rank}">
+        
+        <!-- Column 1: Rank -->
+        <div class="line-rank r${rank <= 5 ? rank : 'default'}">${rank}</div>
+        
+        <!-- Column 2: Name & Progress Bar -->
+        <div class="line-info-group">
+          <div class="line-name">${escapeHtml(item.name)}</div>
+          <div class="line-bar-container">
+            <div class="line-bar" style="width: ${pct}%"></div>
+          </div>
+        </div>
+        
+        <!-- Column 3: Values -->
+        <div class="line-stats">
+          <div class="line-qty">${item.qty.toLocaleString()}</div>
+          <div class="line-lots">${item.lots} Lots</div>
+        </div>
+        
+        <!-- Column 4: Trend Indicator (Icon Only) -->
+        <div class="line-trend-indicator ${trendDirection}">
+          ${trendArrow}
+        </div>
+        
+      </div>
+    `;
+  }).join('');
   
-  reader.readAsArrayBuffer(file);
+  container.innerHTML = html;
+  
+  // 5. Animate
+  gsap.fromTo('.line-item', 
+    { opacity: 0, y: 15 }, 
+    { opacity: 1, y: 0, stagger: 0.06, duration: 0.35, ease: "power1.out" }
+  );
 }
-function exportToExcel(){const d=getMyRecords();if(!d.length)return toast('⚠️ No data to export');const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Records');XLSX.writeFile(wb,'SQE_'+currentUser+'_'+Date.now()+'.xlsx')}
-function openJobProject(){window.location.href='job_project.html'}
 
+// ไม่ต้องการฟังก์ชัน renderLineSparkline แล้ว เพราะเราตัดกราฟเล็กๆ ออกเพื่อความเรียบร้อย
 
-// เรียกใช้งานตอนโหลดหน้าเว็บ
-window.addEventListener('load', loadTheme);
+function renderLineSparkline(containerId, trendData, lineName) {
+  const container = $id(containerId);
+  if (!container || !trendData) return;
+  
+  const dates = Object.keys(trendData).sort();
+  if (dates.length < 2) { container.innerHTML = '<div style="font-size:0.6rem;color:#475569;text-align:center">N/A</div>'; return; }
+  
+  const values = dates.map(d => trendData[d]);
+  const canvas = document.createElement('canvas');
+  canvas.style.width = '100%'; canvas.style.height = '100%';
+  container.innerHTML = '';
+  container.appendChild(canvas);
+  
+  const firstVal = values[0] || 0;
+  const lastVal = values[values.length - 1] || 0;
+  const isUp = lastVal >= firstVal;
+  const color = isUp ? '#f472b6' : '#ef4444';
+  
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createLinearGradient(0, 0, 0, 24);
+  gradient.addColorStop(0, isUp ? 'rgba(244, 114, 182, 0.4)' : 'rgba(239, 68, 68, 0.4)');
+  gradient.addColorStop(1, 'transparent');
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels: dates, datasets: [{ data: values, borderColor: color, borderWidth: 1.5, fill: true, backgroundColor: gradient, tension: 0.4, pointRadius: 0 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.9)', titleFont: { size: 10 }, bodyFont: { size: 9 }, padding: 6, callbacks: { title: () => lineName, label: (ctx) => `${ctx.parsed.y.toLocaleString()} PCS` } } },
+      scales: { x: { display: false }, y: { display: false } },
+      animation: { duration: 800, easing: 'easeOutQuart' }
+    }
+  });
+}
 
+// ── HELPER: ANIMATE VALUE (Simple Counter) ──
+function animateValue(el, target, suffix = '') {
+  const current = parseInt(el.textContent.replace(/[^\d]/g, '')) || 0;
+  const diff = target - current;
+  if (diff === 0) return;
+  
+  const duration = 800;
+  const steps = 30;
+  const stepTime = duration / steps;
+  const stepValue = diff / steps;
+  let step = 0;
+  
+  const timer = setInterval(() => {
+    step++;
+    const val = Math.round(current + stepValue * step);
+    el.textContent = val.toLocaleString() + suffix;
+    if (step >= steps) { clearInterval(timer); el.textContent = target.toLocaleString() + suffix; }
+  }, stepTime);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   AUTO LAYOUT HANDLER (FULLSCREEN & RESIZE)
+   - จัดการ Layout เมื่อเปิด/ปิด Fullscreen
+   - บังคับ Resize Chart ทุกครั้งที่หน้าจอเปลี่ยน
+══════════════════════════════════════════════════════════ */
+
+// 1. ฟังก์ชันสำหรับ Resize Charts ทั้งหมดใน Dashboard
+function handleDashboardResize() {
+  // ตรวจสอบว่า Dashboard เปิดอยู่ไหม
+  const modal = document.getElementById('dashboardModal');
+  if (!modal || modal.style.display !== 'flex') return;
+
+  // Resize Main Trend Chart
+  if (dashCharts.mainTrend) {
+    dashCharts.mainTrend.resize();
+  }
+
+  // Resize Sparklines (Mini Charts)
+  Object.keys(dashCharts).forEach(key => {
+    if (key.includes('Spark') && dashCharts[key]) {
+      dashCharts[key].resize();
+    }
+  });
+  
+  console.log('Dashboard layout recalculated.');
+}
+
+// 2. Event Listener: ทำงานทุกครั้งที่หน้าจอเปลี่ยนขนาด
+window.addEventListener('resize', () => {
+  clearTimeout(window.resizeTimer);
+  window.resizeTimer = setTimeout(handleDashboardResize, 200);
+});
+
+// 3. Event Listener: ทำงานทุกครั้งที่เข้า/ออก Fullscreen
+document.addEventListener('fullscreenchange', () => {
+  // ใช้ Timeout เล็กน้อยเพื่อรอ Browser จัดการ Viewport เสร็จก่อน
+  setTimeout(() => {
+    handleDashboardResize();
+    
+    // ถ้าออกจาก Fullscreen แล้ว Layout พัง ให้ Force Refresh
+    if (!document.fullscreenElement) {
+       // อาจจะสั่ง refreshDash() ถ้าจำเป็น
+       const modal = document.getElementById('dashboardModal');
+       if (modal && modal.style.display === 'flex') {
+         refreshDash(); 
+       }
+    }
+  }, 300);
+});
+
+// 4. แก้ไข Function เดิม: เพิ่ม Logic รองรับ Fullscreen Error
+// ให้นำ function toggleDarkMode หรือ login ที่มี requestFullscreen มาเพิ่ม catch
+/*
+// ตัวอย่างในส่วน Login (ถ้ายังไม่มี catch)
+if (!document.fullscreenElement) {
+  document.documentElement.requestFullscreen().catch(err => {
+    console.warn('Fullscreen request failed:', err);
+  });
+}
+*/
 </script>
 
 </body>
-</html> 
+</html>           
