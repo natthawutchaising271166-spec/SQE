@@ -4616,7 +4616,68 @@ function animNum(id, target) {
     }
   });
 }
+/* ═══════════════════════════════════════════════════
+   EXPORT TO EXCEL FUNCTION
+═══════════════════════════════════════════════════ */
+function exportToExcel() {
+  // 1. ดึงข้อมูลเฉพาะ User ปัจจุบัน
+  const dataToExport = getMyRecords();
 
+  // 2. เช็คว่ามีข้อมูลไหม
+  if (!dataToExport || dataToExport.length === 0) {
+    toast('⚠️ ไม่มีข้อมูลสำหรับ Export');
+    return;
+  }
+
+  // 3. จัดรูปแบบข้อมูลให้เหมาะสมกับ Excel
+  const exportData = dataToExport.map(r => ({
+    "Date": r.date,
+    "Shift": r.shift,
+    "Inspector": r.inspector,
+    "Ref No": r.ref,
+    "Line": r.line,
+    "Supplier": r.supplier,
+    "Part No": r.partNo,
+    "Part Name": r.partName,
+    "QTY": r.qty,
+    "Defect": r.defect,
+    "Remark": r.remark,
+    "Judgment": r.judgment
+  }));
+
+  // 4. สร้าง Worksheet
+  const ws = XLSX.utils.json_to_sheet(exportData);
+
+  // 5. ปรับความกว้างคอลัมน์ (Optional)
+  ws['!cols'] = [
+    { wch: 12 }, // Date
+    { wch: 10 }, // Shift
+    { wch: 12 }, // Inspector
+    { wch: 15 }, // Ref No
+    { wch: 8 },  // Line
+    { wch: 20 }, // Supplier
+    { wch: 15 }, // Part No
+    { wch: 25 }, // Part Name
+    { wch: 8 },  // QTY
+    { wch: 20 }, // Defect
+    { wch: 30 }, // Remark
+    { wch: 15 }  // Judgment
+  ];
+
+  // 6. สร้าง Workbook
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "SQE Report");
+
+  // 7. ตั้งชื่อไฟล์
+  const now = new Date();
+  const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+  const filename = `SQE_Export_${currentUser}_${timestamp}.xlsx`;
+
+  // 8. ดาวน์โหลด
+  XLSX.writeFile(wb, filename);
+  
+  toast('✅ Export ไฟล์สำเร็จ!');
+}
 /* ══ NETWORK ══ */
 function normalizeRow(d,inspector){return{id:d.id||(Date.now()+'_'+Math.random()),date:d.date||'',shift:d.shift||'SHIFT A',inspector:d.inspector||inspector,ref:String(d.ref||''),line:d.line||'',supplier:d.supplier||'',partNo:d.partNo||'',partName:d.partName||'',qty:parseInt(d.qty)||0,defect:d.defect||'',remark:d.remark||'',judgment:d.judgment||'SF'}}
 let _fetchInFlight=false;
@@ -4984,6 +5045,7 @@ function refreshAll(){
     if('requestIdleCallback' in window)requestIdleCallback(updateDataLists,{timeout:2000});else setTimeout(updateDataLists,300);
   });
 }
+
 /* ═══════════════════════════════════════════════════════════
    DASHBOARD JAVASCRIPT — COMPLETE ANIMATED VERSION
 ══════════════════════════════════════════════════════════ */
@@ -5842,6 +5904,264 @@ if (!document.fullscreenElement) {
     console.warn('Fullscreen request failed:', err);
   });
 }
+
+// Use this code to replace your existing importExcel function
+function importExcel(input) {
+  if (_isInitializing) {
+    toast('⏳ กรุณารอให้ระบบโหลดเสร็จก่อน');
+    input.value = '';
+    return;
+  }
+  
+  const file = input.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = async e => {
+    // ★ เปลี่ยนเป็น false เพื่อให้ได้ตัวเลข Serial Number แทน Date Object (แก้ปัญหา Timezone)
+    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: false });
+    
+    // 1. Find 'Daily Report' sheet
+    const sheetName = wb.SheetNames.find(name => name.trim().toLowerCase() === 'daily report');
+    if (!sheetName) {
+      toast('❌ ไม่พบชีทชื่อ "Daily Report"');
+      input.value = '';
+      return;
+    }
+    
+    const sheet = wb.Sheets[sheetName];
+    const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+    // 2. Define Mapping Rules
+    const mappingRules = {
+      date:     ['inspection date', 'date', 'วันที่', 'inspected date'],
+      ref:      ['claim no', 'reference no', 'ref no', 'claim number'],
+      supplier: ['vendor name', 'supplier name', 'supplier', 'vendor'],
+      partNo:   ['part no', 'part number', 'p/n'],
+      partName: ['part name', 'part name (eng)', 'part description'],
+      qty:      ['qty', 'quantity', 'จำนวน'],
+      defect:   ['trouble claim', 'defect', 'defect type', 'trouble'],
+      shift:    ['shift', '_shift'],
+      line:     ['line', 'line no'],
+      judgment: ['judgment', 'result', 'status'],
+      remark:   ['remark', 'remarks', 'note', 'หมายเหตุ']
+    };
+
+    // 3. Helper: Find Header Row
+    function findHeaderRow(data, rules) {
+      for (let i = 0; i < Math.min(20, data.length); i++) {
+        const row = data[i];
+        let foundCount = 0;
+        for (let j = 0; j < row.length; j++) {
+          const cellText = String(row[j]).toLowerCase().trim();
+          for (const keywords of Object.values(rules)) {
+            if (keywords.some(kw => cellText.includes(kw))) {
+              foundCount++;
+              break;
+            }
+          }
+        }
+        if (foundCount >= 3) return i;
+      }
+      return -1;
+    }
+    
+    // 4. Helper: Create Column Map
+    function createColMap(headerRow, rules) {
+      const map = {};
+      for (let j = 0; j < headerRow.length; j++) {
+        const cellText = String(headerRow[j]).toLowerCase().trim();
+        for (const [field, keywords] of Object.entries(rules)) {
+          
+          // Logic Fix Vendor Code/Name
+          if (field === 'supplier') {
+            if (cellText.includes('code')) continue;
+            if (keywords.some(kw => cellText.includes(kw))) {
+               if (cellText.includes('name')) {
+                   map[field] = j; 
+               } else if (!map[field]) {
+                   map[field] = j; 
+               }
+            }
+          } else {
+            if (keywords.some(kw => cellText.includes(kw))) {
+              if (!map[field]) map[field] = j;
+            }
+          }
+        }
+      }
+      return map;
+    }
+
+    // 5. Process Data
+    const headerRowIndex = findHeaderRow(rawData, mappingRules);
+    
+    if (headerRowIndex === -1) {
+      toast('❌ ไม่พบหัวตาราง (ต้องมี Claim No, Vendor Name, หรือ Date)');
+      input.value = '';
+      return;
+    }
+    
+    const colMap = createColMap(rawData[headerRowIndex], mappingRules);
+    const dataRows = rawData.slice(headerRowIndex + 1);
+    
+    // ★ ฟังก์ชันแปลงวันที่ใหม่ (แก้ปัญหา Timezone ถาวร)
+    const pd = v => {
+      if (!v) return '';
+      
+      // Case 1: เป็นตัวเลข (Excel Serial Number) -> ใช้ XLSX.SSF แปลงโดยตรง (ไม่ผ่าน Timezone)
+      if (typeof v === 'number') {
+        try {
+          const d = XLSX.SSF.parse_date_code(v);
+          // d.y, d.m, d.d เป็นตัวเลขจริงๆ จาก Excel
+          return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
+        } catch(e) { return ''; }
+      }
+      
+      // Case 2: เป็นข้อความ (String)
+      if (typeof v === 'string') {
+        // ลองแปลง format dd/mm/yyyy หรือ dd-mm-yyyy
+        const parts = v.split(/[\/\-\.]/);
+        if (parts.length === 3) {
+           let [p1, p2, p3] = parts;
+           let y, m, d;
+           
+           // เช็คว่าปีอยู่ตัวแรก (yyyy-mm-dd) หรือตัวสุดท้าย (dd-mm-yyyy)
+           if (p1.length === 4) { 
+             y = p1; m = p2; d = p3; 
+           } else { 
+             d = p1; m = p2; y = p3; 
+           }
+           
+           // แก้ปี ค.ศ./พ.ศ.
+           if (y.length === 2) y = (parseInt(y) > 50 ? '19' : '20') + y;
+           
+           // Swap วัน/เดือน (สมมติฐาน: ถ้าตัวแรก > 12 แสดงว่าเป็นวัน)
+           if(parseInt(d) > 12) { [d, m] = [m, d]; }
+           
+           return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        }
+        // เป็น ISO format อยู่แล้ว
+        if (/^\d{4}-\d{2}-\d{2}/.test(v)) return v.substring(0, 10);
+      }
+      
+      // Case 3: เป็น Date Object (กันไว้กรณีพิเศษ แต่พยายามหลีกเลี่ยงการใช้ getHours)
+      if (v instanceof Date) {
+         const y = v.getFullYear();
+         const m = String(v.getMonth() + 1).padStart(2, '0');
+         const d = String(v.getDate()).padStart(2, '0');
+         // เช็คก่อนว่ามันกลางคืนหรือเปล่า (Trick สำหรับ Timezone Offset)
+         // แต่วิธีที่ดีที่สุดคือใช้ Serial Number จาก Case 1
+         return `${y}-${m}-${d}`;
+      }
+      
+      return String(v);
+    };
+
+    let skippedDupe = 0, skippedInvalid = 0;
+    const items = [];
+
+    const getVal = (row, key) => {
+      const idx = colMap[key];
+      return idx !== undefined ? row[idx] : '';
+    };
+
+    for (const r of dataRows) {
+      if (r.every(cell => cell === '' || cell === null || cell === undefined)) continue;
+
+      const ref = String(getVal(r, 'ref')).trim();
+      const supp = String(getVal(r, 'supplier')).trim();
+      const qty = parseInt(getVal(r, 'qty')) || 0;
+
+      if (!ref || !supp || qty <= 0) {
+        skippedInvalid++;
+        continue;
+      }
+      if (isDuplicate(ref)) {
+        skippedDupe++;
+        continue;
+      }
+
+      const dateVal = pd(getVal(r, 'date')) || pd(new Date());
+      
+      let shiftVal = String(getVal(r, 'shift')).trim();
+      let lineVal = String(getVal(r, 'line')).trim();
+
+      if (colMap.shift === colMap.line && shiftVal.includes('/')) {
+        const parts = shiftVal.split('/');
+        shiftVal = parts[0] ? parts[0].trim() : 'SHIFT A';
+        lineVal = parts[1] ? parts[1].trim() : '';
+      } else if (!shiftVal && !lineVal) {
+        shiftVal = 'SHIFT A';
+      }
+
+      const partNoVal = String(getVal(r, 'partNo'));
+      const partNameVal = String(getVal(r, 'partName'));
+      const defectVal = String(getVal(r, 'defect'));
+      const remarkVal = String(getVal(r, 'remark'));
+      
+      let rawJudge = String(getVal(r, 'judgment')).toUpperCase();
+      let finalJudge = 'SF';
+      if (rawJudge.includes('OK') || rawJudge.includes('PASS') || rawJudge.includes('CAN USE')) finalJudge = 'CAN USE';
+      else if (rawJudge.includes('VENDOR')) finalJudge = 'VENDOR FAULT';
+      else if (rawJudge.includes('CTC')) finalJudge = 'CTC';
+      else if (rawJudge.includes('SF')) finalJudge = 'SF';
+
+      items.push({
+        id: Date.now() + '_' + Math.random(),
+        date: dateVal,
+        shift: shiftVal || 'SHIFT A',
+        inspector: currentUser,
+        ref: ref,
+        line: lineVal,
+        supplier: supp,
+        partNo: partNoVal,
+        partName: partNameVal,
+        qty: qty,
+        defect: defectVal,
+        remark: remarkVal,
+        judgment: finalJudge
+      });
+    }
+
+    if (!items.length) {
+      toast(`⚠️ ไม่มีข้อมูลที่ถูกต้อง (ข้าม ${skippedInvalid} แถว)`);
+      input.value = '';
+      return;
+    }
+
+    items.forEach(r => cloudRefAdd(r.ref, currentUser));
+    records.push(...items);
+    _lastRenderHash = '';
+    saveLocal();
+    refreshAll();
+    
+    showInitOverlay('กำลัง Import...', `อัพโหลด ${items.length} รายการ...`, items.length);
+    
+    try {
+      await pushToCloud(items);
+      items.forEach(r => {
+        syncedAdd(r.ref);
+        cloudRefAdd(r.ref, currentUser);
+      });
+      saveLocal();
+      showSyncBadge('☁️ Auto-synced', '#10b981');
+      setSyncPulse('live', 'LIVE SYNC');
+    } catch (e) {
+      console.error('Push error:', e);
+    } finally {
+      _pushInFlight = false;
+    }
+    
+    hideInitOverlay();
+    toast(`📥 Imported ${items.length} records successfully!`);
+    input.value = '';
+  };
+  
+  reader.readAsArrayBuffer(file);
+}
+
+
 */
    function openJobProject(){
   // ทดสอบเปิดแท็บใหม่
@@ -5852,4 +6172,4 @@ if (!document.fullscreenElement) {
 </script>
 
 </body>
-</html>           
+</html>            
