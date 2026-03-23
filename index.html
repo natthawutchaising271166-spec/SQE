@@ -4653,10 +4653,12 @@ function importExcel(input) {
       const sheet = wb.Sheets[sheetName];
       const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
-      // 2. Mapping
+      // 2. Mapping Rules
       const mappingRules = {
         date: ['date', 'inspection date', 'วันที่'], ref: ['claim no', 'ref no', 'ref', 'id'],
-        supplier: ['vendor name', 'supplier', 'vendor'], partNo: ['part no', 'p/n'],
+        // ★ ปล่อยให้มีหลายคำเผื่อไว้ แต่เราจะใช้ Logic พิเศษด้านล่างจัดการ Priority
+        supplier: ['vendor name', 'supplier', 'vendor', 'vendor code'], 
+        partNo: ['part no', 'p/n'],
         partName: ['part name', 'part description'], qty: ['qty', 'quantity', 'จำนวน'],
         defect: ['defect', 'trouble', 'defect type'], shift: ['shift'], line: ['line', 'line no'],
         judgment: ['judgment', 'result', 'status'], remark: ['remark', 'note', 'หมายเหตุ']
@@ -4689,7 +4691,31 @@ function importExcel(input) {
       const hIdx = findHeader(rawData, mappingRules);
       if (hIdx === -1) { toast('❌ ไม่เจอหัวตาราง'); input.value = ''; return; }
       
-      const colMap = createMap(rawData[hIdx], mappingRules);
+      let colMap = createMap(rawData[hIdx], mappingRules);
+
+      // ═══════════════════════════════════════════════════
+      // ★ LOGIC: PRIORITY VENDOR NAME OVER VENDOR CODE ★
+      // วนลูปหา Column ที่มีชื่อว่า "Vendor Name" โดยเฉพาะ
+      // ถ้าเจอ ให้ใช้อันนี้แทนที่ค่าเดิมใน colMap.supplier
+      // ═══════════════════════════════════════════════════
+      const headerRow = rawData[hIdx];
+      let vendorNameIdx = -1;
+      
+      // วนหา "Vendor Name" ก่อน (Priority สูงสุด)
+      for (let j = 0; j < headerRow.length; j++) {
+        const t = String(headerRow[j]).toLowerCase();
+        if (t.includes('vendor name')) { 
+          vendorNameIdx = j; 
+          break; 
+        }
+      }
+
+      // ถ้าเจอ Vendor Name ให้บังคับใช้ตัวนี้
+      if (vendorNameIdx !== -1) {
+        colMap.supplier = vendorNameIdx;
+      }
+      // ถ้าไม่เจอ ให้ใช้ค่าจาก createMap ตามปกติ (ซึ่งอาจจะเจอ Vendor Code หรือ Supplier)
+      
       const rows = rawData.slice(hIdx + 1);
       
       // Date Parser
@@ -4717,7 +4743,7 @@ function importExcel(input) {
       for (const r of rows) {
         if (r.every(c => c === '' || c == null)) continue;
         const ref = String(get(r, 'ref')).trim();
-        const supp = String(get(r, 'supplier')).trim();
+        const supp = String(get(r, 'supplier')).trim(); // ตอนนี้จะดึง Vendor Name มาแล้วถ้ามี
         const qty = parseInt(get(r, 'qty')) || 0;
         
         // ★ 1. เช็คข้อมูลไม่ครบ
@@ -4746,7 +4772,7 @@ function importExcel(input) {
           id: Date.now()+'_'+Math.random(),
           date: pd(get(r, 'date')) || pd(new Date()),
           shift, inspector: currentUser, ref, line,
-          supplier: supp, 
+          supplier: supp, // ใช้ค่าจากตัวแปร supp ที่ดึงมา
           partNo: String(get(r, 'partNo')), 
           partName: String(get(r, 'partName')),
           qty, 
@@ -4795,8 +4821,6 @@ function importExcel(input) {
   };
   reader.readAsArrayBuffer(file);
 }
-
-
 /* ═══════════════════════════════════════════════════
    EXPORT TO EXCEL FUNCTION
 ═══════════════════════════════════════════════════ */
