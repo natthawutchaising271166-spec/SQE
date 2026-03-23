@@ -3650,6 +3650,22 @@ canvas {
 * {
   -ms-overflow-style: none; 
 }
+/* ═══════════════════════════════════════════════════════════
+   FIX: FORCE MAIN GAUGE VISIBILITY (PASS RATE)
+   บังคับให้วงกลม Pass Rate แสดงผลเสมอ ไม่ถูกบีบจนหาย
+══════════════════════════════════════════════════════════ */
+
+.gauge-cluster.main-gauge {
+    min-height: 270px !important; /* กำหนดความสูงขั้นต่ำ */
+    flex-shrink: 0 !important;    /* ห้ามหดตัว */
+    margin-bottom: 1rem;
+}
+
+/* ปรับ Hero KPI ให้พอดีไม่บัง Main Gauge */
+.hero-kpi-card {
+    flex-shrink: 0;
+    min-height: 140px; /* ลดความสูงขั้นต่ำลงเล็กน้อย */
+}
 </style>
 </head>
 <body>
@@ -4384,7 +4400,7 @@ canvas {
           </div>
           <div class="market-badge orange">RISK AREAS</div>
         </div>
-        <div class="market-list" id="defectList">
+         <div class="market-list" id="dashDefectList"> 
           <!-- Injected by JS -->
         </div>
       </div>
@@ -4476,6 +4492,7 @@ function dbClearByInspector(inspector) {
 const GOOGLE_URL  = 'https://script.google.com/macros/s/AKfycbxxHCqL3HzxI_54oo4IvXs0Du7yE86i7NcvwruJwOhCEMMBvs3HCXlBz0W_6KUPRGZ6nw/exec';
 const SYNCED_KEY  = 'qdit_v4_synced';
 const REFS_KEY    = 'qdit_v4_allrefs';
+const STORAGE_KEY = 'qdit_v4_data'; // ★ เพิ่มบรรทัดนี้เข้าไป
 const FETCH_TIMEOUT=15000, PUSH_TIMEOUT=12000, DELETE_TIMEOUT=14000, POLL_MS=8000, PUSH_DEBOUNCE=600;
 
 let _isInitializing=true;
@@ -5173,7 +5190,6 @@ function resetDashFilters() {
   refreshDash();
 }
 
-// ── REFRESH DASHBOARD (Main Logic) ──
 function refreshDash() {
   const start = $id('dashStart').value;
   const end = $id('dashEnd').value;
@@ -5280,10 +5296,20 @@ function refreshDash() {
   $id('dashLotVendor').textContent = venL;
   $id('dashPctVendor').textContent = calcPct(ven) + '%';
   
-  // Update chart stats
+  // ═══ UPDATE CHART & STATS ═══
+  // ★ คืนค่าการแสดงผล 12 เดือนเหมือนเดิม (ไม่ตัดเดือนที่เป็น 0 ออก)
   const byMonth = aggregateByMonth(data);
+  
+  // คำนวณ High / Low / Avg
   const maxVal = Math.max(...byMonth.map(d => d.qty));
-  const minVal = Math.min(...byMonth.filter(d => d.qty > 0).map(d => d.qty)) || 0;
+  
+  // ★ ปรับปรุงการหา LOW: ให้หาค่าต่ำสุดจากเดือนที่ 'มีข้อมูล' (qty > 0) 
+  // เพื่อไม่ให้แสดง 0 ตลอดเวลา ถ้ายังไม่ถึงเดือนนั้น
+  const monthsWithData = byMonth.filter(d => d.qty > 0);
+  const minVal = monthsWithData.length > 0 
+    ? Math.min(...monthsWithData.map(d => d.qty)) 
+    : 0;
+  
   const avgVal = byMonth.reduce((s, d) => s + d.qty, 0) / 12;
   
   $id('statHigh').textContent = maxVal.toLocaleString();
@@ -5298,7 +5324,6 @@ function refreshDash() {
   renderTopLine(data);
   renderIncidentFeed(data);
 }
-
 // ── RENDER TICKER TAPE ──
 function renderTicker(tQ, lots, pass, rej, sf, ven, ctc, ok) {
   const ticker = $id('tickerTape');
@@ -5398,7 +5423,7 @@ function aggregateByMonth(data) {
   }));
 }
 
-// ── MAIN TREND CHART ──
+// ── MAIN TREND CHART (Glowing Points Effect) ──
 function renderMainTrendChart(data) {
   if (dashCharts.mainTrend) {
     dashCharts.mainTrend.destroy();
@@ -5408,10 +5433,16 @@ function renderMainTrendChart(data) {
   if (!ctx) return;
   
   const chartCtx = ctx.getContext('2d');
+  
+  // ★ สีเขียวนีออนสไตล์ Stock Market
+  const neonGreen = '#00ff88'; 
+  const neonGreenRGB = '0, 255, 136'; 
+  
+  // Gradient Fill
   const gradient = chartCtx.createLinearGradient(0, 0, 0, 280);
-  gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
-  gradient.addColorStop(0.5, 'rgba(59, 130, 246, 0.25)');
-  gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)');
+  gradient.addColorStop(0, `rgba(${neonGreenRGB}, 0.5)`);
+  gradient.addColorStop(0.5, `rgba(${neonGreenRGB}, 0.25)`);
+  gradient.addColorStop(1, `rgba(${neonGreenRGB}, 0.02)`);
   
   dashCharts.mainTrend = new Chart(ctx, {
     type: 'line',
@@ -5420,19 +5451,23 @@ function renderMainTrendChart(data) {
       datasets: [{
         label: 'Total Claim (PCS)',
         data: data.map(d => d.qty),
-        borderColor: '#3b82f6',
+        borderColor: neonGreen,
         borderWidth: 3,
         backgroundColor: gradient,
         fill: true,
         tension: 0.4,
-        pointRadius: 6,
-        pointHoverRadius: 10,
-        pointBackgroundColor: '#3b82f6',
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 3,
-        pointHoverBackgroundColor: '#ffffff',
-        pointHoverBorderColor: '#3b82f6',
-        pointHoverBorderWidth: 4,
+        
+        // ★★★ จุดที่ปรับใหม่: เพิ่มเอฟเฟกต์เรืองแสง (Glow) ★★★
+        pointRadius: 4, // ขยายจุดนิดหน่อยให้เห็นชัด
+        pointBackgroundColor: neonGreen, // ไส้ในสีเขียวสด
+        pointBorderColor: `rgba(${neonGreenRGB}, 0.4)`, // ขอบสีเขียวโปร่งแสง (ไม่ใช่สีดำ)
+        pointBorderWidth: 4, // ทำให้ขอบหนาพอที่จะดูเหมือนเรืองแสง
+        
+        pointHoverRadius: 7,
+        pointHoverBackgroundColor: '#ffffff', // ตอนชี้เป็นสีขาว
+        pointHoverBorderColor: neonGreen, // ขอบตอนชี้เป็นสีเขียว
+        pointHoverBorderWidth: 3,
+        
         customData: data.map(d => ({ lots: d.lots, pct: d.pct }))
       }]
     },
@@ -5445,7 +5480,7 @@ function renderMainTrendChart(data) {
           labels: { color: '#94a3b8', font: { size: 10, weight: '600', family: 'Sora' }, boxWidth: 12, boxHeight: 12, borderRadius: 3, usePointStyle: true }
         },
         tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(59, 130, 246, 0.5)', borderWidth: 1,
+          backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: `rgba(${neonGreenRGB}, 0.5)`, borderWidth: 1,
           titleFont: { family: 'Sora', size: 13, weight: '700' },
           bodyFont: { family: 'DM Mono', size: 11 },
           padding: { top: 12, bottom: 12, left: 16, right: 16 }, cornerRadius: 12, displayColors: false,
@@ -5563,7 +5598,12 @@ function renderSupplierList(data) {
   gsap.to('#supplierList .market-item', { opacity: 1, x: 0, duration: 0.4, stagger: 0.05, ease: "power2.out", delay: 0.1 });
 }
 
+// --- แก้ไขฟังก์ชัน renderDefectList ---
 function renderDefectList(data) {
+  // เปลี่ยนจาก $id('defectList') เป็น $id('dashDefectList') เพื่อเล็งไปที่ Dashboard
+  const container = $id('dashDefectList');
+  if(!container) return;
+  
   const totalQty = data.reduce((s, r) => s + r.qty, 0);
   const byDefect = {};
   data.forEach(r => {
@@ -5593,12 +5633,56 @@ function renderDefectList(data) {
     </div>
   `).join('');
   
-  $id('defectList').innerHTML = html || '<div style="text-align:center;color:#64748b;padding:1rem">No defects</div>';
+  container.innerHTML = html || '<div style="text-align:center;color:#64748b;padding:1rem">No defects</div>';
   
   // Animation
-  gsap.to('#defectList .market-item', { opacity: 1, x: 0, duration: 0.4, stagger: 0.05, ease: "power2.out", delay: 0.1 });
+  gsap.to('#dashDefectList .market-item', { opacity: 1, x: 0, duration: 0.4, stagger: 0.05, ease: "power2.out", delay: 0.1 });
 }
 
+// --- แก้ไขฟังก์ชัน renderIncidentFeed (แก้ไข XSS + Animation) ---
+function renderIncidentFeed(data) {
+  const container = $id('incidentList');
+  if (!container) return;
+
+  // Filter เฉพาะ VENDOR FAULT
+  let filtered = data.filter(r => r.judgment === 'VENDOR FAULT').reverse();
+  const items = filtered.slice(0, 50);
+
+  if (items.length === 0) {
+    container.innerHTML = `<div style="text-align:center;color:#475569;padding:1.5rem;font-size:0.75rem">ไม่มีข้อมูล VENDOR FAULT</div>`;
+    return;
+  }
+
+  const html = items.map(r => {
+    const dateStr = r.date || '-';
+    // ★ แก้ไข Security: เพิ่ม escapeHtml ครอบทุกตัวแปรที่เป็นข้อความ
+    return `
+      <div class="incident-item critical" style="opacity: 0; transform: translateY(15px);">
+        <div class="incident-top-row">
+          <div class="incident-date-info">${dateStr} · ${r.shift || '-'} · Line ${r.line || '-'}</div>
+          <div class="incident-ref-badge"># ${escapeHtml(r.ref)}</div>
+        </div>
+        <div class="incident-main-info">
+          <div class="incident-supplier">${escapeHtml(r.supplier)}</div>
+          <div class="incident-part">${escapeHtml(r.partNo)} · ${escapeHtml(r.partName)}</div>
+        </div>
+        <div class="incident-detail-row">
+          <div class="incident-detail-item"><span class="incident-detail-label">Defect:</span><span>${escapeHtml(r.defect || '-')}</span></div>
+          <div class="incident-detail-item"><span class="incident-detail-label">Remark:</span><span>${escapeHtml(r.remark || '-')}</span></div>
+        </div>
+        <div class="incident-footer-row">
+          <div class="incident-qty-display">${r.qty.toLocaleString()} <span style="font-size:0.7rem;color:#94a3b8;font-weight:600">PCS</span></div>
+          <div style="font-size:0.65rem;font-weight:700;color:#f87171;background:rgba(239,68,68,0.15);padding:4px 10px;border-radius:99px;">VENDOR FAULT</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = html;
+
+  // Animation
+  gsap.to('.incident-item', { opacity: 1, y: 0, duration: 0.5, stagger: 0.04, ease: "power2.out" });
+}
 function renderPartList(data) {
   const totalQty = data.reduce((s, r) => s + r.qty, 0);
   const byPart = {};
