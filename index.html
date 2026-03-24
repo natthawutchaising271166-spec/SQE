@@ -4159,24 +4159,23 @@ canvas {
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════
-       MAIN BODY — COCKPIT LAYOUT
+    <!-- ═══════════════════════════════════════════════════════
+       MAIN BODY — COCKPIT LAYOUT (FIXED)
   ═══════════════════════════════════════════════════════ -->
   <div class="cockpit-body">
     
-        <!-- ═══════════════════════════════════════════════════════
-         LEFT PANEL — HERO KPI + PASS RATE
+      <!-- ═══════════════════════════════════════════════════════
+         LEFT PANEL — HERO KPI + PASS RATE (FIXED)
     ═══════════════════════════════════════════════════════ -->
     <div class="cockpit-left">
       
-      <!-- ★ HERO KPI: TOTAL PCS (ด้านบนซ้ายสุด ขยายใหญ่) ★ -->
+      <!-- ★ HERO KPI: TOTAL PCS ★ -->
       <div class="hero-kpi-card">
         <div class="hero-header">
           <span class="hero-title">Total PCS</span>
           <span class="hero-icon">📦</span>
         </div>
         <div class="hero-value" id="heroTotalQty">0</div>
-        <!-- เพิ่มส่วนแสดง Lot และ % -->
         <div class="hero-footer">
           <span class="stat-sub"><span id="heroLot">0</span> Lots</span>
           <span class="stat-pct" id="heroPct">100%</span>
@@ -4184,29 +4183,56 @@ canvas {
         <div class="hero-sparkline" id="heroSparkline"></div>
       </div>
       
-      <!-- MAIN SPEEDOMETER — PASS RATE -->
+      <!-- MAIN SPEEDOMETER — PASS RATE (CYBER EDITION) -->
       <div class="gauge-cluster main-gauge">
         <div class="gauge-ring" id="mainGaugeRing">
-          <svg viewBox="0 0 200 200" class="gauge-svg">
-            <path d="M 30 170 A 80 80 0 1 1 170 170" fill="none" stroke="#1e293b" stroke-width="12" stroke-linecap="round"/>
-            <path id="mainGaugeArc" d="M 30 170 A 80 80 0 0 1 170 170" fill="none" stroke="url(#gaugeGradient)" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 400" style="transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1)"/>
+          
+          <!-- ★ 1. ตัวเลข (Layer ล่าง) - วางก่อน SVG ★ -->
+          <div class="gauge-center" style="bottom: 150%; transform: translateY(0); z-index: 1;">
+            <div class="gauge-value" id="mainGaugeValue" style="font-size: 3.2rem;">0%</div>
+            <div class="gauge-label">PASS RATE</div>
+            <div class="gauge-trend" id="mainGaugeTrend" style="margin-top: 10px;">
+              <span class="trend-arrow">▲</span>
+              <span class="trend-value">Good</span>
+            </div>
+          </div>
+
+          <!-- ★ 2. SVG (Layer บน) - วางหลัง Div ★ -->
+          <svg viewBox="0 0 200 200" class="gauge-svg" style="position: relative; z-index: 2;">
             <defs>
               <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" style="stop-color:#ef4444"/>
                 <stop offset="50%" style="stop-color:#f59e0b"/>
                 <stop offset="100%" style="stop-color:#10b981"/>
               </linearGradient>
+              <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
             </defs>
+
+            <!-- Track (เส้นด้านหลัง) -->
+            <path d="M 20 150 A 80 80 0 1 1 180 150" fill="none" stroke="#1e293b" stroke-width="16" stroke-linecap="round"/>
+            
+            <!-- Ticks (ขีดรอบวง) -->
+            <g id="gaugeTicks" transform="translate(100, 150)"></g> 
+            
+            <!-- Arc (แถบสี Progress) -->
+            <path id="mainGaugeArc" d="M 20 150 A 80 80 0 0 1 180 150" fill="none" stroke="url(#gaugeGradient)" stroke-width="16" stroke-linecap="round" stroke-dasharray="0 400" filter="url(#neonGlow)" style="transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1)"/>
+            
+            <!-- Needle (เข็ม) -->
+            <g id="gaugeNeedle" style="transform-origin: 100px 150px; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
+               <polygon points="100,70 96,145 104,145" fill="#ffffff" filter="url(#neonGlow)"/>
+               <circle cx="100" cy="150" r="10" fill="#0f172a" stroke="#fff" stroke-width="3"/>
+               <circle cx="100" cy="150" r="4" fill="#3b82f6"/>
+            </g>
           </svg>
-          <div class="gauge-center">
-            <div class="gauge-value" id="mainGaugeValue">0%</div>
-            <div class="gauge-label">PASS RATE</div>
-            <div class="gauge-trend" id="mainGaugeTrend">
-              <span class="trend-arrow">▲</span>
-              <span class="trend-value">0%</span>
-            </div>
-          </div>
+          
         </div>
+        
         <div class="gauge-legend">
           <div class="legend-item"><span class="legend-dot" style="background:#ef4444"></span><span>Critical</span></div>
           <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span><span>Warning</span></div>
@@ -4214,46 +4240,61 @@ canvas {
         </div>
       </div>
       
-      <!-- MINI GAUGES ROW -->
+       <!-- MINI GAUGES ROW (CYBER STYLE) -->
       <div class="gauge-row">
+        
+        <!-- SF FAULT -->
         <div class="mini-gauge" data-type="sf">
           <div class="mini-gauge-display">
-            <svg viewBox="0 0 100 100" class="mini-gauge-svg">
-              <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="8"/>
-              <circle id="sfGaugeArc" cx="50" cy="50" r="40" fill="none" stroke="#f97316" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 251" transform="rotate(-90 50 50)"/>
+            <svg viewBox="0 0 100 60" class="mini-gauge-svg">
+              <!-- Track -->
+              <path d="M 10 50 A 40 40 0 1 1 90 50" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
+              <!-- Arc -->
+              <path id="sfGaugeArc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f97316" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 126" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
+              <!-- Needle -->
+              <g id="sfGaugeNeedle" style="transform-origin: 50px 50px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                 <line x1="50" y1="50" x2="50" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+                 <circle cx="50" cy="50" r="4" fill="#1e293b" stroke="#fff" stroke-width="1"/>
+              </g>
             </svg>
             <div class="mini-gauge-value"><span id="sfGaugeValue">0</span><span class="unit">%</span></div>
           </div>
           <div class="mini-gauge-label">SF FAULT</div>
-          <div class="mini-gauge-sparkline" id="sfSparkline"></div>
         </div>
         
+        <!-- VENDOR -->
         <div class="mini-gauge" data-type="vendor">
           <div class="mini-gauge-display">
-            <svg viewBox="0 0 100 100" class="mini-gauge-svg">
-              <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="8"/>
-              <circle id="vendorGaugeArc" cx="50" cy="50" r="40" fill="none" stroke="#ef4444" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 251" transform="rotate(-90 50 50)"/>
+            <svg viewBox="0 0 100 60" class="mini-gauge-svg">
+              <path d="M 10 50 A 40 40 0 1 1 90 50" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
+              <path id="vendorGaugeArc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#ef4444" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 126" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
+              <g id="vendorGaugeNeedle" style="transform-origin: 50px 50px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                 <line x1="50" y1="50" x2="50" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+                 <circle cx="50" cy="50" r="4" fill="#1e293b" stroke="#fff" stroke-width="1"/>
+              </g>
             </svg>
             <div class="mini-gauge-value"><span id="vendorGaugeValue">0</span><span class="unit">%</span></div>
           </div>
           <div class="mini-gauge-label">VENDOR</div>
-          <div class="mini-gauge-sparkline" id="vendorSparkline"></div>
         </div>
         
+        <!-- CTC -->
         <div class="mini-gauge" data-type="ctc">
           <div class="mini-gauge-display">
-            <svg viewBox="0 0 100 100" class="mini-gauge-svg">
-              <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="8"/>
-              <circle id="ctcGaugeArc" cx="50" cy="50" r="40" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 251" transform="rotate(-90 50 50)"/>
+            <svg viewBox="0 0 100 60" class="mini-gauge-svg">
+              <path d="M 10 50 A 40 40 0 1 1 90 50" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
+              <path id="ctcGaugeArc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 126" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
+              <g id="ctcGaugeNeedle" style="transform-origin: 50px 50px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                 <line x1="50" y1="50" x2="50" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+                 <circle cx="50" cy="50" r="4" fill="#1e293b" stroke="#fff" stroke-width="1"/>
+              </g>
             </svg>
             <div class="mini-gauge-value"><span id="ctcGaugeValue">0</span><span class="unit">%</span></div>
           </div>
           <div class="mini-gauge-label">CTC</div>
-          <div class="mini-gauge-sparkline" id="ctcSparkline"></div>
+        </div>
         </div>
       </div>
-      
-    </div>
     
     <!-- ═══════════════════════════════════════════════════════
          CENTER PANEL — STATS + CHART
@@ -4334,50 +4375,50 @@ canvas {
           <canvas id="mainTrendChart"></canvas>
         </div>
       </div>
-<!-- ★ NEW: BOTTOM ROW — INCIDENT + TOP LINE ★ -->
-  <div class="cockpit-bottom-row">
-    
-    <!-- LIVE INCIDENT FEED (ย่อเล็กลง) -->
-    <div class="incident-feed-panel">
-      <div class="feed-header">
-        <div class="feed-title">
-          <span class="live-indicator"></span>
-          LIVE INCIDENT FEED
+      
+      <!-- BOTTOM ROW -->
+      <div class="cockpit-bottom-row">
+        
+        <!-- LIVE INCIDENT FEED -->
+        <div class="incident-feed-panel">
+          <div class="feed-header">
+            <div class="feed-title">
+              <span class="live-indicator"></span>
+              LIVE INCIDENT FEED
+            </div>
+          </div>
+          <div class="incident-list" id="incidentList">
+            <!-- Injected by JS -->
+          </div>
         </div>
-
-      </div>
-      <div class="incident-list" id="incidentList">
-        <!-- Injected by JS -->
-      </div>
-    </div>
-    
-    <!-- ★ NEW: TOP LINE PANEL ★ -->
-    <div class="top-line-panel">
-      <div class="top-line-header">
-        <div class="top-line-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2">
-            <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-          </svg>
-          TOP LINES
+        
+        <!-- TOP LINE PANEL -->
+        <div class="top-line-panel">
+          <div class="top-line-header">
+            <div class="top-line-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2">
+                <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+              </svg>
+              TOP LINES
+            </div>
+            <div class="top-line-badge">
+              <span class="pulse-dot"></span>
+              TRENDING
+            </div>
+          </div>
+          <div class="top-line-list" id="topLineList">
+            <!-- Injected by JS -->
+          </div>
         </div>
-        <div class="top-line-badge">
-          <span class="pulse-dot"></span>
-          TRENDING
-        </div>
+        
       </div>
-      <div class="top-line-list" id="topLineList">
-        <!-- Injected by JS -->
-      </div>
-    </div>
-    
-  </div>
 
 </div>
     
     <!-- RIGHT PANEL — MARKET LEADERS -->
     <div class="cockpit-right">
       
-      <!-- TOP SUPPLIERS (MARKET LEADERS) -->
+      <!-- TOP SUPPLIERS -->
       <div class="market-panel">
         <div class="market-header">
           <div class="market-title">
@@ -4391,7 +4432,7 @@ canvas {
         </div>
       </div>
       
-      <!-- TOP DEFECTS (MARKET MOVERS) -->
+      <!-- TOP DEFECTS -->
       <div class="market-panel">
         <div class="market-header">
           <div class="market-title">
@@ -4421,7 +4462,6 @@ canvas {
     </div>
     
   </div>
-  
 </div>
 </div>
 <script>
@@ -4883,7 +4923,216 @@ function exportToExcel() {
   
   toast('✅ Export ไฟล์สำเร็จ!');
 }
+// ═══════════════════════════════════════════════════════════
+//   FIX: SHOW ALL VALUES IMMEDIATELY ON DASHBOARD OPEN
+//   - ตัด Animation ตวัดเข็มออก ให้แสดงค่า Final ทันที
+//   - เก็บ Animation ตัวเลขนับขึ้นแบบ Smooth ไว้เพื่อความสวยงาม
+// ═══════════════════════════════════════════════════════════
 
+// 1. เปิด Dashboard: โหลดข้อมูลและแสดงผลทันที
+function openDashboard() {
+  const modal = $id('dashboardModal');
+  modal.style.display = 'flex';
+  
+  // ★ ตัดการ Reset ค่าเป็น 0 ออก เพื่อให้แสดงข้อมูลทันที
+  // resetAllGaugesToZero(); <--- ลบบรรทัดนี้ออก
+  
+  // Reset Animation States
+  gsap.set(['.dash-topbar-cockpit', '.cockpit-left', '.cockpit-center', '.cockpit-right'], {clearProps: 'all'});
+  gsap.set(['.hero-kpi-card', '.gauge-cluster', '.stat-card', '.market-panel', '.incident-feed-panel', '.top-line-panel'], {opacity: 0, y: 20, scale: 0.98});
+
+  // Set User & Time
+  $id('dashUser').textContent = currentUser;
+  if (window.dashTimeInterval) clearInterval(window.dashTimeInterval);
+  updateDashTime();
+  window.dashTimeInterval = setInterval(updateDashTime, 1000);
+  
+  // Populate Dropdowns
+  const vendors = [...new Set(getMyRecords().map(r => r.supplier))].filter(Boolean).sort();
+  $id('dashVendor').innerHTML = '<option value="ALL">All Vendors</option>' + 
+    vendors.map(v => `<option value="${v}">${v}</option>`).join('');
+  
+  // ★ โหลดข้อมูลทันที (จะเข้า Logic อัพเดทปกติ ไม่มีการหน่วงเวลา Intro)
+  refreshDash(); 
+  
+  // Animation Timeline (แสดงผลพร้อมกันทุกส่วน)
+  const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+  
+  tl.fromTo('#dashboardModal', { opacity: 0 }, { opacity: 1, duration: 0.3 })
+    .fromTo('.dash-topbar-cockpit', { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, "-=0.1")
+    .fromTo('.cockpit-left', { x: -100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8 }, "-=0.4")
+    .fromTo('.cockpit-right', { x: 100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8 }, "-=0.8")
+    .fromTo('.cockpit-center', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.6")
+    .to(['.hero-kpi-card', '.gauge-cluster', '.stat-card', '.market-panel', '.incident-feed-panel', '.top-line-panel'], {
+      opacity: 1, y: 0, scale: 1, stagger: 0.05, duration: 0.4, ease: "back.out(1.4)"
+    }, "-=0.4");
+}
+
+// 2. ฟังก์ชัน RefreshDash (แสดงผลทันที ไม่มี Intro Animation)
+function refreshDash() {
+  // ═══ 1. INPUT & FILTER ═══
+  const start = $id('dashStart').value;
+  const end = $id('dashEnd').value;
+  const vendor = $id('dashVendor').value;
+  
+  let data = getMyRecords();
+  
+  // Apply Filters
+  if (start) data = data.filter(r => r.date >= start);
+  if (end) data = data.filter(r => r.date <= end);
+  if (vendor !== 'ALL') data = data.filter(r => r.supplier === vendor);
+  
+  // ═══ 2. CALCULATE KPIs ═══
+  let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
+  let sfL = 0, venL = 0, ctcL = 0, okL = 0;
+  
+  data.forEach(r => {
+    tQ += r.qty;
+    if (r.judgment === 'SF') { sf += r.qty; sfL++; }
+    else if (r.judgment === 'VENDOR FAULT') { ven += r.qty; venL++; }
+    else if (r.judgment === 'CTC') { ctc += r.qty; ctcL++; }
+    else if (r.judgment === 'CAN USE') { ok += r.qty; okL++; }
+  });
+  
+  const totalLot = data.length;
+  const rejQ = sf + ven + ctc;
+  const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
+
+  // ═══ 3. UPDATE UI IMMEDIATELY (FAST & SMOOTH) ═══
+  
+  // Update Ticker
+  renderTicker(tQ, totalLot, passPct, rejQ, sf, ven, ctc, ok);
+  
+  // ★ Main Gauge: อัพเดทตำแหน่งเข็มและตัวเลขทันที (มี Animation เลื่อนน้อยๆ)
+  createGaugeTicks(); // สร้างเส้นรอบวง
+  updateMainGauge(passPct); 
+  
+  // ★ Mini Gauges: อัพเดททันที
+  updateMiniGauge('sf', sf, tQ);
+  updateMiniGauge('vendor', ven, tQ);
+  updateMiniGauge('ctc', ctc, tQ);
+  
+  // ═══ 4. UPDATE HERO KPI ═══
+  animNum('heroTotalQty', tQ);
+  $id('heroLot').textContent = totalLot;
+  renderSparkline('heroSparkline', data, '#10b981');
+  
+  // ═══ 5. UPDATE STATS ROW ═══
+  const totalQ = sf + ven + ctc + ok;
+  const calcPct = (val) => totalQ > 0 ? Math.round((val / totalQ) * 100) : 0;
+
+  animNum('dashStatSF', sf);
+  $id('dashLotSF').textContent = sfL;
+  $id('dashPctSF').textContent = calcPct(sf) + '%';
+
+  animNum('dashStatCTC', ctc);
+  $id('dashLotCTC').textContent = ctcL;
+  $id('dashPctCTC').textContent = calcPct(ctc) + '%';
+
+  animNum('dashStatCanUse', ok);
+  $id('dashLotCanUse').textContent = okL;
+  $id('dashPctCanUse').textContent = calcPct(ok) + '%';
+
+  animNum('dashStatVendor', ven);
+  $id('dashLotVendor').textContent = venL;
+  $id('dashPctVendor').textContent = calcPct(ven) + '%';
+  
+  // ═══ 6. UPDATE CHART & STATS ═══
+  const byMonth = aggregateByMonth(data);
+  const maxVal = Math.max(...byMonth.map(d => d.qty));
+  const monthsWithData = byMonth.filter(d => d.qty > 0);
+  const minVal = monthsWithData.length > 0 ? Math.min(...monthsWithData.map(d => d.qty)) : 0;
+  const avgVal = byMonth.reduce((s, d) => s + d.qty, 0) / 12;
+  
+  $id('statHigh').textContent = maxVal.toLocaleString();
+  $id('statLow').textContent = minVal.toLocaleString();
+  $id('statAvg').textContent = Math.round(avgVal).toLocaleString();
+  
+  // Render Charts
+  renderMainTrendChart(byMonth);
+  renderSparklines(data);
+  renderMarketLists(data);
+  renderTopLine(data);
+  renderIncidentFeed(data);
+}
+
+// 3. ฟังก์ชันอัพเดท Main Gauge (ปรับให้ Smooth และรวดเร็ว)
+function updateMainGauge(passPct) {
+  const circumference = 400; 
+  const arcLength = (passPct / 100) * circumference;
+  
+  // อัพเดทแถบ Arc แบบทันที
+  const arc = $id('mainGaugeArc');
+  if (arc) arc.style.strokeDasharray = `${arcLength} ${circumference}`;
+  
+  // อัพเดทตัวเลขแบบนับขึ้น Smooth (ใช้ GSAP ที่มีอยู่แล้ว)
+  const valueEl = $id('mainGaugeValue');
+  if (valueEl) {
+    const current = parseInt(valueEl.textContent) || 0;
+    if (current !== passPct) {
+      gsap.to({ val: current }, { 
+        val: passPct, 
+        duration: 0.8, // ความเร็วในการนับเลข
+        ease: "power1.out",
+        onUpdate: function() {
+          valueEl.textContent = Math.round(this.targets()[0].val) + '%';
+        }
+      });
+    }
+  }
+  
+  // อัพเดทตำแหน่งเข็มแบบทันที
+  const rotationAngle = -90 + (passPct * 1.8);
+  const needle = document.getElementById('gaugeNeedle');
+  if (needle) {
+      // ใช้ Transition แทน GSAP timeline ซับซ้อน เพื่อความเร็ว
+      needle.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      needle.style.transform = `rotate(${rotationAngle}deg)`;
+  }
+
+  // อัพเดทสถานะ
+  const trendEl = $id('mainGaugeTrend');
+  if (trendEl) {
+    let status, color, bg;
+    if (passPct >= 80) { status = 'Excellent'; color = '#10b981'; bg = 'rgba(16,185,129,0.15)'; }
+    else if (passPct >= 60) { status = 'Warning'; color = '#f59e0b'; bg = 'rgba(245,158,11,0.15)'; }
+    else { status = 'Critical'; color = '#ef4444'; bg = 'rgba(239,68,68,0.15)'; }
+    
+    trendEl.style.background = bg;
+    trendEl.style.border = `1px solid ${color}33`;
+    trendEl.querySelector('.trend-arrow').style.color = color;
+    trendEl.querySelector('.trend-arrow').textContent = passPct >= 80 ? '▲' : passPct >= 60 ? '●' : '▼';
+    trendEl.querySelector('.trend-value').style.color = color;
+    trendEl.querySelector('.trend-value').textContent = status;
+  }
+}
+
+// 4. ฟังก์ชันอัพเดท Mini Gauge (ปรับให้ Smooth และรวดเร็ว)
+function updateMiniGauge(type, value, total) {
+  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+  const circumference = 126; 
+  const arcLength = (pct / 100) * circumference;
+  
+  const arc = $id(type + 'GaugeArc');
+  if (arc) arc.style.strokeDasharray = `${arcLength} ${circumference}`;
+
+  const rotation = -90 + (pct * 1.8);
+  const needle = $id(type + 'GaugeNeedle');
+  if (needle) {
+      needle.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      needle.style.transform = `rotate(${rotation}deg)`;
+  }
+
+  const valueEl = $id(type + 'GaugeValue');
+  if (valueEl) {
+      const current = parseInt(valueEl.textContent) || 0;
+      if (current !== pct) {
+          gsap.to({ val: current }, { val: pct, duration: 0.8, ease: "power1.out",
+              onUpdate: function() { valueEl.textContent = Math.round(this.targets()[0].val); }
+          });
+      }
+  }
+}
 /* ══ NETWORK ══ */
 function normalizeRow(d,inspector){return{id:d.id||(Date.now()+'_'+Math.random()),date:d.date||'',shift:d.shift||'SHIFT A',inspector:d.inspector||inspector,ref:String(d.ref||''),line:d.line||'',supplier:d.supplier||'',partNo:d.partNo||'',partName:d.partName||'',qty:parseInt(d.qty)||0,defect:d.defect||'',remark:d.remark||'',judgment:d.judgment||'SF'}}
 let _fetchInFlight=false;
@@ -5282,51 +5531,44 @@ function updateDashTime() {
     });
   }
 }
+// ═══════════════════════════════════════════════════════════
+//   FIX: FORCE DASHBOARD RESET ONCE (Visual + Data)
+//   รีเซ็ตให้เริ่มที่ 0 ทุกครั้งที่เปิด และทำงานแค่ 1 ครั้ง
+// ═══════════════════════════════════════════════════════════
 
-// ── OPEN DASHBOARD (Cinematic Entrance) ──
-function openDashboard() {
-  const modal = $id('dashboardModal');
-  modal.style.display = 'flex';
-  
-  // Reset animations
-  gsap.set(['.dash-topbar-cockpit', '.cockpit-left', '.cockpit-center', '.cockpit-right'], {clearProps: 'all'});
-  gsap.set(['.hero-kpi-card', '.gauge-cluster', '.stat-card', '.market-panel', '.incident-feed-panel', '.top-line-panel'], {opacity: 0, y: 20, scale: 0.98});
+// 1. ฟังก์ชันบังคับให้กราฟทุกตัวชี้ที่ 0 ทันที (Visual Reset)
+function resetAllGaugesToZero() {
+    // --- Reset Main Gauge ---
+    const needle = document.getElementById('gaugeNeedle');
+    const arc = $id('mainGaugeArc');
+    const val = $id('mainGaugeValue');
+    // บังคับ CSS ทันที (ไม่ใช้ Animation)
+    if(needle) { needle.style.transition = 'none'; needle.style.transform = 'rotate(-90deg)'; }
+    if(arc) { arc.style.transition = 'none'; arc.style.strokeDasharray = '0 400'; }
+    if(val) val.textContent = '0%';
+    createGaugeTicks(); // สร้างเส้นรอบวง
 
-  // Set user/time
-  $id('dashUser').textContent = currentUser;
-  updateDashTime();
-  setInterval(updateDashTime, 1000);
-  
-  // Populate vendor dropdown
-  const vendors = [...new Set(getMyRecords().map(r => r.supplier))].filter(Boolean).sort();
-  $id('dashVendor').innerHTML = '<option value="ALL">All Vendors</option>' + 
-    vendors.map(v => `<option value="${v}">${v}</option>`).join('');
-  
-  resetDashFilters();
-  
-  // ★ ANIMATION TIMELINE ★
-  const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-  
-  // 1. Background Fade
-  tl.fromTo('#dashboardModal', { opacity: 0 }, { opacity: 1, duration: 0.3 })
-  
-  // 2. Top Bar Slide Down
-    .fromTo('.dash-topbar-cockpit', { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, "-=0.1")
-  
-  // 3. Panels Slide In (Left/Right/Center)
-    .fromTo('.cockpit-left', { x: -100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8 }, "-=0.4")
-    .fromTo('.cockpit-right', { x: 100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8 }, "-=0.8")
-    .fromTo('.cockpit-center', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.6")
-  
-  // 4. Cards Pop In (Stagger)
-    .to(['.hero-kpi-card', '.gauge-cluster', '.stat-card', '.market-panel', '.incident-feed-panel', '.top-line-panel'], {
-      opacity: 1, 
-      y: 0, 
-      scale: 1,
-      stagger: 0.08, // เวลาหน่วงระหว่างการ์ด
-      duration: 0.5,
-      ease: "back.out(1.4)" // Springy effect
-    }, "-=0.4");
+    // --- Reset Mini Gauges ---
+    ['sf', 'vendor', 'ctc'].forEach(type => {
+        const n = $id(type + 'GaugeNeedle');
+        const a = $id(type + 'GaugeArc');
+        const v = $id(type + 'GaugeValue');
+        if(n) { n.style.transition = 'none'; n.style.transform = 'rotate(-90deg)'; }
+        if(a) { a.style.transition = 'none'; a.style.strokeDasharray = '0 126'; }
+        if(v) v.textContent = '0';
+    });
+    
+    // คืนค่า Transition กลับเพื่อพร้อมทำ Animation ครั้งต่อไป
+    requestAnimationFrame(() => {
+        if(needle) needle.style.transition = 'transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        if(arc) arc.style.transition = 'stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        ['sf', 'vendor', 'ctc'].forEach(type => {
+            const n = $id(type + 'GaugeNeedle');
+            const a = $id(type + 'GaugeArc');
+            if(n) n.style.transition = 'transform 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            if(a) a.style.transition = 'stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)';
+        });
+    });
 }
 
 function closeDashboard() {
@@ -5345,146 +5587,224 @@ function closeDashboard() {
 }
 
 function resetDashFilters() {
+  // ล้างค่า Filter
   $id('dashStart').value = '';
   $id('dashEnd').value = '';
   $id('dashVendor').value = 'ALL';
+  
+  // ★ สั่งให้ refreshDash ทำงานทันที (จะเข้าเงื่อนไข Animation เพราะ hasPlayedDashIntro เป็น false แล้ว)
   refreshDash();
 }
+// ═══════════════════════════════════════════════════════════
+//   SUPPORT LIBRARY (ตัวช่วยสำหรับ refreshDash)
+//   วางส่วนนี้ก่อน function refreshDash()
+// ═══════════════════════════════════════════════════════════
 
-function refreshDash() {
-  const start = $id('dashStart').value;
-  const end = $id('dashEnd').value;
-  const vendor = $id('dashVendor').value;
-  
-  let data = getMyRecords();
-  
-  // Apply Filters
-  if (start) data = data.filter(r => r.date >= start);
-  if (end) data = data.filter(r => r.date <= end);
-  if (vendor !== 'ALL') data = data.filter(r => r.supplier === vendor);
-  
-  // ═══ CALCULATE KPIs ═══
-  let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
-  let sfL = 0, venL = 0, ctcL = 0, okL = 0;
-  
-  data.forEach(r => {
-    tQ += r.qty;
-    if (r.judgment === 'SF') { sf += r.qty; sfL++; }
-    else if (r.judgment === 'VENDOR FAULT') { ven += r.qty; venL++; }
-    else if (r.judgment === 'CTC') { ctc += r.qty; ctcL++; }
-    else if (r.judgment === 'CAN USE') { ok += r.qty; okL++; }
-  });
-  
-  const totalLot = data.length;
-  const activeDays = new Set(data.map(r => r.date)).size;
-  const rejQ = sf + ven + ctc;
-  const rejPct = tQ > 0 ? Math.round((rejQ / tQ) * 100) : 0;
-  const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
-  const avgPerDay = activeDays > 0 ? Math.round(tQ / activeDays) : 0;
-  
-  // ═══ TREND CALCULATION (Month over Month) ═══
-  const now = new Date();
-  const thisMonth = now.getMonth();
-  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
-  const thisYear = now.getFullYear();
-  const lastYear = thisMonth === 0 ? thisYear - 1 : thisYear;
+// 1. ตัวแปรเก็บสถานะ Animation
+let hasPlayedDashIntro = false;
 
-  const currentMonthData = data.filter(r => {
-    const d = new Date(r.date);
-    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
-  });
-  const lastMonthData = data.filter(r => {
-    const d = new Date(r.date);
-    return d.getMonth() === lastMonth && d.getFullYear() === lastYear;
-  });
-
-  const currentTotal = currentMonthData.reduce((s, r) => s + r.qty, 0);
-  const lastTotal = lastMonthData.reduce((s, r) => s + r.qty, 0);
-
-  let trendPct = 0;
-  let trendIcon = '→';
-  let trendColor = '#94a3b8';
-
-  if (lastTotal > 0) {
-    const diff = currentTotal - lastTotal;
-    trendPct = Math.round((diff / lastTotal) * 100);
-    if (diff > 0) { trendIcon = '▲'; trendColor = '#10b981'; }
-    else if (diff < 0) { trendIcon = '▼'; trendColor = '#ef4444'; }
-  } else if (currentTotal > 0) {
-    trendIcon = '▲'; trendPct = 100; trendColor = '#10b981';
+// 2. ฟังก์ชันสร้างเส้นรอบวง (Ticks)
+function createGaugeTicks() {
+  const container = document.getElementById('gaugeTicks');
+  if (!container) return;
+  if (container.children.length > 0) return;
+  let html = '';
+  for (let i = 0; i <= 10; i++) {
+    const angle = -180 + (i * 18); 
+    const rad = angle * (Math.PI / 180);
+    const x1 = Math.cos(rad) * 88; 
+    const y1 = Math.sin(rad) * 88;
+    const x2 = Math.cos(rad) * 98;
+    const y2 = Math.sin(rad) * 98;
+    const isMain = (i % 5 === 0); 
+    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#475569" stroke-width="${isMain ? 2.5 : 1}" opacity="${isMain ? 0.8 : 0.4}"/>`;
   }
-
-  const heroTrendEl = $id('heroPct');
-  if (heroTrendEl) {
-    heroTrendEl.innerHTML = `${trendIcon} ${Math.abs(trendPct)}%`;
-    heroTrendEl.style.color = trendColor;
-    heroTrendEl.title = `vs Last Month (${lastTotal.toLocaleString()} PCS)`;
-  }
-  
-  // Update ticker
-  renderTicker(tQ, totalLot, passPct, rejPct, sf, ven, ctc, ok);
-  
-  // Update main gauge
-  updateMainGauge(passPct);
-  
-  // Update mini gauges
-  updateMiniGauge('sf', sf, tQ, sfL);
-  updateMiniGauge('vendor', ven, tQ, venL);
-  updateMiniGauge('ctc', ctc, tQ, ctcL);
-  
-  // ═══ UPDATE HERO KPI ═══
-  animNum('heroTotalQty', tQ);
-  $id('heroLot').textContent = totalLot;
-  renderSparkline('heroSparkline', data, '#10b981');
-  
-  // ═══ UPDATE STATS ROW ═══
-  const totalQ = sf + ven + ctc + ok;
-  const calcPct = (val) => totalQ > 0 ? Math.round((val / totalQ) * 100) : 0;
-
-  animNum('dashStatSF', sf);
-  $id('dashLotSF').textContent = sfL;
-  $id('dashPctSF').textContent = calcPct(sf) + '%';
-
-  animNum('dashStatCTC', ctc);
-  $id('dashLotCTC').textContent = ctcL;
-  $id('dashPctCTC').textContent = calcPct(ctc) + '%';
-
-  animNum('dashStatCanUse', ok);
-  $id('dashLotCanUse').textContent = okL;
-  $id('dashPctCanUse').textContent = calcPct(ok) + '%';
-
-  animNum('dashStatVendor', ven);
-  $id('dashLotVendor').textContent = venL;
-  $id('dashPctVendor').textContent = calcPct(ven) + '%';
-  
-  // ═══ UPDATE CHART & STATS ═══
-  // ★ คืนค่าการแสดงผล 12 เดือนเหมือนเดิม (ไม่ตัดเดือนที่เป็น 0 ออก)
-  const byMonth = aggregateByMonth(data);
-  
-  // คำนวณ High / Low / Avg
-  const maxVal = Math.max(...byMonth.map(d => d.qty));
-  
-  // ★ ปรับปรุงการหา LOW: ให้หาค่าต่ำสุดจากเดือนที่ 'มีข้อมูล' (qty > 0) 
-  // เพื่อไม่ให้แสดง 0 ตลอดเวลา ถ้ายังไม่ถึงเดือนนั้น
-  const monthsWithData = byMonth.filter(d => d.qty > 0);
-  const minVal = monthsWithData.length > 0 
-    ? Math.min(...monthsWithData.map(d => d.qty)) 
-    : 0;
-  
-  const avgVal = byMonth.reduce((s, d) => s + d.qty, 0) / 12;
-  
-  $id('statHigh').textContent = maxVal.toLocaleString();
-  $id('statLow').textContent = minVal.toLocaleString();
-  $id('statAvg').textContent = Math.round(avgVal).toLocaleString();
-  
-  renderMainTrendChart(byMonth);
-  renderSparklines(data);
-  renderMarketLists(data);
-  
-  // Render Top Line & Incident Feed
-  renderTopLine(data);
-  renderIncidentFeed(data);
+  container.innerHTML = html;
 }
+
+// 3. อัพเดทสถานะ Main Gauge (ตัวเลขสี)
+function updateGaugeStatus(passPct) {
+  const trendEl = $id('mainGaugeTrend');
+  if (!trendEl) return;
+  let status, color, bg;
+  if (passPct >= 80) { status = 'Excellent'; color = '#10b981'; bg = 'rgba(16,185,129,0.15)'; }
+  else if (passPct >= 60) { status = 'Warning'; color = '#f59e0b'; bg = 'rgba(245,158,11,0.15)'; }
+  else { status = 'Critical'; color = '#ef4444'; bg = 'rgba(239,68,68,0.15)'; }
+  trendEl.style.background = bg;
+  trendEl.style.border = `1px solid ${color}33`;
+  trendEl.querySelector('.trend-arrow').style.color = color;
+  trendEl.querySelector('.trend-arrow').textContent = passPct >= 80 ? '▲' : passPct >= 60 ? '●' : '▼';
+  trendEl.querySelector('.trend-value').style.color = color;
+  trendEl.querySelector('.trend-value').textContent = status;
+}
+
+// ═══ ANIMATION FUNCTIONS (เหมือนเดิม แต่เพิ่มความแม่นยำ) ═══
+
+function animateGaugeIntro(targetPct) {
+    const needle = document.getElementById('gaugeNeedle');
+    const valueEl = $id('mainGaugeValue');
+    const arc = $id('mainGaugeArc');
+    const circumference = 400;
+    createGaugeTicks();
+
+    // บังคับให้เริ่มที่ 0 ก่อน (กันพลาด)
+    if(needle) needle.style.transform = 'rotate(-90deg)';
+    if(arc) arc.style.strokeDasharray = '0 400';
+    if(valueEl) valueEl.textContent = '0%';
+
+    const updateUI = (v) => {
+        const rot = -90 + (v * 1.8);
+        const dash = (v / 100) * 400;
+        if(needle) needle.style.transform = `rotate(${rot}deg)`;
+        if(arc) arc.style.strokeDasharray = `${dash} ${circumference}`;
+        if(valueEl) valueEl.textContent = Math.round(v) + '%';
+    };
+
+    const tl = gsap.timeline({
+        onUpdate: function() { updateUI(this.targets()[0].val); },
+        onComplete: function() { updateGaugeStatus(targetPct); }
+    });
+
+    // วิ่ง 0 -> 100 -> Target
+    tl.to({ val: 0 }, { val: 100, duration: 0.8, ease: "power2.out" })
+      .to({ val: 100 }, { val: targetPct, duration: 1.5, ease: "power3.inOut" }, "+=0.1");
+}
+
+function animateMiniGaugesIntro(sfPct, venPct, ctcPct) {
+    const gauges = [
+        { id: 'sf', target: sfPct },
+        { id: 'vendor', target: venPct },
+        { id: 'ctc', target: ctcPct }
+    ];
+
+    gauges.forEach(g => {
+        const needle = $id(g.id + 'GaugeNeedle');
+        const arc = $id(g.id + 'GaugeArc');
+        const valEl = $id(g.id + 'GaugeValue');
+        const circ = 126;
+
+        // บังคับให้เริ่มที่ 0
+        if(needle) needle.style.transform = 'rotate(-90deg)';
+        if(arc) arc.style.strokeDasharray = '0 126';
+        if(valEl) valEl.textContent = '0';
+
+        const updateUI = (v) => {
+             if(needle) needle.style.transform = `rotate(${-90 + (v * 1.8)}deg)`;
+             if(arc) arc.style.strokeDasharray = `${(v/100)*circ} ${circ}`;
+             if(valEl) valEl.textContent = Math.round(v);
+        };
+
+        const tl = gsap.timeline({
+            onUpdate: function() { updateUI(this.targets()[0].v); }
+        });
+
+        tl.to({ v: 0 }, { v: 100, duration: 0.6, ease: "power2.out" })
+          .to({ v: 100 }, { v: g.target, duration: 1.2, ease: "power2.inOut" }, "-=0.2");
+    });
+}
+
+// 7. Update Mini Gauge ปกติ
+function updateMiniGauge(type, value, total, lots) {
+  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+  const circumference = 126; 
+  const arcLength = (pct / 100) * circumference;
+  const arc = $id(type + 'GaugeArc');
+  if (arc) arc.style.strokeDasharray = `${arcLength} ${circumference}`;
+  const rotation = -90 + (pct * 1.8);
+  const needle = $id(type + 'GaugeNeedle');
+  if (needle) needle.style.transform = `rotate(${rotation}deg)`;
+  const valueEl = $id(type + 'GaugeValue');
+  if (valueEl) {
+      const current = parseInt(valueEl.textContent) || 0;
+      if (current !== pct) {
+          gsap.to({ val: current }, { val: pct, duration: 0.8, ease: "power1.out",
+              onUpdate: function() { valueEl.textContent = Math.round(this.targets()[0].val); }
+          });
+      }
+  }
+}
+
+// 8. Helper: Render Ticker
+function renderTicker(tQ, lots, pass, rej, sf, ven, ctc, ok) {
+  const ticker = $id('tickerTape');
+  if(!ticker) return;
+  const items = [
+    { label: 'TOTAL', value: tQ.toLocaleString() + ' PCS', change: '+' + lots + ' Lots', up: true },
+    { label: 'PASS', value: pass + '%', change: '▲', up: true },
+    { label: 'REJECTION', value: rej + '%', change: rej > 20 ? '⚠️' : '✓', up: rej <= 20 },
+    { label: 'SF', value: sf.toLocaleString(), change: 'PCS', up: false },
+    { label: 'VENDOR', value: ven.toLocaleString(), change: 'PCS', up: false },
+    { label: 'CTC', value: ctc.toLocaleString(), change: 'PCS', up: false },
+    { label: 'OK', value: ok.toLocaleString(), change: '✓', up: true }
+  ];
+  const html = items.map(i => `<div class="ticker-item"><span class="label">${i.label}</span><span class="value">${i.value}</span><span class="change ${i.up ? 'up' : 'down'}">${i.change}</span></div>`).join('');
+  ticker.innerHTML = `<div class="ticker-content">${html}${html}</div>`;
+}
+
+// 9. Helper: Render Sparklines
+function renderSparklines(data) {
+  renderSparkline('sfSparkline', data.filter(r => r.judgment === 'SF'), '#f97316');
+  renderSparkline('vendorSparkline', data.filter(r => r.judgment === 'VENDOR FAULT'), '#ef4444');
+  renderSparkline('ctcSparkline', data.filter(r => r.judgment === 'CTC'), '#3b82f6');
+  renderSparkline('prodSparkline', data, '#10b981');
+}
+
+function renderSparkline(containerId, data, color) {
+  const container = $id(containerId);
+  if (!container || !data.length) return;
+  const key = containerId.replace('Sparkline', '') + 'Spark';
+  if (dashCharts[key]) dashCharts[key].destroy();
+  const byDate = {};
+  data.forEach(r => { byDate[r.date] = (byDate[r.date] || 0) + r.qty; });
+  const dates = Object.keys(byDate).sort();
+  const values = dates.map(d => byDate[d]);
+  const canvas = document.createElement('canvas');
+  canvas.style.width = '100%'; canvas.style.height = '100%';
+  container.innerHTML = '';
+  container.appendChild(canvas);
+  dashCharts[key] = new Chart(canvas, {
+    type: 'line', data: { labels: dates, datasets: [{ data: values, borderColor: color, borderWidth: 1.5, fill: true, backgroundColor: color.replace(')', ', 0.15)').replace('rgb', 'rgba'), tension: 0.4, pointRadius: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } }, animation: { duration: 0 } }
+  });
+}
+
+// 10. Helper: Render Market Lists
+function renderMarketLists(data) {
+  renderSupplierList(data);
+  renderDefectList(data);
+  renderPartList(data);
+}
+
+function renderSupplierList(data) {
+  const bySupplier = {};
+  data.forEach(r => { bySupplier[r.supplier] = (bySupplier[r.supplier] || { qty: 0, ok: 0 }); bySupplier[r.supplier].qty += r.qty; if (r.judgment === 'CAN USE') bySupplier[r.supplier].ok += r.qty; });
+  const sorted = Object.entries(bySupplier).map(([name, stats]) => ({ name, ...stats, rate: stats.qty > 0 ? Math.round((stats.ok / stats.qty) * 100) : 0 })).sort((a, b) => b.qty - a.qty).slice(0, 5);
+  const maxQty = sorted[0]?.qty || 1;
+  const html = sorted.map((item, i) => `<div class="market-item"><div class="market-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'default'}">${i + 1}</div><div class="market-info"><div class="market-name">${escapeHtml(item.name)}</div><div class="market-bar-bg"><div class="market-bar" style="background: linear-gradient(90deg, #10b981, #34d399); width: ${(item.qty / maxQty) * 100}%"></div></div></div><div class="market-stats"><div class="market-value">${item.qty.toLocaleString()}</div><div class="market-change ${item.rate >= 80 ? 'up' : 'down'}">${item.rate}%</div></div></div>`).join('');
+  $id('supplierList').innerHTML = html || '<div style="text-align:center;color:#64748b;padding:1rem">No data</div>';
+}
+
+function renderDefectList(data) {
+  const container = $id('dashDefectList'); if(!container) return;
+  const totalQty = data.reduce((s, r) => s + r.qty, 0);
+  const byDefect = {};
+  data.forEach(r => { if (r.defect) byDefect[r.defect] = (byDefect[r.defect] || 0) + r.qty; });
+  const sorted = Object.entries(byDefect).map(([name, qty]) => ({ name, qty, pct: totalQty > 0 ? Math.round((qty / totalQty) * 100) : 0 })).sort((a, b) => b.qty - a.qty).slice(0, 5);
+  const maxQty = sorted[0]?.qty || 1;
+  const html = sorted.map((item, i) => `<div class="market-item"><div class="market-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'default'}">${i + 1}</div><div class="market-info"><div class="market-name">${escapeHtml(item.name)}</div><div class="market-bar-bg"><div class="market-bar" style="background: linear-gradient(90deg, #f59e0b, #fbbf24); width: ${(item.qty / maxQty) * 100}%"></div></div></div><div class="market-stats"><div class="market-value">${item.qty.toLocaleString()}</div><div class="market-change down">${item.pct}%</div></div></div>`).join('');
+  container.innerHTML = html || '<div style="text-align:center;color:#64748b;padding:1rem">No defects</div>';
+}
+
+function renderPartList(data) {
+  const totalQty = data.reduce((s, r) => s + r.qty, 0);
+  const byPart = {};
+  data.forEach(r => { if (r.partNo) { byPart[r.partNo] = (byPart[r.partNo] || { qty: 0, name: r.partName || '' }); byPart[r.partNo].qty += r.qty; } });
+  const sorted = Object.entries(byPart).map(([no, stats]) => ({ no, ...stats, pct: totalQty > 0 ? Math.round((stats.qty / totalQty) * 100) : 0 })).sort((a, b) => b.qty - a.qty).slice(0, 5);
+  const maxQty = sorted[0]?.qty || 1;
+  const html = sorted.map((item, i) => `<div class="market-item"><div class="market-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'default'}">${i + 1}</div><div class="market-info"><div class="market-name">${escapeHtml(item.no)}</div><div class="market-bar-bg"><div class="market-bar" style="background: linear-gradient(90deg, #8b5cf6, #a78bfa); width: ${(item.qty / maxQty) * 100}%"></div></div></div><div class="market-stats"><div class="market-value">${item.qty.toLocaleString()}</div><div class="market-change down">${item.pct}%</div></div></div>`).join('');
+  $id('partList').innerHTML = html || '<div style="text-align:center;color:#64748b;padding:1rem">No parts</div>';
+}
+
 // ── RENDER TICKER TAPE ──
 function renderTicker(tQ, lots, pass, rej, sf, ven, ctc, ok) {
   const ticker = $id('tickerTape');
@@ -5508,58 +5828,59 @@ function renderTicker(tQ, lots, pass, rej, sf, ven, ctc, ok) {
   
   ticker.innerHTML = `<div class="ticker-content">${html}${html}</div>`;
 }
+// ── 1. INTRO ANIMATION (วิ่ง 0 -> 100 -> Target) ──
+function animateMiniGaugesIntro(sfPct, venPct, ctcPct) {
+    const gauges = [
+        { id: 'sf', target: sfPct, color: '#f97316' },
+        { id: 'vendor', target: venPct, color: '#ef4444' },
+        { id: 'ctc', target: ctcPct, color: '#3b82f6' }
+    ];
 
-// ── MAIN GAUGE ──
-function updateMainGauge(passPct) {
-  const circumference = 400;
-  const arcLength = (passPct / 100) * circumference;
-  
-  const arc = $id('mainGaugeArc');
-  if (arc) {
-    arc.style.strokeDasharray = `${arcLength} ${circumference}`;
-  }
-  
-  const valueEl = $id('mainGaugeValue');
-  if (valueEl) {
-    animateValue(valueEl, passPct, '%');
-  }
-  
-  const trendEl = $id('mainGaugeTrend');
-  if (trendEl) {
-    const status = passPct >= 80 ? 'good' : passPct >= 60 ? 'warning' : 'critical';
-    trendEl.className = 'gauge-trend ' + status;
-    trendEl.style.background = status === 'good' ? 'rgba(16, 185, 129, 0.1)' : 
-                                status === 'warning' ? 'rgba(245, 158, 11, 0.1)' : 
-                                'rgba(239, 68, 68, 0.1)';
-    trendEl.style.borderColor = status === 'good' ? 'rgba(16, 185, 129, 0.2)' : 
-                                 status === 'warning' ? 'rgba(245, 158, 11, 0.2)' : 
-                                 'rgba(239, 68, 68, 0.2)';
-    trendEl.querySelector('.trend-arrow').style.color = 
-      status === 'good' ? '#10b981' : status === 'warning' ? '#f59e0b' : '#ef4444';
-    trendEl.querySelector('.trend-value').style.color = 
-      status === 'good' ? '#10b981' : status === 'warning' ? '#f59e0b' : '#ef4444';
-    trendEl.querySelector('.trend-value').textContent = 
-      status === 'good' ? 'Good' : status === 'warning' ? 'Warning' : 'Critical';
-  }
+    gauges.forEach(g => {
+        const needle = $id(g.id + 'GaugeNeedle');
+        const arc = $id(g.id + 'GaugeArc');
+        const valEl = $id(g.id + 'GaugeValue');
+        const circ = 126;
+
+        // A. Reset ไป 0 ก่อน
+        gsap.set({ v: 0 }, { v: 0, onUpdate: function() {
+             const v = this.targets()[0].v;
+             if(needle) needle.style.transform = `rotate(${-90 + (v * 1.8)}deg)`;
+             if(arc) arc.style.strokeDasharray = `${(v/100)*circ} ${circ}`;
+             if(valEl) valEl.textContent = Math.round(v);
+        }});
+
+        // B. Timeline: วิ่งขึ้น 100 -> ลง Target
+        const tl = gsap.timeline({
+            onUpdate: function() {
+                const v = this.targets()[0].v;
+                if(needle) needle.style.transform = `rotate(${-90 + (v * 1.8)}deg)`;
+                if(arc) arc.style.strokeDasharray = `${(v/100)*circ} ${circ}`;
+                if(valEl) valEl.textContent = Math.round(v);
+            }
+        });
+
+        tl.to({ v: 0 }, { v: 100, duration: 0.6, ease: "power2.out" })
+          .to({ v: 100 }, { v: g.target, duration: 1.2, ease: "power3.inOut" }, "+=0.1");
+    });
 }
 
-// ── MINI GAUGE ──
-function updateMiniGauge(type, value, total, lots) {
-  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
-  const circumference = 251;
-  const arcLength = (pct / 100) * circumference;
-  
-  const arc = $id(type + 'GaugeArc');
-  if (arc) {
-    arc.style.strokeDasharray = `${arcLength} ${circumference}`;
-  }
-  
-  const valueEl = $id(type + 'GaugeValue');
-  if (valueEl) {
-    animateValue(valueEl, pct);
-  }
-}
+// ── 2. NORMAL UPDATE (กรณีเปลี่ยน Filter) ──
+function updateMiniGauge(type, value, total) {
+    const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+    const circumference = 126;
+    const arcLength = (pct / 100) * circumference;
+    
+    const arc = $id(type + 'GaugeArc');
+    if (arc) arc.style.strokeDasharray = `${arcLength} ${circumference}`;
 
+    const rotation = -90 + (pct * 1.8);
+    const needle = $id(type + 'GaugeNeedle');
+    if (needle) needle.style.transform = `rotate(${rotation}deg)`;
+
+    const valueEl = $id(type + 'GaugeValue');
+    if (valueEl) valueEl.textContent = pct;
+}
 // ── AGGREGATE BY MONTH ──
 function aggregateByMonth(data) {
   const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -6113,6 +6434,84 @@ if (!document.fullscreenElement) {
   window.open('job_project.html', '_blank');
   
   // ถ้าใช้ได้ค่อยเปลี่ยนกลับเป็น window.location.href='job_project.html';
+}
+// ═══════════════════════════════════════════════════════════
+//   FIX: COMPLETE GAUGE FUNCTIONS (NO MORE ERRORS)
+// ═══════════════════════════════════════════════════════════
+
+// 1. ฟังก์ชันสร้างเส้นรอบวง (สำคัญมาก ห้ามขาด)
+function createGaugeTicks() {
+  const container = document.getElementById('gaugeTicks');
+  if (!container) return;
+  if (container.children.length > 0) return; // สร้างครั้งเดียว
+  
+  let html = '';
+  for (let i = 0; i <= 10; i++) {
+    const angle = -180 + (i * 18); 
+    const rad = angle * (Math.PI / 180);
+    
+    const x1 = Math.cos(rad) * 88; 
+    const y1 = Math.sin(rad) * 88;
+    const x2 = Math.cos(rad) * 98;
+    const y2 = Math.sin(rad) * 98;
+    
+    const isMain = (i % 5 === 0); 
+    
+    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#475569" stroke-width="${isMain ? 2.5 : 1}" opacity="${isMain ? 0.8 : 0.4}"/>`;
+  }
+  container.innerHTML = html;
+}
+
+// 2. ฟังก์ชันอัพเดทกราฟ (เข็ม + แถบ + ตัวเลข)
+function updateMainGauge(passPct) {
+  // สร้างเส้นรอบวง (ถ้ายังไม่มี)
+  createGaugeTicks(); 
+
+  // 1. Update Arc (แถบสี)
+  const circumference = 400; 
+  const arcLength = (passPct / 100) * circumference;
+  const arc = $id('mainGaugeArc');
+  if (arc) arc.style.strokeDasharray = `${arcLength} ${circumference}`;
+
+  // 2. Update Needle (หมุนเข็ม)
+  // สูตรนี้คำนวณสำหรับเข็มที่ชี้ขึ้นบนในตอนแรก (0deg)
+  // 0% = -90deg (ชี้ซ้าย), 100% = 90deg (ชี้ขวา)
+  const rotationAngle = -90 + (passPct * 1.8);
+  
+  const needle = document.getElementById('gaugeNeedle');
+  if (needle) needle.style.transform = `rotate(${rotationAngle}deg)`;
+
+  // 3. Update Value (ตัวเลข)
+  const valueEl = $id('mainGaugeValue');
+  if (valueEl) {
+    const current = parseInt(valueEl.textContent) || 0;
+    if (current !== passPct) {
+      gsap.to({ val: current }, {
+        val: passPct,
+        duration: 1.5,
+        ease: "power2.out",
+        onUpdate: function() {
+          valueEl.textContent = Math.round(this.targets()[0].val) + '%';
+        }
+      });
+    }
+  }
+
+  // 4. Update Status (สถานะ)
+  const trendEl = $id('mainGaugeTrend');
+  if (trendEl) {
+    let status, color, bg;
+    if (passPct >= 80) { status = 'Excellent'; color = '#10b981'; bg = 'rgba(16,185,129,0.15)'; }
+    else if (passPct >= 60) { status = 'Warning'; color = '#f59e0b'; bg = 'rgba(245,158,11,0.15)'; }
+    else { status = 'Critical'; color = '#ef4444'; bg = 'rgba(239,68,68,0.15)'; }
+    
+    trendEl.style.background = bg;
+    trendEl.style.border = `1px solid ${color}33`;
+    trendEl.querySelector('.trend-arrow').style.color = color;
+    trendEl.querySelector('.trend-arrow').textContent = passPct >= 80 ? '▲' : passPct >= 60 ? '●' : '▼';
+    trendEl.querySelector('.trend-value').style.color = color;
+    trendEl.querySelector('.trend-value').textContent = status;
+  }
 }
 </script>
 
