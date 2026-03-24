@@ -3386,58 +3386,66 @@ tbody tr {
   50% { box-shadow: 0 0 20px 5px rgba(239, 68, 68, 0.15); }
 }
 /* ═══════════════════════════════════════════════════════════
-   ADVANCED DASHBOARD ANIMATIONS
+   SET 1: GPU ACCELERATION & FLUID MOTION ENGINE
+   - บังคับให้ใช้การ์ดจอ (GPU) จัดการ Animation
+   - ลดภาระ CPU ทำให้เลื่อนและขยับไหลลื่น
 ══════════════════════════════════════════════════════════ */
 
-/* 1. Effect ตอนเปิด Dashboard (Fade In Scale) */
-.dash-animate-in {
-  opacity: 0;
-  transform: translateY(30px) scale(0.96);
-  animation: dashSlideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+/* 1. Global Settings: บอก Browser ว่าเราต้องการความเร็วสูงสุด */
+* {
+  -webkit-font-smoothing: antialiased; /* ทำให้ Font เรียบ */
+  -webkit-tap-highlight-color: transparent; /* เอาสีน้ำเงินตอนกดออก */
 }
 
-@keyframes dashSlideUp {
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+/* 2. GPU Hack: บังคับให้ทุกอย่างใช้ Hardware Layer */
+/* ใช้ transform: translateZ(0) เพื่อหลอก Browser ให้สร้าง Layer ใหม่บน GPU */
+.card, .kpi-card, .stat-card, .market-panel, .gauge-cluster, 
+.line-item, .incident-item, .dash-chart-card, .hero-kpi-card {
+  transform: translateZ(0);
+  will-change: transform, opacity; /* เตือน Browser ว่าพวกนี้จะขยับ */
+  backface-visibility: hidden; /* ป้องกันการกระพริบตอนหมุน 3D */
 }
 
-/* 2. Effect สำหรับตัวเลข KPI เมื่ออัพเดท (Glow & Pop) */
-.pulse-glow {
-  animation: pulseGlowKey 0.6s ease-out;
+/* 3. Smooth Scrolling: ทำให้การเลื่อนหน้าจอนุ่มนวล */
+html {
+  scroll-behavior: smooth;
 }
 
-@keyframes pulseGlowKey {
-  0% { transform: scale(1); color: inherit; }
-  50% { transform: scale(1.15); text-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
-  100% { transform: scale(1); }
+/* 4. Optimize Heavy Shadows: 
+   Box-shadow ใช้ทรัพยากรสูง ให้ใช้ filter: drop-shadow แทนที่ทำได้ 
+   แต่ถ้าใช้ Box Shadow ต้องลดขนาดลงเมื่อเคลื่อนไหว */
+.kpi-card:hover {
+  /* เก็บ effect เดิมไว้ แต่เพิ่ม performance hint */
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              box-shadow 0.25s ease;
 }
 
-/* 3. Effect สำหรับ List Items (Stagger Slide) */
-.list-item-animate {
-  opacity: 0;
-  transform: translateX(20px);
-  animation: listItemSlide 0.4s ease-out forwards;
+/* 5. Optimize Gauge Movement (SVG Performance) */
+/* SVG ตัวเข็มและวงกลมใช้ CSS transform ดีกว่า attribute transform */
+#mainGaugeNeedle, #gaugeNeedle,
+#sfGaugeNeedle, #vendorGaugeNeedle, #ctcGaugeNeedle {
+  /* เปลี่ยนจากการคำนวณใน JS มาใช้ CSS Hardware Layer */
+  transform-origin: center center;
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform; 
 }
 
-@keyframes listItemSlide {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* 6. Fluid Grid Layout (Prevent Layout Shift) */
+/* กำหนดขนาดขั้นต่ำเพื่อป้องกันการ "กระตุก" ของ Layout ตอนโหลดข้อมูล */
+.cockpit-left, .cockpit-center, .cockpit-right {
+  contain: layout style; /* บอก Browser ว่าส่วนนี้แยกกัน คำนวณเร็วขึ้น */
 }
 
-/* 4. Shimmer Effect สำหรับ Loading */
-.shimmer-bg {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  background-size: 200% 100%;
-  animation: shimmerMove 1.5s infinite;
+/* 7. Animation for Card Hover (More Responsive) */
+.kpi-card:active {
+  transform: translateY(0) scale(0.98); /* กดแล้วยุบนิดหน่อย ให้รู้สึกว่ากดได้ */
+  transition-duration: 0.1s;
 }
 
-@keyframes shimmerMove {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* 8. Fix Text Rendering on Animation */
+/* ตอนขยับบางที Font จะหนา/บางผิดไป ต้อง Fix */
+.animated-text {
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 /* ═══════════════════════════════════════════════════════════
    DASHBOARD: FORCE "LOTS" TEXT TO WHITE
@@ -3666,6 +3674,475 @@ canvas {
     flex-shrink: 0;
     min-height: 140px; /* ลดความสูงขั้นต่ำลงเล็กน้อย */
 }
+/* ═══════════════════════════════════════════════════════════
+   FIX: SMOOTH GAUGE & NUMBER TRANSITIONS
+══════════════════════════════════════════════════════════ */
+
+/* 1. Smooth Gauge Arc Movement */
+#mainGaugeArc, 
+#sfGaugeArc, 
+#vendorGaugeArc, 
+#ctcGaugeArc {
+  transition: stroke-dasharray 1.2s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  will-change: stroke-dasharray;
+}
+
+/* 2. Smooth Number Counter (สำหรับตัวเลขทุกตัว) */
+.kpi-value, .stat-number, .hero-value, .gauge-value {
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-property: transform, color, text-shadow;
+  will-change: transform;
+}
+
+/* 3. Effect เมื่อตัวเลขเปลี่ยน */
+.num-pop {
+  animation: numPopKey 0.4s ease-out;
+}
+
+@keyframes numPopKey {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+  100% { transform: scale(1); }
+}
+
+/* 4. Smooth Progress Bars */
+.market-bar, .line-bar {
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+/* ═══════════════════════════════════════════════════════════
+   SET 2: CYBER-LUXURY GAUGE VISUALS
+   - เพิ่มความลึก (Depth) ด้วย Shadow
+   - เพิ่มความสว่าง (Glow) ด้วย Neon Effect
+══════════════════════════════════════════════════════════ */
+
+/* 1. ปรับพื้นหลังกล่อง Gauge ให้ดูมีมิติ (แบบหลุมฝังศพ/มิติลึก) */
+.gauge-cluster.main-gauge {
+    background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 1) 100%);
+    box-shadow: 
+        inset 0 0 30px rgba(0, 0, 0, 0.5), /* เงาด้านใน */
+        0 10px 40px rgba(0, 0, 0, 0.4),    /* เงาด้านนอก */
+        0 0 0 1px rgba(255, 255, 255, 0.05); /* ขอบเบาๆ */
+    position: relative;
+}
+
+/* เส้นวงกลมด้านในสุด (Decorative Ring) */
+.gauge-cluster.main-gauge::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: 20px; right: 20px; bottom: 20px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+}
+
+/* 2. ตกแต่งตัวเลขให้ดูหรู (สั้นลงและกลม) */
+.gauge-value {
+    font-family: 'Sora', sans-serif;
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.6); /* เพิ่มเงาให้ตัวเลข */
+    letter-spacing: -0.05em;
+}
+
+.gauge-label {
+    color: #64748b; /* สีที่อ่อนลงเพื่อให้ตัวเลขโดด */
+    text-transform: uppercase;
+    letter-spacing: 0.2em; /* ระยะห่างตัวอักษรให้ดูหรู */
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+/* 3. เข็มสปีดโดมิเตอร์ (Needle) - เพิ่มเงาและความคม */
+.gauge-needle-shape {
+    fill: #ffffff;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5)); /* เรืองแสงรอบเข็ม */
+}
+
+/* จุดศูนย์กลางเข็ม (Hub) - ทำให้ดูเป็นโลหะ */
+.gauge-hub {
+    fill: #0f172a;
+    stroke: #475569;
+    stroke-width: 2;
+}
+
+.gauge-hub-inner {
+    fill: #1e293b;
+    stroke: #3b82f6;
+    stroke-width: 1;
+}
+
+/* 4. Tick Marks (ขีดรอบวง) - ปรับให้มีน้ำหนัก */
+.gauge-tick-major {
+    stroke: #ffffff;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+}
+
+.gauge-tick-minor {
+    stroke: #475569;
+    stroke-width: 1;
+}
+/* ═══════════════════════════════════════════════════════════
+   SET 3: 3D PERSPECTIVE & SPOTLIGHT INTERACTION
+   - ทำให้ Card หมุนตามเมาส์ (3D Tilt)
+   - เพิ่มแสงสะท้อน (Spotlight) บนผิว Card
+══════════════════════════════════════════════════════════ */
+
+/* 1. ตั้งค่า Container ให้รองรับ Perspective 3D */
+#kpiGrid, .stats-row {
+  perspective: 1000px; /* ความลึกของมุมมอง */
+}
+
+/* 2. กำหนดคุณสมบัติ Card ให้รองรับการ Transform 3D */
+.kpi-card, .stat-card {
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+  position: relative;
+  overflow: hidden; /* ตัดแสงที่เกินขอบ */
+}
+
+/* 3. เพิ่ม "Spotlight" (แสงสะท้อน) 
+   เราจะใช้ Pseudo-element ::after เป็นวงกลมแสง */
+.kpi-card::after, .stat-card::after {
+  content: '';
+  position: absolute;
+  top: var(--mouse-y, 50%); /* รับค่าจาก JS */
+  left: var(--mouse-x, 50%); /* รับค่าจาก JS */
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.3s ease;
+  mix-blend-mode: overlay; /* ผสานแสงกับพื้นหลัง */
+}
+
+/* แสดงแสงเฉพาะตอน Hover */
+.kpi-card:hover::after, .stat-card:hover::after {
+  opacity: 1;
+}
+
+/* 4. ยกเนื้อหาใน Card ขึ้นมาด้านหน้า (Z-axis) */
+.kpi-label, .kpi-value, .kpi-sub, 
+.stat-header, .stat-number, .stat-footer {
+  position: relative;
+  z-index: 2; /* อยู่เหนือแสง */
+  pointer-events: none; /* ป้องกันกังวลเรื่อง Event */
+}
+/* ═══════════════════════════════════════════════════════════
+   SET 4: UNIVERSAL 3D TILT & SPOTLIGHT (ALL BOXES)
+   - ครอบคลุม Panel ใหญ่, กราฟ, และ List Items
+══════════════════════════════════════════════════════════ */
+
+/* 1. กำหนด Perspective ให้ Parent ทุกตัว */
+.cockpit-body, .cockpit-left, .cockpit-center, .cockpit-right, 
+.cockpit-bottom-row, #kpiGrid, .stats-row, .gauge-row {
+  perspective: 1200px;
+}
+
+/* 2. กำหนด Target ทุกกล่องให้รองรับ 3D 
+   เราจะใช้ Class ชื่อ .tilt-box เพื่อให้จัดการง่าย แต่ตอนนี้เราจะกำหนดแบบ Specific เลย */
+   
+/* กลุ่ม Small Cards (หมุนเยอะหน่อย สนุกกว่า) */
+.kpi-card, .stat-card, .mini-gauge, .market-item, .line-item, .incident-item {
+  transform-style: preserve-3d;
+  transition: transform 0.2s cubic-bezier(0.03, 0.98, 0.52, 0.99), 
+              box-shadow 0.2s ease;
+}
+
+/* กลุ่ม Large Panels (หมุนนิดหน่อย ดูดี ไม่เวียนหัว) */
+.hero-kpi-card, .gauge-cluster, .chart-panel, 
+.incident-feed-panel, .top-line-panel, .market-panel {
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.03, 0.98, 0.52, 0.99);
+  /* เพิ่มเงาให้ดูลอยสูงขึ้นตอนโหลด */
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1); 
+}
+
+/* 3. Spotlight Effect (แสงสะท้อน) - ใช้สำหรับทุกกล่อง */
+.kpi-card::after, .stat-card::after, 
+.mini-gauge::after, .market-item::after, .line-item::after, .incident-item::after,
+.hero-kpi-card::after, .gauge-cluster::after, .chart-panel::after,
+.incident-feed-panel::after, .top-line-panel::after, .market-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0; /* ครอบคลุมทั้งกล่อง */
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+              rgba(255,255,255,0.12) 0%, transparent 55%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 10; /* อยู่เหนือสุด */
+  border-radius: inherit; /* รับ Radius ตามกล่องแม่ */
+}
+
+/* แสดงแสงเฉพาะ Hover */
+.kpi-card:hover::after, .stat-card:hover::after, 
+.mini-gauge:hover::after, .market-item:hover::after, .line-item:hover::after, 
+.incident-item:hover::after,
+.hero-kpi-card:hover::after, .gauge-cluster:hover::after, .chart-panel:hover::after,
+.incident-feed-panel:hover::after, .top-line-panel:hover::after, .market-panel:hover::after {
+  opacity: 1;
+}
+
+/* 4. ยกเนื้อหาด้านในขึ้นมา (Floating Content) */
+/* ทำให้ตัวหนังสือและกราฟลอยขึ้นมาด้านบน ไม่ติดกับพื้นหลัง */
+.stat-header, .stat-number, .stat-footer, .kpi-label, .kpi-value, 
+.market-info, .line-info-group, .incident-content, 
+.chart-body, canvas {
+  transform: translateZ(40px); /* สร้างชั้นความสูง 40px */
+  position: relative;
+  z-index: 5;
+  pointer-events: none; /* ป้องกันกดไม่โดน */
+}
+/* ═══════════════════════════════════════════════════════════
+   UPGRADED MINI GAUGES — MATCHES MAIN GAUGE STYLE
+   - เพิ่มการจัดวางตัวเลขและ Label ให้สวยงาม
+══════════════════════════════════════════════════════════ */
+
+/* 1. Container หลักของกราฟเล็ก */
+.mini-gauge {
+  position: relative; /* สำหรับวางตัวเลขทับ */
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+  border-radius: 16px;
+  padding: 1rem 0.5rem;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 2. กล่อง SVG (ใช้ Aspect Ratio แบบ Square เพื่อรองรับการหมุน) */
+.mini-gauge-display {
+  position: relative;
+  width: 100%;
+  padding-bottom: 60%; /* สัดส่วนความสูง */
+  margin-bottom: 0.5rem;
+}
+
+/* 3. SVG ตัวกราฟ */
+.mini-gauge-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  overflow: visible; /* ให้เห็น Glow Effect ที่เข็ม */
+}
+
+/* 4. เข็มสปีดโดมิเตอร์ (ใช้ Polygon เหมือนกราฟใหญ่) */
+.mini-needle-shape {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+}
+
+/* 5. จุดศูนย์กลางเข็ม (Hub) */
+.mini-hub {
+  fill: #0f172a;
+  stroke: #64748b;
+  stroke-width: 2;
+}
+.mini-hub-inner {
+  fill: var(--gauge-color, #3b82f6);
+}
+
+/* 6. ตัวเลข Value (ซ้อนทับกลางจอ) */
+.mini-gauge-value {
+  position: absolute;
+  bottom: 15%; /* ระดับความสูงของตัวเลข */
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  z-index: 5; /* อยู่เหนือ SVG */
+}
+
+/* 7. ขีด Tick Marks (ขีดเล็ก/ใหญ่) */
+.mini-tick {
+  stroke-linecap: round;
+}
+
+/* 8. ป้ายชื่อด้านล่าง (Label) */
+.mini-gauge-label {
+  text-align: center;
+  margin-top: auto;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-500);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+/* ═══════════════════════════════════════════════════════════
+   SPORT GAUGE STYLE — PREMIUM CAR DASHBOARD LOOK
+   - กระจกโค้ง (Curved Glass Reflection)
+   - เข็มเรืองแสง (Glowing Needle)
+   - ตัวเลข 3D (Embossed Numbers)
+══════════════════════════════════════════════════════════ */
+
+/* ── 1. MINI GAUGE CONTAINER (กล่องใส่กราฟ) ── */
+.mini-gauge {
+  position: relative;
+  background: 
+    /* พื้นหลังแบบมิติ (Depth) */
+    radial-gradient(ellipse at 50% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 1) 100%);
+  border-radius: 16px;
+  padding: 0.75rem 0.5rem 0.5rem;
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  
+  /* เงาใต้กล่อง */
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  
+  overflow: hidden; /* ตัดขอบกระจก */
+}
+
+/* ── 2. GLASS REFLECTION (กิมมิกกระจกโค้ง) ── */
+.mini-gauge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%; /* ครึ่งบน */
+  background: 
+    /* แถบแสงสะท้อนด้านบน */
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.05) 30%,
+      transparent 100%
+    );
+  border-radius: 16px 16px 50% 50%; /* โค้งด้านล่าง */
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* ── 3. เส้นขอบเงาด้านใน (Inner Shadow Ring) ── */
+.mini-gauge::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 40px;
+  border-radius: 50%;
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 3px rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ── 4. กล่อง SVG (วงกลม) ── */
+.mini-gauge-display {
+  position: relative;
+  width: 100%;
+  padding-bottom: 65%;
+  margin-bottom: 0.3rem;
+  
+  /* เงาใต้วงกลม */
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* ── 5. SVG ตัวกราฟ ── */
+.mini-gauge-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ── 6. เข็ม (Needle) ── */
+.mini-needle-shape {
+  fill: url(#needleGradient); /* ใช้ Gradient จาก SVG */
+  filter: 
+    drop-shadow(0 0 6px rgba(255, 255, 255, 0.6))  /* เรืองแสง */
+    drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+}
+
+/* ── 7. จุดศูนย์กลางเข็ม (Hub) ── */
+.mini-hub {
+  fill: #0f172a;
+  stroke: #475569;
+  stroke-width: 2;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.mini-hub-inner {
+  fill: var(--gauge-color, #3b82f6);
+  filter: drop-shadow(0 0 4px var(--gauge-color, #3b82f6));
+}
+
+/* ── 8. ตัวเลข (Value) ── */
+.mini-gauge-value {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Orbitron', 'Sora', monospace; /* ฟอนต์ดิจิตอล */
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1;
+  text-shadow: 
+    0 0 10px var(--gauge-color, #3b82f6),  /* เรืองแสง */
+    0 2px 4px rgba(0, 0, 0, 0.5);           /* เงาด้านล่าง */
+  z-index: 10;
+}
+
+.mini-gauge-value .unit {
+  font-size: 0.55rem;
+  color: #64748b;
+  margin-left: 2px;
+  text-shadow: none;
+}
+
+/* ── 9. ป้ายชื่อ (Label) ── */
+.mini-gauge-label {
+  text-align: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  
+  /* เงาด้านล่าง */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ── 10. MAIN GAUGE UPGRADE ── */
+.gauge-cluster.main-gauge {
+  background: 
+    radial-gradient(ellipse at 50% 40%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 1) 100%);
+  box-shadow: 
+    inset 0 0 60px rgba(0, 0, 0, 0.6),
+    0 15px 50px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+/* Glass Effect สำหรับ Main Gauge */
+.gauge-cluster.main-gauge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 100%
+  );
+  border-radius: 20px 20px 50% 50%;
+  pointer-events: none;
+  z-index: 20;
+}
+
 </style>
 </head>
 <body>
@@ -4110,6 +4587,7 @@ canvas {
   </div>
 </div>
 
+
 <!-- ═══════════════════════════════════════════════════════════
      DASHBOARD MODAL — STOCK MARKET × CAR COCKPIT HYBRID
      Premium Financial Dashboard with Automotive Gauges
@@ -4183,117 +4661,273 @@ canvas {
         <div class="hero-sparkline" id="heroSparkline"></div>
       </div>
       
-      <!-- MAIN SPEEDOMETER — PASS RATE (CYBER EDITION) -->
-      <div class="gauge-cluster main-gauge">
-        <div class="gauge-ring" id="mainGaugeRing">
-          
-          <!-- ★ 1. ตัวเลข (Layer ล่าง) - วางก่อน SVG ★ -->
-          <div class="gauge-center" style="bottom: 150%; transform: translateY(0); z-index: 1;">
-            <div class="gauge-value" id="mainGaugeValue" style="font-size: 3.2rem;">0%</div>
-            <div class="gauge-label">PASS RATE</div>
-            <div class="gauge-trend" id="mainGaugeTrend" style="margin-top: 10px;">
-              <span class="trend-arrow">▲</span>
-              <span class="trend-value">Good</span>
-            </div>
-          </div>
-
-          <!-- ★ 2. SVG (Layer บน) - วางหลัง Div ★ -->
-          <svg viewBox="0 0 200 200" class="gauge-svg" style="position: relative; z-index: 2;">
-            <defs>
-              <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:#ef4444"/>
-                <stop offset="50%" style="stop-color:#f59e0b"/>
-                <stop offset="100%" style="stop-color:#10b981"/>
-              </linearGradient>
-              <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
-
-            <!-- Track (เส้นด้านหลัง) -->
-            <path d="M 20 150 A 80 80 0 1 1 180 150" fill="none" stroke="#1e293b" stroke-width="16" stroke-linecap="round"/>
-            
-            <!-- Ticks (ขีดรอบวง) -->
-            <g id="gaugeTicks" transform="translate(100, 150)"></g> 
-            
-            <!-- Arc (แถบสี Progress) -->
-            <path id="mainGaugeArc" d="M 20 150 A 80 80 0 0 1 180 150" fill="none" stroke="url(#gaugeGradient)" stroke-width="16" stroke-linecap="round" stroke-dasharray="0 400" filter="url(#neonGlow)" style="transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1)"/>
-            
-            <!-- Needle (เข็ม) -->
-            <g id="gaugeNeedle" style="transform-origin: 100px 150px; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
-               <polygon points="100,70 96,145 104,145" fill="#ffffff" filter="url(#neonGlow)"/>
-               <circle cx="100" cy="150" r="10" fill="#0f172a" stroke="#fff" stroke-width="3"/>
-               <circle cx="100" cy="150" r="4" fill="#3b82f6"/>
-            </g>
-          </svg>
-          
-        </div>
-        
-        <div class="gauge-legend">
-          <div class="legend-item"><span class="legend-dot" style="background:#ef4444"></span><span>Critical</span></div>
-          <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span><span>Warning</span></div>
-          <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span><span>Good</span></div>
-        </div>
+<!-- MAIN SPEEDOMETER — PASS RATE (SPORT STYLE) -->
+<div class="gauge-cluster main-gauge">
+  <div class="gauge-ring" id="mainGaugeRing">
+    
+    <!-- ตัวเลขและข้อความ (Overlay) -->
+    <div class="gauge-center" style="bottom: 150%; transform: translateY(0); z-index: 25;">
+      <div class="gauge-value" id="mainGaugeValue" style="font-size: 3.5rem;">0%</div>
+      <div class="gauge-label">PASS RATE</div>
+      <div class="gauge-trend" id="mainGaugeTrend" style="margin-top: 10px;">
+        <span class="trend-arrow">▲</span>
+        <span class="trend-value">Good</span>
       </div>
+    </div>
+
+    <!-- SVG Structure (Sport Style) -->
+    <svg viewBox="0 0 200 200" class="gauge-svg" style="position: relative; z-index: 10;">
+      <defs>
+        <!-- Gradient สีแบบ Heatmap -->
+        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#ef4444"/>
+          <stop offset="35%" style="stop-color:#f59e0b"/>
+          <stop offset="70%" style="stop-color:#84cc16"/>
+          <stop offset="100%" style="stop-color:#10b981"/>
+        </linearGradient>
+        
+        <!-- Needle Gradient -->
+        <linearGradient id="mainNeedleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#ffffff"/>
+          <stop offset="40%" style="stop-color:#e2e8f0"/>
+          <stop offset="100%" style="stop-color:#64748b"/>
+        </linearGradient>
+        
+        <!-- Glow Filters -->
+        <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+        
+        <filter id="needleGlow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+        
+        <!-- Glass Reflection -->
+        <linearGradient id="mainGlassReflect" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:rgba(255,255,255,0.15)"/>
+          <stop offset="40%" style="stop-color:rgba(255,255,255,0.05)"/>
+          <stop offset="100%" style="stop-color:transparent"/>
+        </linearGradient>
+        
+        <!-- Outer Ring Gradient -->
+        <linearGradient id="outerRingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#1e293b"/>
+          <stop offset="50%" style="stop-color:#334155"/>
+          <stop offset="100%" style="stop-color:#1e293b"/>
+        </linearGradient>
+      </defs>
+
+      <!-- 1. Outer Ring (ขอบนอก) -->
+      <circle cx="100" cy="100" r="95" fill="none" stroke="url(#outerRingGradient)" stroke-width="3"/>
       
-       <!-- MINI GAUGES ROW (CYBER STYLE) -->
-      <div class="gauge-row">
+      <!-- 2. Inner Shadow Ring -->
+      <circle cx="100" cy="100" r="88" fill="none" stroke="#0f172a" stroke-width="2" opacity="0.5"/>
+      
+      <!-- 3. Background Track (เส้นดำด้านล่าง) -->
+      <path d="M 15 100 A 85 85 0 1 1 185 100" fill="none" stroke="#1e293b" stroke-width="14" stroke-linecap="round"/>
+      
+      <!-- 4. Tick Marks Container -->
+      <g id="gaugeTicks" transform="translate(100, 100)"></g>
+      
+      <!-- 5. Progress Arc (เส้นสีที่วิ่ง) -->
+      <path id="mainGaugeArc" d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#gaugeGradient)" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 267" filter="url(#neonGlow)" style="transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1)"/>
+      
+      <!-- 6. Numbers (ตัวเลขรอบวง) -->
+      <g class="gauge-numbers" font-family="Orbitron, Sora" font-size="11" font-weight="700" fill="#64748b">
+        <text x="18" y="120" text-anchor="middle">0</text>
+        <text x="32" y="65" text-anchor="middle">20</text>
+        <text x="70" y="35" text-anchor="middle">40</text>
+        <text x="130" y="35" text-anchor="middle">60</text>
+        <text x="168" y="65" text-anchor="middle">80</text>
+        <text x="182" y="120" text-anchor="middle">100</text>
+      </g>
+      
+      <!-- 7. Needle Group (เข็ม) -->
+      <g id="gaugeNeedle" style="transform-origin: 100px 100px; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
+         <!-- เข็มแบบสามเหลี่ยมคม (Sport Style) -->
+         <polygon points="100,18 94,88 100,100 106,88" fill="url(#mainNeedleGradient)" filter="url(#needleGlow)"/>
+         
+         <!-- Hub (จุดศูนย์กลาง) -->
+         <circle cx="100" cy="100" r="12" fill="#0f172a" stroke="#475569" stroke-width="2"/>
+         <circle cx="100" cy="100" r="5" fill="#10b981" filter="url(#needleGlow)"/>
+      </g>
+      
+      <!-- 8. Glass Reflection Overlay -->
+      <ellipse cx="100" cy="60" rx="60" ry="30" fill="url(#mainGlassReflect)" opacity="0.5"/>
+      
+      <!-- 9. Small Highlight Dots (จุดเล็กๆ เพื่อความสวย) -->
+      <circle cx="25" cy="85" r="2" fill="rgba(255,255,255,0.1)"/>
+      <circle cx="175" cy="85" r="2" fill="rgba(255,255,255,0.1)"/>
+    </svg>
+    
+  </div>
+  
+  <div class="gauge-legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#ef4444"></span><span>Critical</span></div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span><span>Warning</span></div>
+    <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span><span>Good</span></div>
+  </div>
+</div>
+      
+       <!-- MINI GAUGES ROW (SPORT STYLE) -->
+<div class="gauge-row">
+  
+  <!-- SF FAULT -->
+  <div class="mini-gauge" data-type="sf">
+    <div class="mini-gauge-display">
+      <svg viewBox="0 0 200 200" class="mini-gauge-svg">
+        <defs>
+          <!-- Gradient สีสำหรับแถบ -->
+          <linearGradient id="sfGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#f97316"/>
+            <stop offset="100%" style="stop-color:#fbbf24"/>
+          </linearGradient>
+          
+          <!-- Gradient สำหรับเข็ม -->
+          <linearGradient id="needleGradientSf" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#ffffff"/>
+            <stop offset="50%" style="stop-color:#f1f5f9"/>
+            <stop offset="100%" style="stop-color:#94a3b8"/>
+          </linearGradient>
+          
+          <!-- Glow Filter -->
+          <filter id="miniGlowSf" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          
+          <!-- Glass Reflection -->
+          <linearGradient id="glassReflect" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:rgba(255,255,255,0.3)"/>
+            <stop offset="50%" style="stop-color:rgba(255,255,255,0.05)"/>
+            <stop offset="100%" style="stop-color:transparent"/>
+          </linearGradient>
+        </defs>
+
+        <!-- 1. วงกลมด้านในสุด (Inner Ring) -->
+        <circle cx="100" cy="100" r="85" fill="none" stroke="#1e293b" stroke-width="3"/>
         
-        <!-- SF FAULT -->
-        <div class="mini-gauge" data-type="sf">
-          <div class="mini-gauge-display">
-            <svg viewBox="0 0 100 60" class="mini-gauge-svg">
-              <!-- Track -->
-              <path d="M 10 50 A 40 40 0 1 1 90 50" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
-              <!-- Arc -->
-              <path id="sfGaugeArc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f97316" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 126" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
-              <!-- Needle -->
-              <g id="sfGaugeNeedle" style="transform-origin: 50px 50px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
-                 <line x1="50" y1="50" x2="50" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-                 <circle cx="50" cy="50" r="4" fill="#1e293b" stroke="#fff" stroke-width="1"/>
-              </g>
-            </svg>
-            <div class="mini-gauge-value"><span id="sfGaugeValue">0</span><span class="unit">%</span></div>
-          </div>
-          <div class="mini-gauge-label">SF FAULT</div>
-        </div>
+        <!-- 2. Track (เส้นด้านล่าง) -->
+        <path d="M 25 100 A 75 75 0 1 1 175 100" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
         
-        <!-- VENDOR -->
-        <div class="mini-gauge" data-type="vendor">
-          <div class="mini-gauge-display">
-            <svg viewBox="0 0 100 60" class="mini-gauge-svg">
-              <path d="M 10 50 A 40 40 0 1 1 90 50" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
-              <path id="vendorGaugeArc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#ef4444" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 126" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
-              <g id="vendorGaugeNeedle" style="transform-origin: 50px 50px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
-                 <line x1="50" y1="50" x2="50" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-                 <circle cx="50" cy="50" r="4" fill="#1e293b" stroke="#fff" stroke-width="1"/>
-              </g>
-            </svg>
-            <div class="mini-gauge-value"><span id="vendorGaugeValue">0</span><span class="unit">%</span></div>
-          </div>
-          <div class="mini-gauge-label">VENDOR</div>
-        </div>
+        <!-- 3. Progress Arc (แถบสี) -->
+        <path id="sfGaugeArc" d="M 25 100 A 75 75 0 0 1 175 100" fill="none" stroke="url(#sfGradient)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 235" filter="url(#miniGlowSf)" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
         
-        <!-- CTC -->
-        <div class="mini-gauge" data-type="ctc">
-          <div class="mini-gauge-display">
-            <svg viewBox="0 0 100 60" class="mini-gauge-svg">
-              <path d="M 10 50 A 40 40 0 1 1 90 50" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
-              <path id="ctcGaugeArc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 126" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
-              <g id="ctcGaugeNeedle" style="transform-origin: 50px 50px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
-                 <line x1="50" y1="50" x2="50" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-                 <circle cx="50" cy="50" r="4" fill="#1e293b" stroke="#fff" stroke-width="1"/>
-              </g>
-            </svg>
-            <div class="mini-gauge-value"><span id="ctcGaugeValue">0</span><span class="unit">%</span></div>
-          </div>
-          <div class="mini-gauge-label">CTC</div>
-        </div>
-        </div>
+        <!-- 4. Tick Marks (ขีดรอบวง) -->
+        <g id="sfGaugeTicks"></g>
+        
+        <!-- 5. Numbers (ตัวเลขรอบวง) -->
+        <g class="gauge-numbers" font-family="Sora" font-size="9" font-weight="700" fill="#64748b">
+          <text x="30" y="115" text-anchor="middle">0</text>
+          <text x="45" y="70" text-anchor="middle">25</text>
+          <text x="100" y="45" text-anchor="middle">50</text>
+          <text x="155" y="70" text-anchor="middle">75</text>
+          <text x="170" y="115" text-anchor="middle">100</text>
+        </g>
+        
+        <!-- 6. Needle Group (เข็ม) -->
+        <g id="sfGaugeNeedle" style="transform-origin: 100px 100px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
+           <!-- เข็มแบบสามเหลี่ยมคม -->
+           <polygon points="100,30 96,95 100,100 104,95" fill="url(#needleGradientSf)" filter="url(#miniGlowSf)"/>
+           <!-- Hub (จุดศูนย์กลาง) -->
+           <circle cx="100" cy="100" r="8" class="mini-hub"/>
+           <circle cx="100" cy="100" r="3" class="mini-hub-inner" style="--gauge-color: #f97316"/>
+        </g>
+        
+        <!-- 7. Glass Reflection Overlay -->
+        <ellipse cx="100" cy="70" rx="50" ry="25" fill="url(#glassReflect)" opacity="0.3"/>
+      </svg>
+      
+      <!-- ตัวเลขกลาง -->
+      <div class="mini-gauge-value"><span id="sfGaugeValue">0</span><span class="unit">%</span></div>
+    </div>
+    <div class="mini-gauge-label">SF FAULT</div>
+  </div>
+  
+  <!-- VENDOR FAULT -->
+  <div class="mini-gauge" data-type="vendor">
+    <div class="mini-gauge-display">
+      <svg viewBox="0 0 200 200" class="mini-gauge-svg">
+        <defs>
+          <linearGradient id="vendorGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#dc2626"/>
+            <stop offset="100%" style="stop-color:#ef4444"/>
+          </linearGradient>
+          <filter id="miniGlowVendor" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+
+        <circle cx="100" cy="100" r="85" fill="none" stroke="#1e293b" stroke-width="3"/>
+        <path d="M 25 100 A 75 75 0 1 1 175 100" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
+        <g id="vendorGaugeTicks"></g>
+        <path id="vendorGaugeArc" d="M 25 100 A 75 75 0 0 1 175 100" fill="none" stroke="url(#vendorGradient)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 235" filter="url(#miniGlowVendor)" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
+        
+        <g class="gauge-numbers" font-family="Sora" font-size="9" font-weight="700" fill="#64748b">
+          <text x="30" y="115" text-anchor="middle">0</text>
+          <text x="45" y="70" text-anchor="middle">25</text>
+          <text x="100" y="45" text-anchor="middle">50</text>
+          <text x="155" y="70" text-anchor="middle">75</text>
+          <text x="170" y="115" text-anchor="middle">100</text>
+        </g>
+        
+        <g id="vendorGaugeNeedle" style="transform-origin: 100px 100px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
+           <polygon points="100,30 96,95 100,100 104,95" fill="url(#needleGradientSf)" filter="url(#miniGlowVendor)"/>
+           <circle cx="100" cy="100" r="8" class="mini-hub"/>
+           <circle cx="100" cy="100" r="3" class="mini-hub-inner" style="--gauge-color: #ef4444"/>
+        </g>
+        
+        <ellipse cx="100" cy="70" rx="50" ry="25" fill="url(#glassReflect)" opacity="0.3"/>
+      </svg>
+      <div class="mini-gauge-value"><span id="vendorGaugeValue">0</span><span class="unit">%</span></div>
+    </div>
+    <div class="mini-gauge-label">VENDOR</div>
+  </div>
+  
+  <!-- CTC FAULT -->
+  <div class="mini-gauge" data-type="ctc">
+    <div class="mini-gauge-display">
+      <svg viewBox="0 0 200 200" class="mini-gauge-svg">
+        <defs>
+          <linearGradient id="ctcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#2563eb"/>
+            <stop offset="100%" style="stop-color:#60a5fa"/>
+          </linearGradient>
+          <filter id="miniGlowCtc" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+
+        <circle cx="100" cy="100" r="85" fill="none" stroke="#1e293b" stroke-width="3"/>
+        <path d="M 25 100 A 75 75 0 1 1 175 100" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
+        <g id="ctcGaugeTicks"></g>
+        <path id="ctcGaugeArc" d="M 25 100 A 75 75 0 0 1 175 100" fill="none" stroke="url(#ctcGradient)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 235" filter="url(#miniGlowCtc)" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
+        
+        <g class="gauge-numbers" font-family="Sora" font-size="9" font-weight="700" fill="#64748b">
+          <text x="30" y="115" text-anchor="middle">0</text>
+          <text x="45" y="70" text-anchor="middle">25</text>
+          <text x="100" y="45" text-anchor="middle">50</text>
+          <text x="155" y="70" text-anchor="middle">75</text>
+          <text x="170" y="115" text-anchor="middle">100</text>
+        </g>
+        
+        <g id="ctcGaugeNeedle" style="transform-origin: 100px 100px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
+           <polygon points="100,30 96,95 100,100 104,95" fill="url(#needleGradientSf)" filter="url(#miniGlowCtc)"/>
+           <circle cx="100" cy="100" r="8" class="mini-hub"/>
+           <circle cx="100" cy="100" r="3" class="mini-hub-inner" style="--gauge-color: #3b82f6"/>
+        </g>
+        
+        <ellipse cx="100" cy="70" rx="50" ry="25" fill="url(#glassReflect)" opacity="0.3"/>
+      </svg>
+      <div class="mini-gauge-value"><span id="ctcGaugeValue">0</span><span class="unit">%</span></div>
+    </div>
+    <div class="mini-gauge-label">CTC</div>
+  </div>
+</div>
       </div>
     
     <!-- ═══════════════════════════════════════════════════════
@@ -4644,23 +5278,18 @@ function animNum(id, target) {
   
   const cur = parseInt(el.textContent.replace(/,/g, '')) || 0;
   
-  // ถ้าค่าเปลี่ยน ให้ trigger animation class
-  if (cur !== target) {
-    // เพิ่ม class animation
-    el.classList.add('pulse-update');
-    
-    // ลบ class ออกหลังจบ animation
-    setTimeout(() => {
-      el.classList.remove('pulse-update');
-    }, 600);
-  }
-
+  // ถ้าค่าไม่เปลี่ยน ไม่ต้องทำอะไร
   if (cur === target) {
     el.textContent = target.toLocaleString();
     return;
   }
 
-  gsap.killTweensOf(el);
+  // Add Animation Class
+  el.classList.add('num-pop');
+  setTimeout(() => el.classList.remove('num-pop'), 400);
+
+  // GSAP Counter Animation
+  gsap.killTweensOf(el); // หยุด Animation เก่าถ้ามี
   const obj = { v: cur };
   const dur = Math.abs(target - cur) < 10 ? .2 : Math.abs(target - cur) < 100 ? .4 : .7;
   
@@ -4933,7 +5562,10 @@ function exportToExcel() {
 function openDashboard() {
   const modal = $id('dashboardModal');
   modal.style.display = 'flex';
-  
+  drawTicks('gaugeTicks', 85, false); // Main Gauge
+  drawTicks('sfGaugeTicks', 75, true);  // SF
+  drawTicks('vendorGaugeTicks', 75, true); // Vendor
+  drawTicks('ctcGaugeTicks', 75, true); // CTC
   // ★ ตัดการ Reset ค่าเป็น 0 ออก เพื่อให้แสดงข้อมูลทันที
   // resetAllGaugesToZero(); <--- ลบบรรทัดนี้ออก
   
@@ -4968,9 +5600,7 @@ function openDashboard() {
     }, "-=0.4");
 }
 
-// 2. ฟังก์ชัน RefreshDash (แสดงผลทันที ไม่มี Intro Animation)
 function refreshDash() {
-  // ═══ 1. INPUT & FILTER ═══
   const start = $id('dashStart').value;
   const end = $id('dashEnd').value;
   const vendor = $id('dashVendor').value;
@@ -4982,7 +5612,7 @@ function refreshDash() {
   if (end) data = data.filter(r => r.date <= end);
   if (vendor !== 'ALL') data = data.filter(r => r.supplier === vendor);
   
-  // ═══ 2. CALCULATE KPIs ═══
+  // ═══ CALCULATE KPIs ═══
   let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
   let sfL = 0, venL = 0, ctcL = 0, okL = 0;
   
@@ -4996,28 +5626,61 @@ function refreshDash() {
   
   const totalLot = data.length;
   const rejQ = sf + ven + ctc;
+  const rejPct = tQ > 0 ? Math.round((rejQ / tQ) * 100) : 0;
   const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
-
-  // ═══ 3. UPDATE UI IMMEDIATELY (FAST & SMOOTH) ═══
   
   // Update Ticker
-  renderTicker(tQ, totalLot, passPct, rejQ, sf, ven, ctc, ok);
+  renderTicker(tQ, totalLot, passPct, rejPct, sf, ven, ctc, ok);
   
-  // ★ Main Gauge: อัพเดทตำแหน่งเข็มและตัวเลขทันที (มี Animation เลื่อนน้อยๆ)
-  createGaugeTicks(); // สร้างเส้นรอบวง
-  updateMainGauge(passPct); 
-  
-  // ★ Mini Gauges: อัพเดททันที
-  updateMiniGauge('sf', sf, tQ);
-  updateMiniGauge('vendor', ven, tQ);
-  updateMiniGauge('ctc', ctc, tQ);
-  
-  // ═══ 4. UPDATE HERO KPI ═══
+  // ═══ UPDATE HERO KPI ═══
   animNum('heroTotalQty', tQ);
   $id('heroLot').textContent = totalLot;
-  renderSparkline('heroSparkline', data, '#10b981');
   
-  // ═══ 5. UPDATE STATS ROW ═══
+  // Update Trend Indicator (Logic เดิม)
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+  const thisYear = now.getFullYear();
+  const lastYear = thisMonth === 0 ? thisYear - 1 : thisYear;
+
+  const currentMonthData = data.filter(r => {
+    const d = new Date(r.date);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  });
+  const lastMonthData = data.filter(r => {
+    const d = new Date(r.date);
+    return d.getMonth() === lastMonth && d.getFullYear() === lastYear;
+  });
+
+  const currentTotal = currentMonthData.reduce((s, r) => s + r.qty, 0);
+  const lastTotal = lastMonthData.reduce((s, r) => s + r.qty, 0);
+
+  let trendPct = 0;
+  let trendIcon = '→';
+  let trendColor = '#94a3b8';
+
+  if (lastTotal > 0) {
+    const diff = currentTotal - lastTotal;
+    trendPct = Math.round((diff / lastTotal) * 100);
+    if (diff > 0) { trendIcon = '▲'; trendColor = '#10b981'; }
+    else if (diff < 0) { trendIcon = '▼'; trendColor = '#ef4444'; }
+  } else if (currentTotal > 0) {
+    trendIcon = '▲'; trendPct = 100; trendColor = '#10b981';
+  }
+
+  const heroTrendEl = $id('heroPct');
+  if (heroTrendEl) {
+    heroTrendEl.innerHTML = `${trendIcon} ${Math.abs(trendPct)}%`;
+    heroTrendEl.style.color = trendColor;
+  }
+  
+  // Update Gauges (เรียก Function ที่แก้ไขแล้ว)
+  updateMainGauge(passPct);
+  updateMiniGauge('sf', sf, tQ, sfL);
+  updateMiniGauge('vendor', ven, tQ, venL);
+  updateMiniGauge('ctc', ctc, tQ, ctcL);
+  
+  // ═══ UPDATE STATS ROW ═══
   const totalQ = sf + ven + ctc + ok;
   const calcPct = (val) => totalQ > 0 ? Math.round((val / totalQ) * 100) : 0;
 
@@ -5037,11 +5700,13 @@ function refreshDash() {
   $id('dashLotVendor').textContent = venL;
   $id('dashPctVendor').textContent = calcPct(ven) + '%';
   
-  // ═══ 6. UPDATE CHART & STATS ═══
+  // Update Chart Stats
   const byMonth = aggregateByMonth(data);
   const maxVal = Math.max(...byMonth.map(d => d.qty));
   const monthsWithData = byMonth.filter(d => d.qty > 0);
-  const minVal = monthsWithData.length > 0 ? Math.min(...monthsWithData.map(d => d.qty)) : 0;
+  const minVal = monthsWithData.length > 0 
+    ? Math.min(...monthsWithData.map(d => d.qty)) 
+    : 0;
   const avgVal = byMonth.reduce((s, d) => s + d.qty, 0) / 12;
   
   $id('statHigh').textContent = maxVal.toLocaleString();
@@ -5051,87 +5716,131 @@ function refreshDash() {
   // Render Charts
   renderMainTrendChart(byMonth);
   renderSparklines(data);
+  
+  // Render Lists
   renderMarketLists(data);
   renderTopLine(data);
   renderIncidentFeed(data);
 }
-
-// 3. ฟังก์ชันอัพเดท Main Gauge (ปรับให้ Smooth และรวดเร็ว)
+// ── MAIN GAUGE ──
 function updateMainGauge(passPct) {
-  const circumference = 400; 
+  const circumference = 400;
   const arcLength = (passPct / 100) * circumference;
   
-  // อัพเดทแถบ Arc แบบทันที
   const arc = $id('mainGaugeArc');
-  if (arc) arc.style.strokeDasharray = `${arcLength} ${circumference}`;
+  if (arc) {
+    // เพียงแค่เปลี่ยนค่านี้ CSS Transition จะจัดการ Smooth ให้เอง
+    arc.style.strokeDasharray = `${arcLength} ${circumference}`;
+  }
   
-  // อัพเดทตัวเลขแบบนับขึ้น Smooth (ใช้ GSAP ที่มีอยู่แล้ว)
+  // Animate ตัวเลขในวงกลม
   const valueEl = $id('mainGaugeValue');
   if (valueEl) {
-    const current = parseInt(valueEl.textContent) || 0;
-    if (current !== passPct) {
-      gsap.to({ val: current }, { 
-        val: passPct, 
-        duration: 0.8, // ความเร็วในการนับเลข
-        ease: "power1.out",
-        onUpdate: function() {
-          valueEl.textContent = Math.round(this.targets()[0].val) + '%';
-        }
-      });
-    }
+    animateValue(valueEl, passPct, '%');
   }
   
-  // อัพเดทตำแหน่งเข็มแบบทันที
-  const rotationAngle = -90 + (passPct * 1.8);
-  const needle = document.getElementById('gaugeNeedle');
-  if (needle) {
-      // ใช้ Transition แทน GSAP timeline ซับซ้อน เพื่อความเร็ว
-      needle.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
-      needle.style.transform = `rotate(${rotationAngle}deg)`;
-  }
-
-  // อัพเดทสถานะ
+  // Update Status Text
   const trendEl = $id('mainGaugeTrend');
   if (trendEl) {
-    let status, color, bg;
-    if (passPct >= 80) { status = 'Excellent'; color = '#10b981'; bg = 'rgba(16,185,129,0.15)'; }
-    else if (passPct >= 60) { status = 'Warning'; color = '#f59e0b'; bg = 'rgba(245,158,11,0.15)'; }
-    else { status = 'Critical'; color = '#ef4444'; bg = 'rgba(239,68,68,0.15)'; }
-    
-    trendEl.style.background = bg;
-    trendEl.style.border = `1px solid ${color}33`;
-    trendEl.querySelector('.trend-arrow').style.color = color;
-    trendEl.querySelector('.trend-arrow').textContent = passPct >= 80 ? '▲' : passPct >= 60 ? '●' : '▼';
-    trendEl.querySelector('.trend-value').style.color = color;
-    trendEl.querySelector('.trend-value').textContent = status;
+    const status = passPct >= 80 ? 'good' : passPct >= 60 ? 'warning' : 'critical';
+    trendEl.className = 'gauge-trend ' + status;
+    trendEl.style.background = status === 'good' ? 'rgba(16, 185, 129, 0.1)' : 
+                                status === 'warning' ? 'rgba(245, 158, 11, 0.1)' : 
+                                'rgba(239, 68, 68, 0.1)';
+    trendEl.style.borderColor = status === 'good' ? 'rgba(16, 185, 129, 0.2)' : 
+                                 status === 'warning' ? 'rgba(245, 158, 11, 0.2)' : 
+                                 'rgba(239, 68, 68, 0.2)';
+    trendEl.querySelector('.trend-arrow').style.color = 
+      status === 'good' ? '#10b981' : status === 'warning' ? '#f59e0b' : '#ef4444';
+    trendEl.querySelector('.trend-value').style.color = 
+      status === 'good' ? '#10b981' : status === 'warning' ? '#f59e0b' : '#ef4444';
+    trendEl.querySelector('.trend-value').textContent = 
+      status === 'good' ? 'Good' : status === 'warning' ? 'Warning' : 'Critical';
   }
 }
 
-// 4. ฟังก์ชันอัพเดท Mini Gauge (ปรับให้ Smooth และรวดเร็ว)
-function updateMiniGauge(type, value, total) {
+// ═══════════════════════════════════════════════════════════
+//   FIX: UNIFIED TICK GENERATOR (MAIN & MINI)
+//   วาดขีดรอบวงสำหรับทุก Gauge
+// ═══════════════════════════════════════════════════════════
+
+function drawTicks(containerId, radius, isMini) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (container.children.length > 0) return; // วาดครั้งเดียว
+
+  let html = '';
+  const totalTicks = isMini ? 10 : 20; // Mini=10, Main=20
+  
+  for (let i = 0; i <= totalTicks; i++) {
+    // Semi-circle: -180° (left) to 0° (right)
+    const angleDeg = -180 + (i * (180 / totalTicks));
+    const rad = (angleDeg * Math.PI) / 180;
+    
+    // Main ticks every 4 steps (0, 20, 40...), Mini every 2 steps
+    const isMajor = isMini ? (i % 2 === 0) : (i % 4 === 0);
+    
+    const innerR = isMajor ? radius - 15 : radius - 10;
+    const outerR = radius;
+    
+    const x1 = Math.cos(rad) * innerR;
+    const y1 = Math.sin(rad) * innerR;
+    const x2 = Math.cos(rad) * outerR;
+    const y2 = Math.sin(rad) * outerR;
+    
+    const strokeW = isMajor ? 2.5 : 1;
+    const opacity = isMajor ? 1 : 0.4;
+    const color = isMajor ? '#94a3b8' : '#475569';
+    
+    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" 
+                  stroke="${color}" 
+                  stroke-width="${strokeW}" 
+                  stroke-linecap="round"
+                  opacity="${opacity}"/>`;
+  }
+  
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════
+//   FIX: UPDATE MINI GAUGE (Correct Formula)
+//   สูตรหมุนเข็ม: 0% = -90deg, 100% = 90deg
+// ═══════════════════════════════════════════════════════════
+
+function updateMiniGauge(type, value, total, lots) {
+  // 1. Calculate percentage
   const pct = total > 0 ? Math.round((value / total) * 100) : 0;
-  const circumference = 126; 
+  
+  // 2. Update Arc (semi-circle circumference = π × r)
+  const radius = 75; // From SVG path
+  const circumference = Math.PI * radius; // ≈ 235.6
   const arcLength = (pct / 100) * circumference;
   
   const arc = $id(type + 'GaugeArc');
-  if (arc) arc.style.strokeDasharray = `${arcLength} ${circumference}`;
-
-  const rotation = -90 + (pct * 1.8);
+  if (arc) {
+    arc.style.strokeDasharray = `${arcLength} ${circumference}`;
+  }
+  
+  // 3. Update Needle
+  // Semi-circle: -90° (left/0%) to +90° (right/100%)
+  const rotationAngle = -90 + (pct * 1.8);
+  
   const needle = $id(type + 'GaugeNeedle');
   if (needle) {
-      needle.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
-      needle.style.transform = `rotate(${rotation}deg)`;
+    needle.style.transform = `rotate(${rotationAngle}deg)`;
   }
-
+  
+  // 4. Update Value
   const valueEl = $id(type + 'GaugeValue');
   if (valueEl) {
-      const current = parseInt(valueEl.textContent) || 0;
-      if (current !== pct) {
-          gsap.to({ val: current }, { val: pct, duration: 0.8, ease: "power1.out",
-              onUpdate: function() { valueEl.textContent = Math.round(this.targets()[0].val); }
-          });
-      }
+    const current = parseInt(valueEl.textContent) || 0;
+    if (current !== pct) {
+      animateGaugeNumber(valueEl, current, pct);
+    }
   }
+  
+  // 5. Draw Ticks (once)
+  drawTicks(type + 'GaugeTicks', 75, true);
 }
 /* ══ NETWORK ══ */
 function normalizeRow(d,inspector){return{id:d.id||(Date.now()+'_'+Math.random()),date:d.date||'',shift:d.shift||'SHIFT A',inspector:d.inspector||inspector,ref:String(d.ref||''),line:d.line||'',supplier:d.supplier||'',partNo:d.partNo||'',partName:d.partName||'',qty:parseInt(d.qty)||0,defect:d.defect||'',remark:d.remark||'',judgment:d.judgment||'SF'}}
@@ -5274,7 +5983,73 @@ async function initApp(inspector) {
     startPolling();
   }
 }
+// ═══════════════════════════════════════════════════════════
+//   SET 3: JS FOR 3D TILT & SPOTLIGHT LOGIC
+// ═══════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════
+//   SET 4: SMART 3D TILT (ALL BOXES)
+//   - คำนวณความไวตามขนาดกล่อง (กล่องใหญ่หมุนน้อย, กล่องเล็กหมุนมาก)
+// ═══════════════════════════════════════════════════════════
+
+function init3DCards() {
+  // เลือก Selector ทั้งหมดที่ต้องการให้มี Effect
+  const targets = `
+    .kpi-card, .stat-card, .mini-gauge, 
+    .market-item, .line-item, .incident-item,
+    .hero-kpi-card, .gauge-cluster, .chart-panel,
+    .incident-feed-panel, .top-line-panel, .market-panel
+  `;
+  
+  const cards = document.querySelectorAll(targets);
+
+  cards.forEach(card => {
+    
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // คำนวณตำแหน่งเป็น % (0.5 คือตรงกลาง)
+      const xPct = x / rect.width;
+      const yPct = y / rect.height;
+
+      // ★ LOGIC: กล่องใหญ่หมุนน้อย, กล่องเล็กหมุนมาก ★
+      // เช็คว่ากล่องกว้างเกิน 400px ไหม?
+      const isLarge = rect.width > 400;
+      
+      // ถ้ากล่องใหญ่ (Panel) ให้หมุนสูงสุดแค่ 5 องศา
+      // ถ้ากล่องเล็ก (Card) ให้หมุนสูงสุด 15 องศา
+      const maxRotation = isLarge ? 5 : 15; 
+
+      const rotateY = (xPct - 0.5) * maxRotation * 2; 
+      const rotateX = (0.5 - yPct) * maxRotation * 2;
+
+      // Apply Transform
+      card.style.transform = `
+        perspective(1000px) 
+        rotateX(${rotateX}deg) 
+        rotateY(${rotateY}deg) 
+        scale(1.02)
+      `;
+      
+      // ส่งตำแหน่งเมาส์ไปให้ CSS Variable (--mouse-x, --mouse-y)
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      // Reset กลับที่เดิมแบบนุ่มนวล
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
+    });
+  });
+}
+
+// เรียกใช้งานตอนโหลด
+window.addEventListener('load', () => {
+  // ให้รอ DOM พร้อมก่อน
+  init3DCards();
+});
 /* ══ LOGIN ══ */
 async function setStep(n,state){for(let i=1;i<=3;i++){const el=$id('ls'+i);if(!el)continue;el.classList.remove('active','done');if(i<n)el.classList.add('done');if(i===n)el.classList.add(state)}const pcts={1:20,2:55,3:85};$id('loBar').style.width=(pcts[n]||20)+'%'}
 async function login(){
@@ -5602,42 +6377,192 @@ function resetDashFilters() {
 
 // 1. ตัวแปรเก็บสถานะ Animation
 let hasPlayedDashIntro = false;
+// ═══════════════════════════════════════════════════════════
+//   UPGRADED JS: PRECISION TICKS & SMOOTH NEEDLE
+// ═══════════════════════════════════════════════════════════
 
-// 2. ฟังก์ชันสร้างเส้นรอบวง (Ticks)
+// ═══════════════════════════════════════════════════════════
+//   FIX: UNIVERSAL TICK GENERATOR (MAIN & MINI)
+// ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+//   SPORT GAUGE: CREATE MAIN GAUGE TICKS
+// ═══════════════════════════════════════════════════════════
+
 function createGaugeTicks() {
   const container = document.getElementById('gaugeTicks');
   if (!container) return;
   if (container.children.length > 0) return;
+  
   let html = '';
-  for (let i = 0; i <= 10; i++) {
-    const angle = -180 + (i * 18); 
-    const rad = angle * (Math.PI / 180);
-    const x1 = Math.cos(rad) * 88; 
-    const y1 = Math.sin(rad) * 88;
-    const x2 = Math.cos(rad) * 98;
-    const y2 = Math.sin(rad) * 98;
-    const isMain = (i % 5 === 0); 
-    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#475569" stroke-width="${isMain ? 2.5 : 1}" opacity="${isMain ? 0.8 : 0.4}"/>`;
+  const radius = 85;
+  const totalTicks = 20; // ทุก 5%
+  
+  for (let i = 0; i <= totalTicks; i++) {
+    // มุม: -180° (ซ้าย) → 0° (ขวา)
+    const angleDeg = -180 + (i * (180 / totalTicks));
+    const rad = (angleDeg * Math.PI) / 180;
+    
+    // ขีดหลักทุก 4 ช่อง (ทุก 20%)
+    const isMajor = (i % 4 === 0);
+    const innerR = isMajor ? radius - 18 : radius - 12;
+    const outerR = radius;
+    
+    const x1 = Math.cos(rad) * innerR;
+    const y1 = Math.sin(rad) * innerR;
+    const x2 = Math.cos(rad) * outerR;
+    const y2 = Math.sin(rad) * outerR;
+    
+    const strokeW = isMajor ? 3 : 1.5;
+    const opacity = isMajor ? 1 : 0.4;
+    const color = isMajor ? '#94a3b8' : '#475569';
+    
+    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" 
+                  stroke="${color}" 
+                  stroke-width="${strokeW}" 
+                  stroke-linecap="round"
+                  opacity="${opacity}"/>`;
   }
+  
   container.innerHTML = html;
 }
 
-// 3. อัพเดทสถานะ Main Gauge (ตัวเลขสี)
-function updateGaugeStatus(passPct) {
+// ═══════════════════════════════════════════════════════════
+//   SPORT GAUGE: UPDATE MAIN GAUGE
+// ═══════════════════════════════════════════════════════════
+
+function updateMainGauge(passPct) {
+  // 1. สร้าง Tick Marks
+  createGaugeTicks();
+
+  // 2. Update Arc
+  const circumference = 267; // π * 85
+  const arcLength = (passPct / 100) * circumference;
+  
+  const arc = $id('mainGaugeArc');
+  if (arc) {
+    arc.style.strokeDasharray = `${arcLength} ${circumference}`;
+  }
+
+  // 3. Update Needle
+  // มุมเริ่มต้น (0%) = -180° (ชี้ซ้าย)
+  // มุมสุดท้าย (100%) = 0° (ชี้ขวา)
+  const rotationAngle = -180 + (passPct * 1.8);
+  
+  const needle = document.getElementById('gaugeNeedle');
+  if (needle) {
+    needle.style.setProperty('--needle-angle', rotationAngle + 'deg');
+    needle.style.transform = `rotate(${rotationAngle}deg)`;
+    
+    // Flash Effect
+    needle.classList.add('needle-update');
+    setTimeout(() => needle.classList.remove('needle-update'), 500);
+  }
+
+  // 4. Update Value
+  const valueEl = $id('mainGaugeValue');
+  if (valueEl) {
+    const current = parseInt(valueEl.textContent) || 0;
+    if (current !== passPct) {
+      animateGaugeNumber(valueEl, current, passPct);
+      valueEl.textContent = passPct; // อัพเดททันทีหลัง animate
+      
+      // เพิ่ม % ต่อท้าย
+      setTimeout(() => {
+        valueEl.textContent = passPct + '%';
+      }, 800);
+    }
+  }
+
+  // 5. Update Status
   const trendEl = $id('mainGaugeTrend');
-  if (!trendEl) return;
-  let status, color, bg;
-  if (passPct >= 80) { status = 'Excellent'; color = '#10b981'; bg = 'rgba(16,185,129,0.15)'; }
-  else if (passPct >= 60) { status = 'Warning'; color = '#f59e0b'; bg = 'rgba(245,158,11,0.15)'; }
-  else { status = 'Critical'; color = '#ef4444'; bg = 'rgba(239,68,68,0.15)'; }
-  trendEl.style.background = bg;
-  trendEl.style.border = `1px solid ${color}33`;
-  trendEl.querySelector('.trend-arrow').style.color = color;
-  trendEl.querySelector('.trend-arrow').textContent = passPct >= 80 ? '▲' : passPct >= 60 ? '●' : '▼';
-  trendEl.querySelector('.trend-value').style.color = color;
-  trendEl.querySelector('.trend-value').textContent = status;
+  if (trendEl) {
+    let status, color, bgColor;
+    
+    if (passPct >= 80) {
+      status = 'Excellent';
+      color = '#10b981';
+      bgColor = 'rgba(16, 185, 129, 0.15)';
+    } else if (passPct >= 60) {
+      status = 'Warning';
+      color = '#f59e0b';
+      bgColor = 'rgba(245, 158, 11, 0.15)';
+    } else if (passPct >= 40) {
+      status = 'Caution';
+      color = '#f97316';
+      bgColor = 'rgba(249, 115, 22, 0.15)';
+    } else {
+      status = 'Critical';
+      color = '#ef4444';
+      bgColor = 'rgba(239, 68, 68, 0.15)';
+    }
+    
+    trendEl.style.background = bgColor;
+    trendEl.style.border = `1px solid ${color}40`;
+    
+    const arrow = trendEl.querySelector('.trend-arrow');
+    const value = trendEl.querySelector('.trend-value');
+    
+    if (arrow) {
+      arrow.style.color = color;
+      arrow.textContent = passPct >= 60 ? '▲' : passPct >= 40 ? '●' : '▼';
+    }
+    
+    if (value) {
+      value.style.color = color;
+      value.textContent = status;
+    }
+  }
 }
 
+// ═══════════════════════════════════════════════════════════
+//   HELPER: ANIMATE GAUGE NUMBER (ตัวเลขนับขึ้นแบบ Smooth)
+// ═══════════════════════════════════════════════════════════
+
+function animateGaugeNumber(el, from, to) {
+  const duration = 800;
+  const startTime = performance.now();
+  
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    
+    // Easing: easeOutExpo
+    const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+    
+    const current = Math.round(from + (to - from) * eased);
+    el.textContent = current;
+    
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  }
+  
+  requestAnimationFrame(update);
+}
+
+// ═══════════════════════════════════════════════════════════
+//   CSS ANIMATION: NEEDLE UPDATE FLASH (เข็มกระพริขตอนอัพเดท)
+// ═══════════════════════════════════════════════════════════
+
+// เพิ่ม CSS นี้ในส่วน Style (สามารถเพิ่มท้าย CSS ชุดที่ 1 ได้)
+const needleFlashCSS = `
+@keyframes needleFlash {
+  0% { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 2px rgba(255, 255, 255, 0.8)); }
+  50% { filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 6px rgba(255, 255, 255, 1)); }
+  100% { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 2px rgba(255, 255, 255, 0.8)); }
+}
+
+.needle-update .mini-needle-shape,
+.needle-update polygon {
+  animation: needleFlash 0.5s ease-out;
+}
+`;
+
+// Inject CSS
+const styleSheet = document.createElement('style');
+styleSheet.textContent = needleFlashCSS;
+document.head.appendChild(styleSheet);
 // ═══ ANIMATION FUNCTIONS (เหมือนเดิม แต่เพิ่มความแม่นยำ) ═══
 
 function animateGaugeIntro(targetPct) {
@@ -5703,24 +6628,47 @@ function animateMiniGaugesIntro(sfPct, venPct, ctcPct) {
     });
 }
 
-// 7. Update Mini Gauge ปกติ
+// ── UPDATE MINI GAUGE (WITH NEEDLE) ──
 function updateMiniGauge(type, value, total, lots) {
   const pct = total > 0 ? Math.round((value / total) * 100) : 0;
-  const circumference = 126; 
+  
+  // 1. Update Arc (แถบสี)
+  const circumference = 400; // พิกัดเดียวกับ Main Gauge
   const arcLength = (pct / 100) * circumference;
   const arc = $id(type + 'GaugeArc');
   if (arc) arc.style.strokeDasharray = `${arcLength} ${circumference}`;
-  const rotation = -90 + (pct * 1.8);
+
+  // 2. Update Needle (หมุนเข็ม)
+  // สูตรเดียวกับ Main Gauge: 0% = -90deg (สำหรับ semi-circle ที่วาดจากซ้ายไปขวา)
+  // แต่ SVG เราวาดจาก M20 150 (ซ้าย) ไป A... 180 150 (ขวา) ครับ
+  // คือมุม 0 องศาในระบบเข็มนาฬิกาคือชี้ขึ้นบน (12 น.) สำหรับ Full Circle
+  // แต่ Semi-circle ของเรา:
+  // ซ้ายสุด (0%) = rotate(-90deg) ใน CSS (เทียบกับแนวนอน)
+  // ขวาสุด (100%) = rotate(90deg)
+  
+  // Logic: 
+  // -90deg คือชี้ไปทางซ้าย (Start)
+  // 90deg คือชี้ไปทางขวา (End)
+  // ระยะห่าง = 180 องศา
+  const rotationAngle = -90 + (pct * 1.8); 
+  
   const needle = $id(type + 'GaugeNeedle');
-  if (needle) needle.style.transform = `rotate(${rotation}deg)`;
+  if (needle) needle.style.transform = `rotate(${rotationAngle}deg)`;
+
+  // 3. Update Value (ตัวเลข)
   const valueEl = $id(type + 'GaugeValue');
   if (valueEl) {
-      const current = parseInt(valueEl.textContent) || 0;
-      if (current !== pct) {
-          gsap.to({ val: current }, { val: pct, duration: 0.8, ease: "power1.out",
-              onUpdate: function() { valueEl.textContent = Math.round(this.targets()[0].val); }
-          });
-      }
+    const current = parseInt(valueEl.textContent) || 0;
+    if (current !== pct) {
+      gsap.to({ val: current }, {
+        val: pct,
+        duration: 0.8,
+        ease: "power1.out",
+        onUpdate: function() {
+          valueEl.textContent = Math.round(this.targets()[0].val);
+        }
+      });
+    }
   }
 }
 
@@ -5828,40 +6776,43 @@ function renderTicker(tQ, lots, pass, rej, sf, ven, ctc, ok) {
   
   ticker.innerHTML = `<div class="ticker-content">${html}${html}</div>`;
 }
-// ── 1. INTRO ANIMATION (วิ่ง 0 -> 100 -> Target) ──
+/// ── INTRO ANIMATION (MATCHES MAIN GAUGE) ──
 function animateMiniGaugesIntro(sfPct, venPct, ctcPct) {
     const gauges = [
-        { id: 'sf', target: sfPct, color: '#f97316' },
-        { id: 'vendor', target: venPct, color: '#ef4444' },
-        { id: 'ctc', target: ctcPct, color: '#3b82f6' }
+        { id: 'sf', target: sfPct },
+        { id: 'vendor', target: venPct },
+        { id: 'ctc', target: ctcPct }
     ];
 
     gauges.forEach(g => {
         const needle = $id(g.id + 'GaugeNeedle');
         const arc = $id(g.id + 'GaugeArc');
         const valEl = $id(g.id + 'GaugeValue');
-        const circ = 126;
+        const circ = 400; // Match Main Gauge
 
         // A. Reset ไป 0 ก่อน
-        gsap.set({ v: 0 }, { v: 0, onUpdate: function() {
-             const v = this.targets()[0].v;
-             if(needle) needle.style.transform = `rotate(${-90 + (v * 1.8)}deg)`;
-             if(arc) arc.style.strokeDasharray = `${(v/100)*circ} ${circ}`;
-             if(valEl) valEl.textContent = Math.round(v);
-        }});
+        // Needle at 0% = -90deg
+        if(needle) gsap.set(needle, { rotation: -90 });
+        if(arc) gsap.set(arc, { strokeDasharray: `0 ${circ}` });
+        if(valEl) valEl.textContent = '0';
 
-        // B. Timeline: วิ่งขึ้น 100 -> ลง Target
+        // B. Timeline Animation
         const tl = gsap.timeline({
             onUpdate: function() {
-                const v = this.targets()[0].v;
-                if(needle) needle.style.transform = `rotate(${-90 + (v * 1.8)}deg)`;
-                if(arc) arc.style.strokeDasharray = `${(v/100)*circ} ${circ}`;
-                if(valEl) valEl.textContent = Math.round(v);
+                // อ่านค่า rotation จาก GSAP object แล้วอัพเดท
+                const rot = this.targets()[0].rot;
+                const pct = ((rot + 90) / 1.8); // แปลง deg เป็น %
+                const dash = (pct / 100) * circ;
+                
+                if(needle) needle.style.transform = `rotate(${rot}deg)`;
+                if(arc) arc.style.strokeDasharray = `${dash} ${circ}`;
+                if(valEl) valEl.textContent = Math.round(pct);
             }
         });
 
-        tl.to({ v: 0 }, { v: 100, duration: 0.6, ease: "power2.out" })
-          .to({ v: 100 }, { v: g.target, duration: 1.2, ease: "power3.inOut" }, "+=0.1");
+        // ใช้ Object { rot: -90 } แทนการ animate DOM ตรงๆ เพื่อให้ควบคุมง่าย
+        tl.to({ rot: -90 }, { rot: 90, duration: 0.8, ease: "power2.out" }) // วิ่งไป 100% (90deg)
+          .to({ rot: 90 }, { rot: -90 + (g.target * 1.8), duration: 1.2, ease: "power3.inOut" }, "-=0.2"); // วิ่งไป Target
     });
 }
 
