@@ -2257,74 +2257,75 @@ html.dark-mode .lo-in:focus {
   z-index: 20;
 }
 
-/* ═══════════════════════════════════════════════════
-   FIX: Responsive Main Gauge Container
-═══════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════
-   FIX: แก้ไขวงกลมใหญ่ไม่ล้นออกมา
-═══════════════════════════════════════════════════ */
-
-/* Container หลัก - จำกัดขนาดไม่ให้ล้น */
 .gauge-cluster.main-gauge {
-  min-height: 240px !important;
-  max-height: 280px !important;
+  min-height: 270px !important;
   flex-shrink: 0 !important;
   margin-bottom: 1rem;
-  overflow: hidden !important; /* ✅ ป้องกันการล้น */
-  position: relative;
-  contain: layout style; /* ✅ จำกัดการ render */
+  background: 
+    radial-gradient(ellipse at 50% 40%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 1) 100%);
+  box-shadow: 
+    inset 0 0 60px rgba(0, 0, 0, 0.6),
+    0 15px 50px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
-/* วงกลมหลัก - ปรับขนาดอัตโนมัติตาม container */
-.gauge-ring {
-  position: relative;
-  width: 100%; /* ✅ ใช้ความกว้างเต็มที่ */
-  max-width: 180px; /* ✅ จำกัดความกว้างสูงสุด */
-  height: auto;
-  aspect-ratio: 1 / 1; /* ✅ อัตราส่วน 1:1 */
-  margin: 0 auto; /* ✅ จัดกึ่งกลาง */
-  padding: 10px; /* ✅ เว้นระยะห่าง */
-  box-sizing: border-box;
-}
-
-/* SVG - ให้ปรับขนาดตาม container */
-.gauge-svg {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 180px !important;
-  max-height: 180px !important;
-  display: block;
-  margin: 0 auto;
-}
-
-/* ตัวเลขกลาง - จัดให้อยู่ในวงกลม */
-.gauge-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.main-gauge {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 25;
-  pointer-events: none;
-  width: 120px; /* ✅ จำกัดความกว้าง */
-  max-width: 80%; /* ✅ ไม่เกิน 80% ของ container */
 }
 
-/* ตัวเลข % */
+.gauge-ring {
+  position: relative;
+  width: 220px;
+  height: 220px;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.3));
+}
+
+/* Gauge Center Text */
+.gauge-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 20px;
+  transform: translateZ(40px);
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
+}
+
 .gauge-value {
   font-family: var(--font-head);
-  font-size: clamp(2.5rem, 5vw, 3.5rem); /* ✅ ปรับขนาดตาม viewport */
+  font-size: 2.8rem;
   font-weight: 900;
   color: #f8fafc;
   line-height: 1;
   letter-spacing: -0.02em;
-  text-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 30px rgba(255, 255, 255, 0.2);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
 }
 
-/* Trend indicator */
+.gauge-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
 .gauge-trend {
   display: flex;
   align-items: center;
@@ -2334,6 +2335,10 @@ html.dark-mode .lo-in:focus {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.2);
   border-radius: 99px;
+  transform: translateZ(40px);
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
 }
 
 .trend-arrow {
@@ -3540,203 +3545,132 @@ canvas {
 }
 
 /* ═══════════════════════════════════════════════════
-   RESPONSIVE - ปรับขนาดตามหน้าจอ
+   22. RESPONSIVE STYLES
 ═══════════════════════════════════════════════════ */
-
 @media (max-width: 1400px) {
-  .gauge-ring {
-    max-width: 160px;
+  .cockpit-right {
+    gap: 0.5rem;
   }
   
-  .gauge-svg {
-    max-width: 160px !important;
-    max-height: 160px !important;
-  }
-  
-  .gauge-value {
-    font-size: clamp(2rem, 4.5vw, 3rem);
+  .market-panel {
+    padding: 0.65rem 0.85rem;
   }
 }
 
 @media (max-width: 1200px) {
-  .gauge-cluster.main-gauge {
-    min-height: 220px !important;
-    max-height: 260px !important;
+  .dash-charts-section {
+    grid-template-columns: 1fr 1fr;
   }
   
-  .gauge-ring {
-    max-width: 150px;
+  .dash-rankings-section {
+    grid-template-columns: 1fr 1fr;
   }
   
-  .gauge-svg {
-    max-width: 150px !important;
-    max-height: 150px !important;
+  .kpi-mini-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  .gauge-value {
-    font-size: 2.2rem;
+  .cockpit-body {
+    grid-template-columns: minmax(200px, 300px) 1fr;
   }
   
-  .gauge-center {
-    width: 100px;
+  .cockpit-right {
+    display: none;
   }
 }
 
 @media (max-width: 900px) {
-  .gauge-ring {
-    max-width: 130px;
+  .cockpit-body {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+    gap: 0.75rem;
+    padding: 0.75rem;
   }
   
-  .gauge-svg {
-    max-width: 130px !important;
-    max-height: 130px !important;
+  .cockpit-right {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.5rem;
   }
   
-  .gauge-value {
-    font-size: 2rem;
-  }
-  
-  .gauge-center {
-    width: 90px;
+  .market-panel {
+    min-width: 250px;
+    flex: 1;
   }
 }
 
 @media (max-width: 768px) {
-  .gauge-cluster.main-gauge {
-    min-height: 200px !important;
-    max-height: 240px !important;
+  .dash-kpi-hero {
+    grid-template-columns: 1fr;
   }
   
-  .gauge-ring {
-    max-width: 120px;
+  .dash-charts-section {
+    grid-template-columns: 1fr;
   }
   
-  .gauge-svg {
-    max-width: 120px !important;
-    max-height: 120px !important;
+  .dash-rankings-section {
+    grid-template-columns: 1fr;
   }
   
-  .gauge-value {
-    font-size: 1.8rem;
+  .dash-topbar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 1rem;
+    gap: 0.75rem;
   }
   
-  .gauge-center {
-    width: 80px;
+  .dash-controls {
+    width: 100%;
+    flex-wrap: wrap;
   }
   
-  .gauge-trend {
-    font-size: 0.6rem;
-    padding: 3px 8px;
-  }
-}
-/* ═══════════════════════════════════════════════════
-   RESPONSIVE BREAKPOINTS FOR GAUGE
-═══════════════════════════════════════════════════ */
-
-@media (max-width: 1400px) {
-  .gauge-ring {
-    max-width: 200px;
-    max-height: 200px;
+  .dash-topbar-cockpit {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 0.75rem;
+    gap: 0.5rem;
   }
   
-  .gauge-value {
-    font-size: clamp(1.8rem, 4.5vw, 3rem);
+  .topbar-ticker {
+    order: -1;
+    width: 100%;
   }
-}
-
-@media (max-width: 1200px) {
-  .gauge-ring {
-    max-width: 180px;
-    max-height: 180px;
+  
+  .topbar-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .cockpit-left {
+    flex-direction: column;
   }
   
   .gauge-cluster.main-gauge {
-    min-height: 220px !important;
-    max-height: 250px !important;
-  }
-}
-
-@media (max-width: 900px) {
-  .gauge-ring {
-    max-width: 160px;
-    max-height: 160px;
+    flex: none;
   }
   
-  .gauge-value {
-    font-size: 2rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .gauge-ring {
-    max-width: 140px;
-    max-height: 140px;
+  .gauge-row {
+    grid-template-columns: repeat(3, 1fr);
   }
   
-  .gauge-value {
-    font-size: 1.8rem;
+  .cockpit-center .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .cockpit-right {
+    flex-direction: column;
+  }
+  
+  .cockpit-bottom-row {
+    grid-template-columns: 1fr;
   }
 }
-/* ═══════════════════════════════════════════════════
-   MINI GAUGES - ป้องกันการล้น
-═══════════════════════════════════════════════════ */
 
-.mini-gauge {
-  position: relative;
-  border-radius: 16px;
-  padding: 0.75rem 0.5rem 0.5rem;
-  border: 1px solid rgba(59, 130, 246, 0.15);
-  overflow: hidden !important; /* ✅ ป้องกันล้น */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 140px;
-  max-height: 160px; /* ✅ จำกัดความสูง */
-}
-
-.mini-gauge-display {
-  position: relative;
-  width: 100%;
-  padding-bottom: 65%;
-  margin-bottom: 0.3rem;
-  max-height: 120px; /* ✅ จำกัด */
-}
-
-.mini-gauge-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 120px !important;
-  max-height: 120px !important;
-}
-
-.mini-gauge-value {
-  position: absolute !important;
-  bottom: 8% !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  font-family: 'Orbitron', 'Sora', monospace;
-  font-size: clamp(1rem, 3vw, 1.4rem); /* ✅ Responsive */
-  font-weight: 800;
-  color: #f8fafc;
-  line-height: 1;
-  z-index: 10;
-}
-/* Force reset */
-.gauge-cluster.main-gauge,
-.gauge-ring,
-.gauge-svg {
-  box-sizing: border-box !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-}
-
-/* จำกัดความกว้างสูงสุด */
-.cockpit-left {
-  max-width: 320px;
+@supports not (height: 100dvh) {
+  .cockpit-dash {
+    height: 100vh;
+  }
 }
 </style>
 </head>
@@ -4256,30 +4190,19 @@ canvas {
         <div class="hero-sparkline" id="heroSparkline"></div>
       </div>
       
-<!-- MAIN SPEEDOMETER -->
-<div class="gauge-cluster main-gauge" id="mainGaugeContainer">
+<!-- MAIN SPEEDOMETER — PASS RATE (SPORT STYLE) -->
+<div class="gauge-cluster main-gauge">
   <div class="gauge-ring" id="mainGaugeRing">
     
-    <!-- ✅ เพิ่ม preserveAspectRatio="xMidYMid meet" -->
-    <svg viewBox="0 0 200 200" 
-         class="gauge-svg" 
-         id="mainGaugeSvg"
-         preserveAspectRatio="xMidYMid meet">
-      
-      <!-- ... SVG content ... -->
-      
-    </svg>
-    
-    <!-- ตัวเลขกลาง -->
-    <div class="gauge-center" id="mainGaugeCenter">
-      <div class="gauge-value" id="mainGaugeValue">0%</div>
-      <div class="gauge-trend" id="mainGaugeTrend">
+<!-- ตัวเลขและข้อความ (Overlay) -->
+<div class="gauge-center" style="bottom: 0%; transform: translateY(0); z-index: 25;">
+  <div class="gauge-value" id="mainGaugeValue" style="font-size: 3.5rem;">0%</div>
+
+  <div class="gauge-trend" id="mainGaugeTrend" style="margin-top: 30px;">
         <span class="trend-arrow">▲</span>
         <span class="trend-value">Good</span>
       </div>
     </div>
-  </div>
-</div>
 
     <!-- SVG Structure (Sport Style) -->
     <svg viewBox="0 0 200 200" class="gauge-svg" style="position: relative; z-index: 10;">
@@ -6419,24 +6342,31 @@ function exportToExcel() {
 let hasPlayedDashIntro = false;
 
 function openDashboard() {
-  const modal = document.getElementById('dashboardModal');
+  const modal = $id('dashboardModal');
   modal.style.display = 'flex';
-  
-  // Initial gauge setup
+
   drawTicks('gaugeTicks', 85, false);
   drawTicks('sfGaugeTicks', 75, true);
   drawTicks('vendorGaugeTicks', 75, true);
   drawTicks('ctcGaugeTicks', 75, true);
-  
-  // Clear GSAP transforms
+
   gsap.set(['.dash-topbar-cockpit', '.cockpit-left', '.cockpit-center', '.cockpit-right'], { clearProps: 'all' });
   gsap.set(['.hero-kpi-card', '.gauge-cluster', '.stat-card', '.market-panel', '.incident-feed-panel', '.top-line-panel'], { opacity: 0, y: 20, scale: 0.98 });
-  
-  // ... existing code ...
-  
-  // Animate entrance
+
+  $id('dashUser').textContent = currentUser;
+
+  if (window.dashTimeInterval) clearInterval(window.dashTimeInterval);
+  updateDashTime();
+  window.dashTimeInterval = setInterval(updateDashTime, 1000);
+
+  const vendors = [...new Set(getMyRecords().map(r => r.supplier))].filter(Boolean).sort();
+  $id('dashVendor').innerHTML = '<option value="ALL">All Vendors</option>' +
+    vendors.map(v => `<option value="${v}">${v}</option>`).join('');
+
+  refreshDash();
+
   const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-  
+
   tl.fromTo('#dashboardModal', { opacity: 0 }, { opacity: 1, duration: 0.3 })
     .fromTo('.dash-topbar-cockpit', { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, "-=0.1")
     .fromTo('.cockpit-left', { x: -100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8 }, "-=0.4")
@@ -6444,11 +6374,7 @@ function openDashboard() {
     .fromTo('.cockpit-center', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.6")
     .to(['.hero-kpi-card', '.gauge-cluster', '.stat-card', '.market-panel', '.incident-feed-panel', '.top-line-panel'], {
       opacity: 1, y: 0, scale: 1, stagger: 0.05, duration: 0.4, ease: "back.out(1.4)"
-    }, "-=0.4")
-    .call(() => {
-      // ✅ Recalculate gauge sizes after animation
-      recalculateGaugeSizes();
-    }, null, "-=0.2");
+    }, "-=0.4");
 }
 
 function closeDashboard() {
@@ -7206,210 +7132,7 @@ const needleFlashCSS = `
 const styleSheet = document.createElement('style');
 styleSheet.textContent = needleFlashCSS;
 document.head.appendChild(styleSheet);
-// ═══════════════════════════════════════════════════════════
-// RESPONSIVE GAUGE RESIZE HANDLER
-// ══════════════════════════════════════════════════════════
 
-let gaugeResizeTimer = null;
-
-/**
- * Recalculate gauge sizes after fullscreen change
- */
-function recalculateGaugeSizes() {
-  const container = document.getElementById('mainGaugeContainer');
-  const ring = document.getElementById('mainGaugeRing');
-  const svg = document.getElementById('mainGaugeSvg');
-  
-  if (!container || !ring || !svg) return;
-  
-  // Get container dimensions
-  const containerRect = container.getBoundingClientRect();
-  const maxHeight = Math.min(containerRect.height - 40, 220);
-  const maxWidth = Math.min(containerRect.width - 20, 220);
-  const size = Math.min(maxHeight, maxWidth);
-  
-  // Apply responsive sizing
-  ring.style.maxWidth = size + 'px';
-  ring.style.maxHeight = size + 'px';
-  svg.style.maxWidth = size + 'px';
-  svg.style.maxHeight = size + 'px';
-  
-  // Re-center the gauge
-  const centerEl = document.getElementById('mainGaugeCenter');
-  if (centerEl) {
-    centerEl.style.paddingBottom = (size * 0.1) + 'px';
-  }
-  
-  // Recalculate mini gauges
-  const miniGauges = document.querySelectorAll('.mini-gauge');
-  miniGauges.forEach(gauge => {
-    const display = gauge.querySelector('.mini-gauge-display');
-    if (display) {
-      const gaugeRect = gauge.getBoundingClientRect();
-      const miniSize = Math.min(gaugeRect.width, gaugeRect.height * 0.6);
-      display.style.maxWidth = miniSize + 'px';
-    }
-  });
-  
-  console.log('✅ Gauge sizes recalculated:', size + 'px');
-}
-
-/**
- * Handle fullscreen change event
- */
-function handleFullscreenChange() {
-  console.log('🎬 Fullscreen changed');
-  
-  // Immediate recalculation
-  recalculateGaugeSizes();
-  
-  // Delayed recalculation (wait for layout to settle)
-  clearTimeout(gaugeResizeTimer);
-  gaugeResizeTimer = setTimeout(() => {
-    recalculateGaugeSizes();
-    
-    // Trigger chart resize if dashboard is open
-    const modal = document.getElementById('dashboardModal');
-    if (modal && modal.style.display === 'flex') {
-      if (window.dashCharts && window.dashCharts.mainTrend) {
-        window.dashCharts.mainTrend.resize();
-      }
-    }
-  }, 300);
-}
-
-// ═══════════════════════════════════════════════════════════
-// EVENT LISTENERS
-// ══════════════════════════════════════════════════════════
-
-// Listen for fullscreen changes
-document.addEventListener('fullscreenchange', handleFullscreenChange);
-document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-
-// Listen for window resize
-window.addEventListener('resize', () => {
-  clearTimeout(gaugeResizeTimer);
-  gaugeResizeTimer = setTimeout(() => {
-    const modal = document.getElementById('dashboardModal');
-    if (modal && modal.style.display === 'flex') {
-      recalculateGaugeSizes();
-      
-      // Resize charts
-      if (window.dashCharts) {
-        Object.keys(window.dashCharts).forEach(key => {
-          if (window.dashCharts[key]) {
-            window.dashCharts[key].resize();
-          }
-        });
-      }
-    }
-  }, 200);
-});
-// ═══════════════════════════════════════════════════════════
-// RESPONSIVE GAUGE RESIZE - แก้ไขปัญหาล้นขอบ
-// ══════════════════════════════════════════════════════════
-
-let gaugeResizeTimer = null;
-
-/**
- * คำนวณขนาด gauge ให้พอดีกับ container
- */
-function resizeGaugeToFit() {
-  const container = document.getElementById('mainGaugeContainer');
-  const ring = document.getElementById('mainGaugeRing');
-  const svg = document.getElementById('mainGaugeSvg');
-  const center = document.getElementById('mainGaugeCenter');
-  
-  if (!container || !ring || !svg) return;
-  
-  // วัดขนาด container
-  const containerRect = container.getBoundingClientRect();
-  const availableWidth = containerRect.width - 40; // เว้น padding
-  const availableHeight = containerRect.height - 80; // เว้นพื้นที่ด้านบนและล่าง
-  
-  // ใช้ค่าที่น้อยกว่า
-  const maxSize = Math.min(availableWidth, availableHeight, 180);
-  
-  // กำหนดขนาดให้วงกลม
-  const size = Math.max(120, maxSize); // ไม่เล็กกว่า 120px
-  
-  ring.style.maxWidth = size + 'px';
-  ring.style.maxHeight = size + 'px';
-  
-  svg.style.maxWidth = size + 'px';
-  svg.style.maxHeight = size + 'px';
-  
-  // ปรับตัวเลขกลาง
-  if (center) {
-    const centerSize = size * 0.6;
-    center.style.width = centerSize + 'px';
-    center.style.maxWidth = centerSize + 'px';
-  }
-  
-  console.log('✅ Gauge resized to:', size + 'px');
-}
-
-// ═══════════════════════════════════════════════════════════
-// EVENT LISTENERS - จัดการเมื่อหน้าจอเปลี่ยน
-// ══════════════════════════════════════════════════════════
-
-// เมื่อ fullscreen เปลี่ยน
-document.addEventListener('fullscreenchange', () => {
-  console.log('🎬 Fullscreen changed');
-  
-  // Resize ทันที
-  resizeGaugeToFit();
-  
-  // Resize อีกครั้งหลังจาก layout เรียบร้อย
-  setTimeout(resizeGaugeToFit, 300);
-});
-
-// เมื่อ window resize
-window.addEventListener('resize', () => {
-  clearTimeout(gaugeResizeTimer);
-  gaugeResizeTimer = setTimeout(() => {
-    const modal = document.getElementById('dashboardModal');
-    if (modal && modal.style.display === 'flex') {
-      resizeGaugeToFit();
-    }
-  }, 200);
-});
-
-// เมื่อเปิด dashboard
-function openDashboard() {
-  const modal = document.getElementById('dashboardModal');
-  modal.style.display = 'flex';
-  
-  // ... existing animation code ...
-  
-  // ✅ Resize gauge หลังจาก animation เสร็จ
-  setTimeout(() => {
-    resizeGaugeToFit();
-    
-    // Resize charts ด้วย
-    if (window.dashCharts) {
-      Object.keys(window.dashCharts).forEach(key => {
-        if (window.dashCharts[key]) {
-          window.dashCharts[key].resize();
-        }
-      });
-    }
-  }, 500);
-}
-
-// เรียกใช้ครั้งแรก
-window.addEventListener('load', () => {
-  setTimeout(resizeGaugeToFit, 100);
-});
-
-console.log('✅ Gauge resize handler loaded');
-// Expose function globally
-window.recalculateGaugeSizes = recalculateGaugeSizes;
-window.handleFullscreenChange = handleFullscreenChange;
-
-console.log('✅ Responsive gauge fix loaded');
 </script>
 
 </body>
