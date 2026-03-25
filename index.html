@@ -1769,7 +1769,11 @@ tbody tr {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-top: 45px;
+  
+  /* ★ เพิ่มบรรทัดนี้เพื่อย่อขนาด */
+  transform: scale(0.6);  /* 0.8 = ย่อเหลือ 80% */
 }
 
 .gauge-value {
@@ -2020,7 +2024,10 @@ tbody tr {
   width: 100% !important;
   height: 100% !important;
 }
-
+.chart-panel {
+    overflow: visible !important; 
+    z-index: 10;
+}
 /* ═══════════════════════════════════════════════════════════
    HERO KPI CARD (Top Left - Expanded)
 ══════════════════════════════════════════════════════════ */
@@ -4668,8 +4675,8 @@ canvas {
     <!-- ตัวเลขและข้อความ (Overlay) -->
     <div class="gauge-center" style="bottom: 150%; transform: translateY(0); z-index: 25;">
       <div class="gauge-value" id="mainGaugeValue" style="font-size: 3.5rem;">0%</div>
-      <div class="gauge-label">PASS RATE</div>
-      <div class="gauge-trend" id="mainGaugeTrend" style="margin-top: 10px;">
+      
+      <div class="gauge-trend" id="mainGaugeTrend" style="margin-top: 35px;">
         <span class="trend-arrow">▲</span>
         <span class="trend-value">Good</span>
       </div>
@@ -6856,8 +6863,9 @@ function aggregateByMonth(data) {
   }));
 }
 
-// ── MAIN TREND CHART (Glowing Points Effect) ──
+/// ── MAIN TREND CHART (ROBUST TOOLTIP FIX) ──
 function renderMainTrendChart(data) {
+  // 1. ทำลายกราฟเก่าถ้ามี
   if (dashCharts.mainTrend) {
     dashCharts.mainTrend.destroy();
   }
@@ -6867,16 +6875,23 @@ function renderMainTrendChart(data) {
   
   const chartCtx = ctx.getContext('2d');
   
-  // ★ สีเขียวนีออนสไตล์ Stock Market
+  // ★ สีเขียวนีออน
   const neonGreen = '#00ff88'; 
   const neonGreenRGB = '0, 255, 136'; 
   
-  // Gradient Fill
+  // 2. Gradient Fill
   const gradient = chartCtx.createLinearGradient(0, 0, 0, 280);
   gradient.addColorStop(0, `rgba(${neonGreenRGB}, 0.5)`);
   gradient.addColorStop(0.5, `rgba(${neonGreenRGB}, 0.25)`);
   gradient.addColorStop(1, `rgba(${neonGreenRGB}, 0.02)`);
   
+  // 3. เตรียม Custom Data (แยกตัวแปรเพื่อความปลอดภัย)
+  const customData = data.map(d => ({
+    lots: d.lots || 0,
+    pct: d.pct || 0
+  }));
+
+  // 4. สร้างกราฟ
   dashCharts.mainTrend = new Chart(ctx, {
     type: 'line',
     data: {
@@ -6889,19 +6904,15 @@ function renderMainTrendChart(data) {
         backgroundColor: gradient,
         fill: true,
         tension: 0.4,
-        
-        // ★★★ จุดที่ปรับใหม่: เพิ่มเอฟเฟกต์เรืองแสง (Glow) ★★★
-        pointRadius: 4, // ขยายจุดนิดหน่อยให้เห็นชัด
-        pointBackgroundColor: neonGreen, // ไส้ในสีเขียวสด
-        pointBorderColor: `rgba(${neonGreenRGB}, 0.4)`, // ขอบสีเขียวโปร่งแสง (ไม่ใช่สีดำ)
-        pointBorderWidth: 4, // ทำให้ขอบหนาพอที่จะดูเหมือนเรืองแสง
-        
-        pointHoverRadius: 7,
-        pointHoverBackgroundColor: '#ffffff', // ตอนชี้เป็นสีขาว
-        pointHoverBorderColor: neonGreen, // ขอบตอนชี้เป็นสีเขียว
-        pointHoverBorderWidth: 3,
-        
-        customData: data.map(d => ({ lots: d.lots, pct: d.pct }))
+        customData: customData, // ★ ใส่ข้อมูลที่เตรียมไว้
+        pointRadius: 4,
+        pointBackgroundColor: neonGreen,
+        pointBorderColor: `rgba(${neonGreenRGB}, 0.4)`,
+        pointBorderWidth: 4,
+        pointHoverRadius: 8,
+        pointHoverBackgroundColor: '#ffffff',
+        pointHoverBorderColor: neonGreen,
+        pointHoverBorderWidth: 3
       }]
     },
     options: {
@@ -6910,32 +6921,91 @@ function renderMainTrendChart(data) {
       plugins: {
         legend: {
           display: true, position: 'top', align: 'end',
-          labels: { color: '#94a3b8', font: { size: 10, weight: '600', family: 'Sora' }, boxWidth: 12, boxHeight: 12, borderRadius: 3, usePointStyle: true }
+          labels: { 
+            color: '#94a3b8', 
+            font: { size: 10, weight: '600', family: 'Sora' }, 
+            boxWidth: 12, 
+            boxHeight: 12, 
+            borderRadius: 3, 
+            usePointStyle: true 
+          }
         },
         tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: `rgba(${neonGreenRGB}, 0.5)`, borderWidth: 1,
+          enabled: true, // ★ บังคับให้แสดง
+          mode: 'index',
+          intersect: false,
+          backgroundColor: 'rgba(15, 23, 42, 0.98)', 
+          titleColor: '#ffffff',
+          bodyColor: '#e2e8f0',
+          borderColor: `rgba(${neonGreenRGB}, 0.5)`, 
+          borderWidth: 1,
           titleFont: { family: 'Sora', size: 13, weight: '700' },
           bodyFont: { family: 'DM Mono', size: 11 },
-          padding: { top: 12, bottom: 12, left: 16, right: 16 }, cornerRadius: 12, displayColors: false,
+          padding: { top: 12, bottom: 12, left: 16, right: 16 }, 
+          cornerRadius: 10,
+          displayColors: false,
+          // ★ ตั้งค่าตำแหน่งให้แสดงผลภายในกรอบเสมอ
+          position: 'average', 
+          xAlign: 'center', 
+          yAlign: 'bottom',
+          
           callbacks: {
-            title: (items) => `📅 ${data[items[0].dataIndex].month}`,
-            label: (ctx) => {
-              const d = data[ctx.dataIndex];
-              return [`📦 PCS: ${d.qty.toLocaleString()}`, `📊 Lots: ${d.lots}`, `📈 %: ${d.pct}%`];
+            title: function(tooltipItems) {
+              if (!tooltipItems.length) return '';
+              return '📅 ' + tooltipItems[0].label;
+            },
+            label: function(context) {
+              // ★ Safe Access: ป้องกัน Error ถ้าข้อมูลหาย
+              const dataIndex = context.dataIndex;
+              const dataset = context.dataset;
+              
+              // ดึงค่า PCS
+              const qty = context.parsed.y !== null ? context.parsed.y : 0;
+              
+              // ดึง Custom Data
+              let lots = 0;
+              let pct = 0;
+              
+              if (dataset.customData && dataset.customData[dataIndex]) {
+                lots = dataset.customData[dataIndex].lots || 0;
+                pct = dataset.customData[dataIndex].pct || 0;
+              }
+
+              // ส่งออกเป็น Array แยกบรรทัด
+              return [
+                '📦 PCS: ' + qty.toLocaleString(),
+                '📊 LOT: ' + lots,
+                '📈 %: ' + pct + '%'
+              ];
             }
           }
         }
       },
       scales: {
-        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#64748b', font: { size: 10, weight: '600', family: 'Sora' } } },
-        y: { beginAtZero: true, grid: { display: false }, border: { display: false }, ticks: { color: '#64748b', font: { family: 'DM Mono', size: 10 }, callback: v => v >= 1000 ? (v/1000) + 'k' : v } }
+        x: { 
+          grid: { display: false }, 
+          border: { display: false }, 
+          ticks: { color: '#64748b', font: { size: 10, weight: '600', family: 'Sora' } } 
+        },
+        y: { 
+          beginAtZero: true, 
+          grid: { display: false }, 
+          border: { display: false }, 
+          ticks: { 
+            color: '#64748b', 
+            font: { family: 'DM Mono', size: 10 }, 
+            callback: v => v >= 1000 ? (v/1000) + 'k' : v 
+          } 
+        }
       },
-      interaction: { intersect: false, mode: 'index' },
+      interaction: { 
+        intersect: false, 
+        mode: 'index' 
+      },
       animation: { duration: 1500, easing: 'easeOutQuart' }
     }
   });
 }
-
 // ── SPARKLINES ──
 function renderSparklines(data) {
   renderSparkline('sfSparkline', data.filter(r => r.judgment === 'SF'), '#f97316');
