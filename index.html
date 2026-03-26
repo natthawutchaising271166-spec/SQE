@@ -155,6 +155,12 @@ body::before {
 }
 #initOverlay.show { display: flex; }
 
+/* ✅ เพิ่ม @keyframes spin ที่ขาดไป */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .init-ring {
   width: 52px; 
   height: 52px; 
@@ -3672,11 +3678,701 @@ canvas {
     height: 100vh;
   }
 }
+.kpi-flash {
+  animation: kpiFlash 0.6s ease-out;
+}
+
+@keyframes kpiFlash {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); transform: scale(1); }
+  50% { box-shadow: 0 0 20px 5px rgba(59, 130, 246, 0.3); transform: scale(1.02); }
+  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); transform: scale(1); }
+}
+
+.row-deleting {
+  opacity: 0.5 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  animation: rowDeletePulse 0.8s ease-in-out infinite;
+}
+
+.btn-success {
+  animation: btnSuccess 0.7s ease-out;
+}
+/* ─────────────────────────────────────────────────────
+   PROBLEM 1: .row-deleting uses animation "rowDeletePulse"
+   but @keyframes rowDeletePulse was missing
+   ───────────────────────────────────────────────────── */
+.row-deleting {
+  opacity: 0.5 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  animation: rowDeletePulse 0.8s ease-in-out infinite;
+}
+
+/* ✅ FIX: Add missing @keyframes */
+@keyframes rowDeletePulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 0.3;
+    transform: translateX(-5px);
+  }
+}
+
+/* ─────────────────────────────────────────────────────
+   PROBLEM 2: .btn-success uses animation "btnSuccess"
+   but @keyframes btnSuccess was missing
+   ───────────────────────────────────────────────────── */
+.btn-success {
+  animation: btnSuccess 0.7s ease-out;
+}
+
+/* ✅ FIX: Add missing @keyframes */
+@keyframes btnSuccess {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  }
+  30% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  }
+}
+
+/* ─────────────────────────────────────────────────────
+   BONUS: Additional useful animations that might be needed
+   ───────────────────────────────────────────────────── */
+
+/* Shake animation for validation errors */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Slide up animation */
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* Glow pulse for alerts */
+@keyframes glowPulse {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.5); 
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); 
+  }
+}
+  /* ═══ ADD THESE AT THE END ═══ */
+  @keyframes rowDeletePulse {
+    0%, 100% { opacity: 0.5; transform: translateX(0); }
+    50% { opacity: 0.3; transform: translateX(-5px); }
+  }
+  
+  @keyframes btnSuccess {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.05); box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+    100% { transform: scale(1); }
+  }
+  <!-- ═══════════════════════════════════════════════════
+     ADDITIONAL CSS CLASSES (ที่ควรอยู่ใน <style> ใน <head>)
+═══════════════════════════════════════════════════ -->
+<!--
+เพิ่ม CSS เหล่านี้ใน <style> block ใน <head>:
+
+/* Datalists hidden */
+datalist { display: none; }
+
+/* Mascot animations */
+.mascot-float {
+  animation: mascotFloat 3s ease-in-out infinite;
+}
+
+.mascot-sway {
+  animation: mascotSway 2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes mascotFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes mascotSway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+/* qDraw animation for SVG */
+.q-draw-anim {
+  animation: qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1);
+}
+
+@keyframes qDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Gauge needle transition */
+.gauge-needle {
+  transform-origin: center center;
+  transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mini-gauge-needle {
+  transform-origin: 100px 100px;
+  transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Delete modal styles */
+.del-title {
+  font-family: var(--font-head);
+  font-weight: 800;
+  color: var(--text-900);
+  font-size: 1.05rem;
+  margin-bottom: .35rem;
+}
+
+.del-desc {
+  color: var(--text-400);
+  font-size: .75rem;
+  font-weight: 500;
+  margin-bottom: 1.4rem;
+  line-height: 1.5;
+}
+
+.del-btns {
+  display: flex;
+  gap: .65rem;
+}
+
+.del-btn-cancel {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border);
+  color: var(--text-500);
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: .7rem;
+  padding: .8rem;
+  border-radius: var(--r-sm);
+  letter-spacing: .03em;
+}
+
+.del-btn-confirm {
+  flex: 1;
+  background: linear-gradient(135deg,#dc2626,#ef4444);
+  color: #fff;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: .7rem;
+  padding: .8rem;
+  border-radius: var(--r-sm);
+  letter-spacing: .03em;
+  box-shadow: 0 4px 14px rgba(239,68,68,.35);
+}
+
+.del-note {
+  margin-top: .75rem;
+  font-size: .6rem;
+  color: var(--text-300);
+  font-family: var(--font-mono);
+}
+
+/* Progress bar container */
+.del-prog-bar-container {
+  margin-top: 1rem;
+  height: 4px;
+  background: var(--blue-100);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.del-prog-bar {
+  height: 100%;
+  background: linear-gradient(90deg,var(--blue-600),var(--blue-400));
+  border-radius: 99px;
+  transition: width .5s cubic-bezier(.22,.68,0,1.2);
+  width: 0%;
+}
+
+.del-prog-icon {
+  font-size: 2.5rem;
+  margin-bottom: .75rem;
+}
+
+.del-prog-title {
+  color: var(--text-900);
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: .95rem;
+  margin-bottom: .3rem;
+}
+
+.del-prog-sub {
+  color: var(--text-400);
+  font-weight: 500;
+  font-size: .7rem;
+}
+
+/* Login form styles */
+.lo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lo-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.lo-progress {
+  display: none;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 1.1rem;
+}
+
+.lo-version {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  color: var(--text-300);
+  text-align: center;
+  margin-top: .3rem;
+}
+
+.lo-brand-title {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--text-900);
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+
+.lo-brand-title span {
+  color: var(--blue-600);
+}
+
+.lo-brand-subtitle {
+  font-size: .6rem;
+  color: var(--text-400);
+  font-weight: 600;
+  letter-spacing: .04em;
+  font-family: var(--font-head);
+}
+
+.lo-footer {
+  margin-top: 1.4rem;
+  font-size: .6rem;
+  color: var(--text-200);
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+/* App header */
+.app-header {
+  display: grid;
+  grid-template-columns: 2.8fr 9.2fr;
+  gap: .9rem;
+  flex-shrink: 0;
+}
+
+/* Brand card */
+.brand-card {
+  position: relative;
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.3);
+}
+
+.brand-info {
+  z-index: 1;
+  position: relative;
+}
+
+.brand-title {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -.02em;
+}
+
+.brand-title span {
+  opacity: .85;
+}
+
+.brand-clock {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  color: rgba(255,255,255,.6);
+  margin-top: .15rem;
+}
+
+.sync-pulse {
+  margin-top: .4rem;
+}
+
+/* Brand buttons */
+.brand-btn {
+  position: absolute;
+  top: .75rem;
+  z-index: 2;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  color: rgba(255,255,255,.8);
+  border-radius: 8px;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: all .2s;
+  font-size: .7rem;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-head);
+  font-weight: 600;
+}
+
+.brand-btn:hover {
+  background: rgba(255,255,255,.25);
+}
+
+.theme-btn {
+  right: .75rem;
+}
+
+.logout-btn {
+  right: 45px;
+}
+
+/* KPI grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: .75rem;
+}
+
+.kpi-total { --kpi-grad: linear-gradient(90deg,#475569,#94a3b8); --kpi-pale: rgba(71,85,105,.04); }
+.kpi-sf { --kpi-grad: linear-gradient(90deg,#ea580c,#f97316); --kpi-pale: rgba(249,115,22,.05); }
+.kpi-vendor { --kpi-grad: linear-gradient(90deg,#dc2626,#ef4444); --kpi-pale: rgba(239,68,68,.05); }
+.kpi-ctc { --kpi-grad: linear-gradient(90deg,var(--blue-700),var(--blue-500)); --kpi-pale: rgba(59,130,246,.05); }
+.kpi-canuse { --kpi-grad: linear-gradient(90deg,#059669,#10b981); --kpi-pale: rgba(16,185,129,.05); }
+
+.kpi-sf .kpi-value, .kpi-sf .kpi-lot-num, .kpi-sf .kpi-pct { color: var(--accent-or); }
+.kpi-vendor .kpi-value, .kpi-vendor .kpi-lot-num, .kpi-vendor .kpi-pct { color: var(--accent-red); }
+.kpi-ctc .kpi-value, .kpi-ctc .kpi-lot-num, .kpi-ctc .kpi-pct { color: var(--blue-600); }
+.kpi-canuse .kpi-value, .kpi-canuse .kpi-lot-num, .kpi-canuse .kpi-pct { color: var(--accent-grn); }
+
+/* App body */
+.app-body {
+  display: flex;
+  gap: .9rem;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 310px;
+  flex-shrink: 0;
+  padding: 1.2rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: .85rem;
+  border-bottom: 1.5px solid var(--blue-100);
+}
+
+.sidebar-title {
+  font-family: var(--font-head);
+  font-size: .7rem;
+  font-weight: 800;
+  color: var(--text-900);
+}
+
+.sidebar-subtitle {
+  font-size: .6rem;
+  color: var(--text-400);
+  margin-top: 1px;
+}
+
+.user-badge {
+  background: var(--blue-600);
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: .6rem;
+  font-weight: 700;
+  font-family: var(--font-head);
+}
+
+/* Claim form */
+.claim-form {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-right: .1rem;
+}
+
+.form-section {
+  background: var(--bg-input);
+  border-radius: var(--r-sm);
+  padding: .75rem;
+  border: 1px solid var(--border);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .45rem;
+  margin-top: .5rem;
+}
+
+.form-date {
+  padding: .65rem .85rem;
+  font-size: .75rem;
+  font-weight: 600;
+  margin-bottom: .5rem;
+}
+
+.form-textarea {
+  resize: none;
+  margin-top: .5rem;
+}
+
+.form-judgment {
+  padding: .75rem .85rem;
+  font-size: .75rem;
+  font-weight: 700;
+  border-width: 2px;
+}
+
+.submit-btn {
+  padding: 1rem;
+  font-weight: 700;
+  font-size: .75rem;
+  letter-spacing: .04em;
+  border-radius: var(--r-sm);
+}
+
+/* Main panel */
+.main-panel {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Toolbar */
+.toolbar-filters {
+  display: flex;
+  gap: .4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.toolbar-btns {
+  display: flex;
+  gap: .45rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: .65rem;
+  pointer-events: none;
+  color: var(--text-300);
+}
+
+.toolbar-btn {
+  padding: .45rem 1rem;
+  border-radius: 99px;
+  font-family: var(--font-head);
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+
+.sync-btn {
+  background: var(--accent-grn);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  box-shadow: 0 3px 10px rgba(16,185,129,.3);
+}
+
+.dash-btn {
+  background: linear-gradient(135deg,var(--blue-700),var(--blue-500));
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(37,99,235,.3);
+}
+
+.job-btn {
+  background: linear-gradient(135deg,#7c3aed,#8b5cf6);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(124,58,237,.25);
+}
+
+.import-btn, .export-btn {
+  background: #f8faff;
+  border: 1.5px solid var(--border);
+  color: var(--text-600);
+}
+
+.import-btn {
+  color: var(--blue-700);
+}
+
+.clear-btn {
+  background: rgba(239,68,68,.07);
+  border: 1.5px solid rgba(239,68,68,.2);
+  color: var(--accent-red);
+  padding: .45rem .6rem;
+}
+
+/* Table wrapper */
+.table-wrapper {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Empty state */
+.empty-state {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  gap: 1rem;
+}
+
+.empty-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  color: var(--text-500);
+  font-size: .9rem;
+}
+
+.empty-subtitle {
+  font-size: .75rem;
+  color: var(--text-300);
+}
+
+/* Dashboard modal */
+.dashboard-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: stretch;
+  justify-content: stretch;
+  background: rgba(15,23,42,.4);
+  backdrop-filter: blur(12px);
+  z-index: 5000;
+}
+
+/* Dashboard accent */
+.brand-accent {
+  color: #10b981;
+}
+
+.dash-user {
+  color: #f59e0b;
+  font-weight: 800;
+}
+
+.control-sep {
+  color: #475569;
+}
+/* สำคัญที่สุด */
+datalist { display: none; }
+
+.mascot-float { animation: mascotFloat 3s ease-in-out infinite; }
+.mascot-sway { animation: mascotSway 2s ease-in-out infinite; transform-origin: bottom center; }
+
+@keyframes mascotFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes mascotSway { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+
+.q-draw-anim { animation: qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1); }
+@keyframes qDraw { to { stroke-dashoffset: 0; } }
+
+.gauge-needle { transform-origin: center center; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.mini-gauge-needle { transform-origin: 100px 100px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
 </style>
 </head>
 <body>
-
-<!-- Loading -->
+<!-- ═══════════════════════════════════════════════════
+     DATALISTS (FIXED - เพิ่ม datalist ที่ขาดหายไป)
+═══════════════════════════════════════════════════ -->
+<!-- Inspector names datalist -->
+<datalist id="inspectorList"></datalist>
+<!-- Line numbers datalist -->
+<datalist id="lineList"></datalist>
+<!-- Reference numbers datalist -->
+<datalist id="refList"></datalist>
+<!-- Supplier names datalist -->
+<datalist id="supList"></datalist>
+<!-- Part numbers datalist -->
+<datalist id="ptList"></datalist>
+<!-- Part names/lot datalist -->
+<datalist id="lotList"></datalist>
+<!-- Defect types datalist -->
+<datalist id="defectList"></datalist>
+<!-- ═══════════════════════════════════════════════════
+     LOADING OVERLAY
+═══════════════════════════════════════════════════ -->
 <div id="initOverlay">
   <div class="init-ring"></div>
   <div class="init-msg" id="initMsg">กำลังโหลดข้อมูล…</div>
@@ -3684,10 +4380,18 @@ canvas {
   <div class="init-count" id="initCount"></div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════
+     TOAST & SYNC BADGE
+═══════════════════════════════════════════════════ -->
 <div id="toast"></div>
-<div id="syncBadge"><span id="syncBadgeIcon" style="margin-right:5px">●</span><span id="syncBadgeText"></span></div>
+<div id="syncBadge">
+  <span id="syncBadgeIcon" style="margin-right:5px">●</span>
+  <span id="syncBadgeText"></span>
+</div>
 
-<!-- ── DELETE MODAL ── -->
+<!-- ═══════════════════════════════════════════════════
+     DELETE MODAL
+═══════════════════════════════════════════════════ -->
 <div id="deleteModal">
   <div class="del-card">
     <!-- Surprised mascot SVG -->
@@ -3730,37 +4434,33 @@ canvas {
         <rect x="46" y="56" width="12" height="30" rx="6" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.2"/>
       </svg>
     </div>
-    <h3 style="font-family:var(--font-head);font-weight:800;color:var(--text-900);font-size:1.05rem;margin-bottom:.35rem">ยืนยันการลบ?</h3>
-    <p id="delModalDesc" style="color:var(--text-400);font-size:.75rem;font-weight:500;margin-bottom:1.4rem;line-height:1.5"></p>
-    <div style="display:flex;gap:.65rem">
-      <button id="delCancelBtn" class="btn"
-        style="flex:1;background:var(--bg-input);border:1.5px solid var(--border);color:var(--text-500);font-family:var(--font-head);font-weight:700;font-size:.7rem;padding:.8rem;border-radius:var(--r-sm);letter-spacing:.03em">
-        ยกเลิก
-      </button>
-      <button id="delConfirmBtn" class="btn"
-        style="flex:1;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;font-family:var(--font-head);font-weight:700;font-size:.7rem;padding:.8rem;border-radius:var(--r-sm);letter-spacing:.03em;box-shadow:0 4px 14px rgba(239,68,68,.35)">
-        ลบเลย
-      </button>
+    <h3 class="del-title">ยืนยันการลบ?</h3>
+    <p id="delModalDesc" class="del-desc"></p>
+    <div class="del-btns">
+      <button id="delCancelBtn" class="btn del-btn-cancel">ยกเลิก</button>
+      <button id="delConfirmBtn" class="btn del-btn-confirm">ลบเลย</button>
     </div>
-    <p style="margin-top:.75rem;font-size:.6rem;color:var(--text-300);font-family:var(--font-mono)">⚡ ลบพร้อมกันทั้ง Local และ Google Sheets</p>
+    <p class="del-note">⚡ ลบพร้อมกันทั้ง Local และ Google Sheets</p>
   </div>
 </div>
 
-<!-- Delete progress -->
+<!-- ═══════════════════════════════════════════════════
+     DELETE PROGRESS OVERLAY
+═══════════════════════════════════════════════════ -->
 <div id="deleteProgressOverlay">
   <div class="del-progress-card">
-    <div id="delProgIcon" style="font-size:2.5rem;margin-bottom:.75rem">⏳</div>
-    <div id="delProgTitle" style="color:var(--text-900);font-family:var(--font-head);font-weight:800;font-size:.95rem;margin-bottom:.3rem">กำลังลบ…</div>
-    <div id="delProgSub" style="color:var(--text-400);font-weight:500;font-size:.7rem">กำลังลบออกจาก Google Sheets</div>
-    <div style="margin-top:1rem;height:4px;background:var(--blue-100);border-radius:99px;overflow:hidden">
-      <div id="delProgBar" style="height:100%;background:linear-gradient(90deg,var(--blue-600),var(--blue-400));border-radius:99px;transition:width .5s cubic-bezier(.22,.68,0,1.2);width:0%"></div>
+    <div id="delProgIcon" class="del-prog-icon">⏳</div>
+    <div id="delProgTitle" class="del-prog-title">กำลังลบ…</div>
+    <div id="delProgSub" class="del-prog-sub">กำลังลบออกจาก Google Sheets</div>
+    <div class="del-prog-bar-container">
+      <div id="delProgBar" class="del-prog-bar"></div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════════
-     LOGIN — Enterprise Portal
-════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════
+     LOGIN OVERLAY - Enterprise Portal
+═══════════════════════════════════════════════════ -->
 <div id="loginOverlay">
   <div class="lo-lines"></div>
   <div class="lo-geo"></div>
@@ -4623,7 +5323,7 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 
 /* ═══════════════════════════════════════════════════
    SQE SUPPORT V4 — INTELLIGENCE PLATFORM
-   JavaScript — Cleaned & Optimized
+   JavaScript — Cleaned & Optimized (FIXED VERSION)
    ═══════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════
@@ -4934,7 +5634,7 @@ function animateValue(el, target, suffix = '') {
   }, stepTime);
 }
 
-function animateGaugeNumber(el, from, to) {
+function animateGaugeNumber(el, from, to, suffix = '') {
   const duration = 800;
   const startTime = performance.now();
 
@@ -4943,7 +5643,7 @@ function animateGaugeNumber(el, from, to) {
     const progress = Math.min(elapsed / duration, 1);
     const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
     const current = Math.round(from + (to - from) * eased);
-    el.textContent = current;
+    el.textContent = current + suffix;
 
     if (progress < 1) {
       requestAnimationFrame(update);
@@ -4988,11 +5688,18 @@ function loadTheme() {
 }
 
 /* ═══════════════════════════════════════════════════
-   9. GAUGE FUNCTIONS (UNIFIED)
+   9. GAUGE FUNCTIONS (UNIFIED) - FIXED
 ═══════════════════════════════════════════════════ */
 function drawTicks(containerId, radius, isMini) {
   const container = document.getElementById(containerId);
-  if (!container) return;
+  
+  // ✅ FIX: ตรวจสอบ container ก่อน ถ้าไม่มีให้ return ทันที
+  if (!container) {
+    console.warn(`drawTicks: Container "${containerId}" not found`);
+    return;
+  }
+  
+  // ถ้ามี ticks อยู่แล้ว ไม่ต้องวาดซ้ำ
   if (container.children.length > 0) return;
 
   let html = '';
@@ -5026,32 +5733,11 @@ function drawTicks(containerId, radius, isMini) {
   container.innerHTML = html;
 }
 
-function createGaugeTicks() {
-  const container = document.getElementById('gaugeTicks');
-  if (!container) return;
-  if (container.children.length > 0) return;
-
-  let html = '';
-  const radius = 85;
-
-  for (let i = 0; i <= 10; i++) {
-    const angle = -180 + (i * 18);
-    const rad = angle * (Math.PI / 180);
-
-    const x1 = Math.cos(rad) * 88;
-    const y1 = Math.sin(rad) * 88;
-    const x2 = Math.cos(rad) * 98;
-    const y2 = Math.sin(rad) * 98;
-
-    const isMain = (i % 5 === 0);
-
-    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#475569" stroke-width="${isMain ? 2.5 : 1}" opacity="${isMain ? 0.8 : 0.4}"/>`;
-  }
-  container.innerHTML = html;
-}
+// ✅ FIX: ลบ createGaugeTicks ออกเพราะซ้ำซ้อนกับ drawTicks
+// function createGaugeTicks() { ... } // ลบออก
 
 function updateMainGauge(passPct) {
-  createGaugeTicks();
+  // ✅ FIX: เรียก drawTicks ครั้งเดียว ไม่ซ้ำซ้อน
   drawTicks('gaugeTicks', 85, false);
 
   // Update Arc
@@ -5064,10 +5750,6 @@ function updateMainGauge(passPct) {
   }
 
   // Update Needle
-  // *** แก้ไขตรงนี้: เข็มวาดหันขึ้นบน (0 องศาของ CSS = 3 นาฬิกา)
-  // ตำแหน่ง 0% อยู่ที่ 9 นาฬิกา (ซ้าย) ซึ่งคือ -90 องศาจากด้านบน
-  // ตำแหน่ง 100% อยู่ที่ 3 นาฬิกา (ขวา) ซึ่งคือ +90 องศาจากด้านบน
-  // ช่วงทั้งหมด 180 องศา
   const rotationAngle = -90 + (passPct * 1.8);
 
   const needle = document.getElementById('gaugeNeedle');
@@ -5079,17 +5761,15 @@ function updateMainGauge(passPct) {
     setTimeout(() => needle.classList.remove('needle-update'), 500);
   }
 
-  // Update Value
+  // ✅ FIX: แก้ไขการอัพเดทค่า gauge - ไม่ทับ animation
   const valueEl = $id('mainGaugeValue');
   if (valueEl) {
     const current = parseInt(valueEl.textContent) || 0;
     if (current !== passPct) {
-      animateGaugeNumber(valueEl, current, passPct);
-      valueEl.textContent = passPct;
-
-      setTimeout(() => {
-        valueEl.textContent = passPct + '%';
-      }, 800);
+      // ส่ง suffix '%' เข้าไปใน animation function
+      animateGaugeNumber(valueEl, current, passPct, '%');
+    } else {
+      valueEl.textContent = passPct + '%';
     }
   }
 
@@ -5148,7 +5828,6 @@ function updateMiniGauge(type, value, total, lots) {
   }
 
   // Update Needle
-  // ใช้สูตรเดียวกันคือ -90 + (pct * 1.8)
   const rotationAngle = -90 + (pct * 1.8);
 
   const needle = $id(type + 'GaugeNeedle');
@@ -5156,12 +5835,14 @@ function updateMiniGauge(type, value, total, lots) {
     needle.style.transform = `rotate(${rotationAngle}deg)`;
   }
 
-  // Update Value
+  // ✅ FIX: แก้ไขการอัพเดทค่า - เพิ่ม suffix '%'
   const valueEl = $id(type + 'GaugeValue');
   if (valueEl) {
     const current = parseInt(valueEl.textContent) || 0;
     if (current !== pct) {
-      animateGaugeNumber(valueEl, current, pct);
+      animateGaugeNumber(valueEl, current, pct, '%');
+    } else {
+      valueEl.textContent = pct + '%';
     }
   }
 
@@ -5675,6 +6356,7 @@ $id('claimForm').addEventListener('submit', e => {
     return;
   }
 
+  // ✅ FIX: เปลี่ยน $id('partOn') เป็น $id('partName') ให้ชัดเจน
   const newRow = {
     id: Date.now() + '_' + Math.random().toString(36).slice(2),
     date: $id('inputDate').value,
@@ -5684,7 +6366,7 @@ $id('claimForm').addEventListener('submit', e => {
     line: $id('lineNo').value,
     supplier: supp,
     partNo: $id('partNo').value,
-    partName: $id('partOn').value,
+    partName: $id('partName') ? $id('partName').value : ($id('partOn') ? $id('partOn').value : ''),
     qty,
     defect: $id('defectName').value,
     remark: $id('remark').value,
@@ -5976,7 +6658,11 @@ function cloneRecord(id) {
   $id('supplier').value = r.supplier || '';
   $id('qty').value = r.qty || '';
   $id('partNo').value = r.partNo || '';
-  $id('partOn').value = r.partName || '';
+  
+  // ✅ FIX: รองรับทั้ง partName และ partOn
+  const partNameEl = $id('partName') || $id('partOn');
+  if (partNameEl) partNameEl.value = r.partName || '';
+  
   $id('defectName').value = r.defect || '';
   $id('remark').value = r.remark || '';
   $id('judgmentSelect').value = r.judgment || '';
@@ -6345,6 +7031,7 @@ function openDashboard() {
   const modal = $id('dashboardModal');
   modal.style.display = 'flex';
 
+  // ✅ FIX: เรียก drawTicks เฉพาะที่จำเป็น
   drawTicks('gaugeTicks', 85, false);
   drawTicks('sfGaugeTicks', 75, true);
   drawTicks('vendorGaugeTicks', 75, true);
@@ -6652,6 +7339,15 @@ function renderSparkline(containerId, data, color) {
   container.innerHTML = '';
   container.appendChild(canvas);
 
+  // ✅ FIX: Convert color to rgba format properly
+  let fillColor = 'rgba(16, 185, 129, 0.15)';
+  if (color && color.startsWith('#')) {
+    const r = parseInt(color.slice(1, 3), 16);
+    const g = parseInt(color.slice(3, 5), 16);
+    const b = parseInt(color.slice(5, 7), 16);
+    fillColor = `rgba(${r}, ${g}, ${b}, 0.15)`;
+  }
+
   dashCharts[key] = new Chart(canvas, {
     type: 'line',
     data: {
@@ -6661,7 +7357,7 @@ function renderSparkline(containerId, data, color) {
         borderColor: color,
         borderWidth: 1.5,
         fill: true,
-        backgroundColor: color.replace(')', ', 0.15)').replace('rgb', 'rgba'),
+        backgroundColor: fillColor,
         tension: 0.4,
         pointRadius: 0
       }]
@@ -6717,7 +7413,7 @@ function renderSupplierList(data) {
   });
 
   const sorted = Object.entries(bySupplier)
-    .map(([name, stats]) => ({ name, ...stats, rate: Math.round((stats.ok / stats.qty) * 100) }))
+    .map(([name, stats]) => ({ name, ...stats, rate: stats.qty > 0 ? Math.round((stats.ok / stats.qty) * 100) : 0 }))
     .sort((a, b) => b.qty - a.qty)
     .slice(0, 5);
 
@@ -6823,6 +7519,7 @@ function renderPartList(data) {
 /* ═══════════════════════════════════════════════════
    24. INCIDENT FEED
 ═══════════════════════════════════════════════════ */
+// ✅ FIX: ใช้ currentIncidentFilter ในการกรอง
 let currentIncidentFilter = 'VENDOR FAULT';
 
 function filterIncidents(type) {
@@ -6840,11 +7537,12 @@ function renderIncidentFeed(data) {
   const container = $id('incidentList');
   if (!container) return;
 
-  let filtered = data.filter(r => r.judgment === 'VENDOR FAULT').reverse();
+  // ✅ FIX: ใช้ currentIncidentFilter แทนการ hardcode
+  let filtered = data.filter(r => r.judgment === currentIncidentFilter).reverse();
   const items = filtered.slice(0, 50);
 
   if (items.length === 0) {
-    container.innerHTML = `<div style="text-align:center;color:#475569;padding:1.5rem;font-size:0.75rem">ไม่มีข้อมูล VENDOR FAULT</div>`;
+    container.innerHTML = `<div style="text-align:center;color:#475569;padding:1.5rem;font-size:0.75rem">ไม่มีข้อมูล ${currentIncidentFilter}</div>`;
     return;
   }
 
@@ -6866,7 +7564,7 @@ function renderIncidentFeed(data) {
         </div>
         <div class="incident-footer-row">
           <div class="incident-qty-display">${r.qty.toLocaleString()} <span style="font-size:0.7rem;color:#94a3b8;font-weight:600">PCS</span></div>
-          <div style="font-size:0.65rem;font-weight:700;color:#f87171;background:rgba(239,68,68,0.15);padding:4px 10px;border-radius:99px;">VENDOR FAULT</div>
+          <div style="font-size:0.65rem;font-weight:700;color:#f87171;background:rgba(239,68,68,0.15);padding:4px 10px;border-radius:99px;">${currentIncidentFilter}</div>
         </div>
       </div>
     `;
@@ -7133,6 +7831,611 @@ const styleSheet = document.createElement('style');
 styleSheet.textContent = needleFlashCSS;
 document.head.appendChild(styleSheet);
 
+/**
+ * ═══════════════════════════════════════════════════════════
+   VIRTUAL TABLE CONFIGURATION
+   ═══════════════════════════════════════════════════════════
+ */
+const VIRTUAL_TABLE_CONFIG = {
+  rowHeight: 52,           // ความสูงของแต่ละแถว (px)
+  bufferSize: 8,           // จำนวนแถว buffer รอบ viewport
+  scrollThrottle: 16,      // Throttle scroll events (ms)
+  chunkSize: 50,           // จำนวนแถวต่อ chunk สำหรับ lazy render
+  animationThreshold: 100, // ถ้าเกินจำนวนนี้ จะไม่ animate
+  enableVirtualScroll: true // เปิด/ปิด Virtual Scrolling
+};
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   VIRTUAL TABLE STATE
+   ═══════════════════════════════════════════════════════════
+ */
+let virtualTableState = {
+  visibleStart: 0,
+  visibleEnd: 20,
+  scrollTop: 0,
+  isScrolling: false,
+  scrollRAF: null,
+  lastScrollTime: 0,
+  totalHeight: 0,
+  containerHeight: 0,
+  allRows: [],
+  renderedRows: new Map(),
+  rowPool: [],
+  maxPoolSize: 30
+};
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   INITIALIZATION
+   ═══════════════════════════════════════════════════════════
+ */
+
+/**
+ * Initialize Virtual Table
+ * เรียกครั้งเดียวเมื่อ DOM พร้อม
+ */
+function initVirtualTable() {
+  const tableWrapper = document.querySelector('#mainPanel .scroll') || 
+                       document.querySelector('.table-wrapper');
+  
+  if (!tableWrapper) {
+    console.warn('Virtual Table: Table wrapper not found');
+    return;
+  }
+
+  // Create virtual scroll container
+  createVirtualScrollStructure(tableWrapper);
+  
+  // Bind scroll event with throttle
+  let scrollTimeout;
+  tableWrapper.addEventListener('scroll', (e) => {
+    if (!VIRTUAL_TABLE_CONFIG.enableVirtualScroll) return;
+    
+    const now = Date.now();
+    if (now - virtualTableState.lastScrollTime < VIRTUAL_TABLE_CONFIG.scrollThrottle) {
+      if (!scrollTimeout) {
+        scrollTimeout = setTimeout(() => {
+          handleVirtualScroll(e);
+          scrollTimeout = null;
+        }, VIRTUAL_TABLE_CONFIG.scrollThrottle);
+      }
+      return;
+    }
+    
+    virtualTableState.lastScrollTime = now;
+    handleVirtualScroll(e);
+  }, { passive: true });
+
+  // Initial render
+  console.log('✅ Virtual Table Engine initialized');
+}
+
+/**
+ * Create Virtual Scroll Structure
+ * สร้างโครงสร้าง DOM สำหรับ Virtual Scrolling
+ */
+function createVirtualScrollStructure(wrapper) {
+  // Find existing tbody
+  const existingTbody = wrapper.querySelector('tbody');
+  if (!existingTbody) return;
+
+  // Add necessary styles
+  const style = document.createElement('style');
+  style.textContent = `
+    .virtual-scroll-container {
+      position: relative;
+      overflow-y: auto;
+      will-change: transform;
+    }
+    
+    .virtual-scroll-spacer {
+      position: relative;
+      pointer-events: none;
+    }
+    
+    .virtual-row {
+      position: absolute;
+      left: 0;
+      right: 0;
+      contain: layout style;
+      will-change: transform;
+    }
+    
+    .virtual-row-rendering {
+      opacity: 0;
+      animation: fadeInRow 0.15s ease-out forwards;
+    }
+    
+    @keyframes fadeInRow {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .virtual-table-fast .virtual-row-rendering {
+      animation: none;
+      opacity: 1;
+    }
+    
+    /* Smooth scrollbar */
+    .table-wrapper::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .table-wrapper::-webkit-scrollbar-track {
+      background: var(--bg-input);
+      border-radius: 4px;
+    }
+    
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: var(--blue-200);
+      border-radius: 4px;
+    }
+    
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: var(--blue-300);
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   DATA MANAGEMENT
+   ═══════════════════════════════════════════════════════════
+ */
+
+/**
+ * Update Virtual Table Data
+ * อัพเดทข้อมูลทั้งหมดสำหรับ Virtual Table
+ * @param {Array} rows - ข้อมูลแถวทั้งหมด
+ */
+function updateVirtualTableData(rows) {
+  virtualTableState.allRows = rows;
+  virtualTableState.totalHeight = rows.length * VIRTUAL_TABLE_CONFIG.rowHeight;
+  
+  // Update spacer height
+  const spacer = document.querySelector('.virtual-scroll-spacer');
+  if (spacer) {
+    spacer.style.height = virtualTableState.totalHeight + 'px';
+  }
+  
+  // Calculate visible range
+  calculateVisibleRange();
+  
+  // Render visible rows
+  renderVisibleRows();
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   SCROLL HANDLING
+   ═══════════════════════════════════════════════════════════
+ */
+
+/**
+ * Handle Virtual Scroll
+ * จัดการ scroll event และอัพเดท visible rows
+ */
+function handleVirtualScroll(e) {
+  const wrapper = e.target;
+  virtualTableState.scrollTop = wrapper.scrollTop;
+  virtualTableState.containerHeight = wrapper.clientHeight;
+  
+  // Cancel previous RAF
+  if (virtualTableState.scrollRAF) {
+    cancelAnimationFrame(virtualTableState.scrollRAF);
+  }
+  
+  // Use RAF for smooth updates
+  virtualTableState.scrollRAF = requestAnimationFrame(() => {
+    calculateVisibleRange();
+    renderVisibleRows();
+    virtualTableState.scrollRAF = null;
+  });
+}
+
+/**
+ * Calculate Visible Range
+ * คำนวณแถวที่ต้องแสดงใน viewport
+ */
+function calculateVisibleRange() {
+  const { scrollTop, containerHeight, allRows } = virtualTableState;
+  const { rowHeight, bufferSize } = VIRTUAL_TABLE_CONFIG;
+  
+  if (allRows.length === 0) {
+    virtualTableState.visibleStart = 0;
+    virtualTableState.visibleEnd = 0;
+    return;
+  }
+  
+  // Calculate visible range
+  const visibleCount = Math.ceil(containerHeight / rowHeight) + bufferSize * 2;
+  const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - bufferSize);
+  const endIndex = Math.min(allRows.length, startIndex + visibleCount);
+  
+  // Only update if changed significantly
+  if (Math.abs(startIndex - virtualTableState.visibleStart) > 2 || 
+      Math.abs(endIndex - virtualTableState.visibleEnd) > 2) {
+    virtualTableState.visibleStart = startIndex;
+    virtualTableState.visibleEnd = endIndex;
+  }
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   RENDERING ENGINE
+   ═══════════════════════════════════════════════════════════
+ */
+
+/**
+ * Render Visible Rows
+ * แสดงเฉพาะแถวที่มองเห็นได้
+ */
+function renderVisibleRows() {
+  const { visibleStart, visibleEnd, allRows } = virtualTableState;
+  const tbody = document.getElementById('tableBody');
+  
+  if (!tbody || allRows.length === 0) {
+    showEmptyState();
+    return;
+  }
+  
+  hideEmptyState();
+  
+  const rowsToRender = allRows.slice(visibleStart, visibleEnd);
+  const shouldAnimate = allRows.length <= VIRTUAL_TABLE_CONFIG.animationThreshold;
+  
+  // Use DocumentFragment for batch updates
+  const fragment = document.createDocumentFragment();
+  
+  // Track which rows are now visible
+  const newVisibleIds = new Set();
+  
+  rowsToRender.forEach((r, i) => {
+    const globalIndex = visibleStart + i;
+    newVisibleIds.add(r.id);
+    
+    // Create row element
+    const tr = createTableRow(r, globalIndex, shouldAnimate);
+    fragment.appendChild(tr);
+  });
+  
+  // Clear and append in one operation
+  tbody.innerHTML = '';
+  tbody.appendChild(fragment);
+  
+  // Add visibility class after a microtask for animation
+  if (shouldAnimate) {
+    requestAnimationFrame(() => {
+      tbody.querySelectorAll('tr').forEach(tr => {
+        tr.classList.add('vis');
+      });
+    });
+  } else {
+    tbody.querySelectorAll('tr').forEach(tr => {
+      tr.classList.add('vis');
+    });
+  }
+  
+  // Update rendered rows map
+  virtualTableState.renderedRows.clear();
+  rowsToRender.forEach(r => virtualTableState.renderedRows.set(r.id, r));
+}
+
+/**
+ * Create Table Row
+ * สร้างแถวในตาราง (optimized)
+ */
+function createTableRow(r, index, shouldAnimate = true) {
+  const s = SM[r.judgment] || SM['SF'];
+  const synced = _syncedSet.has(r.ref);
+  const safeId = String(r.id).replace(/"/g, '&quot;');
+  
+  const tr = document.createElement('tr');
+  tr.className = 'group' + (shouldAnimate ? ' virtual-row-rendering' : '');
+  tr.dataset.rid = safeId;
+  
+  // Use template literal for fast HTML generation
+  tr.innerHTML = `
+    <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">${r.date}</td>
+    <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${r.shift}</div><div style="font-size:.65rem;color:var(--text-400);margin-top:1px;font-family:var(--font-head);font-weight:600">L: ${escapeHtml(r.line) || '—'}</div></td>
+    <td><span style="font-family:var(--font-head);font-size:.68rem;color:${synced ? 'var(--accent-grn)' : 'var(--text-200)'};margin-right:4px" title="${synced ? 'Synced' : 'Pending'}">●</span><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">#${escapeHtml(r.ref)}</span></td>
+    <td><div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${escapeHtml(r.supplier)}</div><div style="font-size:.65rem;color:var(--text-400);font-family:var(--font-head);font-weight:600;margin-top:1px">${escapeHtml(r.partNo)} · ${escapeHtml(r.partName)}</div></td>
+    <td style="text-align:center"><span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900);letter-spacing:-.03em">${r.qty.toLocaleString()}</span></td>
+    <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${escapeHtml(r.defect)}</td>
+    <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(r.remark || '')}">${escapeHtml(r.remark) || '—'}</td>
+    <td style="text-align:center">
+      <span class="status-badge" style="${s.s};animation:none">
+        <span style="width:5px;height:5px;border-radius:50%;background:${s.dot};flex-shrink:0;display:inline-block"></span>
+        ${r.judgment}
+      </span>
+    </td>
+    <td style="padding-right:1.2rem;text-align:right;white-space:nowrap">
+      <button data-action="clone" class="btn" style="opacity:0;color:var(--blue-500);font-size:.75rem;padding:.22rem .55rem;border-radius:8px;background:var(--blue-50);border:1px solid var(--blue-200);transition:opacity .15s;margin-right:.3rem" title="Clone">📑</button>
+      <button data-action="delete" class="btn" style="opacity:0;color:var(--accent-red);font-size:.75rem;padding:.22rem .55rem;border-radius:8px;background:#fef2f2;border:1px solid #fecaca;transition:opacity .15s" title="Delete">✕</button>
+    </td>
+  `;
+  
+  // Add hover handlers for buttons
+  const btns = tr.querySelectorAll('[data-action]');
+  tr.addEventListener('mouseenter', () => btns.forEach(b => b.style.opacity = '1'));
+  tr.addEventListener('mouseleave', () => btns.forEach(b => b.style.opacity = '0'));
+  
+  return tr;
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   OPTIMIZED TABLE RENDER (Replacement for original renderTable)
+   ═══════════════════════════════════════════════════════════
+ */
+
+/**
+ * Fast Render Table (Virtual Scrolling Enabled)
+ * ใช้แทน renderTable เดิม
+ */
+function renderTableFast() {
+  const search = ($id('searchInput').value || '').toLowerCase();
+  const myR = getMyRecords();
+  
+  // Use cached search if available
+  const cache = getSearchCache();
+  const filtered = [];
+  
+  // Fast filter with early exit
+  for (let i = myR.length - 1; i >= 0; i--) {
+    const r = myR[i];
+    if (filterType !== 'ALL' && r.judgment !== filterType) continue;
+    if (search && !(cache.get(r.id) || '').includes(search)) continue;
+    filtered.push(r);
+  }
+  
+  // Check if data changed
+  const hash = filterType + '|' + search + '|' + filtered.length;
+  if (hash === _lastRenderHash && !VIRTUAL_TABLE_CONFIG.enableVirtualScroll) {
+    return; // No changes, skip render
+  }
+  _lastRenderHash = hash;
+  
+  // Update empty state
+  const empty = $id('emptyState');
+  if (empty) empty.style.display = filtered.length === 0 ? 'flex' : 'none';
+  
+  if (filtered.length === 0) {
+    $id('tableBody').innerHTML = '';
+    return;
+  }
+  
+  // Use virtual scrolling for large datasets
+  if (VIRTUAL_TABLE_CONFIG.enableVirtualScroll && filtered.length > 50) {
+    updateVirtualTableData(filtered);
+    return;
+  }
+  
+  // Standard render for small datasets
+  renderTableStandard(filtered);
+}
+
+/**
+ * Standard Table Render
+ * สำหรับข้อมูลน้อย (ไม่เกิน 50 แถว)
+ */
+function renderTableStandard(filtered) {
+  const tbody = $id('tableBody');
+  const shouldAnimate = filtered.length <= VIRTUAL_TABLE_CONFIG.animationThreshold;
+  
+  // Use DocumentFragment for batch updates
+  const fragment = document.createDocumentFragment();
+  
+  // Build all rows
+  filtered.forEach((r, i) => {
+    const tr = createTableRow(r, i, shouldAnimate);
+    fragment.appendChild(tr);
+  });
+  
+  // Single DOM update
+  tbody.innerHTML = '';
+  tbody.appendChild(fragment);
+  
+  // Add visibility class
+  requestAnimationFrame(() => {
+    tbody.querySelectorAll('tr').forEach(tr => tr.classList.add('vis'));
+  });
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   BATCH OPERATIONS
+   ═══════════════════════════════════════════════════════════
+ */
+
+/**
+ * Batch Update Table
+ * สำหรับอัพเดทตารางหลายรายการพร้อมกัน
+ * @param {Array} updates - [{action: 'add'|'update'|'delete', data: {...}}]
+ */
+function batchUpdateTable(updates) {
+  if (!updates || updates.length === 0) return;
+  
+  // Process all updates in memory first
+  updates.forEach(update => {
+    switch (update.action) {
+      case 'add':
+        if (!isDuplicate(update.data.ref)) {
+          records.push(update.data);
+        }
+        break;
+      case 'delete':
+        records = records.filter(r => r.id !== update.data.id);
+        break;
+      case 'update':
+        const idx = records.findIndex(r => r.id === update.data.id);
+        if (idx !== -1) {
+          records[idx] = { ...records[idx], ...update.data };
+        }
+        break;
+    }
+  });
+  
+  // Single refresh at the end
+  invalidateCache();
+  invalidateMyRecCache();
+  saveLocal();
+  
+  // Use fast render
+  renderTableFast();
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   LAZY LOADING & PROGRESSIVE RENDER
+   ═══════════════════════════════════════════════════════════
+ */
+
+/**
+ * Progressive Render
+ * แสดงข้อมูลทีละส่วนเพื่อไม่ให้ UI ค้าง
+ * @param {Array} data - ข้อมูลทั้งหมด
+ * @param {Function} callback - เรียกเมื่อเสร็จสิ้น
+ */
+function progressiveRender(data, callback) {
+  const tbody = $id('tableBody');
+  tbody.innerHTML = '';
+  
+  let currentIndex = 0;
+  const chunkSize = VIRTUAL_TABLE_CONFIG.chunkSize;
+  
+  function renderChunk() {
+    const endIndex = Math.min(currentIndex + chunkSize, data.length);
+    const fragment = document.createDocumentFragment();
+    
+    for (let i = currentIndex; i < endIndex; i++) {
+      const tr = createTableRow(data[i], i, false);
+      tr.classList.add('vis');
+      fragment.appendChild(tr);
+    }
+    
+    tbody.appendChild(fragment);
+    currentIndex = endIndex;
+    
+    if (currentIndex < data.length) {
+      // Continue rendering next chunk
+      requestAnimationFrame(renderChunk);
+    } else {
+      // Done
+      if (callback) callback();
+    }
+  }
+  
+  // Start progressive render
+  requestAnimationFrame(renderChunk);
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   UTILITY FUNCTIONS
+   ═══════════════════════════════════════════════════════════
+ */
+
+function showEmptyState() {
+  const empty = $id('emptyState');
+  if (empty) empty.style.display = 'flex';
+}
+
+function hideEmptyState() {
+  const empty = $id('emptyState');
+  if (empty) empty.style.display = 'none';
+}
+
+/**
+ * Scroll to Row
+ * เลื่อนไปยังแถวที่ระบุ
+ * @param {number} index - ลำดับแถว
+ * @param {boolean} smooth - ใช้ smooth scroll
+ */
+function scrollToRow(index, smooth = true) {
+  const wrapper = document.querySelector('#mainPanel .scroll') || 
+                  document.querySelector('.table-wrapper');
+  
+  if (!wrapper) return;
+  
+  const targetTop = index * VIRTUAL_TABLE_CONFIG.rowHeight;
+  
+  wrapper.scrollTo({
+    top: targetTop,
+    behavior: smooth ? 'smooth' : 'auto'
+  });
+}
+
+/**
+ * Get Visible Rows
+ * ดึงข้อมูลแถวที่แสดงอยู่
+ */
+function getVisibleRows() {
+  const { visibleStart, visibleEnd, allRows } = virtualTableState;
+  return allRows.slice(visibleStart, visibleEnd);
+}
+
+/**
+ * Toggle Virtual Scrolling
+ * เปิด/ปิด Virtual Scrolling
+ */
+function toggleVirtualScroll(enabled) {
+  VIRTUAL_TABLE_CONFIG.enableVirtualScroll = enabled;
+  renderTableFast();
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   INTEGRATION WITH EXISTING CODE
+   ═══════════════════════════════════════════════════════════
+ */
+
+/**
+ * Replace original renderTable with fast version
+ * เรียกใช้ครั้งเดียวเพื่อแทนที่ function เดิม
+ */
+function upgradeToFastTable() {
+  // Store original for fallback
+  window._originalRenderTable = window.renderTable;
+  
+  // Replace with fast version
+  window.renderTable = renderTableFast;
+  
+  // Initialize virtual scrolling
+  initVirtualTable();
+  
+  console.log('✅ Table upgraded to Fast Mode with Virtual Scrolling');
+}
+
+// Auto-upgrade when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(upgradeToFastTable, 100);
+  });
+} else {
+  setTimeout(upgradeToFastTable, 100);
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════
+   EXPORT FOR GLOBAL USE
+   ═══════════════════════════════════════════════════════════
+ */
+window.VirtualTableEngine = {
+  render: renderTableFast,
+  updateData: updateVirtualTableData,
+  batchUpdate: batchUpdateTable,
+  progressiveRender: progressiveRender,
+  scrollToRow: scrollToRow,
+  getVisibleRows: getVisibleRows,
+  toggle: toggleVirtualScroll,
+  
+  // Expose state for debugging
+  getState: () => virtualTableState,
+  getConfig: () => VIRTUAL_TABLE_CONFIG
+};
 </script>
 
 </body>
