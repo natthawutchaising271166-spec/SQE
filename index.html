@@ -4349,7 +4349,63 @@ datalist { display: none; }
 
 .gauge-needle { transform-origin: center center; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .mini-gauge-needle { transform-origin: 100px 100px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1); }
+/* ═══════════════════════════════════════════════════
+   MULTI-YEAR CHART STYLES
+═══════════════════════════════════════════════════ */
 
+/* Glow effect สำหรับปีปัจจุบัน */
+.chart-panel .chart-body::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 120px;
+  background: radial-gradient(ellipse at bottom, rgba(0, 255, 136, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Chart container styling */
+.chart-panel .chart-body canvas {
+  position: relative;
+  z-index: 1;
+}
+
+/* Legend hover effect */
+.chart-panel .chart-body {
+  position: relative;
+}
+
+/* Year comparison badge */
+.year-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  letter-spacing: 0.05em;
+}
+
+.year-badge.current {
+  background: rgba(0, 255, 136, 0.15);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  color: #00ff88;
+}
+
+.year-badge.previous {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+}
+
+.year-badge.older {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
 </style>
 </head>
 <body>
@@ -7217,33 +7273,55 @@ function refreshDash() {
   renderIncidentFeed(data);
 }
 
-function aggregateByMonth(data) {
+function aggregateByMonthMultiYear(data) {
   const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const qtyByMonth = new Array(12).fill(0);
-  const lotByMonth = new Array(12).fill(0);
-
+  
+  // สร้าง structure สำหรับ 3 ปี
+  const yearData = {
+    2024: { qty: new Array(12).fill(0), lots: new Array(12).fill(0) },
+    2025: { qty: new Array(12).fill(0), lots: new Array(12).fill(0) },
+    2026: { qty: new Array(12).fill(0), lots: new Array(12).fill(0) }
+  };
+  
+  // กรองและนับข้อมูลตามปี
   data.forEach(r => {
-    const m = new Date(r.date).getMonth();
-    if (!isNaN(m)) {
-      qtyByMonth[m] += r.qty;
-      lotByMonth[m]++;
+    const date = new Date(r.date);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    
+    if (!isNaN(month) && yearData[year]) {
+      yearData[year].qty[month] += r.qty;
+      yearData[year].lots[month]++;
     }
   });
+  
+  // คำนวณ total และ percentage สำหรับแต่ละปี
+  const result = {};
+  Object.keys(yearData).forEach(year => {
+    const totalYear = yearData[year].qty.reduce((a, b) => a + b, 0);
+    result[year] = mo.map((label, i) => ({
+      month: label,
+      qty: yearData[year].qty[i],
+      lots: yearData[year].lots[i],
+      pct: totalYear > 0 ? Math.round((yearData[year].qty[i] / totalYear) * 100) : 0
+    }));
+  });
+  
+  return result;
+}
 
-  const totalYear = qtyByMonth.reduce((a, b) => a + b, 0);
-
-  return mo.map((label, i) => ({
-    month: label,
-    qty: qtyByMonth[i],
-    lots: lotByMonth[i],
-    pct: totalYear > 0 ? Math.round((qtyByMonth[i] / totalYear) * 100) : 0
-  }));
+// เก็บฟังก์ชันเดิมไว้สำหรับ backward compatibility
+function aggregateByMonth(data) {
+  const multiYear = aggregateByMonthMultiYear(data);
+  const currentYear = new Date().getFullYear();
+  return multiYear[currentYear] || multiYear['2026'];
 }
 
 /* ═══════════════════════════════════════════════════
    22. CHART RENDERING
 ═══════════════════════════════════════════════════ */
 function renderMainTrendChart(data) {
+  // Destroy chart เดิม
   if (dashCharts.mainTrend) {
     dashCharts.mainTrend.destroy();
   }
@@ -7252,67 +7330,329 @@ function renderMainTrendChart(data) {
   if (!ctx) return;
 
   const chartCtx = ctx.getContext('2d');
-
-  const neonGreen = '#00ff88';
-  const neonGreenRGB = '0, 255, 136';
-
-  const gradient = chartCtx.createLinearGradient(0, 0, 0, 280);
-  gradient.addColorStop(0, `rgba(${neonGreenRGB}, 0.5)`);
-  gradient.addColorStop(0.5, `rgba(${neonGreenRGB}, 0.25)`);
-  gradient.addColorStop(1, `rgba(${neonGreenRGB}, 0.02)`);
-
+  
+  // ═══════════════════════════════════════════════════
+  // COLOR CONFIGURATION — แยกสีชัดเจนสำหรับแต่ละปี
+  // ═══════════════════════════════════════════════════
+  const yearColors = {
+    2024: { qty: new Array(12).fill(0) }
+  };
+  
+  // ========================================
+  // 1. เตรียมข้อมูลแยกตามปี
+  // ========================================
+  const multiYearData = aggregateByMonthMultiYear(data);
+  
+  // หาปีปัจจุบันและปีย้อนหลัง
+  const currentYear = new Date().getFullYear();
+  const years = [2024, 2025, 2026].filter(y => y <= currentYear);
+  
+  // เรียงลำดับให้ปีปัจจุบันอยู่ท้ายสุด (render ทับ)
+  const sortedYears = [...years].sort((a, b) => a - b);
+  
+  // ========================================
+  // 2. กำหนดสีและ styling สำหรับแต่ละปี
+  // ========================================
+  const yearStyles = {
+    2024: {
+      borderColor: '#6366f1',        // Indigo จาง
+      backgroundColor: 'rgba(99, 102, 241, 0.05)',
+      borderWidth: 2,
+      borderDash: [5, 5],            // เส้นประ
+      pointRadius: 3,
+      pointHoverRadius: 6,
+      opacity: 0.4,                  // จาง
+      hoverOpacity: 0.9,             // hover แล้วเข้ม
+      tension: 0.4,
+      fill: false,
+      label: '2024'
+    },
+    2025: {
+      borderColor: '#8b5cf6',        // Violet จาง
+      backgroundColor: 'rgba(139, 92, 246, 0.05)',
+      borderWidth: 2,
+      borderDash: [3, 3],
+      pointRadius: 3,
+      pointHoverRadius: 6,
+      opacity: 0.5,
+      hoverOpacity: 0.9,
+      tension: 0.4,
+      fill: false,
+      label: '2025'
+    },
+    2026: {
+      borderColor: '#00ff88',        // Neon Green (ปีปัจจุบัน - เด่น)
+      backgroundColor: 'rgba(0, 255, 136, 0.25)', // ละอองสี
+      borderWidth: 3,
+      borderDash: [],                // เส้นทึบ
+      pointRadius: 5,
+      pointHoverRadius: 8,
+      opacity: 1,                    // เข้มสุด
+      hoverOpacity: 1,
+      tension: 0.4,
+      fill: true,                    // มีละอองลงด้านล่าง
+      label: '2026 (Current)'
+    }
+  };
+  
+  // ========================================
+  // 3. สร้าง gradient สำหรับปีปัจจุบัน
+  // ========================================
+  const ctx = $id('mainTrendChart');
+  if (!ctx) return;
+  
+  const chartCtx = ctx.getContext('2d');
+  
+  // Gradient สำหรับปีปัจจุบัน (ละอองลงด้านล่าง)
+  const currentYearGradient = chartCtx.createLinearGradient(0, 0, 0, 280);
+  currentYearGradient.addColorStop(0, 'rgba(0, 255, 136, 0.4)');    // ด้านบนเข้ม
+  currentYearGradient.addColorStop(0.4, 'rgba(0, 255, 136, 0.2)');  // กลาง
+  currentYearGradient.addColorStop(0.7, 'rgba(0, 255, 136, 0.08)'); // ล่าง
+  currentYearGradient.addColorStop(1, 'rgba(0, 255, 136, 0.01)');   // ใกล้พื้น
+  
+  // ========================================
+  // 4. สร้าง datasets
+  // ========================================
+  const datasets = sortedYears.map((year, index) => {
+    const style = yearStyles[year];
+    const yearData = multiYearData[year] || [];
+    
+    // สร้าง gradient สำหรับแต่ละปี (แบบ dynamic)
+    let bgGradient;
+    if (year === currentYear) {
+      bgGradient = currentYearGradient;
+    } else {
+      const r = parseInt(style.borderColor.slice(1, 3), 16);
+      const g = parseInt(style.borderColor.slice(3, 5), 16);
+      const b = parseInt(style.borderColor.slice(5, 7), 16);
+      bgGradient = chartCtx.createLinearGradient(0, 0, 0, 200);
+      bgGradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.15)`);
+      bgGradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.02)`);
+    }
+    
+    return {
+      label: style.label,
+      data: yearData.map(d => d.qty),
+      borderColor: style.borderColor,
+      backgroundColor: style.fill ? bgGradient : 'transparent',
+      borderWidth: style.borderWidth,
+      borderDash: style.borderDash,
+      fill: style.fill,
+      tension: style.tension,
+      pointRadius: style.pointRadius,
+      pointBackgroundColor: style.borderColor,
+      pointBorderColor: year === currentYear ? 'rgba(0, 255, 136, 0.4)' : `rgba(${parseInt(style.borderColor.slice(1, 3), 16)}, ${parseInt(style.borderColor.slice(3, 5), 16)}, ${parseInt(style.borderColor.slice(5, 7), 16)}, 0.3)`,
+      pointBorderWidth: year === currentYear ? 4 : 2,
+      pointHoverRadius: style.pointHoverRadius,
+      pointHoverBackgroundColor: '#ffffff',
+      pointHoverBorderColor: style.borderColor,
+      pointHoverBorderWidth: 3,
+      // Custom properties สำหรับ hover effect
+      customOpacity: style.opacity,
+      customHoverOpacity: style.hoverOpacity,
+      customData: yearData.map(d => ({ lots: d.lots, pct: d.pct, year: year })),
+      isCurrentYear: year === currentYear,
+      // Z-index control (render order)
+      order: year === currentYear ? 1 : 2
+    };
+  });
+  
+  // ========================================
+  // 5. สร้าง Chart
+  // ========================================
   dashCharts.mainTrend = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: data.map(d => d.month),
-      datasets: [{
-        label: 'Total Claim (PCS)',
-        data: data.map(d => d.qty),
-        borderColor: neonGreen,
-        borderWidth: 3,
-        backgroundColor: gradient,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 4,
-        pointBackgroundColor: neonGreen,
-        pointBorderColor: `rgba(${neonGreenRGB}, 0.4)`,
-        pointBorderWidth: 4,
-        pointHoverRadius: 7,
-        pointHoverBackgroundColor: '#ffffff',
-        pointHoverBorderColor: neonGreen,
-        pointHoverBorderWidth: 3,
-        customData: data.map(d => ({ lots: d.lots, pct: d.pct }))
-      }]
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      datasets: datasets
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      
+      // ========================================
+      // 6. Interaction Mode
+      // ========================================
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      },
+      
+      // ========================================
+      // 7. Hover Effects (เข้มขึ้นเมื่อชี้)
+      // ========================================
+      onHover: (event, elements) => {
+        // ทำให้ทุกเส้นเข้มขึ้นเมื่อ hover
+        const chart = dashCharts.mainTrend;
+        if (!chart) return;
+        
+        const isHovering = elements.length > 0;
+        
+        chart.data.datasets.forEach((dataset, i) => {
+          if (!dataset.isCurrentYear) {
+            // ปีย้อนหลัง: ปกติจาง, hover แล้วเข้ม
+            const meta = chart.getDatasetMeta(i);
+            if (meta.dataset) {
+              meta.dataset.options.opacity = isHovering ? dataset.customHoverOpacity : dataset.customOpacity;
+            }
+          }
+        });
+        
+        chart.update('none'); // update แบบไม่ animate
+      },
+      
       plugins: {
+        // ========================================
+        // 8. Legend
+        // ========================================
         legend: {
-          display: true, position: 'top', align: 'end',
-          labels: { color: '#94a3b8', font: { size: 10, weight: '600', family: 'Sora' }, boxWidth: 12, boxHeight: 12, borderRadius: 3, usePointStyle: true }
+          display: true,
+          position: 'top',
+          align: 'end',
+          labels: {
+            color: '#94a3b8',
+            font: { size: 11, weight: '600', family: 'Sora' },
+            boxWidth: 16,
+            boxHeight: 3,
+            borderRadius: 2,
+            usePointStyle: false,
+            padding: 20,
+            // Custom legend item style
+            generateLabels: (chart) => {
+              return chart.data.datasets.map((dataset, i) => ({
+                text: dataset.label,
+                fillStyle: dataset.borderColor,
+                strokeStyle: dataset.borderColor,
+                lineWidth: dataset.borderWidth,
+                lineDash: dataset.borderDash || [],
+                hidden: false,
+                index: i
+              }));
+            }
+          },
+          onClick: (e, legendItem, legend) => {
+            // Toggle visibility
+            const index = legendItem.index;
+            const ci = legend.chart;
+            const meta = ci.getDatasetMeta(index);
+            meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+            ci.update();
+          }
         },
+        
+        // ========================================
+        // 9. Tooltip (แสดงทุกปีพร้อมกัน)
+        // ========================================
         tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: `rgba(${neonGreenRGB}, 0.5)`, borderWidth: 1,
+          enabled: true,
+          backgroundColor: 'rgba(15, 23, 42, 0.95)',
+          borderColor: 'rgba(0, 255, 136, 0.4)',
+          borderWidth: 1,
           titleFont: { family: 'Sora', size: 13, weight: '700' },
           bodyFont: { family: 'DM Mono', size: 11 },
-          padding: { top: 12, bottom: 12, left: 16, right: 16 }, cornerRadius: 12, displayColors: false,
+          padding: { top: 14, bottom: 14, left: 18, right: 18 },
+          cornerRadius: 12,
+          displayColors: true,
+          boxPadding: 6,
+          usePointStyle: true,
+          
           callbacks: {
-            title: (items) => `📅 ${data[items[0].dataIndex].month}`,
+            title: (items) => {
+              if (items.length > 0) {
+                return `📅 ${items[0].label}`;
+              }
+              return '';
+            },
+            
             label: (ctx) => {
-              const d = data[ctx.dataIndex];
-              return [`📦 PCS: ${d.qty.toLocaleString()}`, `📊 Lots: ${d.lots}`, `📈 %: ${d.pct}%`];
-            }
+              const data = ctx.dataset.customData;
+              const item = data ? data[ctx.dataIndex] : null;
+              const year = item ? item.year : ctx.dataset.label;
+              const yearLabel = ctx.dataset.isCurrentYear ? '🔥 Current' : year;
+              
+              return [
+                `━━━ ${yearLabel} ━━━`,
+                `📦 PCS: ${ctx.parsed.y.toLocaleString()}`,
+                `📊 Lots: ${item?.lots || 0}`,
+                `📈 Share: ${item?.pct || 0}%`
+              ];
+            },
+            
+            // สีของแต่ละ item ใน tooltip
+            labelColor: (ctx) => ({
+              borderColor: ctx.dataset.borderColor,
+              backgroundColor: ctx.dataset.borderColor,
+              borderWidth: 2,
+              borderRadius: 2
+            })
           }
         }
       },
+      
+      // ========================================
+      // 10. Scales
+      // ========================================
       scales: {
-        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#64748b', font: { size: 10, weight: '600', family: 'Sora' } } },
-        y: { beginAtZero: true, grid: { display: false }, border: { display: false }, ticks: { color: '#64748b', font: { family: 'DM Mono', size: 10 }, callback: v => v >= 1000 ? (v / 1000) + 'k' : v } }
+        x: {
+          grid: { 
+            display: false 
+          },
+          border: { 
+            display: false 
+          },
+          ticks: { 
+            color: '#64748b', 
+            font: { size: 10, weight: '600', family: 'Sora' } 
+          }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { 
+            display: false 
+          },
+          border: { 
+            display: false 
+          },
+          ticks: { 
+            color: '#64748b', 
+            font: { family: 'DM Mono', size: 10 },
+            callback: v => v >= 1000 ? (v / 1000) + 'k' : v
+          }
+        }
       },
-      interaction: { intersect: false, mode: 'index' },
-      animation: { duration: 1500, easing: 'easeOutQuart' }
+      
+      // ========================================
+      // 11. Animation
+      // ========================================
+      animation: {
+        duration: 1500,
+        easing: 'easeOutQuart',
+        
+        // Stagger animation สำหรับแต่ละ dataset
+        delay: (context) => {
+          return context.datasetIndex * 300;
+        }
+      }
     }
+  });
+  
+  // ========================================
+  // 12. Mouse Leave Effect (กลับเป็นจาง)
+  // ========================================
+  ctx.addEventListener('mouseleave', () => {
+    const chart = dashCharts.mainTrend;
+    if (!chart) return;
+    
+    chart.data.datasets.forEach((dataset, i) => {
+      if (!dataset.isCurrentYear) {
+        const meta = chart.getDatasetMeta(i);
+        if (meta.dataset) {
+          meta.dataset.options.opacity = dataset.customOpacity;
+        }
+      }
+    });
+    
+    chart.update('none');
   });
 }
 
