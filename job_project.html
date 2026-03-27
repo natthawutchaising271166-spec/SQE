@@ -1477,6 +1477,29 @@ body.dark-mode .date-filter-bar select {
 
 .tb-btn:active { transform: scale(0.96); }
 
+/* 👇👇👇 วางโค้ดใหม่ตรงนี้ (ก่อน @media) */
+/* ปรับปรุงปุ่ม Dark Mode */
+#darkBtn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--txt2);
+  font-family: inherit;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#darkBtn:hover {
+  background: var(--bg3);
+  border-color: var(--b300);
+  color: var(--primary);
+}
 @media (max-width: 600px) {
   .tb-btn {
     padding: 6px;
@@ -1596,6 +1619,16 @@ body.dark-mode .img-zone-lbl {
 
 body.dark-mode .img-zone-sub {
   color: var(--txt4);
+}
+/* เพิ่มในส่วน <style> */
+@media (max-width: 600px) {
+  #darkBtn {
+    padding: 4px 6px !important;
+    font-size: 0.8rem !important;
+  }
+  #darkBtn span {
+    display: none; /* ซ่อนข้อความในมือถือ */
+  }
 }
 </style>
 
@@ -2729,15 +2762,22 @@ body.dark-mode .img-zone-sub {
    BACKUP & RESTORE SYSTEM
 ══════════════════════════════════ */
 function exportDB() {
-  const dataStr = JSON.stringify(db, null, 2);
-  const blob = new Blob([dataStr], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `WAP_Backup_${new Date().toISOString().split('T')[0]}.json`;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('💾 สำรองข้อมูลสำเร็จ!');
+  try {
+    const dataStr = JSON.stringify(db, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `WAP_Backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a); 
+    a.click(); 
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url); // ✅ Cleanup memory
+    toast('💾 สำรองข้อมูลสำเร็จ!');
+  } catch (e) {
+    console.error('Export error:', e);
+    toast('❌ สำรองข้อมูลล้มเหลว');
+  }
 }
 
 function importDB(event) {
@@ -3781,7 +3821,7 @@ window.addEventListener('load', async () => {
 
   // Step 6: Start polling (both DB and images)
   startPolling();
-  migrateOldData(); 
+ 
 });
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 async function syncWithGoogleSheets(){if(document.getElementById('syncBtn').classList.contains('loading'))return;setBtnLoading(true,'⏳ SYNCING...');showSyncStatus('🔄 กำลัง Sync...','#f59e0b');try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();if(r.status==='success'&&r.data){const cloud=r.data;if(!cloud._owner||cloud._owner===currentUser){const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);if(cloudMod>localMod||cloudLen>localLen){cloud._owner=currentUser;db=cloud;saveLocal();refreshAllPages();showSyncStatus('✅ ดึงข้อมูลจาก Cloud','#22c55e');toast('✅ Sync: โหลดจาก Cloud');}else{await pushToCloud();showSyncStatus('☁️ อัปโหลดขึ้น Cloud','#22c55e');toast('✅ Sync: อัปโหลดขึ้น Cloud');}}}else{await pushToCloud();}setText('dash-timestamp','Sync: '+fullTimestamp());}catch(e){showSyncStatus('❌ Sync ล้มเหลว','#dc2626');toast('❌ Sync ล้มเหลว');}finally{setBtnLoading(false);}}
