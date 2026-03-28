@@ -1630,6 +1630,237 @@ body.dark-mode .img-zone-sub {
     display: none; /* ซ่อนข้อความในมือถือ */
   }
 }
+/* ═══════════════════════════════════════════════════
+   ULTRA-WIDE REPORT CARD (Expanded Width)
+═══════════════════════════════════════════════════ */
+
+/* 1. ขยายความกว้างของ Modal ออกไปมากขึ้น */
+.rec-detail-panel {
+  width: min(98vw, 1150px) !important; /* กว้างขึ้นจาก 850px เป็น 1150px */
+  height: auto !important;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.25);
+  aspect-ratio: auto; /* ยกเลิกอัตราส่วนตายตัว เพื่อให้ข้อมูลแสดงได้เต็มที่ */
+  min-height: 480px; /* กำหนดความสูงขั้นต่ำ */
+}
+
+.rec-layout-container {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* --- ซ้าย: รูปภาพ (กว้างขึ้นเล็กน้อย) --- */
+.rec-col-left-image {
+  width: 38%; 
+  min-width: 280px;
+  background: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.rec-img-hero {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: zoom-in;
+}
+
+/* --- ขวา: ข้อมูล (Grid Layout แบบ Full Height) --- */
+.rec-col-right-data {
+  flex: 1;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* จัดให้เต็มความสูง */
+  overflow: hidden; /* ป้องกัน Scrollbar */
+  gap: 16px;
+}
+
+/* 2. จัดวางข้อมูลเป็น Grid แนวนอน (ทุกอย่างอยู่ในจอ) */
+.data-content-area {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* แบ่งเป็น 2 คอลัมน์ */
+  grid-template-rows: auto auto auto;    /* 3 แถว */
+  gap: 20px 32px; /* ระยะห่างแนวตั้ง แนวนอน */
+  flex: 1;
+}
+
+/* ปัญหาและ Action ให้กว้างข้ามคอลัมน์ (Span 2) */
+.d-item.span-full {
+  grid-column: 1 / -1;
+}
+
+.d-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.d-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.d-val {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.4;
+}
+
+.d-val.problem {
+  color: #b91c1c;
+  font-size: 1.05rem;
+}
+.d-val.action {
+  color: #1d4ed8;
+}
+
+/* Footer: สถานะและปุ่มกด */
+.footer-bar {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Pills Design */
+.pill-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.pill {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pill.report { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.pill.status { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.pill.ok { background: #ecfdf5; color: #059669; }
+.pill.ng { background: #fef2f2; color: #dc2626; }
+
+/* Buttons Design */
+.btn-group {
+  display: flex;
+  gap: 12px;
+}
+.btn-action {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.btn-edit { background: #2563eb; color: #fff; }
+.btn-edit:hover { background: #1d4ed8; transform: translateY(-1px); }
+.btn-del { background: #fff; color: #dc2626; border-color: #fecaca; }
+.btn-del:hover { background: #fef2f2; }
+
+/* Dark Mode */
+body.dark-mode .rec-col-left-image { background: #0f172a; border-color: #334155; }
+body.dark-mode .rec-col-right-data { background: #1e293b; }
+body.dark-mode .d-val { color: #f1f5f9; }
+body.dark-mode .footer-bar { border-top-color: #334155; }
+body.dark-mode .btn-del { background: #1e293b; color: #f87171; border-color: #7f1d1d; }
+
+/* Responsive */
+@media (max-width: 800px) {
+  .rec-detail-panel {
+    width: 100vw !important;
+    max-height: 100vh;
+    height: auto;
+    min-height: auto;
+    border-radius: 0 !important;
+  }
+  .rec-layout-container {
+    flex-direction: column;
+  }
+  .rec-col-left-image {
+    width: 100%;
+    height: 250px;
+    min-height: 250px;
+  }
+  .data-content-area {
+    grid-template-columns: 1fr; /* มือถือเป็น 1 คอลัมน์ */
+  }
+  .d-item.span-full {
+    grid-column: auto;
+  }
+}
+/* ปุ่ม Action ใน Footer */
+.btn-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap; /* กันหน้าจอแคบ */
+}
+
+.btn-action {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ปุ่มเปลี่ยนรูป (สีเทาสวย) */
+.btn-img {
+  background: #f8fafc;
+  color: #475569;
+  border-color: #e2e8f0;
+}
+.btn-img:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+  transform: translateY(-1px);
+}
+
+.btn-edit { background: #2563eb; color: #fff; }
+.btn-edit:hover { background: #1d4ed8; }
+.btn-del { background: #fff; color: #dc2626; border-color: #fecaca; }
+.btn-del:hover { background: #fef2f2; }
+
+/* Dark Mode สำหรับปุ่มรูป */
+body.dark-mode .btn-img {
+  background: #334155;
+  color: #cbd5e1;
+  border-color: #475569;
+}
+body.dark-mode .btn-img:hover {
+  background: #475569;
+  color: #fff;
+}
+
+/* ลบ CSS ของปุ่ม overlay เก่าทิ้ง */
+.img-change-btn {
+  display: none; 
+}
 </style>
 
 </head>
@@ -5200,63 +5431,99 @@ window.addEventListener('resize',adjustSkillGrid);adjustSkillGrid();
 
 /* ── Record Detail Popup ── */
 function openRecDetail(idx){
-  const s=db.support[idx];if(!s)return;
-  const bc=s.report==='RP'?'#dc2626':s.report==='VF'?'#2563eb':'#d97706';
-  const bcBg=s.report==='RP'?'#fef2f2':s.report==='VF'?'#eff6ff':'#fffbeb';
-  const el=document.getElementById('recDetailBody');
-  const recImg=imageMap[s.id];
-  el.innerHTML=`
-    ${recImg?`<div class="rec-img-hero" style="border-radius:12px;overflow:hidden;background:#f1f5f9;border:1px solid var(--border);min-height:160px;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:2px;">
-      <img src="${recImg}" onclick="imgZoomOrChange(event,'${s.id}',${idx})" style="max-width:100%;max-height:260px;object-fit:contain;display:block;cursor:zoom-in;" title="คลิกเพื่อซูม · ดับเบิ้ลคลิกเพื่อเปลี่ยน">
-    </div>`:`<div onclick="openQuickImgEdit('${s.id}',${idx})" style="border:2px dashed var(--b200);border-radius:12px;padding:24px;text-align:center;cursor:pointer;background:var(--bg);margin-bottom:2px;transition:all .2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--b200)'">
-      <div style="font-size:2rem;margin-bottom:6px;">📷</div>
-      <div style="font-size:.73rem;color:var(--txt4);font-weight:600;">คลิกเพื่อเพิ่มรูปภาพ</div>
-    </div>`}
-    <div class="rec-okng-row">
-      <div class="rec-ok-big">
-        <div class="rec-big-num" style="color:#059669;">${s.ok??'—'}</div>
-        <div class="rec-big-lbl" style="color:#059669;">✓ OK ชิ้นดี</div>
+  const s = db.support[idx];
+  if(!s) return;
+
+  const recImg = imageMap[s.id];
+  const st = deriveStatus(s.result);
+  
+  // สี Report Type
+  const rptColor = s.report === 'RP' ? '#dc2626' : s.report === 'VF' ? '#2563eb' : '#d97706';
+  
+  const el = document.getElementById('recDetailBody');
+  
+  // HTML Layout ใหม่ (Expanded)
+  el.innerHTML = `
+    <div class="rec-layout-container">
+      
+      <!-- ซ้าย: รูปภาพ -->
+      <div class="rec-col-left-image">
+        ${recImg ? `
+          <img src="${recImg}" class="rec-img-hero" onclick="imgZoomOrChange(event, '${s.id}', ${idx})" title="คลิกเพื่อซูม">
+          <div class="img-change-btn" onclick="event.stopPropagation(); openQuickImgEdit('${s.id}', ${idx})">📷 เปลี่ยนรูป</div>
+        ` : `
+          <div style="text-align:center; color:#94a3b8; cursor:pointer;" onclick="openQuickImgEdit('${s.id}', ${idx})">
+            <div style="font-size:3rem; margin-bottom:10px;">🖼️</div>
+            <div style="font-size:0.9rem; font-weight:600;">เพิ่มรูปภาพ</div>
+          </div>
+        `}
       </div>
-      <div class="rec-ng-big">
-        <div class="rec-big-num" style="color:#dc2626;">${s.ng??'—'}</div>
-        <div class="rec-big-lbl" style="color:#dc2626;">✗ NG ของเสีย</div>
+
+      <!-- ขวา: ข้อมูล (Grid แนวนอน) -->
+      <div class="rec-col-right-data">
+        
+        <div class="data-content-area">
+          
+          <!-- Row 1: วันที่ (ซ้าย) / ผู้บันทึก (ขวา) -->
+          <div class="d-item">
+            <div class="d-label">📅 Date / Time</div>
+            <div class="d-val">${s.fullTimestamp || s.datetime || '—'}</div>
+          </div>
+          <div class="d-item" style="text-align:right;">
+            <div class="d-label">👤 Recorded By</div>
+            <div class="d-val">${s._user || '—'}</div>
+          </div>
+
+          <!-- Row 2: ปัญหา (กว้างเต็ม) -->
+          <div class="d-item span-full">
+            <div class="d-label">⚠️ Problem Detail</div>
+            <div class="d-val problem">${s.problem || '—'}</div>
+          </div>
+
+          <!-- Row 3: Action (กว้างเต็ม) -->
+          <div class="d-item span-full">
+            <div class="d-label">🔧 Action Taken</div>
+            <div class="d-val action">${s.action || '—'}</div>
+          </div>
+
+          <!-- Row 4: Group Part (ซ้าย) / LOT (ขวา) -->
+          <div class="d-item">
+            <div class="d-label">📦 Group Part</div>
+            <div class="d-val">${s.part || '—'}</div>
+          </div>
+          <div class="d-item" style="text-align:right;">
+            <div class="d-label">🏷️ LOT No.</div>
+            <div class="d-val" style="color:var(--violet);">${s.lot || '—'}</div>
+          </div>
+          
+        </div>
+
+        <!-- Footer: Status & Buttons -->
+        <div class="footer-bar">
+          
+          <!-- กลุ่มสถานะ -->
+          <div class="pill-group">
+            <span class="pill report" style="background:${rptColor}11; color:${rptColor}; border-color:${rptColor}44;">${s.report}</span>
+            <span class="pill status" style="${st.cls === 'sp-status-wip' ? 'background:#fffbeb;color:#b45309;border-color:#fcd34d;' : ''}">
+              ${st.cls === 'sp-status-wip' ? '⏳' : '✅'} ${st.txt}
+            </span>
+            <span class="pill ok">✓ ${s.ok ?? '—'}</span>
+            <span class="pill ng">✗ ${s.ng ?? '—'}</span>
+          </div>
+
+          <!-- กลุ่มปุ่ม -->
+          <div class="btn-group">
+            <button class="btn-action btn-del" onclick="delSupportConfirm(${idx}); closeRecDetail()">🗑️ ลบ</button>
+            <button class="btn-action btn-edit" onclick="openEditSupport(${idx}); closeRecDetail()">✏️ แก้ไข</button>
+            
+          </div>
+
+        </div>
+
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;background:${bcBg};border:1px solid ${bc}33;border-radius:10px;padding:10px 14px;margin-bottom:4px;">
-      <div style="width:10px;height:10px;border-radius:50%;background:${bc};flex-shrink:0;box-shadow:0 0 0 3px ${bc}22;"></div>
-      <div><div style="font-size:.51rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt4);">Report Type</div>
-      <div style="font-size:.9rem;font-weight:800;color:${bc};">${s.report}</div></div>
-    </div>
-    <div class="rec-fields-grid">
-      <div class="rec-field">
-        <div class="rec-field-label">📅 วัน/เวลา</div>
-        <div class="rec-field-val mono">${s.fullTimestamp||s.datetime||'—'}</div>
-      </div>
-      <div class="rec-field">
-        <div class="rec-field-label">📦 Group Part</div>
-        <div class="rec-field-val" style="font-weight:800;">${s.part||'—'}</div>
-      </div>
-      <div class="rec-field full">
-        <div class="rec-field-label">🔧 รายละเอียดปัญหา</div>
-        <div class="rec-field-val">${s.problem||'—'}</div>
-      </div>
-      <div class="rec-field full">
-        <div class="rec-field-label">⚙️ การแก้ไข (Action)</div>
-        <div class="rec-field-val">${s.action||'—'}</div>
-      </div>
-      <div class="rec-field">
-        <div class="rec-field-label">🏷️ LOT No.</div>
-        <div class="rec-field-val mono" style="color:var(--violet);">${s.lot||'—'}</div>
-      </div>
-      <div class="rec-field">
-        <div class="rec-field-label">👤 บันทึกโดย</div>
-        <div class="rec-field-val">${s._user||'—'}</div>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:12px;">
-      <button onclick="openEditSupport(${idx});closeRecDetail()" style="background:var(--b50);border:1px solid var(--b200);color:var(--primary);border-radius:var(--r);padding:7px 13px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;">✏️ แก้ไข</button>
-      <button onclick="delSupportConfirm(${idx});closeRecDetail()" style="background:var(--red-l);border:1px solid #fecaca;color:var(--red);border-radius:var(--r);padding:7px 13px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;">🗑 ลบ</button>
-    </div>`;
+  `;
+
   document.getElementById('recDetailModal').classList.add('open');
 }
 function closeRecDetail(){document.getElementById('recDetailModal').classList.remove('open');}
