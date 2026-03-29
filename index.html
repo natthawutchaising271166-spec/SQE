@@ -6060,6 +6060,9 @@ function schedulePush() {
   }, PUSH_DEBOUNCE);
 }
 
+/* ═══════════════════════════════════════════════════
+   FIXED: Polling — ใช้ MERGE แทน REPLACE
+   ═══════════════════════════════════════════════════ */
 function startPolling() {
   if (pollingTimer) clearInterval(pollingTimer);
 
@@ -6073,25 +6076,38 @@ function startPolling() {
       const result = await fetchFromCloud(currentUser, FETCH_TIMEOUT);
 
       if (result.ok) {
+        // ✅ FIX: ใช้ mergeCloud แทน replace
+        // mergeCloud จะเพิ่มเฉพาะ record ใหม่ ไม่ลบข้อมูลเก่า
         const added = mergeCloud(result.rows);
 
         if (added > 0) {
           await saveLocal();
           refreshAll();
-          showSyncBadge('🔔 +' + added + ' new', '#3b82f6');
+          showSyncBadge('🔔 +' + added + ' new from others', '#3b82f6');
         }
+        
+        // ✅ FIX: Update synced status สำหรับ records ที่ confirm ว่าอยู่บน cloud
+        result.rows.forEach(cloudRow => {
+          syncedAdd(cloudRow.ref);
+          cloudRefAdd(cloudRow.ref, currentUser);
+        });
+        saveLocal();
+        
         setSyncPulse('live', 'LIVE SYNC');
       } else {
         setSyncPulse('offline', 'Offline');
       }
     } catch (e) {
-      setSyncPulse('offline', 'Offline');
+      setSyncPulse('offline', 'Error');
     } finally {
       _fetchInFlight = false;
     }
   }, POLL_MS);
 }
 
+/* ═══════════════════════════════════════════════════
+   FIXED: syncToCloud — ใช้ merge แทน replace
+   ═══════════════════════════════════════════════════ */
 async function syncToCloud() {
   if (_fetchInFlight) { toast('⏳ Syncing...'); return; }
 
@@ -6099,7 +6115,7 @@ async function syncToCloud() {
   setSyncPulse('syncing', 'Syncing…');
   _fetchInFlight = true;
 
-  // Push
+  // Push unsynced
   const unsync = getMyRecords().filter(r => !syncedHas(r.ref));
   if (unsync.length > 0) {
     try {
@@ -6115,14 +6131,18 @@ async function syncToCloud() {
   try {
     const fetchResult = await fetchFromCloud(currentUser, FETCH_TIMEOUT);
     if (fetchResult.ok) {
-      records = records.filter(r => r.inspector !== currentUser);
-      records.push(...fetchResult.rows);
+      // ✅ FIX: ใช้ mergeCloud แทน replace
+      const added = mergeCloud(fetchResult.rows);
+
+      // Update synced status
+      fetchResult.rows.forEach(r => {
+        syncedAdd(r.ref);
+        cloudRefAdd(r.ref, currentUser);
+      });
 
       await saveLocal();
-
-      syncedReset(fetchResult.rows.map(r => r.ref));
       refreshAll();
-      toast(`✅ Sync สำเร็จ!`);
+      toast(`✅ Sync สำเร็จ!${added > 0 ? ' (+' + added + ' จากคนอื่น)' : ''}`);
       setSyncPulse('live', 'LIVE SYNC');
     }
   } catch (e) {
@@ -6134,8 +6154,8 @@ async function syncToCloud() {
 }
 
 /* ═══════════════════════════════════════════════════
-   11. INITIALIZATION
-═══════════════════════════════════════════════════ */
+   FIXED: initApp — ปกป้อง unsynced data
+   ═══════════════════════════════════════════════════ */
 async function initApp(inspector) {
   _isInitializing = true;
   currentUser = inspector;
@@ -6156,36 +6176,50 @@ async function initApp(inspector) {
 
   records = await dbGetAll();
 
-  const unsync = getMyRecords().filter(r => !syncedHas(r.ref));
-  if (unsync.length > 0) {
-    showInitOverlay('กำลัง Sync...', `Uploading ${unsync.length} items...`, unsync.length);
+  // ✅ FIX: เก็บ unsynced IDs ก่อน push
+  const myRecordsBeforePush = getMyRecords();
+  const unsynced = myRecordsBeforePush.filter(r => !syncedHas(r.ref));
+  const unsyncedIds = new Set(unsynced.map(r => r.id));
+
+  if (unsynced.length > 0) {
+    showInitOverlay('กำลัง Sync...', `Uploading ${unsynced.length} items...`, unsynced.length);
     try {
-      await pushToCloud(unsync);
-      unsync.forEach(r => {
+      await pushToCloud(unsynced);
+      unsynced.forEach(r => {
         syncedAdd(r.ref);
         cloudRefAdd(r.ref, currentUser);
       });
-    } catch (e) { }
+      saveLocalImmediate(); // บันทึกทันที
+    } catch (e) { 
+      console.warn('Push failed on init, will retry via polling:', e);
+    }
   }
 
   showInitOverlay('กำลังดึงข้อมูล...', 'Syncing Cloud...', '');
   try {
     const fetchResult = await fetchFromCloud(inspector, FETCH_TIMEOUT);
     if (fetchResult.ok) {
-      records = records.filter(r => r.inspector !== inspector);
-      records.push(...fetchResult.rows);
+      // ✅ FIX: ใช้ mergeCloud แทน replace
+      const added = mergeCloud(fetchResult.rows);
+
+      // ✅ FIX: อัพเดท synced status
+      fetchResult.rows.forEach(r => {
+        syncedAdd(r.ref);
+        cloudRefAdd(r.ref, inspector);
+      });
 
       await saveLocal();
-
-      syncedReset(fetchResult.rows.map(r => r.ref));
       refreshAll();
-      toast(`✅ พร้อมใช้งาน: ${fetchResult.rows.length} รายการ`);
+      
+      const totalForUser = getMyRecords().length;
+      toast(`✅ พร้อมใช้งาน: ${totalForUser} รายการ`);
       setSyncPulse('live', 'LIVE SYNC');
     } else {
       refreshAll();
       setSyncPulse('offline', 'Offline Mode');
     }
   } catch (err) {
+    refreshAll();
     setSyncPulse('offline', 'Error');
   } finally {
     hideInitOverlay();
