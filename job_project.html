@@ -2683,10 +2683,12 @@ body.dark-mode .btn-img:hover {
         </div>
         <div>
           <label>🔧 การแก้ไข</label>
-          <select id="supAction">
-            <option value="Repair">Rework: ซ่อมแซม/คัด</option>
-            <option value="Replace">Replace: ส่งกลับ</option>
-          </select>
+<select id="supAction">
+  <option value="Rework">Rework (ซ่อมแซม/คัด)</option>
+  <option value="Replace">Replace (ส่งกลับ)</option>
+  <option value="Refer Approval">Refer Approval</option>
+  <option value="Refer TI DMS">Refer TI DMS</option>
+</select>
         </div>
         <div class="full">
           <label>📝 รายละเอียดปัญหา</label>
@@ -2961,7 +2963,7 @@ body.dark-mode .btn-img:hover {
     <div class="edit-modal-grid">
       <div class="edit-field"><label class="edit-label">วันที่</label><input class="edit-input" type="date" id="editDate"></div>
       <div class="edit-field" style="grid-column:1/-1;"><label class="edit-label">รายละเอียดปัญหา</label><input class="edit-input" type="text" id="editProblem"></div>
-      <div class="edit-field"><label class="edit-label">การแก้ไข</label><select class="edit-input" id="editAction"><option value="Repair">Rework: ซ่อมแซม/คัด</option><option value="Replace">Replace: ส่งกลับ</option></select></div>
+<select class="edit-input" id="editAction"><option value="Rework">Rework (ซ่อมแซม/คัด)</option><option value="Replace">Replace (ส่งกลับ)</option><option value="Refer Approval">Refer Approval</option><option value="Refer TI DMS">Refer TI DMS</option></select>
       <div class="edit-field"><label class="edit-label">Group Part</label><input class="edit-input" type="text" id="editPart"></div>
       <div class="edit-field"><label class="edit-label">LOT</label><input class="edit-input" type="text" id="editLot"></div>
       <div class="edit-field"><label class="edit-label">OK</label><input class="edit-input" type="number" id="editOk" min="0"></div>
