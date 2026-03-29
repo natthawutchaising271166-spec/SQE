@@ -5461,11 +5461,10 @@ function openRecDetail(idx){
       <div class="rec-col-left-image">
         ${recImg ? `
           <img src="${recImg}" class="rec-img-hero" onclick="imgZoomOrChange(event, '${s.id}', ${idx})" title="คลิกเพื่อซูม">
-          <div class="img-change-btn" onclick="event.stopPropagation(); openQuickImgEdit('${s.id}', ${idx})">📷 เปลี่ยนรูป</div>
         ` : `
-          <div style="text-align:center; color:#94a3b8; cursor:pointer;" onclick="openQuickImgEdit('${s.id}', ${idx})">
+          <div style="text-align:center; color:#94a3b8;">
             <div style="font-size:3rem; margin-bottom:10px;">🖼️</div>
-            <div style="font-size:0.9rem; font-weight:600;">เพิ่มรูปภาพ</div>
+            <div style="font-size:0.9rem; font-weight:600;">ไม่มีรูปภาพ</div>
           </div>
         `}
       </div>
@@ -5475,54 +5474,73 @@ function openRecDetail(idx){
         
         <div class="data-content-area">
           
-          <!-- Row 1: วันที่ (ซ้าย) / ผู้บันทึก (ขวา) -->
+          <!-- Row 1: วันที่ (ซ้าย) / LOT ใหญ่ (ขวา) -->
           <div class="d-item">
             <div class="d-label">📅 Date / Time</div>
             <div class="d-val">${s.fullTimestamp || s.datetime || '—'}</div>
           </div>
           <div class="d-item" style="text-align:right;">
+            <div class="d-label">🏷️ LOT No.</div>
+            <!-- ✅ เพิ่มขนาด LOT ให้ใหญ่และชัดเจน -->
+            <div class="d-val" style="font-size:1.8rem; font-weight:900; color:var(--violet); line-height:1.1; letter-spacing:-0.02em;">
+              ${s.lot || '—'}
+            </div>
+          </div>
+
+          <!-- Row 2: ผู้บันทึก (ซ้าย) / กล่อง OK NG (ขวา) -->
+          <div class="d-item">
             <div class="d-label">👤 Recorded By</div>
             <div class="d-val">${s._user || '—'}</div>
           </div>
+          <!-- ✅ ย้าย OK/NG มาไว้ตรงนี้ ใต้ LOT -->
+          <div class="d-item" style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">
+             <div style="display:flex; gap:8px; margin-top:4px;">
+                <!-- OK Box -->
+                <div style="background:linear-gradient(135deg, #ecfdf5, #d1fae5); border:1.5px solid #6ee7b7; padding:6px 14px; border-radius:10px; display:flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(5,150,105,.1);">
+                   <span style="font-size:1.1rem;">✅</span>
+                   <span style="font-weight:800; font-size:1.05rem; color:#059669; font-family:'DM Mono',monospace;">OK ${s.ok ?? '—'}</span>
+                </div>
+                <!-- NG Box -->
+                <div style="background:linear-gradient(135deg, #fef2f2, #fee2e2); border:1.5px solid #fca5a5; padding:6px 14px; border-radius:10px; display:flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(220,38,38,.1);">
+                   <span style="font-size:1.1rem;">❌</span>
+                   <span style="font-weight:800; font-size:1.05rem; color:#dc2626; font-family:'DM Mono',monospace;">NG ${s.ng ?? '—'}</span>
+                </div>
+             </div>
+          </div>
 
-          <!-- Row 2: ปัญหา (กว้างเต็ม) -->
+          <!-- Row 3: ปัญหา (กว้างเต็ม) -->
           <div class="d-item span-full">
             <div class="d-label">⚠️ Problem Detail</div>
             <div class="d-val problem">${s.problem || '—'}</div>
           </div>
 
-          <!-- Row 3: Action (กว้างเต็ม) -->
+          <!-- Row 4: Action (กว้างเต็ม) -->
           <div class="d-item span-full">
             <div class="d-label">🔧 Action Taken</div>
             <div class="d-val action">${s.action || '—'}</div>
           </div>
 
-          <!-- Row 4: Group Part (ซ้าย) / LOT (ขวา) -->
+          <!-- Row 5: Group Part (ซ้าย) -->
           <div class="d-item">
             <div class="d-label">📦 Group Part</div>
-            <div class="d-val">${s.part || '—'}</div>
+            <div class="d-val" style="font-weight:700;">${s.part || '—'}</div>
           </div>
-          <div class="d-item" style="text-align:right;">
-            <div class="d-label">🏷️ LOT No.</div>
-            <div class="d-val" style="color:var(--violet);">${s.lot || '—'}</div>
-          </div>
+          <div class="d-item"></div> <!-- Spacer -->
           
         </div>
 
-        <!-- Footer: Status & Buttons -->
+        <!-- Footer: Status -->
         <div class="footer-bar">
           
-          <!-- กลุ่มสถานะ -->
-          <div class="pill-group">
-            <span class="pill report" style="background:${rptColor}11; color:${rptColor}; border-color:${rptColor}44;">${s.report}</span>
-            <span class="pill status" style="${st.cls === 'sp-status-wip' ? 'background:#fffbeb;color:#b45309;border-color:#fcd34d;' : ''}">
-              ${st.cls === 'sp-status-wip' ? '⏳' : '✅'} ${st.txt}
-            </span>
-            <span class="pill ok">✓ ${s.ok ?? '—'}</span>
-            <span class="pill ng">✗ ${s.ng ?? '—'}</span>
+          <!-- กลุ่มสถานะ (ย้ายไปด้านซ้ายเพื่อความสมดุล) -->
+          <div class="pill-group" style="justify-content:flex-start;">
+             <span class="pill report" style="background:${rptColor}11; color:${rptColor}; border-color:${rptColor}44;">
+               ${s.report}
+             </span>
+             <span class="pill status" style="${st.cls === 'sp-status-wip' ? 'background:#fffbeb;color:#b45309;border-color:#fcd34d;' : ''}">
+               ${st.cls === 'sp-status-wip' ? '⏳' : '✅'} ${st.txt}
+             </span>
           </div>
-
-
 
         </div>
 
