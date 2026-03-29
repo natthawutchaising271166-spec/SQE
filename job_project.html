@@ -5411,13 +5411,22 @@ function buildResultChart(withR, withoutR){
   if(leg) leg.innerHTML = `<div class="sp-leg-item"><div class="sp-leg-dot" style="background:#059669;"></div>มีผลลัพธ์: ${withR}</div><div class="sp-leg-item"><div class="sp-leg-dot" style="background:#cbd5e1;"></div>รอผล: ${withoutR}</div>`;
 }
 
-// Helper function สำหรับหาสถานะ
 function deriveStatus(result){
-  if(!result || result.trim()==='') return {cls:'sp-status-pending', txt:'Pending'};
+  // ✅ แก้ตรงนี้: ถ้าว่าง ให้แสดง "เสร็จสิ้น" ทันที
+  if(!result || result.trim()==='') return {cls:'sp-status-done', txt:'เสร็จสิ้น'};
+  
   const r = result.toLowerCase();
-  if(r.includes('เสร็จ') || r.includes('done') || r.includes('complete') || r.includes('สำเร็จ') || r.includes('ok') || r.includes('ผ่าน')) return {cls:'sp-status-done', txt:'Done'};
-  if(r.includes('กำลัง') || r.includes('wip') || r.includes('progress') || r.includes('ดำเนิน')) return {cls:'sp-status-wip', txt:'In Progress'};
-  return {cls:'sp-status-done', txt:'Done'};
+  
+  // ถ้ามีคำว่า เสร็จ/Done/OK ก็ให้แสดงเสร็จสิ้น
+  if(r.includes('เสร็จ') || r.includes('done') || r.includes('complete') || r.includes('สำเร็จ') || r.includes('ok') || r.includes('ผ่าน')) 
+    return {cls:'sp-status-done', txt:'เสร็จสิ้น'};
+    
+  // ถ้ามีคำว่า กำลัง/WIP ก็ให้แสดงกำลังดำเนินการ
+  if(r.includes('กำลัง') || r.includes('wip') || r.includes('progress') || r.includes('ดำเนิน')) 
+    return {cls:'sp-status-wip', txt:'กำลังดำเนินการ'};
+  
+  // Default สุดท้ายให้เป็นเสร็จสิ้น
+  return {cls:'sp-status-done', txt:'เสร็จสิ้น'};
 }
 
 /* ══════════════════════════════════
