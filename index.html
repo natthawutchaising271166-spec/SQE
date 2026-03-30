@@ -5461,6 +5461,91 @@ const _ck = (i, r) => `${i || currentUser}|${String(r)}`;
 function cloudRefAdd(r, i) { _allCloudRefs.add(_ck(i || currentUser, r)); }
 function cloudRefDelete(r, i) { _allCloudRefs.delete(_ck(i || currentUser, r)); }
 function cloudRefSetFromRows(rows) { rows.forEach(r => _allCloudRefs.add(_ck(r.inspector, r.ref))); }
+/* ═══════════════════════════════════════════════════
+   DELETE TRACKING SYSTEM — ติดตาม ref ที่ถูกลบแล้ว
+   ป้องกัน ghost data ที่โผล่กลับมาจาก cloud
+═══════════════════════════════════════════════════ */
+const DELETED_REFS_KEY = 'qdit_v4_deleted_refs';
+let _deletedRefsSet = new Set(safeJSON(DELETED_REFS_KEY, []));
+
+// ตรวจสอบว่า ref+inspector ถูกลบแล้วหรือยัง
+function deletedRefHas(ref, inspector) {
+  return _deletedRefsSet.has(`${String(inspector)}|${String(ref)}`);
+}
+
+// เพิ่ม ref เข้า deleted set
+function deletedRefAdd(ref, inspector) {
+  _deletedRefsSet.add(`${String(inspector)}|${String(ref)}`);
+  saveDeletedRefs();
+}
+
+// ลบ ref ออกจาก deleted set (เมื่อ cloud ยืนยันว่าลบสำเร็จ)
+function deletedRefRemove(ref, inspector) {
+  _deletedRefsSet.delete(`${String(inspector)}|${String(ref)}`);
+  saveDeletedRefs();
+}
+
+// บันทึกลง localStorage
+function saveDeletedRefs() {
+  localStorage.setItem(DELETED_REFS_KEY, JSON.stringify([..._deletedRefsSet]));
+}
+
+// ล้าง deleted refs ทั้งหมดของ inspector ที่ระบุ
+function clearDeletedRefsByInspector(inspector) {
+  const prefix = inspector + '|';
+  for (const key of [..._deletedRefsSet]) {
+    if (key.startsWith(prefix)) _deletedRefsSet.delete(key);
+  }
+  saveDeletedRefs();
+}
+
+// ตรวจสอบกับ cloud — ref ที่ลบไปแล้วยังอยู่บน cloud หรือไม่?
+// ถ้าไม่อยู่ = ลบสำเร็จ → ลบออกจาก deleted set
+function verifyDeletionsAgainstCloud(cloudRows, inspector) {
+  const cloudRefSet = new Set(
+    cloudRows.map(r => `${r.inspector}|${r.ref}`)
+  );
+  const prefix = inspector + '|';
+  let verified = 0, pending = 0;
+
+  for (const key of [..._deletedRefsSet]) {
+    if (!key.startsWith(prefix)) continue;
+    if (cloudRefSet.has(key)) {
+      pending++;
+    } else {
+      _deletedRefsSet.delete(key);
+      verified++;
+    }
+  }
+  if (verified > 0) saveDeletedRefs();
+  return { verified, pending };
+}
+
+// Retry ลบ refs ที่ยังค้างบน cloud (ส่ง DELETE ซ้ำ)
+async function retryPendingDeletions(inspector) {
+  const pending = [];
+  for (const key of [..._deletedRefsSet]) {
+    if (!key.startsWith(inspector + '|')) continue;
+    const parts = key.split('|');
+    pending.push({ ref: parts[1], inspector: parts[0] });
+  }
+  if (!pending.length) return 0;
+
+  let success = 0;
+  for (const item of pending) {
+    try {
+      const result = await deleteFromCloud(null, item.ref, item.inspector);
+      if (result.method === 'cors' && result.ok === true) {
+        deletedRefRemove(item.ref, item.inspector);
+        success++;
+      }
+    } catch (e) {
+      console.warn('Retry delete failed:', item.ref);
+    }
+  }
+  return success;
+}
+
 function clearInspectorCloudRefs(insp) {
   const p = insp + '|';
   for (const k of [..._allCloudRefs]) {
@@ -5875,13 +5960,16 @@ function normalizeRow(d, inspector) {
 
 let _fetchInFlight = false;
 
+/* ═══════════════════════════════════════════════════
+   FIXED: fetchFromCloud — verify deletions + ตรวจสอบ cloud status
+═══════════════════════════════════════════════════ */
 async function fetchFromCloud(inspector, ms) {
   ms = ms || FETCH_TIMEOUT;
   const url = GOOGLE_URL + '?inspector=' + encodeURIComponent(inspector) + '&t=' + Date.now();
 
-  const doFetch = t => {
+  const doFetch = (timeout) => {
     const ctrl = new AbortController();
-    const ti = setTimeout(() => ctrl.abort(), t);
+    const ti = setTimeout(() => ctrl.abort(), timeout);
     return fetch(url, { signal: ctrl.signal, cache: 'no-store' })
       .then(r => { clearTimeout(ti); return r; })
       .catch(e => { clearTimeout(ti); throw e; });
@@ -5892,29 +5980,44 @@ async function fetchFromCloud(inspector, ms) {
     try {
       res = await doFetch(ms);
     } catch (e) {
+      // ✅ FIX: Retry ด้วย timeout สั้นลง
       res = await doFetch(Math.min(ms, 5000));
     }
 
-    if (!res.ok) return { ok: false, rows: [] };
+    if (!res.ok) return { ok: false, rows: [], deletionStatus: null };
 
     const text = await res.text();
-    let r;
+    let parsed;
     try {
-      r = JSON.parse(text);
+      parsed = JSON.parse(text);
     } catch (e) {
-      return { ok: false, rows: [] };
+      console.warn('Cloud response parse error:', text.substring(0, 200));
+      return { ok: false, rows: [], deletionStatus: null };
     }
 
-    if (!r || r.status !== 'success' || !Array.isArray(r.data)) return { ok: false, rows: [] };
+    if (!parsed || parsed.status !== 'success' || !Array.isArray(parsed.data)) {
+      console.warn('Cloud response unexpected:', parsed);
+      return { ok: false, rows: [], deletionStatus: null };
+    }
 
-    const rows = r.data.map(d => normalizeRow(d, inspector));
+    const rows = parsed.data.map(d => normalizeRow(d, inspector));
     clearInspectorCloudRefs(inspector);
     cloudRefSetFromRows(rows);
     saveAllCloudRefs();
 
-    return { ok: true, rows };
+    // ✅ FIX: ตรวจสอบ refs ที่ลบไปแล้วว่ายังอยู่บน cloud หรือไม่
+    const deletionStatus = verifyDeletionsAgainstCloud(rows, inspector);
+    if (deletionStatus.verified > 0) {
+      console.log(`✅ Confirmed ${deletionStatus.verified} deletions on cloud`);
+    }
+    if (deletionStatus.pending > 0) {
+      console.log(`⏳ ${deletionStatus.pending} deletions still pending on cloud`);
+    }
+
+    return { ok: true, rows, deletionStatus };
   } catch (err) {
-    return { ok: false, rows: [] };
+    console.warn('fetchFromCloud error:', err.message);
+    return { ok: false, rows: [], deletionStatus: null };
   }
 }
 
@@ -5950,8 +6053,11 @@ async function pushToCloud(rows) {
   }).catch(() => { });
 }
 
+/* ═══════════════════════════════════════════════════
+   FIXED: deleteFromCloud — ยืนยันการลบ + auto-cleanup
+═══════════════════════════════════════════════════ */
 async function deleteFromCloud(id, ref, inspector) {
-  if (!ref) return { ok: false, method: 'none' };
+  if (!ref) return { ok: false, method: 'none', verified: false };
 
   const payload = JSON.stringify({
     action: 'delete',
@@ -5960,6 +6066,7 @@ async function deleteFromCloud(id, ref, inspector) {
     inspector: String(inspector || currentUser)
   });
 
+  // ═══ Step 1: ลอง CORS ก่อน ═══
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), DELETE_TIMEOUT);
@@ -5972,11 +6079,26 @@ async function deleteFromCloud(id, ref, inspector) {
       body: payload,
       signal: ctrl.signal
     });
-
     clearTimeout(t);
+
     const data = await res.json();
-    return { ok: data.status === 'success', method: 'cors', data };
+
+    if (data.status === 'success') {
+      // ★ ยืนยันทันทีว่าลบจริงจาก cloud
+      const verified = await verifyDeletionImmediately(ref, inspector);
+      if (verified) {
+        deletedRefRemove(ref, inspector);
+        console.log('✅ Delete verified immediately (CORS)');
+        return { ok: true, method: 'cors', verified: true };
+      }
+      return { ok: true, method: 'cors', verified: false };
+    }
+    console.warn('Cloud delete rejected:', data);
+    return { ok: false, method: 'cors', verified: false };
   } catch (corsErr) {
+
+    // ═══ Step 2: CORS ล้มเหลว → ใช้ no-cors ═══
+    console.warn('CORS delete failed, trying no-cors:', corsErr.message);
     try {
       const ctrl2 = new AbortController();
       setTimeout(() => ctrl2.abort(), PUSH_TIMEOUT);
@@ -5990,9 +6112,24 @@ async function deleteFromCloud(id, ref, inspector) {
         signal: ctrl2.signal
       });
 
-      return { ok: null, method: 'no-cors' };
+      // ★ แม้ no-cors ก็ยืนยันทันที
+      const verified = await verifyDeletionImmediately(ref, inspector);
+      if (verified) {
+        deletedRefRemove(ref, inspector);
+        console.log('✅ Delete verified immediately (no-cors)');
+        return { ok: true, method: 'no-cors', verified: true };
+      }
+      return { ok: null, method: 'no-cors', verified: false };
     } catch (e) {
-      return { ok: false, method: 'error' };
+
+      // ═══ Step 3: fetch ล้มเหลวทั้งหมด → ยังคงลอง verify ═══
+      const verified = await verifyDeletionImmediately(ref, inspector);
+      if (verified) {
+        deletedRefRemove(ref, inspector);
+        console.log('✅ Delete verified immediately (fallback)');
+        return { ok: true, method: 'fallback', verified: true };
+      }
+      return { ok: false, method: 'error', verified: false };
     }
   }
 }
@@ -6013,86 +6150,101 @@ function clearAllFromCloud(inspector) {
   }).catch(() => { });
 }
 
-function mergeCloud(cloudRows) {
-  const localRefMap = new Map(records.map(r => [String(r.ref) + '|' + r.inspector, r]));
-  let added = 0;
-
-  cloudRows.forEach(r => {
-    const key = String(r.ref) + '|' + r.inspector;
-    if (!localRefMap.has(key)) {
-      records.push(r);
-      added++;
-    } else {
-      Object.assign(localRefMap.get(key), r);
-    }
-  });
-
-  if (added || cloudRows.length) invalidateMyRecCache();
-  if (cloudRows.length) syncedReset(cloudRows.map(r => r.ref));
-
-  return added;
-}
-
-let _pushInFlight = false;
-
-function schedulePush() {
-  if (_isInitializing) return;
-  clearTimeout(pushDebounce);
-  pushDebounce = setTimeout(async () => {
-    if (_pushInFlight) return;
-    const unsync = getMyRecords().filter(r => !syncedHas(r.ref));
-    if (!unsync.length) return;
-
-    _pushInFlight = true;
-    try {
-      await pushToCloud(unsync);
-      unsync.forEach(r => {
-        syncedAdd(r.ref);
-        cloudRefAdd(r.ref, currentUser);
-      });
-      saveLocal();
-      showSyncBadge('☁️ Auto-synced', '#10b981');
-      setSyncPulse('live', 'LIVE SYNC');
-    } catch (e) { }
-    finally {
-      _pushInFlight = false;
-    }
-  }, PUSH_DEBOUNCE);
-}
-
 /* ═══════════════════════════════════════════════════
-   FIXED: Polling — ใช้ MERGE แทน REPLACE
-   ═══════════════════════════════════════════════════ */
+   CLOUD-FIRST: อ่านจาก Google Sheets เท่านั้น
+   แก้ปัญหาลบแล้วข้อมูลกลับมา — REPLACE ไม่ MERGE
+═══════════════════════════════════════════════════ */
+function replaceWithCloud(cloudRows, inspector) {
+  // เอาข้อมูลของ inspector นี้จาก cloud
+  const myCloudData = cloudRows.filter(r => r.inspector === inspector);
+
+  // กรอง ghost — ที่ถูกลบแล้ว
+  const cleaned = myCloudData.filter(r => !deletedRefHas(r.ref, r.inspector));
+
+  // เก็บข้อมูลคนอื่นไว้
+  const otherRecords = records.filter(r => r.inspector !== inspector);
+
+  // ★ KEY: REPLACE ไม่ใช่ MERGE — cloud คือ source of truth
+  records = [...otherRecords, ...cleaned];
+
+  // Reset sync — ทุกอย่างจาก cloud = synced หมด
+  syncedReset(cleaned.map(r => r.ref));
+
+  // อัพเดท cloud ref tracking
+  clearInspectorCloudRefs(inspector);
+  cloudRefSetFromRows(cleaned);
+  saveAllCloudRefs();
+
+  // ล้าง cache ทั้งหมด
+  invalidateMyRecCache();
+  invalidateCache();
+  _lastRenderHash = '';
+
+  return cleaned.length;
+}
+/* ═══════════════════════════════════════════════════
+   ยืนยันการลบทันที — fetch จาก cloud ตรวจสอบ
+═══════════════════════════════════════════════════ */
+async function verifyDeletionImmediately(ref, inspector) {
+  try {
+    const result = await fetchFromCloud(inspector, 8000);
+    if (!result.ok) return false;
+
+    // ตรวจว่า ref นี้ยังอยู่ใน cloud หรือไม่
+    const stillExists = result.rows.some(r =>
+      String(r.ref) === String(ref) && r.inspector === inspector
+    );
+
+    // ไม่อยู่ = ลบสำเร็จ
+    return !stillExists;
+  } catch (e) {
+    console.warn('Immediate verify failed:', e.message);
+    return false;
+  }
+}
 function startPolling() {
   if (pollingTimer) clearInterval(pollingTimer);
+
+  let pollCount = 0;
 
   pollingTimer = setInterval(async () => {
     if (_fetchInFlight || _isInitializing) return;
 
     _fetchInFlight = true;
     setSyncPulse('syncing', 'Syncing…');
+    pollCount++;
 
     try {
       const result = await fetchFromCloud(currentUser, FETCH_TIMEOUT);
 
       if (result.ok) {
-        // ✅ FIX: ใช้ mergeCloud แทน replace
-        // mergeCloud จะเพิ่มเฉพาะ record ใหม่ ไม่ลบข้อมูลเก่า
-        const added = mergeCloud(result.rows);
+        // ★ KEY FIX: REPLACE ไม่ใช่ MERGE
+        const prevCount = getMyRecords().length;
+        replaceWithCloud(result.rows, currentUser);
+        const newCount = getMyRecords().length;
+        const changed = prevCount !== newCount;
 
-        if (added > 0) {
+        if (changed) {
           await saveLocal();
           refreshAll();
-          showSyncBadge('🔔 +' + added + ' new from others', '#3b82f6');
+          showSyncBadge('🔔 อัพเดตจาก Cloud', '#3b82f6');
         }
-        
-        // ✅ FIX: Update synced status สำหรับ records ที่ confirm ว่าอยู่บน cloud
-        result.rows.forEach(cloudRow => {
-          syncedAdd(cloudRow.ref);
-          cloudRefAdd(cloudRow.ref, currentUser);
-        });
-        saveLocal();
-        
+
+        // ตรวจสอบสถานะการลบ
+        if (result.deletionStatus) {
+          if (result.deletionStatus.verified > 0) {
+            showSyncBadge('✅ ยืนยันลบแล้ว ' + result.deletionStatus.verified + ' รายการ', '#10b981');
+            refreshAll();
+          }
+          if (result.deletionStatus.pending > 0 && pollCount % 3 === 0) {
+            retryPendingDeletions(currentUser).then(count => {
+              if (count > 0) {
+                showSyncBadge('🗑 ลบ cloud สำเร็จ ' + count + ' รายการ', '#10b981');
+              }
+            });
+          }
+        }
+
         setSyncPulse('live', 'LIVE SYNC');
       } else {
         setSyncPulse('offline', 'Offline');
@@ -6124,26 +6276,45 @@ async function syncToCloud() {
         syncedAdd(r.ref);
         cloudRefAdd(r.ref, currentUser);
       });
-    } catch (e) { }
+    } catch (e) { /* silent */ }
+  }
+
+  // Retry pending deletions ก่อน fetch
+  const pendingDelCount = [..._deletedRefsSet].filter(k => k.startsWith(currentUser + '|')).length;
+  if (pendingDelCount > 0) {
+    const delSuccess = await retryPendingDeletions(currentUser);
+    if (delSuccess > 0) {
+      console.log('Sync: deleted ' + delSuccess + ' pending items from cloud');
+    }
   }
 
   // Fetch
   try {
     const fetchResult = await fetchFromCloud(currentUser, FETCH_TIMEOUT);
     if (fetchResult.ok) {
-      // ✅ FIX: ใช้ mergeCloud แทน replace
-      const added = mergeCloud(fetchResult.rows);
-
-      // Update synced status
-      fetchResult.rows.forEach(r => {
-        syncedAdd(r.ref);
-        cloudRefAdd(r.ref, currentUser);
-      });
+      // ★ KEY FIX: REPLACE ไม่ใช่ MERGE
+      replaceWithCloud(fetchResult.rows, currentUser);
 
       await saveLocal();
       refreshAll();
-      toast(`✅ Sync สำเร็จ!${added > 0 ? ' (+' + added + ' จากคนอื่น)' : ''}`);
+
+      // แสดงรายละเอียด
+      let msg = '✅ Sync สำเร็จ!';
+      msg += ' (' + getMyRecords().length + ' รายการจาก Cloud)';
+
+      if (fetchResult.deletionStatus) {
+        if (fetchResult.deletionStatus.verified > 0) {
+          msg += ' · ยืนยันลบ ' + fetchResult.deletionStatus.verified + ' รายการ';
+        }
+        if (fetchResult.deletionStatus.pending > 0) {
+          msg += ' · รอลบ ' + fetchResult.deletionStatus.pending + ' รายการ';
+        }
+      }
+      toast(msg);
       setSyncPulse('live', 'LIVE SYNC');
+    } else {
+      toast('⚠️ Cloud fetch ล้มเหลว');
+      setSyncPulse('offline', 'Error');
     }
   } catch (e) {
     setSyncPulse('offline', 'Error');
@@ -6161,8 +6332,9 @@ async function initApp(inspector) {
   currentUser = inspector;
   $id('currentUserDisp').textContent = inspector;
 
-  showInitOverlay('กำลังเปิดฐานข้อมูล...', 'Initializing...', '');
+  showInitOverlay('กำลังเชื่อมต่อ...', 'Reading Cloud...', '');
 
+  // ═══ Step 1: เปิด IndexedDB เพื่อหา unsynced เท่านั้น ═══
   try {
     await initDB();
   } catch (e) {
@@ -6170,65 +6342,120 @@ async function initApp(inspector) {
     return;
   }
 
-  showInitOverlay('กำลังโหลดข้อมูล...', 'Reading Cache...', '');
   setSyncBtn(true);
-  setSyncPulse('syncing', 'Loading…');
+  setSyncPulse('syncing', 'Connecting…');
 
-  records = await dbGetAll();
+  // อ่าน local เฉพาะเพื่อ push unsynced ขึ้น cloud
+  const localRecords = await dbGetAll();
+  const myLocal = localRecords.filter(r => r.inspector === inspector);
+  const unsynced = myLocal.filter(r => !syncedHas(r.ref));
 
-  // ✅ FIX: เก็บ unsynced IDs ก่อน push
-  const myRecordsBeforePush = getMyRecords();
-  const unsynced = myRecordsBeforePush.filter(r => !syncedHas(r.ref));
-  const unsyncedIds = new Set(unsynced.map(r => r.id));
-
+  // ═══ Step 2: Push ข้อมูลที่ยังไม่ sync ขึ้น cloud ก่อน ═══
   if (unsynced.length > 0) {
-    showInitOverlay('กำลัง Sync...', `Uploading ${unsynced.length} items...`, unsynced.length);
+    showInitOverlay('กำลังอัพโหลด...', 'Pushing ' + unsynced.length + ' items to Cloud...', unsynced.length);
     try {
       await pushToCloud(unsynced);
       unsynced.forEach(r => {
         syncedAdd(r.ref);
         cloudRefAdd(r.ref, currentUser);
       });
-      saveLocalImmediate(); // บันทึกทันที
-    } catch (e) { 
-      console.warn('Push failed on init, will retry via polling:', e);
+      saveLocalImmediate();
+    } catch (e) {
+      console.warn('Push failed on login:', e);
     }
   }
 
-  showInitOverlay('กำลังดึงข้อมูล...', 'Syncing Cloud...', '');
-  try {
-    const fetchResult = await fetchFromCloud(inspector, FETCH_TIMEOUT);
-    if (fetchResult.ok) {
-      // ✅ FIX: ใช้ mergeCloud แทน replace
-      const added = mergeCloud(fetchResult.rows);
+  // ═══ Step 3: ดึงข้อมูลจาก Google Sheets เท่านั้น ═══
+  showInitOverlay('กำลังโหลด...', 'Fetching from Cloud...', '');
 
-      // ✅ FIX: อัพเดท synced status
-      fetchResult.rows.forEach(r => {
-        syncedAdd(r.ref);
-        cloudRefAdd(r.ref, inspector);
-      });
+  let fetchResult = { ok: false, rows: [] };
+  let attempts = 0;
 
-      await saveLocal();
-      refreshAll();
-      
-      const totalForUser = getMyRecords().length;
-      toast(`✅ พร้อมใช้งาน: ${totalForUser} รายการ`);
-      setSyncPulse('live', 'LIVE SYNC');
-    } else {
-      refreshAll();
-      setSyncPulse('offline', 'Offline Mode');
+  while (!fetchResult.ok && attempts < 3) {
+    attempts++;
+    fetchResult = await fetchFromCloud(inspector, FETCH_TIMEOUT);
+
+    if (!fetchResult.ok && attempts < 3) {
+      showInitOverlay('กำลังลองใหม่...', 'Attempt ' + attempts + '/3', '');
+      await sleep(1500);
     }
-  } catch (err) {
+  }
+
+  // ═══ Step 4: ใช้ข้อมูลจาก Cloud เท่านั้น — ไม่ merge ═══
+  if (fetchResult.ok) {
+    // ★ KEY: เคลียร์ local records ของ inspector นี้ทิ้งก่อน
+    // แล้วใช้ข้อมูลจาก cloud ทั้งหมด
+    const myCloudData = fetchResult.rows.filter(r => r.inspector === inspector);
+    const otherRecords = records.filter(r => r.inspector !== inspector);
+
+    // ★ REPLACE ไม่ใช่ MERGE
+    records = [...otherRecords, ...myCloudData];
+
+    // Reset sync — ทุกอย่างจาก cloud = synced หมด
+    syncedReset(myCloudData.map(r => r.ref));
+    clearInspectorCloudRefs(inspector);
+    cloudRefSetFromRows(myCloudData);
+    saveAllCloudRefs();
+
+    // บันทึกลง IndexedDB
+    await dbPutBulk(records);
+
+    // ล้าง cache ทั้งหมด
+    invalidateMyRecCache();
+    invalidateCache();
+    _lastRenderHash = '';
+
+    // แสดงผล
     refreshAll();
-    setSyncPulse('offline', 'Error');
-  } finally {
+
+    const totalForUser = getMyRecords().length;
+    toast('✅ เชื่อมต่อสำเร็จ: ' + totalForUser + ' รายการ (จาก Cloud)');
+    setSyncPulse('live', 'LIVE SYNC');
+  } else {
+    // ★ Cloud ไม่ได้ → ไม่แสดงข้อมูลเก่า
+    records = [];
+    await dbPutBulk(records);
+    refreshAll();
+
     hideInitOverlay();
     setSyncBtn(false);
     _isInitializing = false;
-    startPolling();
-  }
-}
 
+    toast('❌ ไม่สามารถเชื่อมต่อ Cloud — ตรวจสอบอินเทอร์เน็ต');
+    setSyncPulse('offline', 'OFFLINE');
+
+    // เริ่ม polling อยู่ — เมื่อกลับมาออนไลน์จะโหลดอัตโนมัติ
+    startPolling();
+    return;
+  }
+
+  // ═══ Step 5: Retry ลบที่ค้าง ═══
+  const pendingDelCount = [..._deletedRefsSet].filter(k => k.startsWith(inspector + '|')).length;
+  if (pendingDelCount > 0) {
+    const successCount = await retryPendingDeletions(inspector);
+    if (successCount > 0) {
+      // fetch อีกรอบหลังลบสำเร็จ
+      const reFetch = await fetchFromCloud(inspector, FETCH_TIMEOUT);
+      if (reFetch.ok) {
+        const reCloudData = reFetch.rows.filter(r => r.inspector === inspector);
+        const reOther = records.filter(r => r.inspector !== inspector);
+        records = [...reOther, ...reCloudData];
+        syncedReset(reCloudData.map(r => r.ref));
+        await dbPutBulk(records);
+        invalidateMyRecCache();
+        invalidateCache();
+        _lastRenderHash = '';
+        refreshAll();
+      }
+      saveLocal();
+    }
+  }
+
+  hideInitOverlay();
+  setSyncBtn(false);
+  _isInitializing = false;
+  startPolling();
+}
 /* ═══════════════════════════════════════════════════
    12. LOGIN / LOGOUT
 ═══════════════════════════════════════════════════ */
@@ -6303,7 +6530,11 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && $id('loginOverlay').style.display !== 'none') login();
 });
 
+/* ═══════════════════════════════════════════════════
+   FIXED: logout — push + retry pending deletions ก่อนออก
+═══════════════════════════════════════════════════ */
 async function logout() {
+  // Push unsynced records ก่อน
   const unsync = getMyRecords().filter(r => !syncedHas(r.ref));
   if (unsync.length) {
     toast('⏳ Syncing…');
@@ -6313,6 +6544,18 @@ async function logout() {
       cloudRefAdd(r.ref, currentUser);
     });
     saveLocalImmediate();
+  }
+
+  // ✅ FIX: Retry pending deletions ก่อนออก
+  const pendingCount = [..._deletedRefsSet].filter(k => k.startsWith(currentUser + '|')).length;
+  if (pendingCount > 0) {
+    toast(`🔄 กำลังลบ ${pendingCount} รายการจาก Cloud ก่อนออก…`);
+    const successCount = await retryPendingDeletions(currentUser);
+    if (successCount > 0) {
+      toast(`✅ ลบจาก Cloud สำเร็จ ${successCount}/${pendingCount} รายการ`);
+    } else if (successCount < pendingCount) {
+      toast(`⚠️ ลบได้ ${successCount}/${pendingCount} — ครั้งหน้าจะ retry อีก`);
+    }
   }
 
   if (pollingTimer) clearInterval(pollingTimer);
@@ -6603,7 +6846,10 @@ function hideDelProgress() {
   $id('deleteProgressOverlay').classList.remove('show');
 }
 
-$id('delConfirmBtn').addEventListener('click', async () => {
+/* ═══════════════════════════════════════════════════
+   FIXED: ปุ่มยืนยันลบ — เพิ่ม deleted ref tracking
+═══════════════════════════════════════════════════ */
+  $id('delConfirmBtn').addEventListener('click', async () => {
   if (!_pendingDelete) return;
 
   const { id, trEl, ref, inspector } = _pendingDelete;
@@ -6616,11 +6862,16 @@ $id('delConfirmBtn').addEventListener('click', async () => {
 
   hideDeleteModal();
 
+  // แสดง animation ลบ
   if (trEl && trEl.isConnected) {
     trEl.style.pointerEvents = 'none';
     trEl.classList.add('row-deleting');
   }
 
+  // เพิ่มลง deleted set ก่อน
+  deletedRefAdd(ref, inspector);
+
+  // ลบจาก local ทันที
   records = records.filter(x => String(x.id) !== String(id));
   syncedDelete(ref);
   cloudRefDelete(ref, inspector);
@@ -6636,27 +6887,39 @@ $id('delConfirmBtn').addEventListener('click', async () => {
   try {
     const result = await deleteFromCloud(id, ref, inspector);
 
-    if (result.method === 'cors' && result.ok === true) {
-      showDelProgress('ลบสำเร็จ!', 'Cloud ยืนยันแล้ว', 100);
-      toast('🗑 ลบสำเร็จ ✓');
-      showSyncBadge('✅ Deleted', '#10b981');
-    } else if (result.ok === null) {
-      showDelProgress('ส่งคำสั่งลบแล้ว', 'กำลังประมวลผล…', 80);
+    // ★ ตรวจสอบ verified flag
+    if (result.verified === true) {
+      // ✅ ยืนยันได้ทันที — ไม่มี pending
+      showDelProgress('ลบสำเร็จ!', 'ยืนยันจาก Cloud แล้ว', 100);
+      toast('🗑 ลบสำเร็จ ✓ ยืนยันจาก Cloud');
+      showSyncBadge('✅ Deleted & Verified', '#10b981');
+    } else if (result.ok === true) {
+      // CORS ตอบว่าสำเร็จ แต่ verify ยังไม่ได้
+      showDelProgress('ส่งคำสั่งลบแล้ว', 'รอยืนยัน...', 80);
       $id('delProgIcon').textContent = '📤';
-      toast('🗑 ลบ Local ✓ · Cloud: pending…');
+      toast('🗑 ลบสำเร็จ · รอยืนยัน Cloud…');
+    } else if (result.ok === null) {
+      // no-cors ส่งไปแล้ว แต่ verify ยังไม่ได้
+      showDelProgress('ส่งคำสั่งลบแล้ว', 'รอยืนยัน...', 80);
+      $id('delProgIcon').textContent = '📤';
+      toast('🗑 ลบ Local ✓ · รอยืนยัน Cloud…');
     } else {
-      showDelProgress('ลบ Local แล้ว', 'Cloud มีปัญหา', 60);
+      // ล้มเหลว
+      showDelProgress('ลบ Local แล้ว', 'จะ retry อัตโนมัติ', 60);
       $id('delProgIcon').textContent = '⚠️';
-      toast('⚠️ ลบ Local แล้ว');
+      toast('⚠️ ลบ Local แล้ว · จะ retry อัตโนมัติ');
     }
   } catch (err) {
     $id('delProgIcon').textContent = '⚠️';
-    toast('⚠️ Network Error');
+    toast('⚠️ Network Error · จะ retry อัตโนมัติ');
   } finally {
-    setTimeout(hideDelProgress, 1800);
+    setTimeout(hideDelProgress, 2000);
   }
 });
 
+/* ═══════════════════════════════════════════════════
+   FIXED: clearAllData — ล้าง deleted refs ด้วย
+═══════════════════════════════════════════════════ */
 async function clearAllData() {
   const myCount = getMyRecords().length;
   if (myCount === 0) { toast('⚠️ ไม่มีข้อมูลให้ลบ'); return; }
@@ -6670,6 +6933,9 @@ async function clearAllData() {
 
   await dbClearByInspector(currentUser);
 
+  // ✅ FIX: ล้าง deleted refs ของ inspector นี้ด้วย
+  clearDeletedRefsByInspector(currentUser);
+
   showDelProgress('Syncing Cloud...', 'Please wait', 50);
   await clearAllFromCloud(currentUser);
 
@@ -6679,7 +6945,7 @@ async function clearAllData() {
   setTimeout(() => {
     hideDelProgress();
     startPolling();
-    toast(`🧹 ลบข้อมูลเรียบร้อย`);
+    toast('🧹 ลบข้อมูลเรียบร้อย');
   }, 1500);
 }
 
@@ -8322,4 +8588,4 @@ window.VirtualTableEngine = {
 </script>
 
 </body>
-</html>             
+</html>
