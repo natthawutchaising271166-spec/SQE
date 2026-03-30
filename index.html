@@ -2264,10 +2264,11 @@ html.dark-mode .lo-in:focus {
 }
 
 .gauge-cluster.main-gauge {
-  min-height: 240px !important;
-  flex-shrink: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 0%;
+  min-flex: 180px;
   margin-bottom: 0.5rem;
-  padding-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
   background: 
     radial-gradient(ellipse at 50% 40%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
     radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 1) 100%);
@@ -2275,6 +2276,11 @@ html.dark-mode .lo-in:focus {
     inset 0 0 60px rgba(0, 0, 0, 0.6),
     0 15px 50px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
 }
 
 .main-gauge {
@@ -2287,8 +2293,10 @@ html.dark-mode .lo-in:focus {
 
 .gauge-ring {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: min(170px, 100%);
+  aspect-ratio: 1;
+  max-width: 200px;
+  margin: 0 auto;
 }
 
 .gauge-svg {
@@ -2297,67 +2305,71 @@ html.dark-mode .lo-in:focus {
   filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.25));
 }
 
-/* Gauge Center Text */
 .gauge-center {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding-bottom: 10px;
-  transform: translateZ(40px);
-  position: relative;
+  justify-content: flex-end;
+  padding-bottom: 18%;
   z-index: 5;
   pointer-events: none;
 }
 
 .gauge-value {
-  font-family: var(--font-head);
-  font-size: 2.8rem;
+  font-family: 'Orbitron', 'Sora', monospace;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
   font-weight: 900;
-  color: #f8fafc;
+  color: transparent;
   line-height: 1;
-  letter-spacing: -0.02em;
-  text-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 30px rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.04em;
+  background: linear-gradient(180deg, #ffffff 0%, #a5f3fc 35%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4)) drop-shadow(0 0 3px rgba(52, 211, 153, 0.6));
   transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform;
 }
 
 .gauge-label {
-  font-size: 0.7rem;
+  font-family: 'Orbitron', 'Sora', monospace;
+  font-size: 0.55rem;
   font-weight: 700;
-  color: #64748b;
-  letter-spacing: 0.2em;
+  color: #475569;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  margin-top: 4px;
+  margin-top: 2px;
+  text-shadow: 0 0 6px rgba(71, 85, 105, 0.3);
 }
 
 .gauge-trend {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-top: 8px;
-  padding: 4px 10px;
-  background: rgba(16, 185, 129, 0.1);
+  gap: 5px;
+  margin-top: 6px;
+  padding: 5px 14px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(52, 211, 153, 0.04));
   border: 1px solid rgba(16, 185, 129, 0.2);
   border-radius: 99px;
-  transform: translateZ(40px);
   position: relative;
   z-index: 5;
   pointer-events: none;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .trend-arrow {
-  color: #10b981;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
+  filter: drop-shadow(0 0 4px currentColor);
 }
 
 .trend-value {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-family: 'Orbitron', 'Sora', monospace;
+  font-size: 0.65rem;
   font-weight: 700;
-  color: #10b981;
+  letter-spacing: 0.08em;
 }
 
 .gauge-legend {
@@ -4352,6 +4364,146 @@ datalist { display: none; }
 .gauge-needle { transform-origin: center center; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .mini-gauge-needle { transform-origin: 100px 100px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
+/* ═══════════════════════════════════════════════════
+   FIX: Main Gauge Responsive — ย่อขนาดอัตโนมัติ
+═══════════════════════════════════════════════════ */
+.cockpit-left {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.gauge-cluster.main-gauge {
+  overflow: hidden;
+}
+
+.gauge-cluster.main-gauge .gauge-ring {
+  flex-shrink: 1;
+}
+
+.gauge-cluster.main-gauge .gauge-svg {
+  width: 100% !important;
+  height: auto !important;
+}
+
+.gauge-cluster.main-gauge .gauge-value {
+  text-shadow: 0 0 15px rgba(59, 130, 246, 0.4), 0 0 25px rgba(255, 255, 255, 0.15);
+}
+
+.gauge-cluster.main-gauge .gauge-trend {
+  flex-shrink: 0;
+}
+
+/* Responsive gauge sizing */
+@media (max-height: 700px) {
+  .gauge-ring {
+    width: min(140px, 100%) !important;
+  }
+  .gauge-cluster.main-gauge .gauge-value {
+    font-size: clamp(1.4rem, 4vw, 2rem) !important;
+  }
+  .gauge-cluster.main-gauge .gauge-trend {
+    padding: 2px 8px !important;
+  }
+  .gauge-cluster.main-gauge .gauge-trend .trend-value {
+    font-size: 0.6rem !important;
+  }
+  .gauge-cluster.main-gauge .gauge-trend .trend-arrow {
+    font-size: 0.6rem !important;
+  }
+}
+
+@media (max-height: 550px) {
+  .gauge-ring {
+    width: min(110px, 100%) !important;
+  }
+  .gauge-cluster.main-gauge .gauge-value {
+    font-size: clamp(1.1rem, 3vw, 1.6rem) !important;
+  }
+  .gauge-cluster.main-gauge {
+    padding: 0.3rem 0.5rem !important;
+    gap: 0.2rem !important;
+  }
+  .gauge-cluster.main-gauge .gauge-trend {
+    padding: 2px 6px !important;
+    margin-top: 0 !important;
+  }
+}
+
+/* Mini gauges ย่อได้ด้วย */
+.mini-gauge-display {
+  flex-shrink: 1;
+  min-height: 0;
+}
+
+.mini-gauge-value {
+  font-size: clamp(1rem, 2.5vw, 1.4rem) !important;
+}
+
+.mini-gauge-label {
+  font-size: 0.5rem !important;
+}
+
+@media (max-height: 700px) {
+  .mini-gauge-value {
+    font-size: clamp(0.8rem, 2vw, 1.1rem) !important;
+  }
+  .mini-gauge {
+    padding: 0.5rem 0.3rem 0.3rem !important;
+    gap: 0.3rem !important;
+  }
+  .mini-gauge-sparkline {
+    display: none;
+  }
+}
+
+/* Hero KPI ย่อได้ */
+.hero-kpi-card {
+  flex-shrink: 0;
+  min-height: auto !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.hero-value {
+  font-size: clamp(1.8rem, 5vw, 3.2rem) !important;
+}
+
+@media (max-height: 600px) {
+  .hero-kpi-card {
+    padding: 0.5rem 0.75rem !important;
+    min-height: 80px !important;
+  }
+  .hero-value {
+    font-size: clamp(1.4rem, 4vw, 2.2rem) !important;
+  }
+  .hero-sparkline {
+    display: none;
+  }
+  .hero-footer {
+    margin-top: 0.25rem !important;
+    padding-top: 0.4rem !important;
+  }
+}
+/* ═══════════════════════════════════════════════════
+   GAUGE NUMBER — หน้าปัด Digital Glow Effect
+═══════════════════════════════════════════════════ */
+@keyframes gaugeNumPulse {
+  0%   { filter: drop-shadow(0 0 12px rgba(16,185,129,0.5)) drop-shadow(0 0 4px rgba(52,211,153,0.8)); }
+  50%  { filter: drop-shadow(0 0 20px rgba(16,185,129,0.7)) drop-shadow(0 0 8px rgba(52,211,153,1)); }
+  100% { filter: drop-shadow(0 0 12px rgba(16,185,129,0.5)) drop-shadow(0 0 4px rgba(52,211,153,0.8)); }
+}
+
+.gauge-value.glow-pulse {
+  animation: gaugeNumPulse 0.6s ease-out;
+}
+
+@keyframes labelFlicker {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+
+.gauge-label {
+  animation: labelFlicker 3s ease-in-out infinite;
+}
 </style>
 </head>
 <body>
@@ -4894,20 +5046,15 @@ datalist { display: none; }
       
 <!-- MAIN SPEEDOMETER — PASS RATE (SPORT STYLE) -->
 <div class="gauge-cluster main-gauge">
-  <div class="gauge-ring" id="mainGaugeRing">
+<div class="gauge-ring" id="mainGaugeRing">
     
-<!-- ตัวเลขและข้อความ (Overlay) -->
-<div class="gauge-center" style="bottom: 5%; transform: translateY(-10px); z-index: 25;">
-  <div class="gauge-value" id="mainGaugeValue" style="font-size: 3rem;">0%</div>
+  <!-- ตัวเลขกลางวง -->
+  <div class="gauge-center">
+    <div class="gauge-value" id="mainGaugeValue" style="font-size: clamp(1.8rem, 5vw, 2.8rem);">0%</div>
+  </div>
 
-  <div class="gauge-trend" id="mainGaugeTrend" style="margin-top: 15px;">
-        <span class="trend-arrow">▲</span>
-        <span class="trend-value">Good</span>
-      </div>
-    </div>
-
-    <!-- SVG Structure (Sport Style) -->
-    <svg viewBox="0 0 200 200" class="gauge-svg" style="position: relative; z-index: 10;">
+  <!-- SVG Structure (Sport Style) -->
+  <svg viewBox="0 0 200 200" class="gauge-svg" style="position: relative; z-index: 10;">
       <defs>
         <!-- Gradient สีแบบ Heatmap -->
         <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -4988,10 +5135,17 @@ datalist { display: none; }
       <!-- 8. Glass Reflection Overlay -->
       <ellipse cx="100" cy="60" rx="60" ry="30" fill="url(#mainGlassReflect)" opacity="0.5"/>
       
-      <!-- 9. Small Highlight Dots (จุดเล็กๆ เพื่อความสวย) -->
+ 
+      <!-- 9. Small Highlight Dots -->
       <circle cx="25" cy="85" r="2" fill="rgba(255,255,255,0.1)"/>
       <circle cx="175" cy="85" r="2" fill="rgba(255,255,255,0.1)"/>
     </svg>
+  </div>
+
+  <!-- Trend อยู่นอกวงกลม -->
+  <div class="gauge-trend" id="mainGaugeTrend" style="margin-top: 0;">
+    <span class="trend-arrow">▲</span>
+    <span class="trend-value">Good</span>
   </div>
 </div>
       
@@ -5853,38 +6007,46 @@ function updateMainGauge(passPct) {
   if (valueEl) {
     const current = parseInt(valueEl.textContent) || 0;
     if (current !== passPct) {
-      // ส่ง suffix '%' เข้าไปใน animation function
       animateGaugeNumber(valueEl, current, passPct, '%');
+      valueEl.classList.remove('glow-pulse');
+      void valueEl.offsetWidth;
+      valueEl.classList.add('glow-pulse');
+      setTimeout(() => valueEl.classList.remove('glow-pulse'), 650);
     } else {
       valueEl.textContent = passPct + '%';
     }
   }
 
-  // Update Status
+   // Update Status
   const trendEl = $id('mainGaugeTrend');
   if (trendEl) {
-    let status, color, bgColor;
+    let status, color, bgGrad, borderC;
 
     if (passPct >= 80) {
-      status = 'Excellent';
-      color = '#10b981';
-      bgColor = 'rgba(16, 185, 129, 0.15)';
+      status = 'EXCELLENT';
+      color = '#34d399';
+      bgGrad = 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(52, 211, 153, 0.06))';
+      borderC = 'rgba(52, 211, 153, 0.35)';
     } else if (passPct >= 60) {
-      status = 'Warning';
-      color = '#f59e0b';
-      bgColor = 'rgba(245, 158, 11, 0.15)';
+      status = 'GOOD';
+      color = '#fbbf24';
+      bgGrad = 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.06))';
+      borderC = 'rgba(251, 191, 36, 0.35)';
     } else if (passPct >= 40) {
-      status = 'Caution';
-      color = '#f97316';
-      bgColor = 'rgba(249, 115, 22, 0.15)';
+      status = 'CAUTION';
+      color = '#fb923c';
+      bgGrad = 'linear-gradient(135deg, rgba(249, 115, 22, 0.12), rgba(251, 146, 60, 0.06))';
+      borderC = 'rgba(251, 146, 60, 0.35)';
     } else {
-      status = 'Critical';
-      color = '#ef4444';
-      bgColor = 'rgba(239, 68, 68, 0.15)';
+      status = 'CRITICAL';
+      color = '#f87171';
+      bgGrad = 'linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(248, 113, 113, 0.06))';
+      borderC = 'rgba(248, 113, 113, 0.35)';
     }
 
-    trendEl.style.background = bgColor;
-    trendEl.style.border = `1px solid ${color}40`;
+    trendEl.style.background = bgGrad;
+    trendEl.style.borderColor = borderC;
+    trendEl.style.boxShadow = `0 0 20px ${color}20, inset 0 1px 0 rgba(255,255,255,0.06)`;
 
     const arrow = trendEl.querySelector('.trend-arrow');
     const value = trendEl.querySelector('.trend-value');
@@ -5896,6 +6058,7 @@ function updateMainGauge(passPct) {
 
     if (value) {
       value.style.color = color;
+      value.style.textShadow = `0 0 8px ${color}60`;
       value.textContent = status;
     }
   }
