@@ -1655,9 +1655,9 @@ body.dark-mode .img-zone-sub {
   overflow: hidden;
 }
 
-/* ── ซ้าย: รูปภาพ (กว้าง 50% เพื่อให้ขอบขวาอยู่กลาง) --- */
+/* --- ซ้าย: รูปภาพ (กว้างขึ้นเล็กน้อย) --- */
 .rec-col-left-image {
-  width: 50%;  /* ← เปลี่ยนจาก 38% เป็น 50% */
+  width: 38%; 
   min-width: 280px;
   background: #f8fafc;
   border-right: 1px solid #e2e8f0;
@@ -1665,7 +1665,6 @@ body.dark-mode .img-zone-sub {
   align-items: center;
   justify-content: center;
   position: relative;
-  overflow: hidden;  /* ← เพิ่มบรรทัดนี้ เพื่อป้องกันภาพล้น */
 }
 
 .rec-img-hero {
@@ -1902,6 +1901,433 @@ body:has(#supDashModal.open) .sb-overlay {
   z-index: 1 !important;
   opacity: 0 !important;
   pointer-events: none !important;
+}
+/* ═══════════════════════════════════════════════════
+   RECORD DETAIL — PRESENTATION GRADE
+════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   RECORD DETAIL — SEAMLESS + COMPACT + IMAGE-FIRST
+════════════════════════════════════════════════════ */
+.rec-report-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Panel: โค้งเดียว ── */
+.rec-detail-panel {
+  width: min(96vw, 1120px) !important;
+  height: auto !important;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 30px 90px rgba(0,0,0,.2);
+  border-radius: 22px !important;
+  min-height: 420px;
+  background: #fff;
+}
+.rec-detail-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #0f172a, #172554);
+  border-radius: 22px 22px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.rec-detail-hd-title {
+  font-size: .78rem;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rec-detail-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.07);
+  cursor: pointer;
+  color: rgba(255,255,255,.7);
+  font-size: .7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+}
+.rec-detail-close:hover { background: rgba(220,38,38,.25); color: #fff; }
+
+/* ── Header: compact ── */
+.rec-problem-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #172554 100%);
+  padding: 14px 22px 16px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.rec-problem-header::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(37,99,235,.15) 0%, transparent 65%);
+  pointer-events: none;
+}
+.rec-ph-eyebrow {
+  font-size: .48rem;
+  font-weight: 800;
+  letter-spacing: .22em;
+  color: rgba(165,243,252,.5);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.rec-ph-eyebrow::before {
+  content: '';
+  width: 14px;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgba(165,243,252,.5), transparent);
+  border-radius: 99px;
+}
+.rec-ph-title {
+  font-size: .95rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.45;
+  position: relative;
+  z-index: 1;
+  word-break: break-word;
+}
+.rec-ph-meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.rec-ph-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .6rem;
+  color: rgba(255,255,255,.38);
+  font-weight: 500;
+}
+.rec-ph-meta-item b {
+  color: rgba(255,255,255,.85);
+  font-weight: 700;
+}
+
+/* ── ไม่มี curve — เนื้อเดียว ── */
+
+/* ── Body: เนื้อเดียวกัน ── */
+.rec-body-row {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* ── รูป: เต็มพื้นที่ ไม่มี background แยก ── */
+.rec-col-img {
+  width: 50%;
+  min-width: 260px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.rec-col-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  cursor: zoom-in;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.rec-col-img-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #cbd5e1;
+  cursor: pointer;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+  background: #f8fafc;
+}
+.rec-col-img-empty:hover { color: #94a3b8; }
+.rec-col-img-empty-icon { font-size: 2.6rem; opacity: .3; }
+.rec-col-img-empty-text { font-size: .8rem; font-weight: 600; }
+.rec-col-img-empty-sub { font-size: .58rem; color: #e2e8f0; }
+
+/* ── ขวา: Data + Footer ── */
+.rec-col-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-left: 1px solid #f1f5f9;
+  padding: 10px 16px 10px 16px;
+}
+
+/* ── Data: ไม่มี background แยก ── */
+.rec-col-data {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+.rec-data-section {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.rec-data-section-title {
+  font-size: .48rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: #94a3b8;
+  padding-bottom: 4px;
+  border-bottom: 1.5px solid #f1f5f9;
+}
+.rec-data-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 18px;
+}
+.rec-data-field {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.rec-data-label {
+  font-size: .5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: #94a3b8;
+}
+.rec-data-value {
+  font-size: .78rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.3;
+}
+
+/* ── ตัวเลข highlight ── */
+.rec-data-value.mono {
+  font-family: 'DM Mono', monospace;
+  font-size: .84rem;
+  font-weight: 800;
+}
+.rec-data-value.violet {
+  color: #7c3aed;
+  background: rgba(124,58,237,.05);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(124,58,237,.1);
+  display: inline-block;
+  width: fit-content;
+}
+.rec-data-value.action {
+  color: #2563eb;
+  background: rgba(37,99,235,.05);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(37,99,235,.1);
+  display: inline-block;
+  width: fit-content;
+}
+
+/* ── OK/NG compact ── */
+.rec-result-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.rec-result-chip {
+  flex: 1;
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.rec-result-chip-ok {
+  background: rgba(5,150,105,.04);
+  border: 1.5px solid #86efac;
+}
+.rec-result-chip-ng {
+  background: rgba(220,38,38,.04);
+  border: 1.5px solid #fca5a5;
+}
+.rec-result-num {
+  font-size: 1.5rem;
+  font-weight: 900;
+  font-family: 'DM Mono', monospace;
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+.rec-result-num-ok { color: #059669; }
+.rec-result-num-ng { color: #dc2626; }
+.rec-result-lbl {
+  font-size: .45rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+.rec-result-lbl-ok { color: #15803d; }
+.rec-result-lbl-ng { color: #b91c1c; }
+
+/* ── Remark: compact ── */
+.rec-remark-box {
+  background: rgba(251,191,11,.04);
+  border: 1.5px solid #fde68a;
+  border-radius: 10px;
+  padding: 10px 12px;
+  position: relative;
+}
+.rec-remark-box::before {
+  content: '💬';
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  font-size: .72rem;
+  background: #fbbf24;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(251,191,11,.3);
+}
+.rec-remark-label {
+  font-size: .46rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: #92400e;
+  margin-bottom: 2px;
+  margin-top: 2px;
+}
+.rec-remark-value {
+  font-size: .76rem;
+  color: #78350f;
+  font-weight: 600;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.rec-remark-empty {
+  font-size: .66rem;
+  color: #b45309;
+  font-style: italic;
+  opacity: .5;
+}
+
+/* ── Footer: แนบขอบล่าง เนื้อเดียว ── */
+.rec-footer-bar {
+  margin-top: auto;
+  padding: 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-top: 1.5px solid #f1f5f9;
+  flex-shrink: 0;
+}
+.rec-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rec-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rec-pill {
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: .72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.rec-pill-report {
+  background: rgba(37,99,235,.06);
+  color: #2563eb;
+  border: 1.5px solid #bfdbfe;
+}
+.rec-pill-status {
+  background: rgba(5,150,105,.06);
+  color: #15803d;
+  border: 1.5px solid #86efac;
+}
+.rec-pill-status-wip {
+  background: rgba(217,119,6,.06);
+  color: #b45309;
+  border: 1.5px solid #fcd34d;
+}
+
+/* ── Dark Mode ── */
+body.dark-mode .rec-detail-panel { background: #1e293b; }
+body.dark-mode .rec-detail-hd { background: linear-gradient(135deg, #020617, #0c1445); }
+body.dark-mode .rec-problem-header { background: linear-gradient(135deg, #020617, #0f172a 50%, #0c1445); }
+body.dark-mode .rec-body-row { background: #1e293b; }
+body.dark-mode .rec-col-right { border-color: #334155; }
+body.dark-mode .rec-col-img-empty { background: #0f172a; color: #475569; }
+body.dark-mode .rec-col-img-empty-sub { color: #334155; }
+body.dark-mode .rec-data-label { color: #64748b; }
+body.dark-mode .rec-data-value { color: #f1f5f9; }
+body.dark-mode .rec-data-section-title { color: #64748b; border-color: #334155; }
+body.dark-mode .rec-data-value.violet { background: rgba(124,58,237,.08); border-color: rgba(124,58,237,.18); color: #a78bfa; }
+body.dark-mode .rec-data-value.action { background: rgba(37,99,235,.08); border-color: rgba(37,99,235,.18); color: #93c5fd; }
+body.dark-mode .rec-result-chip-ok { background: rgba(5,150,105,.06); border-color: rgba(34,197,94,.25); }
+body.dark-mode .rec-result-chip-ng { background: rgba(220,38,38,.06); border-color: rgba(239,68,68,.25); }
+body.dark-mode .rec-remark-box { background: rgba(251,191,11,.04); border-color: rgba(251,191,11,.15); }
+body.dark-mode .rec-remark-label { color: #fbbf24; }
+body.dark-mode .rec-remark-value { color: #fde68a; }
+body.dark-mode .rec-footer-bar { border-color: #334155; }
+body.dark-mode .rec-pill-report { background: rgba(37,99,235,.1); color: #60a5fa; border-color: rgba(37,99,235,.25); }
+body.dark-mode .rec-pill-status { background: rgba(16,185,129,.1); color: #34d399; border-color: rgba(16,185,129,.25); }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .rec-detail-panel { border-radius: 16px !important; width: 100vw !important; max-height: 100vh; min-height: auto; }
+  .rec-detail-hd { border-radius: 16px 16px 0 0; }
+  .rec-body-row { flex-direction: column; }
+  .rec-col-img { width: 100%; min-width: auto; height: 220px; min-height: 220px; }
+  .rec-col-right { border-left: none; border-top: 1px solid #f1f5f9; padding: 10px 14px; }
+  .rec-data-grid { grid-template-columns: 1fr; }
+  .rec-footer-bar { flex-direction: column; align-items: stretch; gap: 6px; }
+  .rec-footer-left { justify-content: flex-start; }
+  .rec-footer-right { justify-content: flex-end; }
+  .rec-result-num { font-size: 1.3rem; }
+  body.dark-mode .rec-col-right { border-top-color: #334155; }
 }
 </style>
 
@@ -2692,7 +3118,10 @@ body:has(#supDashModal.open) .sb-overlay {
               </table>
             </div>
           </div>
-
+        <div class="full">
+          <label>💬 Remark / หมายเหตุเพิ่มเติม</label>
+          <textarea id="supRemark" placeholder="บันทึกเพิ่มเติม เช่น สาเหตุที่คาดว่า, แนวทางแก้ไขเพิ่มเติม, ผู้ที่เกี่ยวข้อง..." style="min-height:56px;resize:vertical;"></textarea>
+        </div>
         </div><!-- /sdb-right -->
       </div><!-- /sup-dash-body -->
     </div>
@@ -3005,6 +3434,7 @@ body:has(#supDashModal.open) .sb-overlay {
     <div class="edit-modal-grid">
       <div class="edit-field"><label class="edit-label">วันที่</label><input class="edit-input" type="date" id="editDate"></div>
       <div class="edit-field" style="grid-column:1/-1;"><label class="edit-label">รายละเอียดปัญหา</label><input class="edit-input" type="text" id="editProblem"></div>
+            <div class="edit-field" style="grid-column:1/-1;"><label class="edit-label">💬 Remark / หมายเหตุเพิ่มเติม</label><textarea class="edit-input" id="editRemark" placeholder="บันทึกเพิ่มเติม..." style="min-height:50px;resize:vertical;"></textarea></div>
 <select class="edit-input" id="editAction"><option value="Rework">Rework (ซ่อมแซม/คัด)</option><option value="Replace">Replace (ส่งกลับ)</option><option value="Refer Approval">Refer Approval</option><option value="Refer TI DMS">Refer TI DMS</option></select>
       <div class="edit-field"><label class="edit-label">Group Part</label><input class="edit-input" type="text" id="editPart"></div>
       <div class="edit-field"><label class="edit-label">LOT</label><input class="edit-input" type="text" id="editLot"></div>
@@ -3553,6 +3983,7 @@ function saveEditSupport() {
             refreshSupportImagesOnly();
         }
     }
+        document.getElementById('editRemark').value = s.remark || '';
     _pendingEditImg = undefined;
     
     save();
@@ -3925,6 +4356,7 @@ function exportSupportToExcel() {
         "OK (ชิ้นดี)": s.ok || 0,
         "NG (ของเสีย)": s.ng || 0,
         "ประเภท Report": s.report || '',
+                "Remark": s.remark || '',
         "หมายเหตุ/ผู้บันทึก": s._user || ''
     }));
 
@@ -3934,7 +4366,7 @@ function exportSupportToExcel() {
     // ปรับความกว้างคอลัมน์ให้สวยงาม (Optional)
     ws['!cols'] = [
         {wch: 20}, {wch: 40}, {wch: 15}, {wch: 15}, 
-        {wch: 12}, {wch: 10}, {wch: 10}, {wch: 10}, {wch: 15}
+        {wch: 12}, {wch: 10}, {wch: 10}, {wch: 15}, {wch: 30}
     ];
 
     const wb = XLSX.utils.book_new();
@@ -5029,6 +5461,7 @@ function saveEditSupport(){
   db.support[i].report = document.getElementById('editReport').value;
   db.support[i].month = month;
   db.support[i].eventDate = di; // ***สำคัญ: อัปเดต eventDate***
+  db.support[i].remark = document.getElementById('editRemark').value || '';
   db.support[i]._editedAt = fullTimestamp();
   db.support[i]._user = currentUser;
   
@@ -5489,86 +5922,107 @@ function openRecDetail(idx){
 
   const recImg = imageMap[s.id];
   const st = deriveStatus(s.result);
-  
-  // สี Report Type
   const rptColor = s.report === 'RP' ? '#dc2626' : s.report === 'VF' ? '#2563eb' : '#d97706';
-  
+  const isWip = st.cls === 'sp-status-wip';
+
   const el = document.getElementById('recDetailBody');
   
-  // HTML Layout ใหม่ (Expanded)
   el.innerHTML = `
-    <div class="rec-layout-container">
+    <div class="rec-report-layout">
       
-      <!-- ซ้าย: รูปภาพ -->
-      <div class="rec-col-left-image">
-        ${recImg ? `
-          <img src="${recImg}" class="rec-img-hero" onclick="imgZoomOrChange(event, '${s.id}', ${idx})" title="คลิกเพื่อซูม">
-          <div class="img-change-btn" onclick="event.stopPropagation(); openQuickImgEdit('${s.id}', ${idx})">📷 เปลี่ยนรูป</div>
-        ` : `
-          <div style="text-align:center; color:#94a3b8; cursor:pointer;" onclick="openQuickImgEdit('${s.id}', ${idx})">
-            <div style="font-size:3rem; margin-bottom:10px;">🖼️</div>
-            <div style="font-size:0.9rem; font-weight:600;">เพิ่มรูปภาพ</div>
-          </div>
-        `}
+      <!-- ═══ HEADER ═══ -->
+      <div class="rec-problem-header">
+        <div class="rec-ph-eyebrow">⚠️ Problem Detail</div>
+        <div class="rec-ph-title">${s.problem || '—'}</div>
+        <div class="rec-ph-meta">
+          <div class="rec-ph-meta-item">📅 <b>${s.fullTimestamp || s.datetime || '—'}</b></div>
+          <div class="rec-ph-meta-item">👤 <b>${s._user || '—'}</b></div>
+          <div class="rec-ph-meta-item">📦 <b>${s.part || '—'}</b></div>
+          <div class="rec-ph-meta-item">🏷️ LOT <b>${s.lot || '—'}</b></div>
+        </div>
       </div>
 
-      <!-- ขวา: ข้อมูล (Grid แนวนอน) -->
-      <div class="rec-col-right-data">
+      <!-- ═══ BODY: เนื้อเดียวกัน ═══ -->
+      <div class="rec-body-row">
         
-        <div class="data-content-area">
-          
-          <!-- Row 1: วันที่ (ซ้าย) / ผู้บันทึก (ขวา) -->
-          <div class="d-item">
-            <div class="d-label">📅 Date / Time</div>
-            <div class="d-val">${s.fullTimestamp || s.datetime || '—'}</div>
-          </div>
-          <div class="d-item" style="text-align:right;">
-            <div class="d-label">👤 Recorded By</div>
-            <div class="d-val">${s._user || '—'}</div>
-          </div>
-
-          <!-- Row 2: ปัญหา (กว้างเต็ม) -->
-          <div class="d-item span-full">
-            <div class="d-label">⚠️ Problem Detail</div>
-            <div class="d-val problem">${s.problem || '—'}</div>
-          </div>
-
-          <!-- Row 3: Action (กว้างเต็ม) -->
-          <div class="d-item span-full">
-            <div class="d-label">🔧 Action Taken</div>
-            <div class="d-val action">${s.action || '—'}</div>
-          </div>
-
-          <!-- Row 4: Group Part (ซ้าย) / LOT (ขวา) -->
-          <div class="d-item">
-            <div class="d-label">📦 Group Part</div>
-            <div class="d-val">${s.part || '—'}</div>
-          </div>
-          <div class="d-item" style="text-align:right;">
-            <div class="d-label">🏷️ LOT No.</div>
-            <div class="d-val" style="color:var(--violet);">${s.lot || '—'}</div>
-          </div>
-          
+        <!-- ซ้าย: รูป เต็มพื้นที่ -->
+        <div class="rec-col-img">
+          ${recImg ? `
+            <img src="${recImg}" onclick="imgZoomOrChange(event, '${s.id}', ${idx})" title="คลิกเพื่อซูม">
+          ` : `
+            <div class="rec-col-img-empty" onclick="openQuickImgEdit('${s.id}', ${idx})">
+              <div class="rec-col-img-empty-icon">🖼️</div>
+              <div class="rec-col-img-empty-text">เพิ่มรูปภาพ</div>
+              <div class="rec-col-img-empty-sub">คลิกเพื่ออัปโหลด</div>
+            </div>
+          `}
         </div>
 
-        <!-- Footer: Status & Buttons -->
-        <div class="footer-bar">
+        <!-- ขวา: Data + Footer -->
+        <div class="rec-col-right">
           
-          <!-- กลุ่มสถานะ -->
-          <div class="pill-group">
-            <span class="pill report" style="background:${rptColor}11; color:${rptColor}; border-color:${rptColor}44;">${s.report}</span>
-            <span class="pill status" style="${st.cls === 'sp-status-wip' ? 'background:#fffbeb;color:#b45309;border-color:#fcd34d;' : ''}">
-              ${st.cls === 'sp-status-wip' ? '⏳' : '✅'} ${st.txt}
-            </span>
-            <span class="pill ok">✓ ${s.ok ?? '—'}</span>
-            <span class="pill ng">✗ ${s.ng ?? '—'}</span>
+          <div class="rec-col-data">
+            
+            <div class="rec-data-section">
+              <div class="rec-data-section-title">🔧 Action & Classification</div>
+              <div class="rec-data-grid">
+                <div class="rec-data-field">
+                  <div class="rec-data-label">การแก้ไข</div>
+                  <div class="rec-data-value action">${s.action || '—'}</div>
+                </div>
+                <div class="rec-data-field">
+                  <div class="rec-data-label">Group Part</div>
+                  <div class="rec-data-value" style="font-weight:800;">${s.part || '—'}</div>
+                </div>
+                <div class="rec-data-field">
+                  <div class="rec-data-label">LOT No.</div>
+                  <div class="rec-data-value violet mono">${s.lot || '—'}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rec-data-section">
+              <div class="rec-data-section-title">📊 Inspection Result</div>
+              <div class="rec-result-row">
+                <div class="rec-result-chip rec-result-chip-ok">
+                  <div class="rec-result-num rec-result-num-ok">${s.ok ?? '—'}</div>
+                  <div class="rec-result-lbl rec-result-lbl-ok">✓ OK</div>
+                </div>
+                <div class="rec-result-chip rec-result-chip-ng">
+                  <div class="rec-result-num rec-result-num-ng">${s.ng ?? '—'}</div>
+                  <div class="rec-result-lbl rec-result-lbl-ng">✗ NG </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rec-data-section">
+              <div class="rec-data-section-title">💬 Remark</div>
+              <div class="rec-remark-box">
+                <div class="rec-remark-label">หมายเหตุเพิ่มเติม</div>
+                ${s.remark && s.remark.trim() 
+                  ? `<div class="rec-remark-value">${s.remark}</div>` 
+                  : `<div class="rec-remark-empty">ไม่มีหมายเหตุเพิ่มเติม</div>`
+                }
+              </div>
+            </div>
+
           </div>
 
-
+          <!-- ═══ FOOTER ═══ -->
+          <div class="rec-footer-bar">
+            <div class="rec-footer-left">
+              <span class="rec-pill rec-pill-report" style="color:${rptColor};border-color:${rptColor}33;background:${rptColor}08;">${s.report}</span>
+            </div>
+            <div class="rec-footer-right">
+              <span class="rec-pill ${isWip ? 'rec-pill-status-wip' : 'rec-pill-status'}">
+                ${isWip ? '⏳' : '✅'} ${st.txt}
+              </span>
+            </div>
+          </div>
 
         </div>
-
       </div>
+
     </div>
   `;
 
@@ -5809,6 +6263,9 @@ closeEditModal = function(e) {
   _origCloseEditModal(e);
   restoreSidebarState();
 };
+
+    const rmEl = document.getElementById('supRemark');
+    if(rmEl) rmEl.value = '';
 
 const _origCloseAddSupModal = closeAddSupModal;
 closeAddSupModal = function() {
