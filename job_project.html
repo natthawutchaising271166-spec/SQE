@@ -1655,9 +1655,9 @@ body.dark-mode .img-zone-sub {
   overflow: hidden;
 }
 
-/* --- ซ้าย: รูปภาพ (กว้างขึ้นเล็กน้อย) --- */
+/* ── ซ้าย: รูปภาพ (กว้าง 50% เพื่อให้ขอบขวาอยู่กลาง) --- */
 .rec-col-left-image {
-  width: 38%; 
+  width: 50%;  /* ← เปลี่ยนจาก 38% เป็น 50% */
   min-width: 280px;
   background: #f8fafc;
   border-right: 1px solid #e2e8f0;
@@ -1665,6 +1665,7 @@ body.dark-mode .img-zone-sub {
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;  /* ← เพิ่มบรรทัดนี้ เพื่อป้องกันภาพล้น */
 }
 
 .rec-img-hero {
@@ -1901,69 +1902,6 @@ body:has(#supDashModal.open) .sb-overlay {
   z-index: 1 !important;
   opacity: 0 !important;
   pointer-events: none !important;
-}
-/* ═══════════════════════════════════════════════════
-   ENHANCED OK/NG PILLS — Record Detail Popup
-════════════════════════════════════════════════════ */
-.pill.ok {
-  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-  color: #059669;
-  border: 2px solid #6ee7b7;
-  box-shadow: 0 2px 10px rgba(5,150,105,.2);
-  font-size: .85rem;
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-weight: 800;
-  letter-spacing: .02em;
-}
-
-.pill.ng {
-  background: linear-gradient(135deg, #fef2f2, #fee2e2);
-  color: #dc2626;
-  border: 2px solid #fca5a5;
-  box-shadow: 0 2px 10px rgba(220,38,38,.2);
-  font-size: .85rem;
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-weight: 800;
-  letter-spacing: .02em;
-}
-
-.pill.ok:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 16px rgba(5,150,105,.35);
-}
-
-.pill.ng:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 16px rgba(220,38,38,.35);
-}
-
-/* Dark Mode สำหรับ OK/NG Pills */
-body.dark-mode .pill.ok {
-  background: linear-gradient(135deg, rgba(5,150,105,.2), rgba(5,150,105,.1));
-  border-color: rgba(34,197,94,.4);
-  color: #34d399;
-}
-
-body.dark-mode .pill.ng {
-  background: linear-gradient(135deg, rgba(220,38,38,.2), rgba(220,38,38,.1));
-  border-color: rgba(248,113,113,.4);
-  color: #f87171;
-}
-/* ═══════════════════════════════════════════════════
-   IMAGE ZOOM POPUP — Dark Mode OK/NG Badges
-════════════════════════════════════════════════════ */
-body.dark-mode [style*="background:linear-gradient(135deg,#ecfdf5"] {
-  background: linear-gradient(135deg, rgba(5,150,105,.2), rgba(5,150,105,.08)) !important;
-  border-color: rgba(34,197,94,.4) !important;
-  color: #34d399 !important;
-}
-
-body.dark-mode [style*="background:linear-gradient(135deg,#fef2f2"] {
-  background: linear-gradient(135deg, rgba(220,38,38,.2), rgba(220,38,38,.08)) !important;
-  border-color: rgba(248,113,113,.4) !important;
-  color: #f87171 !important;
 }
 </style>
 
@@ -3782,107 +3720,30 @@ function delSpecialConfirm(i) {
 
 function getImgCellHTML(id,idx){return getImgCell(id,idx);}
 
-/* Zoom modal — กึ่งกลางสวยงาม + แสดง OK/NG */
+/* Zoom modal + change on double click */
 let _imgZoomTimer=null;
 function imgZoomOrChange(e,id,idx){
   if(_imgZoomTimer){
     clearTimeout(_imgZoomTimer);_imgZoomTimer=null;
+    // Double click → change
     openQuickImgEdit(id,idx);
   }else{
     _imgZoomTimer=setTimeout(()=>{
       _imgZoomTimer=null;
+      // Single click → zoom
       const src=imageMap[id];if(!src)return;
-      
-      // ดึงข้อมูล Support เพื่อแสดง OK/NG
-      const rec = db.support.find(s=>s.id===id);
-      const okVal = rec ? (rec.ok ?? '—') : '—';
-      const ngVal = rec ? (rec.ng ?? '—') : '—';
-      
-      // สร้าง Overlay
       const ov=document.createElement('div');
-      ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(12px);';
-      ov.onclick=(ev)=>{if(ev.target===ov||ev.target===img||ev.target===imgWrap)document.body.removeChild(ov);};
-      
-      // ── Header Bar: ข้อมูลสั้นๆ ──
-      const header=document.createElement('div');
-      header.style.cssText='display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px;';
-      
-      // OK Badge
-      const okBadge=document.createElement('div');
-      okBadge.style.cssText='display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:2px solid #6ee7b7;color:#059669;padding:8px 18px;border-radius:12px;font-weight:800;font-size:.9rem;box-shadow:0 4px 16px rgba(5,150,105,.25);letter-spacing:.03em;';
-      okBadge.innerHTML='<span style="font-size:.75rem;">✅</span><span>OK</span><span style="font-family:DM Mono,monospace;font-size:1.05rem;">'+okVal+'</span>';
-      
-      // NG Badge
-      const ngBadge=document.createElement('div');
-      ngBadge.style.cssText='display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#fef2f2,#fee2e2);border:2px solid #fca5a5;color:#dc2626;padding:8px 18px;border-radius:12px;font-weight:800;font-size:.9rem;box-shadow:0 4px 16px rgba(220,38,38,.25);letter-spacing:.03em;';
-      ngBadge.innerHTML='<span style="font-size:.75rem;">❌</span><span>NG</span><span style="font-family:DM Mono,monospace;font-size:1.05rem;">'+ngVal+'</span>';
-      
-      header.append(okBadge,ngBadge);
-      
-      // ── Image Container ──
-      const imgWrap=document.createElement('div');
-      imgWrap.style.cssText='position:relative;display:flex;align-items:center;justify-content:center;width:100%;max-width:88vw;height:100%;max-height:78vh;padding:0 20px;box-sizing:border-box;';
-      
+      ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(8px);';
+      ov.onclick=()=>document.body.removeChild(ov);
+      const wrap=document.createElement('div');
+      wrap.style.cssText='position:relative;max-width:90vw;max-height:90vh;';
       const img=document.createElement('img');
-      img.src=src;
-      img.style.cssText='max-width:100%;max-height:78vh;width:auto;height:auto;border-radius:18px;object-fit:contain;box-shadow:0 30px 100px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08);transition:transform .3s ease;';
-      img.onclick=(ev)=>{ev.stopPropagation();};
-      
-      imgWrap.appendChild(img);
-      
-      // ── Footer Bar: ปุ่ม Action ──
-      const footer=document.createElement('div');
-      footer.style.cssText='display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px;';
-      
-      const btnStyle='padding:11px 24px;border:none;border-radius:12px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:Plus Jakarta Sans,Prompt,sans-serif;backdrop-filter:blur(10px);transition:all .2s;display:flex;align-items:center;gap:8px;';
-      
-      const btnChange=document.createElement('button');
-      btnChange.style.cssText=btnStyle+'background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;box-shadow:0 4px 20px rgba(37,99,235,.45);';
-      btnChange.innerHTML='<span style="font-size:1rem;">🔄</span> เปลี่ยนรูป';
-      btnChange.onmouseover=()=>btnChange.style.transform='translateY(-2px) scale(1.04)';
-      btnChange.onmouseout=()=>btnChange.style.transform='';
-      btnChange.onclick=(ev)=>{
-        ev.stopPropagation();
-        document.body.removeChild(ov);
-        openQuickImgEdit(id,idx);
-      };
-      
-      const btnDel=document.createElement('button');
-      btnDel.style.cssText=btnStyle+'background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;box-shadow:0 4px 20px rgba(220,38,38,.4);';
-      btnDel.innerHTML='<span style="font-size:1rem;">🗑</span> ลบรูป';
-      btnDel.onmouseover=()=>btnDel.style.transform='translateY(-2px) scale(1.04)';
-      btnDel.onmouseout=()=>btnDel.style.transform='';
-      btnDel.onclick=(ev)=>{
-        ev.stopPropagation();
-        removeImage(id);
-        refreshSupportImagesOnly();
-        document.body.removeChild(ov);
-        toast('🗑 ลบรูปแล้ว');
-      };
-      
-      const btnClose=document.createElement('button');
-      btnClose.style.cssText=btnStyle+'background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1.5px solid rgba(255,255,255,.18);box-shadow:0 4px 16px rgba(0,0,0,.3);';
-      btnClose.innerHTML='<span style="font-size:1.1rem;">✕</span> ปิด';
-      btnClose.onmouseover=()=>{btnClose.style.background='rgba(255,255,255,.2)';btnClose.style.transform='translateY(-2px) scale(1.04)';};
-      btnClose.onmouseout=()=>{btnClose.style.background='rgba(255,255,255,.12)';btnClose.style.transform='';};
-      btnClose.onclick=(ev)=>{
-        ev.stopPropagation();
-        document.body.removeChild(ov);
-      };
-      
-      footer.append(btnChange,btnDel,btnClose);
-      
-      // ── Assemble All Parts ──
-      ov.append(header,imgWrap,footer);
-      document.body.appendChild(ov);
-      
-      // Entrance animation
-      requestAnimationFrame(()=>{
-        ov.style.opacity='0';
-        ov.style.transition='opacity .25s ease';
-        requestAnimationFrame(()=>ov.style.opacity='1');
-      });
-      
+      img.src=src;img.style.cssText='max-width:90vw;max-height:85vh;border-radius:14px;object-fit:contain;box-shadow:0 24px 80px rgba(0,0,0,.6);';
+      const btnRow=document.createElement('div');
+      btnRow.style.cssText='position:absolute;bottom:-42px;left:0;right:0;display:flex;justify-content:center;gap:10px;';
+      btnRow.innerHTML=`<button onclick="event.stopPropagation();openQuickImgEdit('${id}',${idx});document.body.removeChild(document.querySelector('[style*=\"z-index:99999\"]'))" style="padding:6px 14px;background:var(--grad);color:#fff;border:none;border-radius:8px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;">🔄 เปลี่ยนรูป</button>
+      <button onclick="event.stopPropagation();if(confirm('ลบรูปภาพ?')){removeImage('${id}');refreshSupportImagesOnly();document.body.removeChild(document.querySelector('[style*=\"z-index:99999\"]'));toast('🗑 ลบรูปแล้ว');}" style="padding:6px 14px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;">🗑 ลบ</button>`;
+      wrap.append(img,btnRow);ov.appendChild(wrap);document.body.appendChild(ov);
     },220);
   }
 }
@@ -5699,8 +5560,8 @@ function openRecDetail(idx){
             <span class="pill status" style="${st.cls === 'sp-status-wip' ? 'background:#fffbeb;color:#b45309;border-color:#fcd34d;' : ''}">
               ${st.cls === 'sp-status-wip' ? '⏳' : '✅'} ${st.txt}
             </span>
-            <span class="pill ok" style="min-width:70px;justify-content:center;gap:4px;"><span style="font-weight:800;font-size:.75rem;">OK</span> <span style="font-family:'DM Mono',monospace;font-weight:900;">${s.ok ?? '—'}</span></span>
-            <span class="pill ng" style="min-width:70px;justify-content:center;gap:4px;"><span style="font-weight:800;font-size:.75rem;">NG</span> <span style="font-family:'DM Mono',monospace;font-weight:900;">${s.ng ?? '—'}</span></span>
+            <span class="pill ok">✓ ${s.ok ?? '—'}</span>
+            <span class="pill ng">✗ ${s.ng ?? '—'}</span>
           </div>
 
 
