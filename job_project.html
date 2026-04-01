@@ -2157,48 +2157,19 @@ body:has(#supDashModal.open) .sb-overlay {
   width: fit-content;
 }
 
-/* ── OK/NG compact ── */
-.rec-result-row {
-  display: flex;
-  gap: 8px;
-  align-items: stretch;
-}
-.rec-result-chip {
-  flex: 1;
-  border-radius: 10px;
-  padding: 8px 10px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-}
-.rec-result-chip-ok {
-  background: rgba(5,150,105,.04);
-  border: 1.5px solid #86efac;
-}
-.rec-result-chip-ng {
-  background: rgba(220,38,38,.04);
-  border: 1.5px solid #fca5a5;
-}
-.rec-result-num {
-  font-size: 1.5rem;
-  font-weight: 900;
-  font-family: 'DM Mono', monospace;
-  line-height: 1;
-  letter-spacing: -.02em;
-}
-.rec-result-num-ok { color: #059669; }
-.rec-result-num-ng { color: #dc2626; }
-.rec-result-lbl {
-  font-size: .45rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .12em;
-}
-.rec-result-lbl-ok { color: #15803d; }
-.rec-result-lbl-ng { color: #b91c1c; }
+.rec-result-chip{border-radius:12px;padding:10px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:80px;max-width:130px;}
+.rec-result-chip-ok{background:linear-gradient(145deg,#059669,#047857);border:3px solid #34d399;box-shadow:0 8px 28px rgba(5,150,105,.35),inset 0 1px 0 rgba(255,255,255,.2);}
+.rec-result-chip-ng{background:linear-gradient(145deg,#dc2626,#b91c1c);border:3px solid #f87171;box-shadow:0 8px 28px rgba(220,38,38,.35),inset 0 1px 0 rgba(255,255,255,.15);}
+.rec-result-chip-lot{background:linear-gradient(145deg,#7c3aed,#6d28d9);border:3px solid #a78bfa;box-shadow:0 8px 28px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.15);}
+
+.rec-result-num{font-size:clamp(1.8rem,5vw,3rem);font-weight:900;font-family:'DM Mono',monospace;line-height:1;letter-spacing:-.04em;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.2);}
+.rec-result-num-ok{color:#fff;}
+.rec-result-num-ng{color:#fff;}
+.rec-result-num-lot{color:#fff;}
+.rec-result-lbl{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.85);}
+.rec-result-lbl-ok{color:rgba(255,255,255,.85);}
+.rec-result-lbl-ng{color:rgba(255,255,255,.85);}
+.rec-result-lbl-lot{color:rgba(255,255,255,.85);}
 
 /* ── Remark: compact ── */
 .rec-remark-box {
@@ -2248,16 +2219,7 @@ body:has(#supDashModal.open) .sb-overlay {
 }
 
 /* ── Footer: แนบขอบล่าง เนื้อเดียว ── */
-.rec-footer-bar {
-  margin-top: auto;
-  padding: 8px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  border-top: 1.5px solid #f1f5f9;
-  flex-shrink: 0;
-}
+.rec-footer-bar{margin-top:10px;padding:8px 0 0;display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1.5px solid #f1f5f9;}
 .rec-footer-left {
   display: flex;
   align-items: center;
@@ -2306,8 +2268,9 @@ body.dark-mode .rec-data-value { color: #f1f5f9; }
 body.dark-mode .rec-data-section-title { color: #64748b; border-color: #334155; }
 body.dark-mode .rec-data-value.violet { background: rgba(124,58,237,.08); border-color: rgba(124,58,237,.18); color: #a78bfa; }
 body.dark-mode .rec-data-value.action { background: rgba(37,99,235,.08); border-color: rgba(37,99,235,.18); color: #93c5fd; }
-body.dark-mode .rec-result-chip-ok { background: rgba(5,150,105,.06); border-color: rgba(34,197,94,.25); }
-body.dark-mode .rec-result-chip-ng { background: rgba(220,38,38,.06); border-color: rgba(239,68,68,.25); }
+body.dark-mode .rec-result-chip-ok{background:linear-gradient(145deg,#047857,#065f46);border-color:#34d399;box-shadow:0 8px 28px rgba(5,150,105,.4);}
+body.dark-mode .rec-result-chip-ng{background:linear-gradient(145deg,#b91c1c,#991b1b);border-color:#f87171;box-shadow:0 8px 28px rgba(220,38,38,.4);}
+body.dark-mode .rec-result-chip-lot{background:linear-gradient(145deg,#6d28d9,#5b21b6);border-color:#a78bfa;box-shadow:0 8px 28px rgba(124,58,237,.4);}
 body.dark-mode .rec-remark-box { background: rgba(251,191,11,.04); border-color: rgba(251,191,11,.15); }
 body.dark-mode .rec-remark-label { color: #fbbf24; }
 body.dark-mode .rec-remark-value { color: #fde68a; }
@@ -2315,215 +2278,6 @@ body.dark-mode .rec-footer-bar { border-color: #334155; }
 body.dark-mode .rec-pill-report { background: rgba(37,99,235,.1); color: #60a5fa; border-color: rgba(37,99,235,.25); }
 body.dark-mode .rec-pill-status { background: rgba(16,185,129,.1); color: #34d399; border-color: rgba(16,185,129,.25); }
 
-/* ═══════════════════════════════════════════════════════════════
-   DARK MODE — SUPPORT ANALYTICS DASHBOARD (COMPLETE FIX)
-   สำหรับ Modal #supDashModal และลูกหลานทั้งหมด
-════════════════════════════════════════════════════════════════ */
-
-/* ── 1. Dashboard Panel Header ── */
-body.dark-mode .sup-dash-hd {
-  background: linear-gradient(90deg, #020617, #0c1445 55%, #1a0a3d);
-  border-bottom-color: rgba(56,189,248,.12);
-}
-body.dark-mode .sup-dash-hd-title { color: #fff; }
-body.dark-mode .sup-dash-ts { color: rgba(255,255,255,.25); }
-body.dark-mode .sup-dash-close {
-  background: rgba(255,255,255,.06);
-  border-color: rgba(255,255,255,.12);
-  color: rgba(255,255,255,.65);
-}
-body.dark-mode .sup-dash-close:hover {
-  background: rgba(220,38,38,.25);
-  color: #fff;
-  border-color: rgba(220,38,38,.4);
-}
-
-/* ── 2. Left & Right Panel Background ── */
-body.dark-mode .sdb-left {
-  background: #0f172a;
-  border-right-color: rgba(255,255,255,.06);
-}
-body.dark-mode .sdb-right {
-  background: #0f172a;
-}
-
-/* ── 3. Section Title ── */
-body.dark-mode .sdb-section-title {
-  color: #64748b;
-}
-body.dark-mode .sdb-section-title::after {
-  background: rgba(255,255,255,.06);
-}
-
-/* ── 4. KPI Cards — Base ── */
-body.dark-mode .sdb-kpi {
-  background: #1e293b;
-  border-color: rgba(255,255,255,.06);
-  box-shadow: 0 1px 4px rgba(0,0,0,.2);
-}
-body.dark-mode .sdb-kpi:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,.35);
-  background: #243348;
-}
-body.dark-mode .sdb-kpi-lbl { color: #64748b; }
-body.dark-mode .sdb-kpi-icon {
-  background: rgba(255,255,255,.05);
-}
-
-/* ── 5. KPI Cards — Per Variant ── */
-
-/* Total (Blue) */
-body.dark-mode .kpi-total {
-  background: linear-gradient(135deg, #1e293b, #172554);
-  border-color: rgba(59,130,246,.15);
-}
-body.dark-mode .kpi-total .sdb-kpi-val { color: #93c5fd; }
-body.dark-mode .kpi-total .sdb-kpi-delta { color: #64748b; }
-body.dark-mode .kpi-total .sdb-kpi-icon { background: rgba(59,130,246,.12); }
-body.dark-mode .kpi-total .sdb-kpi-bar { background: linear-gradient(180deg, #3b82f6, #7c3aed); }
-
-/* RP (Red) */
-body.dark-mode .kpi-rp {
-  background: linear-gradient(135deg, #1e293b, #1c1917);
-  border-color: rgba(220,38,38,.15);
-}
-body.dark-mode .kpi-rp .sdb-kpi-val { color: #fca5a5; }
-body.dark-mode .kpi-rp .sdb-kpi-delta { color: #fca5a5; }
-body.dark-mode .kpi-rp .sdb-kpi-icon { background: rgba(220,38,38,.12); }
-body.dark-mode .kpi-rp .sdb-kpi-bar { background: #dc2626; }
-
-/* VF (Blue) */
-body.dark-mode .kpi-vf {
-  background: linear-gradient(135deg, #1e293b, #172554);
-  border-color: rgba(37,99,235,.15);
-}
-body.dark-mode .kpi-vf .sdb-kpi-val { color: #93c5fd; }
-body.dark-mode .kpi-vf .sdb-kpi-delta { color: #93c5fd; }
-body.dark-mode .kpi-vf .sdb-kpi-icon { background: rgba(37,99,235,.12); }
-body.dark-mode .kpi-vf .sdb-kpi-bar { background: #2563eb; }
-
-/* Records (Amber) */
-body.dark-mode .kpi-rec {
-  background: linear-gradient(135deg, #1e293b, #1c1917);
-  border-color: rgba(217,119,6,.15);
-}
-body.dark-mode .kpi-rec .sdb-kpi-val { color: #fcd34d; }
-body.dark-mode .kpi-rec .sdb-kpi-delta { color: #fcd34d; }
-body.dark-mode .kpi-rec .sdb-kpi-icon { background: rgba(217,119,6,.12); }
-body.dark-mode .kpi-rec .sdb-kpi-bar { background: #d97706; }
-
-/* OK (Green) */
-body.dark-mode .kpi-ok {
-  background: linear-gradient(135deg, #1e293b, #052e16);
-  border-color: rgba(5,150,105,.15);
-}
-body.dark-mode .kpi-ok .sdb-kpi-val { color: #6ee7b7; }
-body.dark-mode .kpi-ok .sdb-kpi-delta { color: #6ee7b7; }
-body.dark-mode .kpi-ok .sdb-kpi-icon { background: rgba(5,150,105,.12); }
-body.dark-mode .kpi-ok .sdb-kpi-bar { background: #059669; }
-
-/* NG (Red Strong) */
-body.dark-mode .kpi-ng {
-  background: linear-gradient(135deg, #1e293b, #1c1917);
-  border-color: rgba(220,38,38,.2);
-  box-shadow: 0 2px 10px rgba(220,38,38,.08);
-}
-body.dark-mode .kpi-ng .sdb-kpi-val { color: #fca5a5; }
-body.dark-mode .kpi-ng .sdb-kpi-delta { color: #fca5a5; }
-body.dark-mode .kpi-ng .sdb-kpi-icon { background: rgba(220,38,38,.15); }
-body.dark-mode .kpi-ng .sdb-kpi-bar { background: linear-gradient(180deg, #dc2626, #b91c1c); }
-
-/* ── 6. Insight Mini Cards ── */
-body.dark-mode .sdb-insight-card {
-  background: #1e293b;
-  border-color: rgba(255,255,255,.06);
-}
-body.dark-mode .sdb-insight-icon {
-  background: rgba(255,255,255,.04);
-}
-body.dark-mode .sdb-insight-label { color: #64748b; }
-body.dark-mode .sdb-insight-val { color: #f1f5f9; }
-body.dark-mode .sdb-insight-sub { color: #94a3b8; }
-
-/* ── 7. Chart Cards ── */
-body.dark-mode .sdb-chart-card {
-  background: #1e293b;
-  border-color: rgba(255,255,255,.06);
-  box-shadow: none;
-}
-body.dark-mode .sdb-chart-card:hover {
-  box-shadow: 0 6px 24px rgba(0,0,0,.25);
-}
-body.dark-mode .sdb-chart-card-title { color: #e2e8f0; }
-body.dark-mode .badge-sm {
-  background: rgba(255,255,255,.06);
-  color: #94a3b8;
-  border-color: rgba(255,255,255,.1);
-}
-body.dark-mode .sdb-chart-card--glow-red { border-top-color: #dc2626; }
-body.dark-mode .sdb-chart-card--glow-blue { border-top-color: #2563eb; }
-body.dark-mode .sdb-chart-card--glow-green { border-top-color: #059669; }
-
-/* ── 8. Group Card ── */
-body.dark-mode .sdb-group-card {
-  background: #1e293b;
-  border-color: rgba(255,255,255,.06);
-}
-
-/* ── 9. Full Breakdown Table ── */
-body.dark-mode .sdb-tbl-wrap {
-  background: #1e293b;
-  border-color: rgba(255,255,255,.06);
-}
-body.dark-mode .sdb-tbl thead th {
-  background: linear-gradient(180deg, #0f172a, #1e293b);
-  color: #94a3b8;
-  border-bottom-color: #334155;
-}
-body.dark-mode .sdb-tbl tbody td {
-  color: #cbd5e1;
-  border-bottom-color: rgba(255,255,255,.04);
-}
-body.dark-mode .sdb-tbl tbody tr:nth-child(even) td { background: #1a2332; }
-body.dark-mode .sdb-tbl tbody tr:nth-child(odd) td { background: #0f172a; }
-body.dark-mode .sdb-tbl tbody tr:hover td { background: #1e3a5f !important; }
-
-/* Big Table Specific */
-body.dark-mode .sdb-tbl--big td:nth-child(2) { color: #e2e8f0; }
-body.dark-mode .sdb-tbl--big td:nth-child(3) { color: #f1f5f9; }
-body.dark-mode .sdb-tbl--big td:nth-child(7) { color: #6ee7b7; }
-body.dark-mode .sdb-tbl--big td:nth-child(8) { color: #fca5a5; }
-body.dark-mode .sdb-tbl--big td:nth-child(10) { color: #94a3b8; }
-
-/* ── 10. Heat Bar ── */
-body.dark-mode .sdb-heatbar {
-  background: rgba(255,255,255,.06);
-  box-shadow: none;
-}
-
-/* ── 11. Donut Center Stat ── */
-body.dark-mode #donut-center-stat,
-body.dark-mode #donut-center-num {
-  color: #f1f5f9 !important;
-  -webkit-text-fill-color: #f1f5f9 !important;
-}
-
-/* ── 12. Live Pill ── */
-body.dark-mode .live-pill {
-  background: rgba(34,197,94,.08);
-  border-color: rgba(34,197,94,.2);
-  color: #4ade80;
-}
-
-/* ── 13. Empty State Text ── */
-body.dark-mode .sdb-tbl td[style*="text-align:center"] {
-  color: #64748b !important;
-}
-
-/* ── 14. Chart Tooltip Override ── */
-body.dark-mode .sdb-chart-card canvas {
-  filter: none;
-}
 /* ── Responsive ── */
 @media (max-width: 700px) {
   .rec-detail-panel { border-radius: 16px !important; width: 100vw !important; max-height: 100vh; min-height: auto; }
@@ -2537,6 +2291,340 @@ body.dark-mode .sdb-chart-card canvas {
   .rec-footer-right { justify-content: flex-end; }
   .rec-result-num { font-size: 1.3rem; }
   body.dark-mode .rec-col-right { border-top-color: #334155; }
+}
+@media(max-width:700px){.rec-result-row{grid-template-columns:1fr 1fr;}.rec-result-chip{min-height:100px;padding:14px 10px 12px;}.rec-result-num{font-size:2.2rem;}.rec-result-chip-lot{grid-column:1/-1;}}
+@media(max-width:500px){.rec-result-row{grid-template-columns:1fr;}.rec-result-chip-lot{grid-column:auto;}}
+/* ═══════════════════════════════════════════════════
+   RECORD DETAIL — COMPACT HEADER + REORGANIZED
+════════════════════════════════════════════════════ */
+
+/* ── Header: ย่อให้กระชับ ── */
+.rec-problem-header.compact {
+  padding: 10px 18px 12px !important;
+}
+.rec-problem-header.compact .rec-ph-eyebrow {
+  font-size: .42rem !important;
+  letter-spacing: .16em !important;
+  margin-bottom: 3px !important;
+}
+.rec-problem-header.compact .rec-ph-title {
+  font-size: .82rem !important;
+  line-height: 1.4 !important;
+}
+.rec-problem-header.compact .rec-ph-meta {
+  margin-top: 5px !important;
+  gap: 10px !important;
+}
+.rec-problem-header.compact .rec-ph-meta-item {
+  font-size: .55rem !important;
+}
+
+/* ── Right Column: จัดเรียงใหม่ ── */
+.rec-col-right.compact {
+  padding: 10px 14px 8px !important;
+  gap: 8px !important;
+}
+.rec-col-data.compact {
+  gap: 6px !important;
+}
+
+/* ── Data Section: กระชับขึ้น ── */
+.rec-data-section.compact .rec-data-section-title {
+  font-size: .42rem !important;
+  letter-spacing: .12em !important;
+  padding-bottom: 3px !important;
+  margin-bottom: 4px !important;
+}
+.rec-data-section.compact .rec-data-grid {
+  gap: 4px 12px !important;
+}
+.rec-data-field.compact .rec-data-label {
+  font-size: .46rem !important;
+}
+.rec-data-field.compact .rec-data-value {
+  font-size: .72rem !important;
+}
+.rec-data-field.compact .rec-data-value.action,
+.rec-data-field.compact .rec-data-value.violet {
+  font-size: .68rem !important;
+  padding: 2px 6px !important;
+}
+
+/* ── Result Chips: ย่อให้เหมาะสม ── */
+.rec-result-row.compact {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.rec-result-chip.compact {
+  padding: 8px 6px !important;
+  min-width: 70px !important;
+  max-width: none !important;
+  border-radius: 12px !important;
+  flex: 1;
+}
+.rec-result-num.compact {
+  font-size: clamp(1.4rem, 3.5vw, 2rem) !important;
+}
+.rec-result-lbl.compact {
+  font-size: .5rem !important;
+  letter-spacing: .1em !important;
+}
+
+/* ── LOT Chip: ย่อลง ── */
+.rec-result-chip-lot.compact {
+  max-width: 90px !important;
+  flex: 0 0 90px !important;
+}
+.rec-result-chip-lot.compact .rec-result-num-lot {
+  font-size: 1.1rem !important;
+}
+.rec-result-chip-lot.compact > div:first-child {
+  font-size: .85rem !important;
+  margin-bottom: 1px !important;
+}
+
+/* ── Remark: กระชับ ── */
+.rec-remark-box.compact {
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+}
+.rec-remark-box.compact::before {
+  top: -8px !important;
+  left: 8px !important;
+  width: 16px !important;
+  height: 16px !important;
+  font-size: .6rem !important;
+}
+.rec-remark-box.compact .rec-remark-label {
+  font-size: .42rem !important;
+  margin-top: 1px !important;
+  margin-bottom: 1px !important;
+}
+.rec-remark-box.compact .rec-remark-value {
+  font-size: .7rem !important;
+}
+.rec-remark-box.compact .rec-remark-empty {
+  font-size: .6rem !important;
+}
+
+/* ── Footer: กระชับ ── */
+.rec-footer-bar.compact {
+  margin-top: 6px !important;
+  padding-top: 6px !important;
+}
+.rec-pill.compact {
+  padding: 4px 10px !important;
+  font-size: .65rem !important;
+}
+
+/* ── Info Row: เพิ่ม layout แบบ inline ── */
+.rec-info-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 6px 10px;
+  background: rgba(37,99,235,.03);
+  border: 1px solid rgba(37,99,235,.08);
+  border-radius: 8px;
+}
+.rec-info-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .65rem;
+  color: var(--txt3);
+}
+.rec-info-item b {
+  color: var(--txt);
+  font-weight: 700;
+}
+.rec-info-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Action Badge: ขนาดเล็กสวย ── */
+.rec-action-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: .65rem;
+  font-weight: 700;
+  background: rgba(37,99,235,.08);
+  color: var(--primary);
+  border: 1px solid rgba(37,99,235,.15);
+}
+.rec-part-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: .65rem;
+  font-weight: 700;
+  background: rgba(124,58,237,.08);
+  color: var(--violet);
+  border: 1px solid rgba(124,58,237,.15);
+}
+
+/* Dark Mode */
+body.dark-mode .rec-info-inline {
+  background: rgba(37,99,235,.05);
+  border-color: rgba(37,99,235,.12);
+}
+body.dark-mode .rec-action-badge {
+  background: rgba(37,99,235,.12);
+  color: #93c5fd;
+  border-color: rgba(37,99,235,.25);
+}
+body.dark-mode .rec-part-badge {
+  background: rgba(124,58,237,.12);
+  color: #a78bfa;
+  border-color: rgba(124,58,237,.25);
+}
+/* ── Result Chips: ย่อให้เหมาะสม ── */
+.rec-result-row.compact {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.rec-result-chip.compact {
+  padding: 8px 6px !important;
+  min-width: 70px !important;
+  max-width: none !important;
+  border-radius: 12px !important;
+  flex: 1; /* ← สำคัญ: ทำให้ทุกกล่องเท่ากัน */
+}
+
+/* ── LOT Chip: อยู่ด้านซ้ายสุด ขนาดเท่า OK/NG ── */
+.rec-result-chip-lot.compact {
+  max-width: none !important; /* ← เปลี่ยนจาก 90px เป็น none เพื่อให้เท่ากัน */
+  flex: 0 0 auto; /* ← ให้ขนาดตามเนื้อหา แต่ไม่เล็กเกินไป */
+  min-width: 90px !important; /* ← กำหนดความกว้างขั้นต่ำ */
+}
+.rec-result-chip-lot.compact .rec-result-num-lot {
+  font-size: 1rem !important; /* ← ขนาดตัวเลข LOT */
+  word-break: break-all; /* ← ถ้า LOT ยาวให้ขึ้นบรรทัดใหม่ */
+  line-height: 1.2 !important;
+}
+.rec-result-chip-lot.compact > div:first-child {
+  font-size: .85rem !important;
+  margin-bottom: 1px !important;
+}
+
+/* ── ปรับ OK/NG ให้กระชับเข้ากับ LOT ── */
+.rec-result-num.compact {
+  font-size: clamp(1.4rem, 3.5vw, 2rem) !important;
+}
+.rec-result-lbl.compact {
+  font-size: .5rem !important;
+  letter-spacing: .1em !important;
+}
+/* ── LOT Chip Label ── */
+.rec-result-lbl-lot {
+  color: rgba(255,255,255,.85);
+  font-size: .5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+}
+
+/* Dark Mode สำหรับ LOT Label */
+body.dark-mode .rec-result-lbl-lot {
+  color: rgba(255,255,255,.9);
+}
+
+/* ═══════════════════════════════════════════════════
+   RESULT CHIPS — LOT + OK + NG ขนาดเท่ากันพอดี
+════════════════════════════════════════════════════ */
+.rec-result-row.compact {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* กล่องทั้ง 3 ใช้ flex: 1 เหมือนกัน → ขนาดเท่ากัน 100% */
+.rec-result-chip.compact {
+  padding: 10px 8px 9px !important;
+  min-width: 0 !important;       /* ยกเลิก min-width เดิม */
+  max-width: none !important;    /* ยกเลิก max-width เดิม */
+  flex: 1 1 0% !important;       /* ← สำคัญ: ทั้ง 3 กล่องเท่ากันอัตโนมัติ */
+  border-radius: 14px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  box-sizing: border-box;
+  min-height: 82px;              /* ความสูงขั้นต่ำให้เท่ากัน */
+}
+
+/* ── LOT กล่อง: พิเศษ — ระบายตัวอักษร ── */
+.rec-result-chip-lot.compact {
+  /* ไม่ตั้งค่า flex แยก → ตาม .rec-result-chip.compact คือ flex:1 */
+  overflow: hidden;
+  word-break: break-all;
+}
+.rec-result-chip-lot.compact .rec-result-num-lot {
+  font-size: clamp(.85rem, 2.8vw, 1.15rem) !important;
+  word-break: break-all;
+  line-height: 1.25 !important;
+  text-align: center;
+  max-width: 100%;
+}
+.rec-result-chip-lot.compact > div:first-child {
+  font-size: .85rem !important;
+  margin-bottom: 0 !important;
+}
+
+/* ── OK / NG ตัวเลข ── */
+.rec-result-num.compact {
+  font-size: clamp(1.6rem, 4.5vw, 2.4rem) !important;
+}
+.rec-result-lbl.compact {
+  font-size: .5rem !important;
+  letter-spacing: .12em !important;
+}
+
+/* ── LOT Label ── */
+.rec-result-lbl-lot {
+  color: rgba(255,255,255,.85);
+  font-size: .48rem !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  white-space: nowrap;
+}
+
+/* ── Dark Mode ── */
+body.dark-mode .rec-result-lbl-lot {
+  color: rgba(255,255,255,.9);
+}
+
+/* ── Responsive: มือถือ ── */
+@media(max-width:500px){
+  .rec-result-row.compact {
+    gap: 6px;
+  }
+  .rec-result-chip.compact {
+    min-height: 76px !important;
+    padding: 8px 6px 7px !important;
+  }
+  .rec-result-num.compact {
+    font-size: clamp(1.3rem, 4vw, 2rem) !important;
+  }
+  .rec-result-chip-lot.compact .rec-result-num-lot {
+    font-size: clamp(.75rem, 2.5vw, 1rem) !important;
+  }
+}
+/* ── Remark: ขยะลงมาเล็กน้อย ── */
+.rec-remark-box.compact {
+  margin-top: 8px !important; /* เพิ่มระยะห่างด้านบน */
 }
 </style>
 
@@ -4513,6 +4601,7 @@ function resetEditImgZone(txt='คลิกเพื่อเลือก/เป
 
 const COLORS=['#2563eb','#dc2626','#7c3aed','#059669','#d97706','#0891b2','#db2777','#0d9488','#65a30d','#4f46e5','#ea580c','#f59e0b'];
 
+
 /* ══════════════════════════════════
    LOADING
 ══════════════════════════════════ */
@@ -6123,7 +6212,7 @@ window.addEventListener('resize',adjustSkillGrid);adjustSkillGrid();
 /* Default dates */
 (function(){const sd=document.getElementById('specDate');if(sd)sd.value=new Date().toISOString().split('T')[0];const dd=document.getElementById('dailyDate');if(dd)dd.value=new Date().toISOString().split('T')[0];const supD=document.getElementById('supDate');if(supD)supD.value=new Date().toISOString().split('T')[0];})();
 
-/* ── Record Detail Popup ── */
+/* ── Record Detail Popup (Compact Version) ── */
 function openRecDetail(idx){
   const s = db.support[idx];
   if(!s) return;
@@ -6138,22 +6227,20 @@ function openRecDetail(idx){
   el.innerHTML = `
     <div class="rec-report-layout">
       
-      <!-- ═══ HEADER ═══ -->
-      <div class="rec-problem-header">
+      <!-- ═══ HEADER (COMPACT) ═══ -->
+      <div class="rec-problem-header compact">
         <div class="rec-ph-eyebrow">⚠️ Problem Detail</div>
         <div class="rec-ph-title">${s.problem || '—'}</div>
         <div class="rec-ph-meta">
           <div class="rec-ph-meta-item">📅 <b>${s.fullTimestamp || s.datetime || '—'}</b></div>
           <div class="rec-ph-meta-item">👤 <b>${s._user || '—'}</b></div>
-          <div class="rec-ph-meta-item">📦 <b>${s.part || '—'}</b></div>
-          <div class="rec-ph-meta-item">🏷️ LOT <b>${s.lot || '—'}</b></div>
         </div>
       </div>
 
-      <!-- ═══ BODY: เนื้อเดียวกัน ═══ -->
+      <!-- ═══ BODY ═══ -->
       <div class="rec-body-row">
         
-        <!-- ซ้าย: รูป เต็มพื้นที่ -->
+        <!-- ซ้าย: รูป -->
         <div class="rec-col-img">
           ${recImg ? `
             <img src="${recImg}" onclick="imgZoomOrChange(event, '${s.id}', ${idx})" title="คลิกเพื่อซูม">
@@ -6166,63 +6253,64 @@ function openRecDetail(idx){
           `}
         </div>
 
-        <!-- ขวา: Data + Footer -->
-        <div class="rec-col-right">
+        <!-- ขวา: Data (COMPACT LAYOUT) -->
+        <div class="rec-col-right compact">
           
-          <div class="rec-col-data">
+          <div class="rec-col-data compact">
             
-            <div class="rec-data-section">
-              <div class="rec-data-section-title">🔧 Action & Classification</div>
-              <div class="rec-data-grid">
-                <div class="rec-data-field">
-                  <div class="rec-data-label">การแก้ไข</div>
-                  <div class="rec-data-value action">${s.action || '—'}</div>
-                </div>
-                <div class="rec-data-field">
-                  <div class="rec-data-label">Group Part</div>
-                  <div class="rec-data-value" style="font-weight:800;">${s.part || '—'}</div>
-                </div>
-                <div class="rec-data-field">
-                  <div class="rec-data-label">LOT No.</div>
-                  <div class="rec-data-value violet mono">${s.lot || '—'}</div>
-                </div>
-              </div>
+            <!-- ── แถวข้อมูลด่วน: Part + Action ── -->
+            <div class="rec-info-inline" style="justify-content:flex-start;">
+              ${s.part ? `<div class="rec-info-item"><span class="rec-part-badge">📦 ${s.part}</span></div>` : ''}
+              <div class="rec-info-item"><span class="rec-action-badge">🔧 ${s.action || '—'}</span></div>
             </div>
 
-            <div class="rec-data-section">
+            <!-- ── Result Chips (COMPACT) — LOT + OK + NG เท่ากัน ── -->
+            <div class="rec-data-section compact">
               <div class="rec-data-section-title">📊 Inspection Result</div>
-              <div class="rec-result-row">
-                <div class="rec-result-chip rec-result-chip-ok">
-                  <div class="rec-result-num rec-result-num-ok">${s.ok ?? '—'}</div>
-                  <div class="rec-result-lbl rec-result-lbl-ok">✓ OK Pieces</div>
+              <div class="rec-result-row compact">
+                <!-- 🔖 LOT Chip (ด้านซ้ายสุด) -->
+                ${s.lot ? `
+                <div class="rec-result-chip rec-result-chip-lot compact">
+                  <div class="rec-result-lbl rec-result-lbl-lot compact">🔖 order.</div>
+                  <div class="rec-result-num rec-result-num-lot compact">${s.lot}</div>
                 </div>
-                <div class="rec-result-chip rec-result-chip-ng">
-                  <div class="rec-result-num rec-result-num-ng">${s.ng ?? '—'}</div>
-                  <div class="rec-result-lbl rec-result-lbl-ng">✗ NG Pieces</div>
+                ` : `
+                <div class="rec-result-chip compact" style="background:var(--bg3);border:3px solid var(--border);opacity:.5;">
+                  <div class="rec-result-lbl compact" style="color:var(--txt4);">🔖 order</div>
+                  <div class="rec-result-num compact" style="color:var(--txt4);font-size:.9rem !important;">—</div>
+                </div>
+                `}
+                <!-- ✅ OK Chip (ตรงกลาง) -->
+                <div class="rec-result-chip rec-result-chip-ok compact">
+                  <div class="rec-result-num rec-result-num-ok compact">${s.ok ?? '—'}</div>
+                  <div class="rec-result-lbl rec-result-lbl-ok compact">✓ OK</div>
+                </div>
+                <!-- ❌ NG Chip (ด้านขวา) -->
+                <div class="rec-result-chip rec-result-chip-ng compact">
+                  <div class="rec-result-num rec-result-num-ng compact">${s.ng ?? '—'}</div>
+                  <div class="rec-result-lbl rec-result-lbl-ng compact">✗ NG</div>
                 </div>
               </div>
             </div>
 
-            <div class="rec-data-section">
-              <div class="rec-data-section-title">💬 Remark</div>
-              <div class="rec-remark-box">
-                <div class="rec-remark-label">หมายเหตุเพิ่มเติม</div>
-                ${s.remark && s.remark.trim() 
-                  ? `<div class="rec-remark-value">${s.remark}</div>` 
-                  : `<div class="rec-remark-empty">ไม่มีหมายเหตุเพิ่มเติม</div>`
-                }
-              </div>
+            <!-- ── Remark (COMPACT) ── -->
+            <div class="rec-remark-box compact">
+              <div class="rec-remark-label">💬 Remark</div>
+              ${s.remark && s.remark.trim() 
+                ? `<div class="rec-remark-value">${s.remark}</div>` 
+                : `<div class="rec-remark-empty">ไม่มีหมายเหตุ</div>`
+              }
             </div>
 
           </div>
 
-          <!-- ═══ FOOTER ═══ -->
-          <div class="rec-footer-bar">
+          <!-- ═══ FOOTER (COMPACT) ═══ -->
+          <div class="rec-footer-bar compact">
             <div class="rec-footer-left">
-              <span class="rec-pill rec-pill-report" style="color:${rptColor};border-color:${rptColor}33;background:${rptColor}08;">${s.report}</span>
+              <span class="rec-pill rec-pill-report compact" style="color:${rptColor};border-color:${rptColor}33;background:${rptColor}08;">${s.report}</span>
             </div>
             <div class="rec-footer-right">
-              <span class="rec-pill ${isWip ? 'rec-pill-status-wip' : 'rec-pill-status'}">
+              <span class="rec-pill ${isWip ? 'rec-pill-status-wip' : 'rec-pill-status'} compact">
                 ${isWip ? '⏳' : '✅'} ${st.txt}
               </span>
             </div>
