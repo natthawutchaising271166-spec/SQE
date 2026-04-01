@@ -2315,6 +2315,215 @@ body.dark-mode .rec-footer-bar { border-color: #334155; }
 body.dark-mode .rec-pill-report { background: rgba(37,99,235,.1); color: #60a5fa; border-color: rgba(37,99,235,.25); }
 body.dark-mode .rec-pill-status { background: rgba(16,185,129,.1); color: #34d399; border-color: rgba(16,185,129,.25); }
 
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE — SUPPORT ANALYTICS DASHBOARD (COMPLETE FIX)
+   สำหรับ Modal #supDashModal และลูกหลานทั้งหมด
+════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Dashboard Panel Header ── */
+body.dark-mode .sup-dash-hd {
+  background: linear-gradient(90deg, #020617, #0c1445 55%, #1a0a3d);
+  border-bottom-color: rgba(56,189,248,.12);
+}
+body.dark-mode .sup-dash-hd-title { color: #fff; }
+body.dark-mode .sup-dash-ts { color: rgba(255,255,255,.25); }
+body.dark-mode .sup-dash-close {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.65);
+}
+body.dark-mode .sup-dash-close:hover {
+  background: rgba(220,38,38,.25);
+  color: #fff;
+  border-color: rgba(220,38,38,.4);
+}
+
+/* ── 2. Left & Right Panel Background ── */
+body.dark-mode .sdb-left {
+  background: #0f172a;
+  border-right-color: rgba(255,255,255,.06);
+}
+body.dark-mode .sdb-right {
+  background: #0f172a;
+}
+
+/* ── 3. Section Title ── */
+body.dark-mode .sdb-section-title {
+  color: #64748b;
+}
+body.dark-mode .sdb-section-title::after {
+  background: rgba(255,255,255,.06);
+}
+
+/* ── 4. KPI Cards — Base ── */
+body.dark-mode .sdb-kpi {
+  background: #1e293b;
+  border-color: rgba(255,255,255,.06);
+  box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+body.dark-mode .sdb-kpi:hover {
+  box-shadow: 0 3px 12px rgba(0,0,0,.35);
+  background: #243348;
+}
+body.dark-mode .sdb-kpi-lbl { color: #64748b; }
+body.dark-mode .sdb-kpi-icon {
+  background: rgba(255,255,255,.05);
+}
+
+/* ── 5. KPI Cards — Per Variant ── */
+
+/* Total (Blue) */
+body.dark-mode .kpi-total {
+  background: linear-gradient(135deg, #1e293b, #172554);
+  border-color: rgba(59,130,246,.15);
+}
+body.dark-mode .kpi-total .sdb-kpi-val { color: #93c5fd; }
+body.dark-mode .kpi-total .sdb-kpi-delta { color: #64748b; }
+body.dark-mode .kpi-total .sdb-kpi-icon { background: rgba(59,130,246,.12); }
+body.dark-mode .kpi-total .sdb-kpi-bar { background: linear-gradient(180deg, #3b82f6, #7c3aed); }
+
+/* RP (Red) */
+body.dark-mode .kpi-rp {
+  background: linear-gradient(135deg, #1e293b, #1c1917);
+  border-color: rgba(220,38,38,.15);
+}
+body.dark-mode .kpi-rp .sdb-kpi-val { color: #fca5a5; }
+body.dark-mode .kpi-rp .sdb-kpi-delta { color: #fca5a5; }
+body.dark-mode .kpi-rp .sdb-kpi-icon { background: rgba(220,38,38,.12); }
+body.dark-mode .kpi-rp .sdb-kpi-bar { background: #dc2626; }
+
+/* VF (Blue) */
+body.dark-mode .kpi-vf {
+  background: linear-gradient(135deg, #1e293b, #172554);
+  border-color: rgba(37,99,235,.15);
+}
+body.dark-mode .kpi-vf .sdb-kpi-val { color: #93c5fd; }
+body.dark-mode .kpi-vf .sdb-kpi-delta { color: #93c5fd; }
+body.dark-mode .kpi-vf .sdb-kpi-icon { background: rgba(37,99,235,.12); }
+body.dark-mode .kpi-vf .sdb-kpi-bar { background: #2563eb; }
+
+/* Records (Amber) */
+body.dark-mode .kpi-rec {
+  background: linear-gradient(135deg, #1e293b, #1c1917);
+  border-color: rgba(217,119,6,.15);
+}
+body.dark-mode .kpi-rec .sdb-kpi-val { color: #fcd34d; }
+body.dark-mode .kpi-rec .sdb-kpi-delta { color: #fcd34d; }
+body.dark-mode .kpi-rec .sdb-kpi-icon { background: rgba(217,119,6,.12); }
+body.dark-mode .kpi-rec .sdb-kpi-bar { background: #d97706; }
+
+/* OK (Green) */
+body.dark-mode .kpi-ok {
+  background: linear-gradient(135deg, #1e293b, #052e16);
+  border-color: rgba(5,150,105,.15);
+}
+body.dark-mode .kpi-ok .sdb-kpi-val { color: #6ee7b7; }
+body.dark-mode .kpi-ok .sdb-kpi-delta { color: #6ee7b7; }
+body.dark-mode .kpi-ok .sdb-kpi-icon { background: rgba(5,150,105,.12); }
+body.dark-mode .kpi-ok .sdb-kpi-bar { background: #059669; }
+
+/* NG (Red Strong) */
+body.dark-mode .kpi-ng {
+  background: linear-gradient(135deg, #1e293b, #1c1917);
+  border-color: rgba(220,38,38,.2);
+  box-shadow: 0 2px 10px rgba(220,38,38,.08);
+}
+body.dark-mode .kpi-ng .sdb-kpi-val { color: #fca5a5; }
+body.dark-mode .kpi-ng .sdb-kpi-delta { color: #fca5a5; }
+body.dark-mode .kpi-ng .sdb-kpi-icon { background: rgba(220,38,38,.15); }
+body.dark-mode .kpi-ng .sdb-kpi-bar { background: linear-gradient(180deg, #dc2626, #b91c1c); }
+
+/* ── 6. Insight Mini Cards ── */
+body.dark-mode .sdb-insight-card {
+  background: #1e293b;
+  border-color: rgba(255,255,255,.06);
+}
+body.dark-mode .sdb-insight-icon {
+  background: rgba(255,255,255,.04);
+}
+body.dark-mode .sdb-insight-label { color: #64748b; }
+body.dark-mode .sdb-insight-val { color: #f1f5f9; }
+body.dark-mode .sdb-insight-sub { color: #94a3b8; }
+
+/* ── 7. Chart Cards ── */
+body.dark-mode .sdb-chart-card {
+  background: #1e293b;
+  border-color: rgba(255,255,255,.06);
+  box-shadow: none;
+}
+body.dark-mode .sdb-chart-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+}
+body.dark-mode .sdb-chart-card-title { color: #e2e8f0; }
+body.dark-mode .badge-sm {
+  background: rgba(255,255,255,.06);
+  color: #94a3b8;
+  border-color: rgba(255,255,255,.1);
+}
+body.dark-mode .sdb-chart-card--glow-red { border-top-color: #dc2626; }
+body.dark-mode .sdb-chart-card--glow-blue { border-top-color: #2563eb; }
+body.dark-mode .sdb-chart-card--glow-green { border-top-color: #059669; }
+
+/* ── 8. Group Card ── */
+body.dark-mode .sdb-group-card {
+  background: #1e293b;
+  border-color: rgba(255,255,255,.06);
+}
+
+/* ── 9. Full Breakdown Table ── */
+body.dark-mode .sdb-tbl-wrap {
+  background: #1e293b;
+  border-color: rgba(255,255,255,.06);
+}
+body.dark-mode .sdb-tbl thead th {
+  background: linear-gradient(180deg, #0f172a, #1e293b);
+  color: #94a3b8;
+  border-bottom-color: #334155;
+}
+body.dark-mode .sdb-tbl tbody td {
+  color: #cbd5e1;
+  border-bottom-color: rgba(255,255,255,.04);
+}
+body.dark-mode .sdb-tbl tbody tr:nth-child(even) td { background: #1a2332; }
+body.dark-mode .sdb-tbl tbody tr:nth-child(odd) td { background: #0f172a; }
+body.dark-mode .sdb-tbl tbody tr:hover td { background: #1e3a5f !important; }
+
+/* Big Table Specific */
+body.dark-mode .sdb-tbl--big td:nth-child(2) { color: #e2e8f0; }
+body.dark-mode .sdb-tbl--big td:nth-child(3) { color: #f1f5f9; }
+body.dark-mode .sdb-tbl--big td:nth-child(7) { color: #6ee7b7; }
+body.dark-mode .sdb-tbl--big td:nth-child(8) { color: #fca5a5; }
+body.dark-mode .sdb-tbl--big td:nth-child(10) { color: #94a3b8; }
+
+/* ── 10. Heat Bar ── */
+body.dark-mode .sdb-heatbar {
+  background: rgba(255,255,255,.06);
+  box-shadow: none;
+}
+
+/* ── 11. Donut Center Stat ── */
+body.dark-mode #donut-center-stat,
+body.dark-mode #donut-center-num {
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+}
+
+/* ── 12. Live Pill ── */
+body.dark-mode .live-pill {
+  background: rgba(34,197,94,.08);
+  border-color: rgba(34,197,94,.2);
+  color: #4ade80;
+}
+
+/* ── 13. Empty State Text ── */
+body.dark-mode .sdb-tbl td[style*="text-align:center"] {
+  color: #64748b !important;
+}
+
+/* ── 14. Chart Tooltip Override ── */
+body.dark-mode .sdb-chart-card canvas {
+  filter: none;
+}
 /* ── Responsive ── */
 @media (max-width: 700px) {
   .rec-detail-panel { border-radius: 16px !important; width: 100vw !important; max-height: 100vh; min-height: auto; }
