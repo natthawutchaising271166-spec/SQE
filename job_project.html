@@ -2053,9 +2053,9 @@ body:has(#supDashModal.open) .sb-overlay {
 .rec-col-img img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   cursor: zoom-in;
-  padding: 10px;
+  padding: 0;
   box-sizing: border-box;
 }
 .rec-col-img-empty {
@@ -2639,6 +2639,281 @@ body.dark-mode .rec-result-lbl-lot {
 
 /* Remark spacing */
 .rec-remark-box.compact { margin-top: 8px !important; }
+
+/* ═══════════════════════════════════════════════════
+   RECORD DETAIL — ENHANCED FEATURES
+════════════════════════════════════════════════════ */
+
+/* ── NG Rate Section ── */
+.rec-ng-rate-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.rec-ng-rate-label {
+  font-size: .52rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--txt4);
+  min-width: 60px;
+}
+.rec-ng-rate-bar-track {
+  flex: 1;
+  height: 10px;
+  background: var(--bg3);
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+}
+.rec-ng-rate-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .8s cubic-bezier(.22,.68,0,1.2);
+}
+.rec-ng-rate-bar-fill.good { background: linear-gradient(90deg, #059669, #34d399); }
+.rec-ng-rate-bar-fill.warn { background: linear-gradient(90deg, #d97706, #fbbf24); }
+.rec-ng-rate-bar-fill.bad { background: linear-gradient(90deg, #dc2626, #f87171); }
+.rec-ng-rate-pct {
+  font-size: 1.1rem;
+  font-weight: 900;
+  font-family: 'DM Mono', monospace;
+  min-width: 55px;
+  text-align: right;
+}
+.rec-ng-rate-pct.good { color: #059669; }
+.rec-ng-rate-pct.warn { color: #d97706; }
+.rec-ng-rate-pct.bad { color: #dc2626; }
+
+/* ── Total Inspected Chip ── */
+.rec-total-inspected {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: rgba(37,99,235,.08);
+  border: 1px solid rgba(37,99,235,.18);
+  font-size: .68rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.rec-total-inspected b {
+  font-size: .95rem;
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── Severity Badge ── */
+.rec-severity {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: .62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.rec-severity.low { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+.rec-severity.medium { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.rec-severity.high { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.rec-severity.critical { background: #fecaca; color: #7f1d1d; border: 2px solid #f87171; animation: pulse-severity 1.5s infinite; }
+@keyframes pulse-severity { 0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.3)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)} }
+
+/* ── Time Ago ── */
+.rec-time-ago {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .6rem;
+  color: var(--txt4);
+  font-weight: 500;
+}
+.rec-time-ago-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.rec-time-ago-dot.fresh { background: #22c55e; }
+.rec-time-ago-dot.recent { background: #f59e0b; }
+.rec-time-ago-dot.old { background: #94a3b8; }
+
+/* ── Part Stats Card ── */
+.rec-part-stats {
+  background: linear-gradient(135deg, rgba(124,58,237,.04), rgba(37,99,235,.04));
+  border: 1px solid rgba(124,58,237,.12);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.rec-part-stats-title {
+  font-size: .48rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--violet);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rec-part-stats-title::before {
+  content: '';
+  width: 10px;
+  height: 1.5px;
+  background: var(--violet);
+  border-radius: 99px;
+}
+.rec-part-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.rec-part-stat-item {
+  text-align: center;
+}
+.rec-part-stat-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-family: 'DM Mono', monospace;
+  line-height: 1.1;
+}
+.rec-part-stat-lbl {
+  font-size: .48rem;
+  color: var(--txt4);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-top: 2px;
+}
+
+/* ── Linked Records ── */
+.rec-linked-section {
+  border-top: 1.5px solid var(--border);
+  padding-top: 10px;
+}
+.rec-linked-title {
+  font-size: .48rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--txt4);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rec-linked-title::before {
+  content: '';
+  width: 10px;
+  height: 1.5px;
+  background: var(--b300);
+  border-radius: 99px;
+}
+.rec-linked-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 100px;
+  overflow-y: auto;
+}
+.rec-linked-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all .15s;
+  font-size: .68rem;
+}
+.rec-linked-item:hover {
+  background: var(--blue-l);
+  border-color: var(--b300);
+  transform: translateX(3px);
+}
+.rec-linked-item-date {
+  font-size: .58rem;
+  color: var(--txt4);
+  font-family: 'DM Mono', monospace;
+  min-width: 90px;
+}
+.rec-linked-item-problem {
+  flex: 1;
+  color: var(--txt2);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rec-linked-item-badge {
+  font-size: .52rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.rec-linked-empty {
+  font-size: .62rem;
+  color: var(--txt4);
+  text-align: center;
+  padding: 8px;
+}
+
+/* ── Action Buttons in Footer ── */
+.rec-footer-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.rec-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: .68rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .2s;
+  font-family: 'Plus Jakarta Sans', 'Prompt', sans-serif;
+}
+.rec-action-btn:hover { transform: translateY(-1px); }
+.rec-action-btn:active { transform: scale(.96); }
+.rec-action-btn.edit { background: #2563eb; color: #fff; border-color: #2563eb; }
+.rec-action-btn.edit:hover { background: #1d4ed8; box-shadow: 0 4px 14px rgba(37,99,235,.35); }
+.rec-action-btn.delete { background: var(--red-l); color: var(--red); border-color: #fecaca; }
+.rec-action-btn.delete:hover { background: #fecaca; box-shadow: 0 4px 14px rgba(220,38,38,.2); }
+.rec-action-btn.image { background: var(--bg2); color: var(--txt2); border-color: var(--border); }
+.rec-action-btn.image:hover { background: var(--bg3); border-color: var(--b300); color: var(--primary); }
+
+/* ── Dark Mode ── */
+body.dark-mode .rec-ng-rate-section { background: rgba(255,255,255,.03); border-color: rgba(255,255,255,.08); }
+body.dark-mode .rec-total-inspected { background: rgba(37,99,235,.12); border-color: rgba(37,99,235,.25); }
+body.dark-mode .rec-severity.low { background: rgba(5,150,105,.12); color: #34d399; border-color: rgba(5,150,105,.25); }
+body.dark-mode .rec-severity.medium { background: rgba(217,119,6,.12); color: #fbbf24; border-color: rgba(217,119,6,.25); }
+body.dark-mode .rec-severity.high { background: rgba(220,38,38,.12); color: #f87171; border-color: rgba(220,38,38,.25); }
+body.dark-mode .rec-severity.critical { background: rgba(220,38,38,.15); color: #fca5a5; border-color: rgba(220,38,38,.4); }
+body.dark-mode .rec-part-stats { background: linear-gradient(135deg, rgba(124,58,237,.06), rgba(37,99,235,.06)); border-color: rgba(124,58,237,.15); }
+body.dark-mode .rec-part-stats-title { color: #a78bfa; }
+body.dark-mode .rec-linked-item { background: rgba(255,255,255,.03); border-color: rgba(255,255,255,.08); }
+body.dark-mode .rec-linked-item:hover { background: rgba(37,99,235,.1); border-color: rgba(37,99,235,.25); }
+body.dark-mode .rec-action-btn.image { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); color: #cbd5e1; }
+
+/* ── Responsive ── */
+@media(max-width:700px){
+  .rec-ng-rate-section { flex-wrap: wrap; gap: 8px; }
+  .rec-ng-rate-bar-track { min-width: 100%; order: 3; }
+  .rec-part-stats-grid { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .rec-footer-actions { justify-content: center; }
+  .rec-action-btn { padding: 6px 10px; font-size: .62rem; }
+}
 </style>
 
 </head>
@@ -6225,18 +6500,155 @@ window.addEventListener('resize',adjustSkillGrid);adjustSkillGrid();
 /* Default dates */
 (function(){const sd=document.getElementById('specDate');if(sd)sd.value=new Date().toISOString().split('T')[0];const dd=document.getElementById('dailyDate');if(dd)dd.value=new Date().toISOString().split('T')[0];const supD=document.getElementById('supDate');if(supD)supD.value=new Date().toISOString().split('T')[0];})();
 
-/* ── Record Detail Popup (Compact Version) ── */
-function openRecDetail(idx){
+/* ══════════════════════════════════
+   RECORD DETAIL — HELPER FUNCTIONS
+══════════════════════════════════ */
+
+/* คำนวณ Time Ago */
+function timeAgo(dateStr) {
+  if (!dateStr) return { text: '—', dotClass: 'old' };
+  
+  // รองรับทั้ง ISO string และ Thai locale string
+  let date;
+  if (dateStr.includes('/')) {
+    // Thai format: dd/mm/yyyy HH:MM:SS
+    const parts = dateStr.split(' ');
+    const dp = parts[0].split('/');
+    const tp = (parts[1] || '00:00:00').split(':');
+    date = new Date(dp[2], dp[1]-1, dp[0], tp[0], tp[1], tp[2]);
+  } else {
+    date = new Date(dateStr);
+  }
+  
+  if (isNaN(date.getTime())) return { text: '—', dotClass: 'old' };
+  
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHr = Math.floor(diffMs / 3600000);
+  const diffDay = Math.floor(diffMs / 86400000);
+  
+  if (diffMin < 1) return { text: 'เมื่อกี้', dotClass: 'fresh' };
+  if (diffMin < 60) return { text: `${diffMin} นาทีที่แล้ว`, dotClass: 'fresh' };
+  if (diffHr < 24) return { text: `${diffHr} ชม.ที่แล้ว`, dotClass: 'fresh' };
+  if (diffDay < 7) return { text: `${diffDay} วันที่แล้ว`, dotClass: 'recent' };
+  if (diffDay < 30) return { text: `${Math.floor(diffDay/7)} สัปดาห์ที่แล้ว`, dotClass: 'recent' };
+  if (diffDay < 365) return { text: `${Math.floor(diffDay/30)} เดือนที่แล้ว`, dotClass: 'old' };
+  return { text: `${Math.floor(diffDay/365)} ปีที่แล้ว`, dotClass: 'old' };
+}
+
+/* คำนวณ NG Rate + Severity */
+function calcNgRate(ok, ng) {
+  const total = (ok || 0) + (ng || 0);
+  if (total === 0) return { rate: 0, level: 'good', severity: 'low', severityText: '✅ ปกติ' };
+  
+  const rate = Math.round((ng / total) * 100);
+  
+  let level, severity, severityText;
+  if (rate === 0) { level = 'good'; severity = 'low'; severityText = '✅ ปกติ'; }
+  else if (rate <= 5) { level = 'good'; severity = 'low'; severityText = '🟢 ต่ำ'; }
+  else if (rate <= 15) { level = 'warn'; severity = 'medium'; severityText = '🟡 กลาง'; }
+  else if (rate <= 30) { level = 'bad'; severity = 'high'; severityText = '🔴 สูง'; }
+  else { level = 'bad'; severity = 'critical'; severityText = '🚨 วิกฤต'; }
+  
+  return { rate, level, severity, severityText };
+}
+
+/* คำนวณ Part Stats สะสม */
+function calcPartStats(problemText) {
+  const partNum = extractPartNumber(problemText);
+  if (!partNum) return null;
+  
+  // กรองรายการที่มีตัวเลข 10 หลักตรงกันใน Problem
+  const records = db.support.filter(s => {
+    const pn = extractPartNumber(s.problem);
+    return pn === partNum;
+  });
+  
+  if (records.length === 0) return null;
+  
+  const totalCases = records.length;
+  const totalOK = records.reduce((s, c) => s + (c.ok || 0), 0);
+  const totalNG = records.reduce((s, c) => s + (c.ng || 0), 0);
+  const totalInspected = totalOK + totalNG;
+  const avgNgRate = totalInspected > 0 ? Math.round((totalNG / totalInspected) * 100) : 0;
+  const rpCount = records.filter(s => s.report === 'RP').length;
+  const vfCount = records.filter(s => s.report === 'VF').length;
+  
+  return { totalCases, totalOK, totalNG, totalInspected, avgNgRate, rpCount, vfCount, partNumber: partNum };
+}
+
+/* หา Linked Records (เรียงตาม LOT) */
+function findLinkedRecords(currentId, problemText) {
+  const partNum = extractPartNumber(problemText);
+  if (!partNum) return [];
+  
+  return db.support
+    .filter(s => {
+      if (s.id === currentId) return false;
+      const pn = extractPartNumber(s.problem);
+      return pn === partNum;
+    })
+    .sort((a, b) => {
+      const da = a.eventDate || a.date || '';
+      const db2 = b.eventDate || b.date || '';
+      return db2.localeCompare(da);
+    })
+    .slice(0, 5);
+}
+/* ══════════════════════════════════
+   ดึงตัวเลข 10 หลักจาก Problem Detail
+   เช่น "INV(R)/I141098201" → "141098201"
+        "Part No.1141098201 test" → "1141098201"
+═════════════════════════════════ */
+function extractPartNumber(text) {
+  if (!text) return null;
+  
+  // ลอง pattern ต่างๆ เพื่อจับตัวเลข 9-10 หลัก
+  const patterns = [
+    /[A-Z]?(\d{10})/g,        // I141098201 → 141098201
+    /[A-Z]?(\d{9})(?!\d)/g,    // 141098201 (9 หลัก ไม่มีตัวเลขตาม)
+    /\b(\d{9,10})\b/g          // ตัวเลข 9-10 หลักล้วๆ
+  ];
+  
+  let best = null;
+  let bestLen = 0;
+  
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      const num = match[1] || match[0];
+      if (num.length > bestLen) {
+        bestLen = num.length;
+        best = num.replace(/^I/i, ''); // ตัด I นำหน้าออก
+      }
+    }
+    pattern.lastIndex = 0; // reset regex
+  }
+  
+  return best || null;
+}
+/* ── Record Detail Popup (FULL ENHANCED VERSION) ── */
+function openRecDetail(idx) {
   const s = db.support[idx];
-  if(!s) return;
+  if (!s) return;
 
   const recImg = imageMap[s.id];
   const st = deriveStatus(s.result);
   const rptColor = s.report === 'RP' ? '#dc2626' : s.report === 'VF' ? '#2563eb' : '#d97706';
   const isWip = st.cls === 'sp-status-wip';
 
+  // ★ คำนวณข้อมูลเพิ่มเติม
+  const okVal = (s.ok !== undefined && s.ok !== '') ? parseInt(s.ok) : 0;
+  const ngVal = (s.ng !== undefined && s.ng !== '') ? parseInt(s.ng) : 0;
+  const totalInspected = okVal + ngVal;
+  const ngInfo = calcNgRate(okVal, ngVal);
+  const timeInfo = timeAgo(s.fullTimestamp || s.datetime);
+  const partStats = calcPartStats(s.problem);
+  const linkedRecords = findLinkedRecords(s.id, s.problem);
+
   const el = document.getElementById('recDetailBody');
-  
+
   el.innerHTML = `
     <div class="rec-report-layout">
       
@@ -6247,6 +6659,13 @@ function openRecDetail(idx){
         <div class="rec-ph-meta">
           <div class="rec-ph-meta-item">📅 <b>${s.fullTimestamp || s.datetime || '—'}</b></div>
           <div class="rec-ph-meta-item">👤 <b>${s._user || '—'}</b></div>
+          <!-- ★ Time Ago -->
+          <div class="rec-ph-meta-item">
+            <span class="rec-time-ago">
+              <span class="rec-time-ago-dot ${timeInfo.dotClass}"></span>
+              ${timeInfo.text}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -6266,72 +6685,115 @@ function openRecDetail(idx){
           `}
         </div>
 
-        <!-- ขวา: Data (COMPACT LAYOUT) -->
+        <!-- ขวา: Data -->
         <div class="rec-col-right compact">
           
           <div class="rec-col-data compact">
             
-            <!-- ── แถวข้อมูลด่วน: Part + Action ── -->
-            <div class="rec-info-inline" style="justify-content:flex-start;">
+            <!-- ── แถวข้อมูลด่วน: Part + Action + Severity ── -->
+            <div class="rec-info-inline" style="justify-content:flex-start;flex-wrap:wrap;">
               ${s.part ? `<div class="rec-info-item"><span class="rec-part-badge">📦 ${s.part}</span></div>` : ''}
               <div class="rec-info-item"><span class="rec-action-badge">🔧 ${s.action || '—'}</span></div>
+              <!-- ★ Severity Badge -->
+              <div class="rec-info-item">
+                <span class="rec-severity ${ngInfo.severity}">${ngInfo.severityText}</span>
+              </div>
             </div>
 
-            <!-- ── Result Chips (COMPACT) — LOT + OK + NG เท่ากัน ── -->
+            <!-- ── Result Chips: LOT + OK + NG ── -->
             <div class="rec-data-section compact">
               <div class="rec-data-section-title">📊 Inspection Result</div>
               <div class="rec-result-row compact">
-                <!-- 🔖 LOT Chip (ด้านซ้ายสุด) -->
- ${s.lot ? `
-<div class="rec-result-chip rec-result-chip-lot compact">
-  <div class="rec-result-num rec-result-num-lot compact">${s.lot}</div>
-  <div class="rec-result-lbl rec-result-lbl-lot compact">🔖 order.</div>
-</div>
-` : `
-<div class="rec-result-chip compact" style="background:var(--bg3);border:3px solid var(--border);opacity:.5;">
-  <div class="rec-result-num compact" style="color:var(--txt4);font-size:clamp(1.6rem, 4.5vw, 2.4rem) !important;">—</div>
-  <div class="rec-result-lbl compact" style="color:var(--txt4);">🔖 order</div>
-</div>
-`}
-                <!-- ✅ OK Chip (ตรงกลาง) -->
+                ${s.lot ? `
+                <div class="rec-result-chip rec-result-chip-lot compact">
+                  <div class="rec-result-num rec-result-num-lot compact">${s.lot}</div>
+                  <div class="rec-result-lbl rec-result-lbl-lot compact">🔖 order.</div>
+                </div>
+                ` : `
+                <div class="rec-result-chip compact" style="background:var(--bg3);border:3px solid var(--border);opacity:.5;">
+                  <div class="rec-result-num compact" style="color:var(--txt4);">—</div>
+                  <div class="rec-result-lbl compact" style="color:var(--txt4);">🔖 order</div>
+                </div>
+                `}
                 <div class="rec-result-chip rec-result-chip-ok compact">
-                  <div class="rec-result-num rec-result-num-ok compact">${s.ok ?? '—'}</div>
+                  <div class="rec-result-num rec-result-num-ok compact">${okVal}</div>
                   <div class="rec-result-lbl rec-result-lbl-ok compact">✓ OK</div>
                 </div>
-                <!-- ❌ NG Chip (ด้านขวา) -->
                 <div class="rec-result-chip rec-result-chip-ng compact">
-                  <div class="rec-result-num rec-result-num-ng compact">${s.ng ?? '—'}</div>
+                  <div class="rec-result-num rec-result-num-ng compact">${ngVal}</div>
                   <div class="rec-result-lbl rec-result-lbl-ng compact">✗ NG</div>
                 </div>
               </div>
             </div>
 
-            <!-- ── Remark (COMPACT) ── -->
+            <!-- ★★★ NG Rate Bar (แสดงเฉพาะเมื่อมีการตรวจ) ★★★ -->
+            ${totalInspected > 0 ? `
+            <div class="rec-ng-rate-section">
+              <div class="rec-ng-rate-label">NG Rate</div>
+              <div class="rec-ng-rate-bar-track">
+                <div class="rec-ng-rate-bar-fill ${ngInfo.level}" style="width: ${Math.min(ngInfo.rate, 100)}%;"></div>
+              </div>
+              <div class="rec-ng-rate-pct ${ngInfo.level}">${ngInfo.rate}%</div>
+              <!-- ★ Total Inspected -->
+              <div class="rec-total-inspected">
+                ตรวจ <b>${totalInspected}</b> ชิ้น
+              </div>
+            </div>
+            ` : ''}
+
+            <!-- ★★★ Part Stats (แสดงเฉพาะเมื่อมี Part) ★★★ -->
+ ${partStats ? `
+<div class="rec-part-stats">
+  <div class="rec-part-stats-title">📊 สถิติสะสม — ${partStats.partNumber}</div>
+              <div class="rec-part-stats-grid">
+                <div class="rec-part-stat-item">
+                  <div class="rec-part-stat-val" style="color:var(--primary);">${partStats.totalCases}</div>
+                  <div class="rec-part-stat-lbl">ครั้ง</div>
+                </div>
+                <div class="rec-part-stat-item">
+                  <div class="rec-part-stat-val" style="color:var(--green);">${partStats.totalOK}</div>
+                  <div class="rec-part-stat-lbl">OK รวม</div>
+                </div>
+                <div class="rec-part-stat-item">
+                  <div class="rec-part-stat-val" style="color:var(--red);">${partStats.totalNG}</div>
+                  <div class="rec-part-stat-lbl">NG รวม</div>
+                </div>
+                <div class="rec-part-stat-item">
+                  <div class="rec-part-stat-val" style="color:var(--amber);">${partStats.avgNgRate}%</div>
+                  <div class="rec-part-stat-lbl">NG Rate เฉลี่ย</div>
+                </div>
+                <div class="rec-part-stat-item">
+                  <div class="rec-part-stat-val" style="color:#dc2626;">${partStats.rpCount}</div>
+                  <div class="rec-part-stat-lbl">RP</div>
+                </div>
+                <div class="rec-part-stat-item">
+                  <div class="rec-part-stat-val" style="color:#2563eb;">${partStats.vfCount}</div>
+                  <div class="rec-part-stat-lbl">VF</div>
+                </div>
+              </div>
+            </div>
+            ` : ''}
+
+            <!-- ── Remark ── -->
             <div class="rec-remark-box compact">
               <div class="rec-remark-label">💬 Remark</div>
-              ${s.remark && s.remark.trim() 
-                ? `<div class="rec-remark-value">${s.remark}</div>` 
+              ${s.remark && s.remark.trim()
+                ? `<div class="rec-remark-value">${s.remark}</div>`
                 : `<div class="rec-remark-empty">ไม่มีหมายเหตุ</div>`
               }
             </div>
 
           </div>
 
-          <!-- ═══ FOOTER (COMPACT) ═══ -->
+          <!-- ═══ FOOTER ═══ -->
           <div class="rec-footer-bar compact">
             <div class="rec-footer-left">
               <span class="rec-pill rec-pill-report compact" style="color:${rptColor};border-color:${rptColor}33;background:${rptColor}08;">${s.report}</span>
-            </div>
-            <div class="rec-footer-right">
               <span class="rec-pill ${isWip ? 'rec-pill-status-wip' : 'rec-pill-status'} compact">
                 ${isWip ? '⏳' : '✅'} ${st.txt}
               </span>
             </div>
-          </div>
-
-        </div>
-      </div>
-
+            
     </div>
   `;
 
