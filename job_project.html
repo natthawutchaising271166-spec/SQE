@@ -2055,8 +2055,12 @@ body:has(#supDashModal.open) .sb-overlay {
   height: 100%;
   object-fit: cover;
   cursor: zoom-in;
-  padding: 0;
-  box-sizing: border-box;
+  display: block;
+}
+
+.rec-col-img {
+  background: #0f172a;
+  overflow: hidden;
 }
 .rec-col-img-empty {
   display: flex;
@@ -6555,16 +6559,10 @@ function calcNgRate(ok, ng) {
 }
 
 /* คำนวณ Part Stats สะสม */
-function calcPartStats(problemText) {
-  const partNum = extractPartNumber(problemText);
-  if (!partNum) return null;
+function calcPartStats(partName) {
+  if (!partName) return null;
   
-  // กรองรายการที่มีตัวเลข 10 หลักตรงกันใน Problem
-  const records = db.support.filter(s => {
-    const pn = extractPartNumber(s.problem);
-    return pn === partNum;
-  });
-  
+  const records = db.support.filter(s => s.part && s.part.trim() === partName.trim());
   if (records.length === 0) return null;
   
   const totalCases = records.length;
@@ -6575,59 +6573,22 @@ function calcPartStats(problemText) {
   const rpCount = records.filter(s => s.report === 'RP').length;
   const vfCount = records.filter(s => s.report === 'VF').length;
   
-  return { totalCases, totalOK, totalNG, totalInspected, avgNgRate, rpCount, vfCount, partNumber: partNum };
+  return { totalCases, totalOK, totalNG, totalInspected, avgNgRate, rpCount, vfCount };
 }
 
 /* หา Linked Records (เรียงตาม LOT) */
-function findLinkedRecords(currentId, problemText) {
-  const partNum = extractPartNumber(problemText);
-  if (!partNum) return [];
-  
+function findLinkedRecords(currentId, lot) {
+  if (!lot) return [];
   return db.support
-    .filter(s => {
-      if (s.id === currentId) return false;
-      const pn = extractPartNumber(s.problem);
-      return pn === partNum;
-    })
+    .filter(s => s.id !== currentId && s.lot && s.lot.trim() === lot.trim())
     .sort((a, b) => {
       const da = a.eventDate || a.date || '';
       const db2 = b.eventDate || b.date || '';
-      return db2.localeCompare(da);
+      return db2.localeCompare(da); // ล่าสุดขึ้นบน
     })
-    .slice(0, 5);
+    .slice(0, 5); // แสดงสูงสุด 5 รายการ
 }
-/* ══════════════════════════════════
-   ดึงตัวเลข 10 หลักจาก Problem Detail
-   เช่น "INV(R)/I141098201" → "141098201"
-        "Part No.1141098201 test" → "1141098201"
-═════════════════════════════════ */
-function extractPartNumber(text) {
-  if (!text) return null;
-  
-  // ลอง pattern ต่างๆ เพื่อจับตัวเลข 9-10 หลัก
-  const patterns = [
-    /[A-Z]?(\d{10})/g,        // I141098201 → 141098201
-    /[A-Z]?(\d{9})(?!\d)/g,    // 141098201 (9 หลัก ไม่มีตัวเลขตาม)
-    /\b(\d{9,10})\b/g          // ตัวเลข 9-10 หลักล้วๆ
-  ];
-  
-  let best = null;
-  let bestLen = 0;
-  
-  for (const pattern of patterns) {
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-      const num = match[1] || match[0];
-      if (num.length > bestLen) {
-        bestLen = num.length;
-        best = num.replace(/^I/i, ''); // ตัด I นำหน้าออก
-      }
-    }
-    pattern.lastIndex = 0; // reset regex
-  }
-  
-  return best || null;
-}
+
 /* ── Record Detail Popup (FULL ENHANCED VERSION) ── */
 function openRecDetail(idx) {
   const s = db.support[idx];
@@ -6644,8 +6605,8 @@ function openRecDetail(idx) {
   const totalInspected = okVal + ngVal;
   const ngInfo = calcNgRate(okVal, ngVal);
   const timeInfo = timeAgo(s.fullTimestamp || s.datetime);
-  const partStats = calcPartStats(s.problem);
-  const linkedRecords = findLinkedRecords(s.id, s.problem);
+  const partStats = calcPartStats(s.part);
+  const linkedRecords = findLinkedRecords(s.id, s.lot);
 
   const el = document.getElementById('recDetailBody');
 
@@ -6659,13 +6620,6 @@ function openRecDetail(idx) {
         <div class="rec-ph-meta">
           <div class="rec-ph-meta-item">📅 <b>${s.fullTimestamp || s.datetime || '—'}</b></div>
           <div class="rec-ph-meta-item">👤 <b>${s._user || '—'}</b></div>
-          <!-- ★ Time Ago -->
-          <div class="rec-ph-meta-item">
-            <span class="rec-time-ago">
-              <span class="rec-time-ago-dot ${timeInfo.dotClass}"></span>
-              ${timeInfo.text}
-            </span>
-          </div>
         </div>
       </div>
 
@@ -6742,9 +6696,9 @@ function openRecDetail(idx) {
             ` : ''}
 
             <!-- ★★★ Part Stats (แสดงเฉพาะเมื่อมี Part) ★★★ -->
- ${partStats ? `
-<div class="rec-part-stats">
-  <div class="rec-part-stats-title">📊 สถิติสะสม — ${partStats.partNumber}</div>
+            ${partStats ? `
+            <div class="rec-part-stats">
+              <div class="rec-part-stats-title">📊 สถิติสะสม — ${s.part}</div>
               <div class="rec-part-stats-grid">
                 <div class="rec-part-stat-item">
                   <div class="rec-part-stat-val" style="color:var(--primary);">${partStats.totalCases}</div>
@@ -6783,6 +6737,25 @@ function openRecDetail(idx) {
               }
             </div>
 
+            <!-- ★★★ Linked Records (แสดงเฉพาะเมื่อมี LOT และมีรายการเชื่อมโยง) ★★★ -->
+            ${linkedRecords.length > 0 ? `
+            <div class="rec-linked-section">
+              <div class="rec-linked-title">🔗 รายการที่เกี่ยวข้อง (LOT: ${s.lot})</div>
+              <div class="rec-linked-list">
+                ${linkedRecords.map(lr => {
+                  const lrIdx = db.support.indexOf(lr);
+                  const lrBadge = lr.report === 'RP' ? 'background:#fee2e2;color:#dc2626;' : lr.report === 'VF' ? 'background:#eff6ff;color:#2563eb;' : 'background:#fffbeb;color:#d97706;';
+                  return `
+                  <div class="rec-linked-item" onclick="closeRecDetail();setTimeout(()=>openRecDetail(${lrIdx}),200);">
+                    <div class="rec-linked-item-date">${lr.eventDate || lr.date || '—'}</div>
+                    <div class="rec-linked-item-problem" title="${lr.problem || ''}">${lr.problem || '—'}</div>
+                    <span class="rec-linked-item-badge" style="${lrBadge}">${lr.report || '—'}</span>
+                  </div>`;
+                }).join('')}
+              </div>
+            </div>
+            ` : ''}
+
           </div>
 
           <!-- ═══ FOOTER ═══ -->
@@ -6797,7 +6770,8 @@ function openRecDetail(idx) {
     </div>
   `;
 
-  document.getElementById('recDetailModal').classList.add('open');
+   document.getElementById('recDetailModal').classList.add('open');
+
 }
 function closeRecDetail(){document.getElementById('recDetailModal').classList.remove('open');}
 // ฟังก์ชันสลับโหมด
