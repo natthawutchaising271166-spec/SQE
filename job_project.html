@@ -6733,25 +6733,6 @@ function openRecDetail(idx) {
               }
             </div>
 
-            <!-- ★★★ Linked Records (แสดงเฉพาะเมื่อมี LOT และมีรายการเชื่อมโยง) ★★★ -->
-            ${linkedRecords.length > 0 ? `
-            <div class="rec-linked-section">
-              <div class="rec-linked-title">🔗 รายการที่เกี่ยวข้อง (LOT: ${s.lot})</div>
-              <div class="rec-linked-list">
-                ${linkedRecords.map(lr => {
-                  const lrIdx = db.support.indexOf(lr);
-                  const lrBadge = lr.report === 'RP' ? 'background:#fee2e2;color:#dc2626;' : lr.report === 'VF' ? 'background:#eff6ff;color:#2563eb;' : 'background:#fffbeb;color:#d97706;';
-                  return `
-                  <div class="rec-linked-item" onclick="closeRecDetail();setTimeout(()=>openRecDetail(${lrIdx}),200);">
-                    <div class="rec-linked-item-date">${lr.eventDate || lr.date || '—'}</div>
-                    <div class="rec-linked-item-problem" title="${lr.problem || ''}">${lr.problem || '—'}</div>
-                    <span class="rec-linked-item-badge" style="${lrBadge}">${lr.report || '—'}</span>
-                  </div>`;
-                }).join('')}
-              </div>
-            </div>
-            ` : ''}
-
           </div>
 
           <!-- ═══ FOOTER ═══ -->
