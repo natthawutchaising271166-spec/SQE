@@ -2501,15 +2501,14 @@ body.dark-mode .rec-part-badge {
   flex: 1; /* ← สำคัญ: ทำให้ทุกกล่องเท่ากัน */
 }
 
-/* ── LOT Chip: อยู่ด้านซ้ายสุด ขนาดเท่า OK/NG ── */
+/* ── LOT Chip: ย่อลง ── */
 .rec-result-chip-lot.compact {
-  max-width: none !important; /* ← เปลี่ยนจาก 90px เป็น none เพื่อให้เท่ากัน */
-  flex: 0 0 auto; /* ← ให้ขนาดตามเนื้อหา แต่ไม่เล็กเกินไป */
-  min-width: 90px !important; /* ← กำหนดความกว้างขั้นต่ำ */
+  max-width: 90px !important;
+  flex: 0 0 90px !important;
 }
 .rec-result-chip-lot.compact .rec-result-num-lot {
-  font-size: 1rem !important; /* ← ขนาดตัวเลข LOT */
-  word-break: break-all; /* ← ถ้า LOT ยาวให้ขึ้นบรรทัดใหม่ */
+  font-size: 1.1rem !important;
+  word-break: break-all;
   line-height: 1.2 !important;
 }
 .rec-result-chip-lot.compact > div:first-child {
@@ -2564,68 +2563,82 @@ body.dark-mode .rec-result-lbl-lot {
   min-height: 82px;              /* ความสูงขั้นต่ำให้เท่ากัน */
 }
 
-/* ── LOT กล่อง: พิเศษ — ระบายตัวอักษร ── */
+/* ═══════════════════════════════════════════════════
+   RESULT CHIPS — LOT + OK + NG ขนาดเท่ากัน 100%
+════════════════════════════════════════════════════ */
+.rec-result-row.compact {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* กล่องทั้ง 3: flex:1 เท่ากัน 100% */
+.rec-result-chip.compact {
+  padding: 10px 8px 9px !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 1 1 0% !important;
+  border-radius: 14px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  min-height: 85px;
+}
+
+/* LOT กล่อง: ไม่ตั้งค่าแยก → ตาม .rec-result-chip.compact */
 .rec-result-chip-lot.compact {
-  /* ไม่ตั้งค่า flex แยก → ตาม .rec-result-chip.compact คือ flex:1 */
   overflow: hidden;
   word-break: break-all;
 }
-.rec-result-chip-lot.compact .rec-result-num-lot {
-  font-size: clamp(.85rem, 2.8vw, 1.15rem) !important;
-  word-break: break-all;
-  line-height: 1.25 !important;
+
+/* ★★★ ตัวเลขทั้ง 3 เท่ากัน ★★★ */
+.rec-result-num.compact,
+.rec-result-num-ok.compact,
+.rec-result-num-ng.compact,
+.rec-result-chip-lot.compact .rec-result-num-lot.compact {
+  font-size: clamp(1.8rem, 5vw, 2.6rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
   text-align: center;
-  max-width: 100%;
-}
-.rec-result-chip-lot.compact > div:first-child {
-  font-size: .85rem !important;
-  margin-bottom: 0 !important;
 }
 
-/* ── OK / NG ตัวเลข ── */
-.rec-result-num.compact {
-  font-size: clamp(1.6rem, 4.5vw, 2.4rem) !important;
-}
-.rec-result-lbl.compact {
-  font-size: .5rem !important;
-  letter-spacing: .12em !important;
-}
-
-/* ── LOT Label ── */
+/* ★★★ Label ทั้ง 3 เท่ากัน ★★★ */
+.rec-result-lbl.compact,
+.rec-result-lbl-ok.compact,
+.rec-result-lbl-ng.compact,
 .rec-result-lbl-lot {
-  color: rgba(255,255,255,.85);
-  font-size: .48rem !important;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .16em;
+  font-size: .5rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .12em !important;
+  color: rgba(255,255,255,.85) !important;
   white-space: nowrap;
 }
 
-/* ── Dark Mode ── */
-body.dark-mode .rec-result-lbl-lot {
-  color: rgba(255,255,255,.9);
+/* Responsive: มือถือ */
+@media(max-width:500px){
+  .rec-result-row.compact { gap: 6px; }
+  .rec-result-chip.compact { min-height: 75px !important; padding: 8px 6px 7px !important; }
+  .rec-result-num.compact,
+  .rec-result-num-ok.compact,
+  .rec-result-num-ng.compact,
+  .rec-result-chip-lot.compact .rec-result-num-lot.compact {
+    font-size: clamp(1.4rem, 5vw, 2rem) !important;
+  }
+  .rec-result-lbl.compact,
+  .rec-result-lbl-ok.compact,
+  .rec-result-lbl-ng.compact,
+  .rec-result-lbl-lot {
+    font-size: .45rem !important;
+  }
 }
 
-/* ── Responsive: มือถือ ── */
-@media(max-width:500px){
-  .rec-result-row.compact {
-    gap: 6px;
-  }
-  .rec-result-chip.compact {
-    min-height: 76px !important;
-    padding: 8px 6px 7px !important;
-  }
-  .rec-result-num.compact {
-    font-size: clamp(1.3rem, 4vw, 2rem) !important;
-  }
-  .rec-result-chip-lot.compact .rec-result-num-lot {
-    font-size: clamp(.75rem, 2.5vw, 1rem) !important;
-  }
-}
-/* ── Remark: ขยะลงมาเล็กน้อย ── */
-.rec-remark-box.compact {
-  margin-top: 8px !important; /* เพิ่มระยะห่างด้านบน */
-}
+/* Remark spacing */
+.rec-remark-box.compact { margin-top: 8px !important; }
 </style>
 
 </head>
@@ -6269,17 +6282,17 @@ function openRecDetail(idx){
               <div class="rec-data-section-title">📊 Inspection Result</div>
               <div class="rec-result-row compact">
                 <!-- 🔖 LOT Chip (ด้านซ้ายสุด) -->
-                ${s.lot ? `
-                <div class="rec-result-chip rec-result-chip-lot compact">
-                  <div class="rec-result-lbl rec-result-lbl-lot compact">🔖 order.</div>
-                  <div class="rec-result-num rec-result-num-lot compact">${s.lot}</div>
-                </div>
-                ` : `
-                <div class="rec-result-chip compact" style="background:var(--bg3);border:3px solid var(--border);opacity:.5;">
-                  <div class="rec-result-lbl compact" style="color:var(--txt4);">🔖 order</div>
-                  <div class="rec-result-num compact" style="color:var(--txt4);font-size:.9rem !important;">—</div>
-                </div>
-                `}
+ ${s.lot ? `
+<div class="rec-result-chip rec-result-chip-lot compact">
+  <div class="rec-result-num rec-result-num-lot compact">${s.lot}</div>
+  <div class="rec-result-lbl rec-result-lbl-lot compact">🔖 order.</div>
+</div>
+` : `
+<div class="rec-result-chip compact" style="background:var(--bg3);border:3px solid var(--border);opacity:.5;">
+  <div class="rec-result-num compact" style="color:var(--txt4);font-size:clamp(1.6rem, 4.5vw, 2.4rem) !important;">—</div>
+  <div class="rec-result-lbl compact" style="color:var(--txt4);">🔖 order</div>
+</div>
+`}
                 <!-- ✅ OK Chip (ตรงกลาง) -->
                 <div class="rec-result-chip rec-result-chip-ok compact">
                   <div class="rec-result-num rec-result-num-ok compact">${s.ok ?? '—'}</div>
