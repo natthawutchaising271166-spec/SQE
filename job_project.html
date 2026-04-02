@@ -2055,12 +2055,8 @@ body:has(#supDashModal.open) .sb-overlay {
   height: 100%;
   object-fit: cover;
   cursor: zoom-in;
-  display: block;
-}
-
-.rec-col-img {
-  background: #0f172a;
-  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
 }
 .rec-col-img-empty {
   display: flex;
@@ -6770,8 +6766,7 @@ function openRecDetail(idx) {
     </div>
   `;
 
-   document.getElementById('recDetailModal').classList.add('open');
-
+  document.getElementById('recDetailModal').classList.add('open');
 }
 function closeRecDetail(){document.getElementById('recDetailModal').classList.remove('open');}
 // ฟังก์ชันสลับโหมด
