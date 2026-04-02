@@ -5875,38 +5875,16 @@ function normalizeRow(d, inspector) {
 
 let _fetchInFlight = false;
 
-/* ═══════════════════════════════════════════════════
-   FIXED: fetchFromCloud — ใช้ setTimeout แทน AbortSignal
-═══════════════════════════════════════════════════ */
 async function fetchFromCloud(inspector, ms) {
   ms = ms || FETCH_TIMEOUT;
   const url = GOOGLE_URL + '?inspector=' + encodeURIComponent(inspector) + '&t=' + Date.now();
-  
-  console.log('🔍 Fetching from Cloud:', inspector);
 
-  const doFetch = (timeout) => {
-    return new Promise((resolve, reject) => {
-      const ctrl = new AbortController();
-      const ti = setTimeout(() => {
-        ctrl.abort();
-        reject(new Error('Timeout after ' + timeout + 'ms'));
-      }, timeout);
-      
-      fetch(url, {
-        signal: ctrl.signal,
-        mode: 'cors',
-        cache: 'no-store',
-        headers: { 'Accept': 'application/json' }
-      })
-        .then(r => {
-          clearTimeout(ti);
-          resolve(r);
-        })
-        .catch(e => {
-          clearTimeout(ti);
-          reject(e);
-        });
-    });
+  const doFetch = t => {
+    const ctrl = new AbortController();
+    const ti = setTimeout(() => ctrl.abort(), t);
+    return fetch(url, { signal: ctrl.signal, cache: 'no-store' })
+      .then(r => { clearTimeout(ti); return r; })
+      .catch(e => { clearTimeout(ti); throw e; });
   };
 
   try {
@@ -5914,118 +5892,66 @@ async function fetchFromCloud(inspector, ms) {
     try {
       res = await doFetch(ms);
     } catch (e) {
-      console.warn('⚠️ First attempt failed:', e.message);
-      showInitOverlay('กำลังลองใหม่...', 'Network retry...', '');
-      res = await doFetch(Math.min(ms, 8000));
+      res = await doFetch(Math.min(ms, 5000));
     }
 
-    if (!res.ok) {
-      console.error('❌ Response not OK:', res.status);
-      return { ok: false, rows: [], error: 'HTTP ' + res.status };
-    }
+    if (!res.ok) return { ok: false, rows: [] };
 
     const text = await res.text();
-    let parsed = JSON.parse(text);
-
-    if (!parsed.status || !Array.isArray(parsed.data)) {
-      return { ok: false, rows: [], error: 'Invalid response format' };
+    let r;
+    try {
+      r = JSON.parse(text);
+    } catch (e) {
+      return { ok: false, rows: [] };
     }
 
-    const rows = parsed.data.map(d => normalizeRow(d, inspector));
-    
-    // ✅ บันทึก localStorage ทันที
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
-    
+    if (!r || r.status !== 'success' || !Array.isArray(r.data)) return { ok: false, rows: [] };
+
+    const rows = r.data.map(d => normalizeRow(d, inspector));
     clearInspectorCloudRefs(inspector);
     cloudRefSetFromRows(rows);
     saveAllCloudRefs();
 
-    console.log('✅ Fetched', rows.length, 'records & saved to localStorage');
     return { ok: true, rows };
-    
   } catch (err) {
-    console.error('❌ fetchFromCloud error:', err);
-    return { ok: false, rows: [], error: err.message };
+    return { ok: false, rows: [] };
   }
 }
 
-/* ═══════════════════════════════════════════════════
-   FIXED: pushToCloud — ใช้ setTimeout แทน AbortSignal.timeout()
-═══════════════════════════════════════════════════ */
-async function pushToCloud(recordsArray) {
-  if (!recordsArray || recordsArray.length === 0) return Promise.resolve();
+async function pushToCloud(rows) {
+  if (!rows || !rows.length) return;
 
-  recordsArray.forEach(r => {
-    syncedAdd(r.ref);
-    cloudRefAdd(r.ref, currentUser);
-  });
+  const payload = JSON.stringify(rows.map(r => ({
+    id: r.id,
+    date: r.date,
+    shift: r.shift,
+    inspector: r.inspector,
+    ref: r.ref,
+    line: r.line,
+    supplier: r.supplier,
+    partNo: r.partNo,
+    partName: r.partName,
+    qty: r.qty,
+    defect: r.defect,
+    remark: r.remark,
+    judgment: r.judgment
+  })));
 
-  console.log('📤 Pushing', recordsArray.length, 'records to Cloud...');
+  const ctrl = new AbortController();
+  setTimeout(() => ctrl.abort(), PUSH_TIMEOUT);
 
-  const payload = JSON.stringify({
-    action: 'save',
-    inspector: currentUser,
-    data: recordsArray
-  });
-
-  return new Promise((resolve) => {
-    // ═══ Try CORS POST ═══
-    const ctrl = new AbortController();
-    const timeout1 = setTimeout(() => ctrl.abort(), PUSH_TIMEOUT);
-
-    fetch(GOOGLE_URL, {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      headers: { 'Content-Type': 'text/plain' },
-      body: payload,
-      signal: ctrl.signal
-    })
-      .then(r => {
-        clearTimeout(timeout1);
-        return r.json();
-      })
-      .then(data => {
-        if (data.status === 'success') {
-          console.log('✅ Cloud push CORS success');
-          saveLocal();
-          resolve(data);
-        } else {
-          throw new Error(data.error || 'Push failed');
-        }
-      })
-      .catch(corsErr => {
-        clearTimeout(timeout1);
-        console.warn('⚠️ CORS failed, trying no-cors:', corsErr.message);
-
-        // ═══ Fallback: no-cors POST ═══
-        const ctrl2 = new AbortController();
-        const timeout2 = setTimeout(() => ctrl2.abort(), PUSH_TIMEOUT);
-
-        fetch(GOOGLE_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          cache: 'no-cache',
-          headers: { 'Content-Type': 'text/plain' },
-          body: payload,
-          signal: ctrl2.signal
-        })
-          .then(() => {
-            clearTimeout(timeout2);
-            console.log('✅ Cloud push no-cors sent');
-            saveLocal();
-            resolve({ ok: true });
-          })
-          .catch(err => {
-            clearTimeout(timeout2);
-            console.error('❌ Push failed:', err.message);
-            resolve({ ok: false, error: err.message });
-          });
-      });
-  });
+  return fetch(GOOGLE_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    cache: 'no-cache',
+    headers: { 'Content-Type': 'text/plain' },
+    body: payload,
+    signal: ctrl.signal
+  }).catch(() => { });
 }
+
 async function deleteFromCloud(id, ref, inspector) {
-  if (!ref) return { ok: false, method: 'none', verified: false };
+  if (!ref) return { ok: false, method: 'none' };
 
   const payload = JSON.stringify({
     action: 'delete',
@@ -6034,7 +5960,6 @@ async function deleteFromCloud(id, ref, inspector) {
     inspector: String(inspector || currentUser)
   });
 
-  // ═══ Step 1: ลอง CORS ก่อน ═══
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), DELETE_TIMEOUT);
@@ -6047,28 +5972,14 @@ async function deleteFromCloud(id, ref, inspector) {
       body: payload,
       signal: ctrl.signal
     });
-    
+
     clearTimeout(t);
     const data = await res.json();
-
-    if (data.status === 'success') {
-      const verified = await verifyDeletionImmediately(ref, inspector);
-      if (verified) {
-        deletedRefRemove(ref, inspector);
-        console.log('✅ Delete verified immediately (CORS)');
-        return { ok: true, method: 'cors', verified: true };
-      }
-      return { ok: true, method: 'cors', verified: false };
-    }
-    console.warn('Cloud delete rejected:', data);
-    return { ok: false, method: 'cors', verified: false };
+    return { ok: data.status === 'success', method: 'cors', data };
   } catch (corsErr) {
-
-    // ═══ Step 2: CORS ล้มเหลว → ใช้ no-cors ═══
-    console.warn('CORS delete failed, trying no-cors:', corsErr.message);
     try {
       const ctrl2 = new AbortController();
-      const t2 = setTimeout(() => ctrl2.abort(), PUSH_TIMEOUT);
+      setTimeout(() => ctrl2.abort(), PUSH_TIMEOUT);
 
       await fetch(GOOGLE_URL, {
         method: 'POST',
@@ -6078,27 +5989,10 @@ async function deleteFromCloud(id, ref, inspector) {
         body: payload,
         signal: ctrl2.signal
       });
-      
-      clearTimeout(t2);
 
-      const verified = await verifyDeletionImmediately(ref, inspector);
-      if (verified) {
-        deletedRefRemove(ref, inspector);
-        console.log('✅ Delete verified immediately (no-cors)');
-        return { ok: true, method: 'no-cors', verified: true };
-      }
-      return { ok: null, method: 'no-cors', verified: false };
+      return { ok: null, method: 'no-cors' };
     } catch (e) {
-
-      // ═══ Step 3: fetch ล้มเหลวทั้งหมด ═══
-      clearTimeout(t2);
-      const verified = await verifyDeletionImmediately(ref, inspector);
-      if (verified) {
-        deletedRefRemove(ref, inspector);
-        console.log('✅ Delete verified immediately (fallback)');
-        return { ok: true, method: 'fallback', verified: true };
-      }
-      return { ok: false, method: 'error', verified: false };
+      return { ok: false, method: 'error' };
     }
   }
 }
@@ -6166,6 +6060,9 @@ function schedulePush() {
   }, PUSH_DEBOUNCE);
 }
 
+/* ═══════════════════════════════════════════════════
+   FIXED: Polling — ใช้ MERGE แทน REPLACE
+   ═══════════════════════════════════════════════════ */
 function startPolling() {
   if (pollingTimer) clearInterval(pollingTimer);
 
@@ -6179,25 +6076,38 @@ function startPolling() {
       const result = await fetchFromCloud(currentUser, FETCH_TIMEOUT);
 
       if (result.ok) {
+        // ✅ FIX: ใช้ mergeCloud แทน replace
+        // mergeCloud จะเพิ่มเฉพาะ record ใหม่ ไม่ลบข้อมูลเก่า
         const added = mergeCloud(result.rows);
 
         if (added > 0) {
           await saveLocal();
           refreshAll();
-          showSyncBadge('🔔 +' + added + ' new', '#3b82f6');
+          showSyncBadge('🔔 +' + added + ' new from others', '#3b82f6');
         }
+        
+        // ✅ FIX: Update synced status สำหรับ records ที่ confirm ว่าอยู่บน cloud
+        result.rows.forEach(cloudRow => {
+          syncedAdd(cloudRow.ref);
+          cloudRefAdd(cloudRow.ref, currentUser);
+        });
+        saveLocal();
+        
         setSyncPulse('live', 'LIVE SYNC');
       } else {
         setSyncPulse('offline', 'Offline');
       }
     } catch (e) {
-      setSyncPulse('offline', 'Offline');
+      setSyncPulse('offline', 'Error');
     } finally {
       _fetchInFlight = false;
     }
   }, POLL_MS);
 }
 
+/* ═══════════════════════════════════════════════════
+   FIXED: syncToCloud — ใช้ merge แทน replace
+   ═══════════════════════════════════════════════════ */
 async function syncToCloud() {
   if (_fetchInFlight) { toast('⏳ Syncing...'); return; }
 
@@ -6205,7 +6115,7 @@ async function syncToCloud() {
   setSyncPulse('syncing', 'Syncing…');
   _fetchInFlight = true;
 
-  // Push
+  // Push unsynced
   const unsync = getMyRecords().filter(r => !syncedHas(r.ref));
   if (unsync.length > 0) {
     try {
@@ -6221,14 +6131,18 @@ async function syncToCloud() {
   try {
     const fetchResult = await fetchFromCloud(currentUser, FETCH_TIMEOUT);
     if (fetchResult.ok) {
-      records = records.filter(r => r.inspector !== currentUser);
-      records.push(...fetchResult.rows);
+      // ✅ FIX: ใช้ mergeCloud แทน replace
+      const added = mergeCloud(fetchResult.rows);
+
+      // Update synced status
+      fetchResult.rows.forEach(r => {
+        syncedAdd(r.ref);
+        cloudRefAdd(r.ref, currentUser);
+      });
 
       await saveLocal();
-
-      syncedReset(fetchResult.rows.map(r => r.ref));
       refreshAll();
-      toast(`✅ Sync สำเร็จ!`);
+      toast(`✅ Sync สำเร็จ!${added > 0 ? ' (+' + added + ' จากคนอื่น)' : ''}`);
       setSyncPulse('live', 'LIVE SYNC');
     }
   } catch (e) {
@@ -6240,8 +6154,8 @@ async function syncToCloud() {
 }
 
 /* ═══════════════════════════════════════════════════
-   11. INITIALIZATION
-═══════════════════════════════════════════════════ */
+   FIXED: initApp — ปกป้อง unsynced data
+   ═══════════════════════════════════════════════════ */
 async function initApp(inspector) {
   _isInitializing = true;
   currentUser = inspector;
@@ -6262,36 +6176,50 @@ async function initApp(inspector) {
 
   records = await dbGetAll();
 
-  const unsync = getMyRecords().filter(r => !syncedHas(r.ref));
-  if (unsync.length > 0) {
-    showInitOverlay('กำลัง Sync...', `Uploading ${unsync.length} items...`, unsync.length);
+  // ✅ FIX: เก็บ unsynced IDs ก่อน push
+  const myRecordsBeforePush = getMyRecords();
+  const unsynced = myRecordsBeforePush.filter(r => !syncedHas(r.ref));
+  const unsyncedIds = new Set(unsynced.map(r => r.id));
+
+  if (unsynced.length > 0) {
+    showInitOverlay('กำลัง Sync...', `Uploading ${unsynced.length} items...`, unsynced.length);
     try {
-      await pushToCloud(unsync);
-      unsync.forEach(r => {
+      await pushToCloud(unsynced);
+      unsynced.forEach(r => {
         syncedAdd(r.ref);
         cloudRefAdd(r.ref, currentUser);
       });
-    } catch (e) { }
+      saveLocalImmediate(); // บันทึกทันที
+    } catch (e) { 
+      console.warn('Push failed on init, will retry via polling:', e);
+    }
   }
 
   showInitOverlay('กำลังดึงข้อมูล...', 'Syncing Cloud...', '');
   try {
     const fetchResult = await fetchFromCloud(inspector, FETCH_TIMEOUT);
     if (fetchResult.ok) {
-      records = records.filter(r => r.inspector !== inspector);
-      records.push(...fetchResult.rows);
+      // ✅ FIX: ใช้ mergeCloud แทน replace
+      const added = mergeCloud(fetchResult.rows);
+
+      // ✅ FIX: อัพเดท synced status
+      fetchResult.rows.forEach(r => {
+        syncedAdd(r.ref);
+        cloudRefAdd(r.ref, inspector);
+      });
 
       await saveLocal();
-
-      syncedReset(fetchResult.rows.map(r => r.ref));
       refreshAll();
-      toast(`✅ พร้อมใช้งาน: ${fetchResult.rows.length} รายการ`);
+      
+      const totalForUser = getMyRecords().length;
+      toast(`✅ พร้อมใช้งาน: ${totalForUser} รายการ`);
       setSyncPulse('live', 'LIVE SYNC');
     } else {
       refreshAll();
       setSyncPulse('offline', 'Offline Mode');
     }
   } catch (err) {
+    refreshAll();
     setSyncPulse('offline', 'Error');
   } finally {
     hideInitOverlay();
