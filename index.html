@@ -6221,11 +6221,29 @@ async function initApp(inspector) {
   } catch (err) {
     refreshAll();
     setSyncPulse('offline', 'Error');
+    // ... โค้ดส่วนอื่นๆ ...
   } finally {
     hideInitOverlay();
     setSyncBtn(false);
     _isInitializing = false;
     startPolling();
+
+    // ✅ FIX FOR TABLET: บังคับให้ Browser คำนวณ Layout ใหม่ทันทีที่ Login เสร็จ
+    // ปัญหา Tablet คือ Height ของ table-wrapper มักเป็น 0 ในช่วงแรก
+    requestAnimationFrame(() => {
+       // สั่งให้ Window มีการ resize จำลอง
+       window.dispatchEvent(new Event('resize'));
+       
+       // ถ้าใช้ Virtual Table Engine ให้สั่ง render ซ้ำอีกรอบเพื่อคำนวณความสูงที่ถูกต้อง
+       if (window.VirtualTableEngine) {
+          window.VirtualTableEngine.render();
+       }
+       
+       // สำหรับ Dashboard กรณีเปิดหน้า Dashboard ค้างไว้
+       if (typeof handleDashboardResize === 'function') {
+          handleDashboardResize();
+       }
+    });
   }
 }
 
@@ -7758,22 +7776,24 @@ function handleDashboardResize() {
   console.log('Dashboard layout recalculated.');
 }
 
-window.addEventListener('resize', () => {
-  clearTimeout(window.resizeTimer);
-  window.resizeTimer = setTimeout(handleDashboardResize, 200);
-});
+window.addEventListener('load', async () => {
+  $id('inputDate').valueAsDate = new Date();
+  startClock();
+  forceViewportReset();
+  loadTheme();
 
-document.addEventListener('fullscreenchange', () => {
-  setTimeout(() => {
-    handleDashboardResize();
-
-    if (!document.fullscreenElement) {
-      const modal = document.getElementById('dashboardModal');
-      if (modal && modal.style.display === 'flex') {
-        refreshDash();
-      }
-    }
-  }, 300);
+  const saved = sessionStorage.getItem('currentUser');
+  if (saved) {
+    $id('loginOverlay').style.display = 'none';
+    $id('appShell').classList.add('visible');
+    currentUser = saved;
+    $id('currentUserDisp').textContent = saved;
+    
+    // ✅ ลบ refreshAll() บรรทัดเดิมออก
+    // ให้รอ initApp ทำงานให้เสร็จก่อน ภายใน initApp จะมีการเรียก refreshAll() เองอยู่แล้ว
+    
+    await initApp(saved);
+  }
 });
 
 /* ═══════════════════════════════════════════════════
