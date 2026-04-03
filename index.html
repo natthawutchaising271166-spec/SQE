@@ -6101,31 +6101,124 @@ function updateMiniGauge(type, value, total, lots) {
 }
 
 /* ═══════════════════════════════════════════════════
-   10. NETWORK FUNCTIONS
+   FIXED: normalizeRow — DEEP SCAN MODE
+   แก้ปัญหา Status เป็น SF ทั้งหมด
+   วิธี: ถ้าหาชื่อคอลัมน์ไม่เจอ จะไล่สแกนทุกช่องว่ามีคำว่า CTC/Vendor/Can Use มั้ย
 ═══════════════════════════════════════════════════ */
 function normalizeRow(d, inspector) {
+  // Helper สำหรับเช็คค่าว่าง
+  const safe = (val) => (val && String(val).trim() !== '') ? String(val).trim() : '-';
+
+  // Helper สำหรับดึงค่าจากหลายๆ ชื่อฟิลด์
+  const getVal = (...keys) => {
+    for (const key of keys) {
+      if (d[key] !== undefined && d[key] !== null && String(d[key]).trim() !== '') {
+        return String(d[key]).trim();
+      }
+    }
+    return ''; 
+  };
+
+  // ── จัดการ Date ──
+  let rawDate = d.date;
+  if (!rawDate && (d.timestamp || d.Timestamp)) rawDate = d.timestamp || d.Timestamp;
+  let formattedDate = rawDate;
+  if (rawDate) {
+    try {
+        const dt = new Date(rawDate);
+        if (!isNaN(dt)) formattedDate = dt.toISOString().split('T')[0];
+        else formattedDate = String(rawDate);
+    } catch (e) { formattedDate = String(rawDate); }
+  }
+
+  // ── จัดการ Status/Judgment (Deep Scan Mode) ──
+  
+  // 1. ลองหาจากชื่อคอลัมน์มาตรฐานก่อน
+  let rawStatus = getVal(
+    'Status', 'status', 'STATUS', 
+    'Judgment', 'judgment', 'JUDGMENT', 
+    'Result', 'result', 'RESULT'
+  );
+
+  // ★ 2. DEEP SCAN: ถ้าหาไม่เจอ ให้ไล่เช็คทุก Key ในข้อมูลนี้
+  if (!rawStatus) {
+    for (let key in d) {
+      if (Object.prototype.hasOwnProperty.call(d, key)) {
+        let val = String(d[key]);
+        if (!val || val === 'undefined' || val === 'null' || val === '') continue;
+
+        let v = val.toUpperCase().trim().replace(/\s+/g, ''); // ลบช่องว่าง เช่น VENDOR FAULT -> VENDORFAULT
+
+        // ตรวจสอบว่าค่านี้ตรงกับสถานะที่รู้จักหรือไม่
+        if (v === 'VENDORFAULT' || v === 'VENDORFAULT') { rawStatus = 'VENDOR FAULT'; break; }
+        if (v === 'CANUSE' || v === 'CANUSE') { rawStatus = 'CAN USE'; break; }
+        if (v === 'CTC') { rawStatus = 'CTC'; break; }
+        if (v === 'SF') { rawStatus = 'SF'; break; }
+      }
+    }
+  }
+
+  // 3. ปรับรูปแบบ Status ให้ตรงระบบ
+  let finalJudgment = 'SF'; // ค่าเริ่มต้น (กรณีอยากจะเป็น SF จริงๆ)
+  
+  if (rawStatus) {
+    const s = String(rawStatus).toUpperCase().trim().replace(/\s+/g, ''); 
+    
+    if (s.includes('VENDOR')) finalJudgment = 'VENDOR FAULT';
+    else if (s.includes('CTC')) finalJudgment = 'CTC';
+    else if (s.includes('CANUSE') || s === 'OK' || s === 'PASS') finalJudgment = 'CAN USE';
+    else if (s === 'SF' || s === 'SURFACE') finalJudgment = 'SF';
+    else {
+        // Fallback: ใส่ช่องว่างให้
+        if (s.length > 5) finalJudgment = s.replace(/([A-Z])/g, ' $1').trim();
+        else finalJudgment = s;
+    }
+  } else {
+    // ถ้าสแกนไปทั้งหมดแล้วยังไม่เจอ ให้ Log ดู (หรือจะ set เป็น CTC/Vendor ก็ได้ตาม Data sheet)
+    // แต่เพื่อความปลอดภัย ผมจะเช็คว่ามี QTY ไหม ถ้ามี QTY แสดงว่ามีข้อมูล แต่ไม่รู้สถานะ -> แสดงว่างหรือ SF ไปก่อน
+    // ในที่นี้จะเป็น SF ตาม default
+    console.log('Status not found for row:', d);
+  }
+
   return {
-    id: d.id || (Date.now() + '_' + Math.random()),
-    date: d.date || '',
-    shift: d.shift || 'SHIFT A',
-    inspector: d.inspector || inspector,
-    ref: String(d.ref || ''),
-    line: d.line || '',
-    supplier: d.supplier || '',
-    partNo: d.partNo || '',
-    partName: d.partName || '',
-    qty: parseInt(d.qty) || 0,
-    defect: d.defect || '',
-    remark: d.remark || '',
-    judgment: d.judgment || 'SF'
+    id: d.id || d.ID || d.Ref || (Date.now() + '_' + Math.random().toString(36).slice(2)),
+    date: formattedDate || '-',
+    shift: safe(getVal('Shift', 'shift', 'SHIFT')),
+    inspector: safe(inspector || d.inspector || d.Inspector || d.User || d.user),
+    ref: safe(getVal('Ref', 'ref', 'RefNo', 'refNo', 'Reference', 'ClaimNo', 'claimNo')),
+    line: safe(getVal('Line', 'line', 'LineNo', 'lineNo')),
+    
+    supplier: safe(getVal(
+      'Supplier', 'supplier', 
+      'SupplierName', 'supplierName', 
+      'Vendor', 'vendor', 
+      'VendorName', 'vendorName'
+    )),
+    
+    partNo: safe(getVal(
+      'Part no', 'part no', 
+      'PartNo', 'partNo', 
+      'Part_No', 'part_no', 
+      'P/N', 'PN'
+    )),
+    
+    partName: safe(getVal(
+      'Part name', 'part name', 
+      'PartName', 'partName', 
+      'Part_Name', 'part_name', 
+      'Description', 'description', 
+      'PartDescription', 'partDescription'
+    )),
+    
+    qty: parseInt(d.qty || d.Qty || d.quantity || d.Quantity || d.QTY || 0) || 0,
+    
+    defect: safe(getVal('Defect', 'defect', 'Trouble', 'trouble', 'DefectType', 'defectType')),
+    remark: safe(getVal('Remark', 'remark', 'Note', 'note', 'Notes')),
+    
+    judgment: finalJudgment
   };
 }
-
 let _fetchInFlight = false;
-
-/* ═══════════════════════════════════════════════════
-   FIXED: fetchFromCloud — verify deletions + ตรวจสอบ cloud status
-═══════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════
    FIXED: fetchFromCloud — ปรับปรุง error handling + auto-retry
 ═══════════════════════════════════════════════════ */
@@ -8612,9 +8705,9 @@ function renderVisibleRows() {
   rowsToRender.forEach(r => virtualTableState.renderedRows.set(r.id, r));
 }
 
-/* ─────────────────────────────────────────────
-   CREATE TABLE ROW
-   ───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   FIXED: createTableRow — จัดการข้อมูลว่างให้แสดงเป็น -
+═══════════════════════════════════════════════════ */
 function createTableRow(r, index, shouldAnimate = true) {
   const SM_local = {
     'SF':           { dot: '#f97316', s: 'color:#c2410c;background:#fff7ed;border:1px solid #fed7aa' },
@@ -8627,30 +8720,36 @@ function createTableRow(r, index, shouldAnimate = true) {
   const synced = _syncedSet.has(r.ref);
   const safeId = String(r.id).replace(/"/g, '&quot;');
 
+  // Helper สำหรับ escape HTML และแสดง "-" ถ้าว่าง
+  const disp = (val) => {
+    if (!val || val === '-' || val === 'null' || val === 'undefined') return '<span style="color:#cbd5e1;font-style:italic">-</span>';
+    return escapeHtml(String(val));
+  };
+
   const tr = document.createElement('tr');
   tr.className  = 'group' + (shouldAnimate ? ' virtual-row-rendering' : '');
   tr.dataset.rid = safeId;
 
   tr.innerHTML = `
-    <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">${r.date}</td>
+    <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">${disp(r.date)}</td>
     <td>
-      <div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${r.shift}</div>
-      <div style="font-size:.65rem;color:var(--text-400);margin-top:1px;font-family:var(--font-head);font-weight:600">L: ${escapeHtml(r.line) || '—'}</div>
+      <div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${disp(r.shift)}</div>
+      <div style="font-size:.65rem;color:var(--text-400);margin-top:1px;font-family:var(--font-head);font-weight:600">L: ${disp(r.line)}</div>
     </td>
     <td>
       <span style="font-family:var(--font-head);font-size:.68rem;color:${synced ? 'var(--accent-grn)' : 'var(--text-200)'};margin-right:4px" title="${synced ? 'Synced' : 'Pending'}">●</span>
-      <span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">#${escapeHtml(r.ref)}</span>
+      <span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">#${disp(r.ref)}</span>
     </td>
     <td>
-      <div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${escapeHtml(r.supplier)}</div>
-      <div style="font-size:.65rem;color:var(--text-400);font-family:var(--font-head);font-weight:600;margin-top:1px">${escapeHtml(r.partNo)} · ${escapeHtml(r.partName)}</div>
+      <div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${disp(r.supplier)}</div>
+      <div style="font-size:.65rem;color:var(--text-400);font-family:var(--font-head);font-weight:600;margin-top:1px">${disp(r.partNo)} · ${disp(r.partName)}</div>
     </td>
     <td style="text-align:center">
-      <span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900);letter-spacing:-.03em">${r.qty.toLocaleString()}</span>
+      <span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900);letter-spacing:-.03em">${r.qty > 0 ? r.qty.toLocaleString() : '<span style="color:#cbd5e1">0</span>'}</span>
     </td>
-    <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${escapeHtml(r.defect)}</td>
+    <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${disp(r.defect)}</td>
     <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
-        title="${escapeHtml(r.remark || '')}">${escapeHtml(r.remark) || '—'}</td>
+        title="${r.remark && r.remark !== '-' ? escapeHtml(r.remark) : 'No Remark'}">${disp(r.remark)}</td>
     <td style="text-align:center">
       <span class="status-badge" style="${s.s};animation:none">
         <span style="width:5px;height:5px;border-radius:50%;background:${s.dot};flex-shrink:0;display:inline-block"></span>
