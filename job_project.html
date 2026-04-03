@@ -6553,14 +6553,39 @@ function calcNgRate(ok, ng) {
   
   return { rate, level, severity, severityText };
 }
+/* ══════════════════════════════════
+   EXTRACT PART NO (HELPER)
+══════════════════════════════════ */
 
+// ฟังก์ชันใหม่: ใช้ Regex ดึงเลข 10-12 หลัก ออกจากข้อความ
+function extractPartNo(text) {
+  if (!text) return null;
+  
+  // Regex: ค้นหาตัวเลข 10-12 หลักต่อเนื่องกัน (\d{10,12})
+  // \b คือ Word Boundary เพื่อให้แน่ใจว่าไม่ตัดตัวเลขยาวๆ ที่ไม่ใช่ Part No
+  const match = text.match(/\b\d{10,12}\b/);
+  
+  return match ? match[0] : null; // คืนค่าเลขที่หาเจอ หรือ null ถ้าไม่เจอ
+}
 /* คำนวณ Part Stats สะสม */
-function calcPartStats(partName) {
-  if (!partName) return null;
+/* คำนวณ Part Stats สะสม โดยอิงจาก Part No ที่ดึงจาก Problem Text */
+function calcPartStats(problemText) {
+  // 1. ดึง Part No จากข้อความปัญหาของ Record นี้
+  const targetPartNo = extractPartNo(problemText);
   
-  const records = db.support.filter(s => s.part && s.part.trim() === partName.trim());
+  // ถ้าไม่พบ Part No ให้คืนค่า null ทันที
+  if (!targetPartNo) return null;
+
+  // 2. ค้นหา Record อื่นๆ ทั้งหมดใน db.support ที่มี Part No เดียวกัน
+  // โดยลองดึง Part No จาก problem ของแต่ละ Record มาเปรียบเทียบ
+  const records = db.support.filter(s => {
+    const sPartNo = extractPartNo(s.problem);
+    return sPartNo === targetPartNo;
+  });
+
   if (records.length === 0) return null;
-  
+
+  // 3. คำนวณค่าสถิติ (Logic เดิม)
   const totalCases = records.length;
   const totalOK = records.reduce((s, c) => s + (c.ok || 0), 0);
   const totalNG = records.reduce((s, c) => s + (c.ng || 0), 0);
@@ -6568,8 +6593,9 @@ function calcPartStats(partName) {
   const avgNgRate = totalInspected > 0 ? Math.round((totalNG / totalInspected) * 100) : 0;
   const rpCount = records.filter(s => s.report === 'RP').length;
   const vfCount = records.filter(s => s.report === 'VF').length;
-  
-  return { totalCases, totalOK, totalNG, totalInspected, avgNgRate, rpCount, vfCount };
+
+  // ส่งค่า targetPartNo กลับไปด้วย เพื่อใช้แสดงผลบนหน้าจอ
+  return { targetPartNo, totalCases, totalOK, totalNG, totalInspected, avgNgRate, rpCount, vfCount };
 }
 
 /* หา Linked Records (เรียงตาม LOT) */
@@ -6584,7 +6610,19 @@ function findLinkedRecords(currentId, lot) {
     })
     .slice(0, 5); // แสดงสูงสุด 5 รายการ
 }
+/* ══════════════════════════════════
+   FORMAT NUMBER HELPER (K UNIT)
+══════════════════════════════════ */
 
+// ฟังก์ชันช่วยจัดรูปแบบตัวเลข: ถ้า >= 1000 ให้เปลี่ยนเป็นหน่วย K
+function formatK(num) {
+  if (num >= 1000) {
+    // หาร 1000 และแสดงทศนิยม 1 ตำแหน่ง (เช่น 1200 -> 1.2K)
+    // ถ้าเป็นจำนวนเต็ม (เช่น 1000) ให้ตัด .0 ทิ้ง (เป็น 1K)
+    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  }
+  return num; // ถ้าต่ำกว่า 1000 ให้คืนค่าตัวเลขเดิม
+}
 /* ── Record Detail Popup (FULL ENHANCED VERSION) ── */
 function openRecDetail(idx) {
   const s = db.support[idx];
@@ -6601,7 +6639,7 @@ function openRecDetail(idx) {
   const totalInspected = okVal + ngVal;
   const ngInfo = calcNgRate(okVal, ngVal);
   const timeInfo = timeAgo(s.fullTimestamp || s.datetime);
-  const partStats = calcPartStats(s.part);
+  const partStats = calcPartStats(s.problem);
   const linkedRecords = findLinkedRecords(s.id, s.lot);
 
   const el = document.getElementById('recDetailBody');
@@ -6691,38 +6729,41 @@ function openRecDetail(idx) {
             </div>
             ` : ''}
 
-            <!-- ★★★ Part Stats (แสดงเฉพาะเมื่อมี Part) ★★★ -->
-            ${partStats ? `
-            <div class="rec-part-stats">
-              <div class="rec-part-stats-title">📊 สถิติสะสม — ${s.part}</div>
-              <div class="rec-part-stats-grid">
-                <div class="rec-part-stat-item">
-                  <div class="rec-part-stat-val" style="color:var(--primary);">${partStats.totalCases}</div>
-                  <div class="rec-part-stat-lbl">ครั้ง</div>
-                </div>
-                <div class="rec-part-stat-item">
-                  <div class="rec-part-stat-val" style="color:var(--green);">${partStats.totalOK}</div>
-                  <div class="rec-part-stat-lbl">OK รวม</div>
-                </div>
-                <div class="rec-part-stat-item">
-                  <div class="rec-part-stat-val" style="color:var(--red);">${partStats.totalNG}</div>
-                  <div class="rec-part-stat-lbl">NG รวม</div>
-                </div>
-                <div class="rec-part-stat-item">
-                  <div class="rec-part-stat-val" style="color:var(--amber);">${partStats.avgNgRate}%</div>
-                  <div class="rec-part-stat-lbl">NG Rate เฉลี่ย</div>
-                </div>
-                <div class="rec-part-stat-item">
-                  <div class="rec-part-stat-val" style="color:#dc2626;">${partStats.rpCount}</div>
-                  <div class="rec-part-stat-lbl">RP</div>
-                </div>
-                <div class="rec-part-stat-item">
-                  <div class="rec-part-stat-val" style="color:#2563eb;">${partStats.vfCount}</div>
-                  <div class="rec-part-stat-lbl">VF</div>
-                </div>
-              </div>
-            </div>
-            ` : ''}
+
+
+  ${partStats ? `
+    <div class="rec-part-stats">
+      <div class="rec-part-stats-title">📊 สถิติสะสม — ${partStats.targetPartNo}</div>
+      <div class="rec-part-stats-grid">
+        <div class="rec-part-stat-item">
+          <div class="rec-part-stat-val" style="color:var(--primary);">${formatK(partStats.totalCases)}</div>
+          <div class="rec-part-stat-lbl">ครั้ง</div>
+        </div>
+        <div class="rec-part-stat-item">
+          <!-- ★★★ เพิ่ม formatK ตรงนี้ (OK รวม) ★★★ -->
+          <div class="rec-part-stat-val" style="color:var(--green);">${formatK(partStats.totalOK)}</div>
+          <div class="rec-part-stat-lbl">OK รวม</div>
+        </div>
+        <div class="rec-part-stat-item">
+          <!-- ★★★ เพิ่ม formatK ตรงนี้ (NG รวม) ★★★ -->
+          <div class="rec-part-stat-val" style="color:var(--red);">${formatK(partStats.totalNG)}</div>
+          <div class="rec-part-stat-lbl">NG รวม</div>
+        </div>
+        <div class="rec-part-stat-item">
+          <div class="rec-part-stat-val" style="color:var(--amber);">${partStats.avgNgRate}%</div>
+          <div class="rec-part-stat-lbl">NG Rate เฉลี่ย</div>
+        </div>
+        <div class="rec-part-stat-item">
+          <div class="rec-part-stat-val" style="color:#dc2626;">${formatK(partStats.rpCount)}</div>
+          <div class="rec-part-stat-lbl">RP</div>
+        </div>
+        <div class="rec-part-stat-item">
+          <div class="rec-part-stat-val" style="color:#2563eb;">${formatK(partStats.vfCount)}</div>
+          <div class="rec-part-stat-lbl">VF</div>
+        </div>
+      </div>
+    </div>
+  ` : ''}
 
             <!-- ── Remark ── -->
             <div class="rec-remark-box compact">
