@@ -1903,9 +1903,6 @@ body:has(#supDashModal.open) .sb-overlay {
   pointer-events: none !important;
 }
 /* ═══════════════════════════════════════════════════
-   RECORD DETAIL — PRESENTATION GRADE
-════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════
    RECORD DETAIL — SEAMLESS + COMPACT + IMAGE-FIRST
 ════════════════════════════════════════════════════ */
 .rec-report-layout {
@@ -2029,8 +2026,6 @@ body:has(#supDashModal.open) .sb-overlay {
   font-weight: 700;
 }
 
-/* ── ไม่มี curve — เนื้อเดียว ── */
-
 /* ── Body: เนื้อเดียวกัน ── */
 .rec-body-row {
   display: flex;
@@ -2040,24 +2035,26 @@ body:has(#supDashModal.open) .sb-overlay {
   background: #fff;
 }
 
-/* ── รูป: เต็มพื้นที่ ไม่มี background แยก ── */
 .rec-col-img {
-  width: 50%;
-  min-width: 260px;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-.rec-col-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  cursor: zoom-in;
   padding: 0;
-  box-sizing: border-box;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.rec-col-img img {
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  margin: 0; /* ลบ margin */
+  padding: 0; /* ลบ padding */
+}
+
+
 .rec-col-img-empty {
   display: flex;
   flex-direction: column;
@@ -2255,6 +2252,7 @@ body:has(#supDashModal.open) .sb-overlay {
   border: 1.5px solid #fcd34d;
 }
 
+
 /* ── Dark Mode ── */
 body.dark-mode .rec-detail-panel { background: #1e293b; }
 body.dark-mode .rec-detail-hd { background: linear-gradient(135deg, #020617, #0c1445); }
@@ -2294,38 +2292,103 @@ body.dark-mode .rec-pill-status { background: rgba(16,185,129,.1); color: #34d39
 }
 @media(max-width:700px){.rec-result-row{grid-template-columns:1fr 1fr;}.rec-result-chip{min-height:100px;padding:14px 10px 12px;}.rec-result-num{font-size:2.2rem;}.rec-result-chip-lot{grid-column:1/-1;}}
 @media(max-width:500px){.rec-result-row{grid-template-columns:1fr;}.rec-result-chip-lot{grid-column:auto;}}
-/* ═══════════════════════════════════════════════════
-   RECORD DETAIL — COMPACT HEADER + REORGANIZED
-════════════════════════════════════════════════════ */
+/* ══════════════════════════════════
+   RECORD DETAIL — LAYOUT MODIFIED (NEW)
+══════════════════════════════════ */
 
-/* ── Header: ย่อให้กระชับ ── */
+/* Header: แบ่งเป็น 2 คอลัมน์ (ซ้าย: ปัญหา, ขวา: สรุปผล) */
 .rec-problem-header.compact {
-  padding: 10px 18px 12px !important;
-}
-.rec-problem-header.compact .rec-ph-eyebrow {
-  font-size: .42rem !important;
-  letter-spacing: .16em !important;
-  margin-bottom: 3px !important;
-}
-.rec-problem-header.compact .rec-ph-title {
-  font-size: .82rem !important;
-  line-height: 1.4 !important;
-}
-.rec-problem-header.compact .rec-ph-meta {
-  margin-top: 5px !important;
-  gap: 10px !important;
-}
-.rec-problem-header.compact .rec-ph-meta-item {
-  font-size: .55rem !important;
+  display: flex !important;
+  flex-direction: row !important; /* วางเรียงแนวนอนในแถวเดียว */
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px !important;
 }
 
-/* ── Right Column: จัดเรียงใหม่ ── */
-.rec-col-right.compact {
-  padding: 10px 14px 8px !important;
-  gap: 8px !important;
+/* ซ้าย: ข้อมูลปัญหา + Badges */
+.rec-ph-left { 
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  gap: 6px; 
 }
-.rec-col-data.compact {
-  gap: 6px !important;
+
+/* ขวา: ผลการตรวจ + NG Rate (ย้ายมาจาก Body) */
+.rec-ph-right { 
+  width: 260px; 
+  flex-shrink: 0; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+  justify-content: center;
+}
+
+/* ปรับขนาดตัวอักษรให้กระชับเข้าไปในแถว */
+.rec-ph-title { font-size: 0.85rem !important; line-height: 1.3 !important; }
+.rec-ph-meta { font-size: 0.55rem !important; margin-top: 2px !important; }
+.rec-ph-eyebrow { font-size: 0.4rem !important; margin-bottom: 2px !important; }
+
+/* ปรับ Layout ของ Result Chips และ NG Bar ให้พอดีในคอลัมน์ขวา */
+.rec-result-row.compact {
+  gap: 6px;
+}
+.rec-result-chip.compact {
+  min-height: 20px !important; /* ย่อความสูงลง */
+  padding: 4px 3px !important;
+}
+.rec-result-num.compact {
+  font-size: clamp(1.2rem, 4vw, 1.6rem) !important; /* ย่อขนาดตัวเลข */
+}
+.rec-result-lbl.compact {
+  font-size: 0.45rem !important;
+}
+.rec-ng-rate-section {
+  padding: 6px 10px !important; /* ย่อ Padding */
+}
+.rec-ng-rate-label { font-size: 0.45rem !important; }
+.rec-ng-rate-pct { font-size: 0.9rem !important; min-width: 40px !important; }
+.rec-total-inspected { font-size: 0.6rem !important; }
+
+/* Body: เปลี่ยนเป็นแนวตั้ง (รูปภาพอยู่บน, Remarks อยู่ล่าง) */
+.rec-body-row {
+  display: flex !important;
+  flex-direction: column !important; /* เปลี่ยนจาก row เป็น column */
+  gap: 12px;
+}
+
+/* รูปภาพ: ขยายเต็มความกว้าง (แทนที่ส่วนที่ว่างเปล่าจากการลบ Stats) */
+.rec-col-img {
+  width: 100% !important;
+  min-width: auto;
+  height: auto; /* กำหนดความสูงตายตัว หรือ auto */
+  min-height: 150px; 
+  border-radius: 0vh;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+/* ส่วน Remarks (อยู่ด้านล่างรูป) */
+.rec-col-right {
+  width: 100%;
+  border-left: none;
+  border-top: 1px solid #f1f5f9;
+  padding: 0 0 0 0;
+}
+.rec-col-data {
+  padding: 0; /* ลด padding */
+}
+.rec-remark-box.compact { margin-top: 0 !important; }
+
+/* Responsive: บนมือถือให้ซ้อนลงมาเหมือนเดิม */
+@media(max-width: 700px) {
+  .rec-problem-header.compact { 
+    flex-direction: column !important; 
+    align-items: stretch; 
+  }
+  .rec-ph-right { width: 100%; margin-top: 10px; }
+  .rec-col-img { height: 250px; }
 }
 
 /* ── Data Section: กระชับขึ้น ── */
@@ -2689,21 +2752,23 @@ body.dark-mode .rec-result-lbl-lot {
 .rec-ng-rate-pct.warn { color: #d97706; }
 .rec-ng-rate-pct.bad { color: #dc2626; }
 
-/* ── Total Inspected Chip ── */
 .rec-total-inspected {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 12px;
+  gap: 10px;              /* ✅ เพิ่มระยะห่างระหว่างข้อความกับตัวเลข */
+  padding: 8px 16px;       /* ✅ เพิ่มความกว้างของกรอบ */
   border-radius: 8px;
   background: rgba(37,99,235,.08);
   border: 1px solid rgba(37,99,235,.18);
-  font-size: .68rem;
+  font-size: 0.9rem;       /* ✅ เพิ่มขนาดตัวอักษรให้ใหญ่ขึ้น */
   font-weight: 700;
   color: var(--primary);
+  white-space: nowrap;      /* ✅ ป้องกันข้อความขึ้นบรรทัดใหม่ */
 }
+
+/* ✅ เพิ่มบรรทัดนี้เพื่อทำให้ตัวเลขดูโดดเด่นขึ้น */
 .rec-total-inspected b {
-  font-size: .95rem;
+  font-size: 1.1rem;
   font-family: 'DM Mono', monospace;
 }
 
@@ -2913,6 +2978,173 @@ body.dark-mode .rec-action-btn.image { background: rgba(255,255,255,.05); border
   .rec-part-stats-grid { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
   .rec-footer-actions { justify-content: center; }
   .rec-action-btn { padding: 6px 10px; font-size: .62rem; }
+}
+/* ══════════════════════════════════
+   RECORD DETAIL — MINI CARDS (SUPER COMPACT)
+══════════════════════════════════ */
+
+/* 1. Header: จัดให้ชิดบนสุด (Top Aligned) */
+.rec-problem-header.compact {
+  align-items: flex-start !important; /* สำคัญ: ให้ซ้าย-ขวา ชิดบนเสมอกัน */
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+/* 2. ช่องขวา (Right Side): ลดความสูงและจัดชิดบน */
+.rec-ph-right { 
+  width: 200px; /* ลดความกว้างเพื่อให้รูปภาพใหญ่ขึ้น */
+  flex-shrink: 0; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 4px; /* ลดระยะห่างระหว่าง Card กับ NG Bar */
+  justify-content: flex-start; /* จัดเนื้อหาชิดบน */
+  margin-top: -2px; /* ดึงขึ้นมาอีกนิดหน่อย */
+}
+
+/* 3. Result Row: ลดระยะห่างระหว่าง Card */
+.rec-result-row.compact {
+  gap: 3px;
+}
+
+/* 4. การ์ดแต่ละใบ (LOT/OK/NG): ย่อให้เล็กมากๆ (Mini Mode) */
+.rec-result-chip.compact {
+  min-height: 36px !important; /* ลดความสูงจาก 60px เหลือ 36px */
+  padding: 3px 4px !important; /* Padding บางๆ */
+  border-radius: 8px !important;
+  justify-content: center; /* จัดกึ่งกลางแนวตั้ง */
+}
+
+/* 5. ตัวเลข: ย่อขนาดลง */
+.rec-result-num.compact,
+.rec-result-num-ok.compact,
+.rec-result-num-ng.compact,
+.rec-result-chip-lot.compact .rec-result-num-lot.compact {
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem) !important; /* เล็กลงเห็นได้ชัด */
+  line-height: 1;
+}
+
+/* 6. Text Label (ORDER/OK/NG): ย่อขนาดลง */
+.rec-result-lbl.compact,
+.rec-result-lbl-ok.compact,
+.rec-result-lbl-ng.compact,
+.rec-result-lbl-lot {
+  font-size: 0.35rem !important; /* ขนาดตัวอักษรเล็กมาก */
+  margin-top: 1px !important;
+  letter-spacing: 0.05em;
+}
+
+/* 7. NG Rate Bar: ทำให้แบนเพื่อไม่กินพื้นที่สูง */
+.rec-ng-rate-section {
+  padding: 2px 8px !important;
+  gap: 2px !important;
+  background: transparent !important; /* ลดภาพเพื่อให้เน้นตัวเลข */
+  border: none !important;
+}
+.rec-ng-rate-bar-track {
+  height: 4px !important; /* บางลง */
+}
+.rec-ng-rate-label { 
+  display: none !important; /* ซ่อนคำว่า "NG Rate" เพื่อประหยัดที่ */
+}
+.rec-ng-rate-pct { 
+  font-size: 0.75rem !important; 
+  text-align: right;
+  margin-left: auto; /* ดันไปขวาสุด */
+}
+.rec-total-inspected { 
+  font-size: 0.55rem !important; 
+  color: var(--txt3);
+  text-align: left;
+}
+/* ลบพื้นหลังและกรอบจางๆ ของกล่องรวม Badge (Container) */
+.rec-info-inline {
+  background: transparent !important; /* ลบพื้นหลังสีฟ้าอ่อนๆ */
+  border: none !important;          /* ลบกรอบจางๆ */
+  box-shadow: none !important;     /* ลบเงา */
+  padding: 0 !important;           /* ลดระยะห่างภายในกล่องออก */
+}
+/* ────────────────────────────────────
+   REPORT TYPE SEGMENTED CONTROL
+──────────────────────────────────── */
+.report-segmented-control {
+  display: flex;
+  background: var(--bg2); /* พื้นหลังอ่อนจาง */
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  gap: 4px;
+  position: relative;
+}
+
+/* ซ่อน Input Radio จริง */
+.report-radio { display: none; }
+
+/* ปุ่ม Label ที่ผู้ใช้กด */
+.report-label {
+  flex: 1;
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--txt3);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* จุดสีตกแต่ง (Dot Indicator) */
+.report-label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: background-color 0.2s;
+  box-shadow: 0 0 0 2px transparent; /* วงแหวนบางๆ */
+}
+
+/* สถานะถ้ากดเลือก (Active) */
+.report-radio:checked + .report-label {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid var(--b200); /* ขอบสีฟ้าอ่อนๆ */
+  color: var(--txt);
+  transform: translateY(-1px);
+}
+
+/* สีของจุดเมื่อถูกเลือก (ให้เป็นสีเดียวกับตัวอักษร) */
+.report-radio:checked + .report-label::before {
+  background-color: currentColor; 
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+}
+
+/* กำหนดสีเฉพาะสำหรับแต่ละประเภท (เมื่อถูกเลือก) */
+/* VF: สีน้ำเงิน */
+#rpt-vf:checked + .report-label { color: #2563eb; }
+/* RP: สีแดง */
+#rpt-rp:checked + .report-label { color: #dc2626; }
+/* RECORDS: สีส้ม/อำพราง */
+#rpt-rec:checked + .report-label { color: #d97706; }
+
+/* ────────────────────────────────────
+   DARK MODE SUPPORT
+──────────────────────────────────── */
+body.dark-mode .report-segmented-control {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.1);
+}
+body.dark-mode .report-label {
+  color: var(--txt4);
+}
+body.dark-mode .report-radio:checked + .report-label {
+  background: var(--bg3);
+  color: #fff;
+  border-color: rgba(255,255,255,0.1);
 }
 </style>
 
@@ -3836,6 +4068,7 @@ body.dark-mode .rec-action-btn.image { background: rgba(255,255,255,.05); border
         <button class="btn-save" onclick="add5S()">บันทึก</button>
       </div>
       <div class="tbl-wrap"><table><thead><tr><th>พื้นที่</th><th>จำนวน</th><th>รายละเอียด</th><th>ผู้ตรวจ</th><th>วันที่บันทึก</th><th style="text-align:center;">จัดการ</th></tr></thead><tbody id="s5TableBody"></tbody></table></div>
+    
     </div>
   </div>
 
@@ -6623,7 +6856,6 @@ function formatK(num) {
   }
   return num; // ถ้าต่ำกว่า 1000 ให้คืนค่าตัวเลขเดิม
 }
-/* ── Record Detail Popup (FULL ENHANCED VERSION) ── */
 function openRecDetail(idx) {
   const s = db.support[idx];
   if (!s) return;
@@ -6633,37 +6865,88 @@ function openRecDetail(idx) {
   const rptColor = s.report === 'RP' ? '#dc2626' : s.report === 'VF' ? '#2563eb' : '#d97706';
   const isWip = st.cls === 'sp-status-wip';
 
-  // ★ คำนวณข้อมูลเพิ่มเติม
+  // คำนวณค่าต่างๆ (เก็บไว้ใช้)
   const okVal = (s.ok !== undefined && s.ok !== '') ? parseInt(s.ok) : 0;
   const ngVal = (s.ng !== undefined && s.ng !== '') ? parseInt(s.ng) : 0;
   const totalInspected = okVal + ngVal;
   const ngInfo = calcNgRate(okVal, ngVal);
-  const timeInfo = timeAgo(s.fullTimestamp || s.datetime);
-  const partStats = calcPartStats(s.problem);
-  const linkedRecords = findLinkedRecords(s.id, s.lot);
 
   const el = document.getElementById('recDetailBody');
 
   el.innerHTML = `
     <div class="rec-report-layout">
       
-      <!-- ═══ HEADER (COMPACT) ═══ -->
+      <!-- ═══ HEADER (SPLIT LAYOUT) ═══ -->
       <div class="rec-problem-header compact">
-        <div class="rec-ph-eyebrow">⚠️ Problem Detail</div>
-        <div class="rec-ph-title">${s.problem || '—'}</div>
-        <div class="rec-ph-meta">
-          <div class="rec-ph-meta-item">📅 <b>${s.fullTimestamp || s.datetime || '—'}</b></div>
-          <div class="rec-ph-meta-item">👤 <b>${s._user || '—'}</b></div>
+        
+        <!-- ซ้าย: ข้อมูลปัญหา -->
+        <div class="rec-ph-left">
+          <div class="rec-ph-eyebrow">⚠️ Problem Detail</div>
+          <div class="rec-ph-title">${s.problem || '—'}</div>
+          
+          <!-- Meta Info (วันที่/ผู้บันทึก) -->
+          <div class="rec-ph-meta">
+            <div class="rec-ph-meta-item">📅 <b>${s.fullTimestamp || s.datetime || '—'}</b></div>
+            <div class="rec-ph-meta-item">👤 <b>${s._user || '—'}</b></div>
+          </div>
+
+          <!-- Badges (Action/Severity/Report Type) -->
+          <div class="rec-info-inline" style="justify-content:flex-start;flex-wrap:wrap;margin-top:4px;">
+            ${s.part ? `<div class="rec-info-item"><span class="rec-part-badge">📦 ${s.part}</span></div>` : ''}
+            <div class="rec-info-item"><span class="rec-action-badge">🔧 ${s.action || '—'}</span></div>
+            <div class="rec-info-item">
+              <span class="rec-severity ${ngInfo.severity}">${ngInfo.severityText}</span>
+            </div>
+            <div class="rec-info-item">
+              <span class="badge" style="background:#e2e8f0; color: ${rptColor}; font-weight: 700; padding: 4px 10px; border-radius: 12px; font-size: 0.65rem;">${s.report || '—'}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ขวา: Inspection Result + NG Rate (ย้ายมาใหม่) -->
+        <div class="rec-ph-right">
+          
+          <!-- Result Chips (LOT/OK/NG) -->
+          <div class="rec-result-row compact">
+            ${s.lot ? `
+            <div class="rec-result-chip rec-result-chip-lot compact">
+              <div class="rec-result-num rec-result-num-lot compact">${s.lot}</div>
+              <div class="rec-result-lbl rec-result-lbl-lot compact">ORDER</div>
+            </div>
+            ` : ''}
+            <div class="rec-result-chip rec-result-chip-ok compact">
+              <div class="rec-result-num rec-result-num-ok compact">${okVal}</div>
+              <div class="rec-result-lbl rec-result-lbl-ok compact">OK</div>
+            </div>
+            <div class="rec-result-chip rec-result-chip-ng compact">
+              <div class="rec-result-num rec-result-num-ng compact">${ngVal}</div>
+              <div class="rec-result-lbl rec-result-lbl-ng compact">NG</div>
+            </div>
+          </div>
+
+          <!-- NG Rate Bar -->
+          ${totalInspected > 0 ? `
+          <div class="rec-ng-rate-section">
+            <div class="rec-ng-rate-bar-track">
+              <div class="rec-ng-rate-bar-fill ${ngInfo.level}" style="width: ${Math.min(ngInfo.rate, 100)}%;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
+             
+              <div class="rec-ng-rate-pct ${ngInfo.level}">${ngInfo.rate}% NG</div>
+            </div>
+          </div>
+          ` : ''}
+
         </div>
       </div>
 
-      <!-- ═══ BODY ═══ -->
+      <!-- ═══ BODY (VERTICAL STACK) ═══ -->
       <div class="rec-body-row">
         
-        <!-- ซ้าย: รูป -->
+        <!-- รูปภาพ: ขยายเต็มจอ (แทนที่ส่วน Stats) -->
         <div class="rec-col-img">
           ${recImg ? `
-            <img src="${recImg}" onclick="imgZoomOrChange(event, '${s.id}', ${idx})" title="คลิกเพื่อซูม">
+            <img src="${recImg}" onclick="imgZoomOrChange(event, '${s.id}', ${idx})" title="คลิกเพื่อซูม" style="width:100%;height:100%;object-fit:contain;">
           ` : `
             <div class="rec-col-img-empty" onclick="openQuickImgEdit('${s.id}', ${idx})">
               <div class="rec-col-img-empty-icon">🖼️</div>
@@ -6673,123 +6956,28 @@ function openRecDetail(idx) {
           `}
         </div>
 
-        <!-- ขวา: Data -->
-        <div class="rec-col-right compact">
+        <!-- ส่วนข้อมูลอื่นๆ (Remarks + Status Footer) -->
+        <div class="rec-col-right">
           
-          <div class="rec-col-data compact">
-            
-            <!-- ── แถวข้อมูลด่วน: Part + Action + Severity ── -->
-            <div class="rec-info-inline" style="justify-content:flex-start;flex-wrap:wrap;">
-              ${s.part ? `<div class="rec-info-item"><span class="rec-part-badge">📦 ${s.part}</span></div>` : ''}
-              <div class="rec-info-item"><span class="rec-action-badge">🔧 ${s.action || '—'}</span></div>
-              <!-- ★ Severity Badge -->
-              <div class="rec-info-item">
-                <span class="rec-severity ${ngInfo.severity}">${ngInfo.severityText}</span>
-              </div>
-            </div>
-
-            <!-- ── Result Chips: LOT + OK + NG ── -->
-            <div class="rec-data-section compact">
-              <div class="rec-data-section-title">📊 Inspection Result</div>
-              <div class="rec-result-row compact">
-                ${s.lot ? `
-                <div class="rec-result-chip rec-result-chip-lot compact">
-                  <div class="rec-result-num rec-result-num-lot compact">${s.lot}</div>
-                  <div class="rec-result-lbl rec-result-lbl-lot compact">🔖 order.</div>
-                </div>
-                ` : `
-                <div class="rec-result-chip compact" style="background:var(--bg3);border:3px solid var(--border);opacity:.5;">
-                  <div class="rec-result-num compact" style="color:var(--txt4);">—</div>
-                  <div class="rec-result-lbl compact" style="color:var(--txt4);">🔖 order</div>
-                </div>
-                `}
-                <div class="rec-result-chip rec-result-chip-ok compact">
-                  <div class="rec-result-num rec-result-num-ok compact">${okVal}</div>
-                  <div class="rec-result-lbl rec-result-lbl-ok compact">✓ OK</div>
-                </div>
-                <div class="rec-result-chip rec-result-chip-ng compact">
-                  <div class="rec-result-num rec-result-num-ng compact">${ngVal}</div>
-                  <div class="rec-result-lbl rec-result-lbl-ng compact">✗ NG</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- ★★★ NG Rate Bar (แสดงเฉพาะเมื่อมีการตรวจ) ★★★ -->
-            ${totalInspected > 0 ? `
-            <div class="rec-ng-rate-section">
-              <div class="rec-ng-rate-label">NG Rate</div>
-              <div class="rec-ng-rate-bar-track">
-                <div class="rec-ng-rate-bar-fill ${ngInfo.level}" style="width: ${Math.min(ngInfo.rate, 100)}%;"></div>
-              </div>
-              <div class="rec-ng-rate-pct ${ngInfo.level}">${ngInfo.rate}%</div>
-              <!-- ★ Total Inspected -->
-              <div class="rec-total-inspected">
-                ตรวจ <b>${totalInspected}</b> ชิ้น
-              </div>
-            </div>
-            ` : ''}
-
-
-
-  ${partStats ? `
-    <div class="rec-part-stats">
-      <div class="rec-part-stats-title">📊 สถิติสะสม — ${partStats.targetPartNo}</div>
-      <div class="rec-part-stats-grid">
-        <div class="rec-part-stat-item">
-          <div class="rec-part-stat-val" style="color:var(--primary);">${formatK(partStats.totalCases)}</div>
-          <div class="rec-part-stat-lbl">ครั้ง</div>
-        </div>
-        <div class="rec-part-stat-item">
-          <!-- ★★★ เพิ่ม formatK ตรงนี้ (OK รวม) ★★★ -->
-          <div class="rec-part-stat-val" style="color:var(--green);">${formatK(partStats.totalOK)}</div>
-          <div class="rec-part-stat-lbl">OK รวม</div>
-        </div>
-        <div class="rec-part-stat-item">
-          <!-- ★★★ เพิ่ม formatK ตรงนี้ (NG รวม) ★★★ -->
-          <div class="rec-part-stat-val" style="color:var(--red);">${formatK(partStats.totalNG)}</div>
-          <div class="rec-part-stat-lbl">NG รวม</div>
-        </div>
-        <div class="rec-part-stat-item">
-          <div class="rec-part-stat-val" style="color:var(--amber);">${partStats.avgNgRate}%</div>
-          <div class="rec-part-stat-lbl">NG Rate เฉลี่ย</div>
-        </div>
-        <div class="rec-part-stat-item">
-          <div class="rec-part-stat-val" style="color:#dc2626;">${formatK(partStats.rpCount)}</div>
-          <div class="rec-part-stat-lbl">RP</div>
-        </div>
-        <div class="rec-part-stat-item">
-          <div class="rec-part-stat-val" style="color:#2563eb;">${formatK(partStats.vfCount)}</div>
-          <div class="rec-part-stat-lbl">VF</div>
-        </div>
-      </div>
-    </div>
-  ` : ''}
-
-            <!-- ── Remark ── -->
-            <div class="rec-remark-box compact">
-              <div class="rec-remark-label">💬 Remark</div>
-              ${s.remark && s.remark.trim()
-                ? `<div class="rec-remark-value">${s.remark}</div>`
-                : `<div class="rec-remark-empty">ไม่มีหมายเหตุ</div>`
-              }
-            </div>
-
+          <!-- Remark -->
+          <div class="rec-remark-box compact">
+            <div class="rec-remark-label">💬 Remark</div>
+            ${s.remark && s.remark.trim()
+              ? `<div class="rec-remark-value">${s.remark}</div>`
+              : `<div class="rec-remark-empty">ไม่มีหมายเหตุ</div>`
+            }
           </div>
 
-          <!-- ═══ FOOTER ═══ -->
+          <!-- Footer (Report Type / Status) -->
           <div class="rec-footer-bar compact">
             <div class="rec-footer-left">
-              <span class="rec-pill rec-pill-report compact" style="color:${rptColor};border-color:${rptColor}33;background:${rptColor}08;">${s.report}</span>
-              <span class="rec-pill ${isWip ? 'rec-pill-status-wip' : 'rec-pill-status'} compact">
-                ${isWip ? '⏳' : '✅'} ${st.txt}
-              </span>
-            </div>
-            
-    </div>
+          </div>
+        </div>
   `;
 
   document.getElementById('recDetailModal').classList.add('open');
 }
+
 function closeRecDetail(){document.getElementById('recDetailModal').classList.remove('open');}
 // ฟังก์ชันสลับโหมด
 function toggleDarkMode() {
