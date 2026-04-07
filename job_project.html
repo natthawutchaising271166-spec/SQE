@@ -4712,111 +4712,92 @@ function delDailyConfirm(id) {
 /* ─────────────────────────────────
    2. SUPPORT PRODUCTION
 ───────────────────────────────── */
+/* ─────────────────────────────────
+   SUPPORT PRODUCTION (ADD/SAVE)
+   ฟังก์ชันบันทึกข้อมูลใหม่ (แก้ไขแล้ว)
+───────────────────────────────── */
 function addSupport() {
+    // 1. ดึงค่าจาก Input ทั้งหมด
     const prob = document.getElementById('supProblem').value;
     const act = document.getElementById('supAction').value;
     const part = document.getElementById('supPart').value;
-    const rep = document.getElementById('supReport').value;
-    const di = document.getElementById('supDate').value;
     const lot = document.getElementById('supLot').value;
     const ok = document.getElementById('supOk').value;
     const ng = document.getElementById('supNg').value;
-    const remark = document.getElementById('supRemark').value; // ★ เพิ่มบรรทัดนี้
+    const rep = document.getElementById('supReport').value;
+    const remark = document.getElementById('supRemark').value; // ดึงค่า Remark
+    const di = document.getElementById('supDate').value;
 
-    if (!prob) return toast('❌ กรอกรายละเอียดปัญหา');
+    // 2. Validation: ตรวจสอบว่ากรอกข้อมูลครบถูกต้องหรือยัง
+    if (!prob || prob.trim() === '') {
+        toast('❌ กรุณาระบุรายละเอียดปัญหา');
+        return; // หยุดการทำงานถ้าไม่มีปัญหา
+    }
 
+    // 3. จัดรูปแบบวันที่และเวลา (Timestamp)
     const ts = fullTimestamp();
     const now = new Date();
+    // ถ้าไม่ได้เลือกวันที่ ให้ใช้วันที่ปัจจุบัน
     const d = di ? new Date(di) : now;
     const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    // ใช้ eventDate (YYYY-MM-DD) สำหรับการกรองข้อมูล
     const eventDate = di || now.toISOString().split('T')[0];
 
+    // 4. สร้าง ID ใหม่ (Unique ID)
     const newId = Date.now().toString();
-    db.support.push({
+
+    // 5. สร้าง Object ข้อมูลใหม่
+    const newRecord = {
         id: newId,
         problem: prob,
         action: act,
-        part,
+        part: part,
+        lot: lot,
+        ok: ok !== '' ? parseInt(ok) : '', // แปลงเป็นตัวเลข ถ้ามีค่า
+        ng: ng !== '' ? parseInt(ng) : '', // แปลงเป็นตัวเลข ถ้ามีค่า
         report: rep,
-        lot,
-        ok: ok !== '' ? parseInt(ok) : '',
-        ng: ng !== '' ? parseInt(ng) : '',
-        remark: remark, // ★ เพิ่มบรรทัดนี้เพื่อบันทึกลงฐานข้อมูล
+        remark: remark, // ★ บันทึกค่า Remark ลงฐานข้อมูล
         datetime: ts,
         fullTimestamp: ts,
-        month,
-        eventDate,
+        month: month,
+        eventDate: eventDate, // สำคัญสำหรับ Filter วันที่
         _user: currentUser
-    });
+    };
 
+    // 6. เพิ่มข้อมูลลงใน Database (db.support)
+    db.support.push(newRecord);
+
+    // 7. จัดการรูปภาพ (ถ้ามีการอัปโหลดไว้ชั่วคราว)
     if (_pendingAddImg && typeof _pendingAddImg === 'string' && _pendingAddImg.startsWith('data:')) {
         saveImage(newId, _pendingAddImg);
     }
-    _pendingAddImg = null;
+    _pendingAddImg = null; // ล้างค่าตัวแปรรูปภาพชั่วคราว
+
+    // 8. บันทึกข้อมูล (Save Process)
+    saveLocal();     // บันทึกลง LocalStorage ทันที
+    schedulePush();  // สั่ง Sync ขึ้น Google Sheet
+
+    // 9. ★ รีเซทฟอร์ม (Clear Form) - ส่วนแก้ไขปัญหาไม่เคลียร์ข้อมูล ★
+    document.getElementById('supProblem').value = '';
+    document.getElementById('supPart').value = '';
+    document.getElementById('supLot').value = '';
+    document.getElementById('supOk').value = '';
+    document.getElementById('supNg').value = '';
+    document.getElementById('supRemark').value = ''; // เคลียร์ช่อง Remark
     
-    save();
-    toast('🛠️ บันทึก Support แล้ว');
-    closeAddSupModal();
+    // ตั้งค่าวันที่กลับเป็น "วันนี้" เพื่อความสะดวกในการบันทึกครั้งต่อไป
+    document.getElementById('supDate').value = new Date().toISOString().split('T')[0];
     
-    // ★ เคลียร์ค่าช่อง Remark หลังจากบันทึกเสร็จ
-    document.getElementById('supRemark').value = '';
-    
-    refreshSupport();
-    refreshMasterDashboard();
-}
-
-function delSupportConfirm(i) {
-    robotConfirm('ลบ Support record นี้?', () => {
-        const s = db.support[i];
-        if (s && s.id) removeImage(s.id);
-        db.support.splice(i, 1);
-        save();
-        toast('🗑 ลบแล้ว');
-        
-        refreshSupport();
-        refreshMasterDashboard();
-    });
-}
-
-function saveEditSupport() {
-    const i = parseInt(document.getElementById('editIdx').value);
-    if (isNaN(i) || !db.support[i]) return toast('❌ ข้อมูลไม่ถูกต้อง');
-
-    const di = document.getElementById('editDate').value;
-    const d = di ? new Date(di) : new Date();
-    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const ok_val = document.getElementById('editOk').value;
-    const ng_val = document.getElementById('editNg').value;
-
-    db.support[i].problem = document.getElementById('editProblem').value;
-    db.support[i].action = document.getElementById('editAction').value;
-    db.support[i].part = document.getElementById('editPart').value;
-    db.support[i].lot = document.getElementById('editLot').value;
-    db.support[i].ok = ok_val !== '' ? parseInt(ok_val) : '';
-    db.support[i].ng = ng_val !== '' ? parseInt(ng_val) : '';
-    db.support[i].report = document.getElementById('editReport').value;
-    db.support[i].month = month;
-    db.support[i].eventDate = di;
-    db.support[i]._editedAt = fullTimestamp();
-    db.support[i]._user = currentUser;
-
-    const recId = db.support[i].id;
-    if (recId) {
-        if (_pendingEditImg === null) {
-            removeImage(recId);
-            refreshSupportImagesOnly();
-        } else if (typeof _pendingEditImg === 'string' && _pendingEditImg.startsWith('data:')) {
-            saveImage(recId, _pendingEditImg);
-            refreshSupportImagesOnly();
-        }
+    // เรียกฟังก์ชันรีเซทรูปภาพ (จากโค้ดเดิมของคุณ)
+    if(typeof resetAddImgZone === 'function'){
+        resetAddImgZone();
     }
-        document.getElementById('editRemark').value = s.remark || '';
-    _pendingEditImg = undefined;
-    
-    save();
-    toast('✅ อัปเดตข้อมูลแล้ว');
-    document.getElementById('editModal').style.display = 'none';
-    
+
+    // 10. แจ้งเตือนและปิดหน้าต่าง
+    toast('✅ บันทึกข้อมูลเรียบร้อย');
+    closeAddSupModal();
+
+    // 11. รีเฟรชหน้าจอแสดงผล
     refreshSupport();
     refreshMasterDashboard();
 }
@@ -6168,57 +6149,6 @@ function openAddSupModal(){
   const ai=document.getElementById('addImgInput');if(ai)ai.value='';
 }
 function closeAddSupModal(){document.getElementById('addSupModal').classList.remove('open');}
-
-
-
-// 2. แก้ไขการเพิ่มข้อมูลใหม่ให้มี eventDate
-function addSupport(){
-  const prob = document.getElementById('supProblem').value,
-    act = document.getElementById('supAction').value,
-    part = document.getElementById('supPart').value,
-    rep = document.getElementById('supReport').value,
-    di = document.getElementById('supDate').value,
-    lot = document.getElementById('supLot').value,
-    ok = document.getElementById('supOk').value,
-    ng = document.getElementById('supNg').value;
-    
-  if(!prob) return toast('❌ กรอกรายละเอียดปัญหา');
-  
-  const ts = fullTimestamp();
-  const now = new Date();
-  // ใช้วันที่จาก Input ถ้ามี ถ้าไม่มีใช้วันปัจจุบัน
-  const d = di ? new Date(di) : now;
-  const month = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  // ***สำคัญ: สร้าง eventDate เป็น YYYY-MM-DD***
-  const eventDate = di || now.toISOString().split('T')[0];
-  
-  const newId = Date.now().toString();
-  db.support.push({
-    id: newId,
-    problem: prob,
-    action: act,
-    part,
-    report: rep,
-    lot,
-    ok: ok!==''?parseInt(ok):'',
-    ng: ng!==''?parseInt(ng):'',
-    datetime: ts,
-    fullTimestamp: ts,
-    month,
-    eventDate, // เพิ่ม field นี้เข้าไป
-    _user: currentUser
-  });
-  
-  if(_pendingAddImg && typeof _pendingAddImg==='string' && _pendingAddImg.startsWith('data:')){
-    saveImage(newId, _pendingAddImg);
-  }
-  _pendingAddImg = null;
-  save();
-  toast('🛠️ บันทึก Support แล้ว');
-  closeAddSupModal();
-  refreshSupport();
-  if(isActive('master-dash')) refreshMasterDashboard();
-}
 
 function delSupportConfirm(i){
   const s=db.support[i];
