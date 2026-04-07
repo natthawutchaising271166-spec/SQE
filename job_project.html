@@ -3146,6 +3146,73 @@ body.dark-mode .report-radio:checked + .report-label {
   color: #fff;
   border-color: rgba(255,255,255,0.1);
 }
+/* ────────────────────────────────────
+   COLLAPSE / SUMMARY MODE CSS
+──────────────────────────────────── */
+/* 1. ปุ่ม Toggle ด้านขวาบน */
+.btn-toggle-detail {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.btn-toggle-detail:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* 2. Container ที่ครอบเนื้อหาที่ต้องการซ่อน */
+/* (เราจะสร้าง div นี้ใน JS ทีหลัง) */
+#recDetailCollapsibleArea {
+  transition: all 0.3s ease;
+}
+
+/* 3. สถานะเมื่อกดปุ่มซ่อน (Summary Mode) */
+.is-summary-mode .rec-problem-header {
+  display: none !important; /* ซ่อนหัวข้อปัญหา */
+}
+
+.is-summary-mode .rec-col-right {
+  display: none !important; /* ซ่อนข้อมูลขวา (Remark, Info) */
+}
+
+/* 4. ปรับรูปภาพให้โตและตรงกลางเมื่อซ่อนรายละเอียด (เพื่อความสวยงามของ Report) */
+.is-summary-mode .rec-body-row {
+  display: block !important; /* เปลี่ยนจาก flex เป็น block */
+}
+.is-summary-mode .rec-col-img {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 320px !important; /* กำหนดความสูงคงที่ เพื่อให้ขนาดเท่ากันทุกรายการ */
+  min-height: 320px !important;
+  border-right: none !important;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+.is-summary-mode .rec-col-img img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important; /* แสดงรูปครบ */
+}
+
+/* 5. ปรับ Result Chips ให้จัดวางใหม่ตรงกลาง */
+.is-summary-mode .rec-result-row.compact {
+  justify-content: center; /* จัดกลาง */
+  margin-top: 16px;
+}
+
+/* Dark Mode สำหรับปุ่ม */
+body.dark-mode .btn-toggle-detail {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
 </style>
 
 </head>
@@ -5133,7 +5200,65 @@ function showSyncStatus(msg,color='#22c55e'){const el=document.getElementById('s
 function getDataLen(o){return Object.values(o).reduce((a,c)=>a+(Array.isArray(c)?c.length:0),0);}
 function schedulePush(){clearTimeout(pushTimer);pushTimer=setTimeout(()=>pushToCloud(),900);}
 async function pushToCloud(){db._owner=currentUser;db._lastModified=Date.now();saveLocal();try{await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:currentUser,data:db})});showSyncStatus('☁️ บันทึกขึ้น Cloud แล้ว','#22c55e');}catch(e){showSyncStatus('⚠️ Cloud push ล้มเหลว','#f59e0b');}}
-async function pullFromCloud(silent=false){try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();if(r.status==='success'&&r.data){const cloud=r.data;if(cloud._owner&&cloud._owner!==currentUser){if(!silent)console.warn('Wrong user data');return false;}const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);if(cloudMod>localMod||cloudLen>localLen){cloud._owner=currentUser;db=cloud;saveLocal();return true;}}}catch(e){}return false;}
+async function pullFromCloud(silent=false){
+  try{
+    const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
+    const r=await res.json();
+    if(r.status==='success'&&r.data){
+      const cloud=r.data;
+      
+      // ✅ เช็คว่าเจ้าของข้อมูลตรงกันไหม
+      if(cloud._owner&&cloud._owner!==currentUser){
+        if(!silent) console.warn('Wrong user data');
+        return false;
+      }
+
+      // ✅ คำนวณจำนวนข้อมูล
+      const cloudLen = getDataLen(cloud);
+      const localLen = getDataLen(db);
+
+      // ───── ส่วนสำคัญ: ตรรกะป้องกันการลบข้อมูล ─────
+      
+      // กรณีที่ 1: Cloud มีข้อมูล "มากกว่า" Local (ปลอดภัยที่จะดึงมา)
+      if (cloudLen > localLen) {
+        cloud._owner=currentUser; 
+        db=cloud; 
+        saveLocal(); 
+        if(!silent) toast('📥 ดึงข้อมูลใหม่จาก Cloud สำเร็จ');
+        return true; 
+      }
+      
+      // กรณีที่ 2: จำนวนเท่ากัน แต่ Cloud อัปเดตล่าสุด (ปลอดภัยที่จะดึงมา เช่น แก้ไขข้อมูลเดิม)
+      else if (cloudLen === localLen && (cloud._lastModified||0) > (db._lastModified||0)) {
+        cloud._owner=currentUser;
+        db=cloud;
+        saveLocal();
+        if(!silent) toast('🔄 อัปเดตข้อมูลจาก Cloud');
+        return true;
+      }
+
+      // ───── กรณีอันตราย: Local มีข้อมูลมากกว่า Cloud ─────
+      else {
+        // อย่าทำอะไร! อย่าลบข้อมูล Local
+        console.warn(`⚠️ Sync Protection: Cloud has ${cloudLen} records, Local has ${localLen}. Keeping Local data to prevent data loss.`);
+        
+        if(!silent) {
+          showSyncStatus('🛡️ ข้อมูล Local ใหม่กว่า ยกเลิกดึงข้อมูลเก่า','#f59e0b');
+          // เสนอให้ Sync ขึ้น Cloud แทน
+          setTimeout(() => {
+            if(confirm('⚠️ ตรวจพบว่าข้อมูลในเครื่องนี้ใหม่กว่าบน Cloud\nต้องการอัปโหลดข้อมูลใหม่นี้ขึ้น Cloud ไหม?')) {
+              pushToCloud();
+            }
+          }, 1000);
+        }
+        return false;
+      }
+    }
+  }catch(e){
+    console.error("Pull error", e);
+  }
+  return false;
+}
 function saveLocal(){db._owner=currentUser;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}
 
 function exportSupportToExcel() {
@@ -6857,7 +6982,32 @@ function openRecDetail(idx) {
 
   document.getElementById('recDetailModal').classList.add('open');
 }
-
+/* ══════════════════════════════════
+   TOGGLE SUMMARY MODE FUNCTION
+   ฟังก์ชันสลับโหมด แสดงผล/ซ่อนรายละเอียด
+══════════════════════════════════ */
+function toggleSummaryMode() {
+  const panel = document.querySelector('.rec-detail-panel');
+  const btn = document.getElementById('btnToggleSummary');
+  const btnText = btn.querySelector('span:last-child'); // ตัวหนังสือ
+  const btnIcon = btn.querySelector('span:first-child'); // ไอคอน
+  
+  // 1. สลับ Class
+  const isSummary = panel.classList.toggle('is-summary-mode');
+  
+  // 2. เปลี่ยนข้อความปุ่ม
+  if (isSummary) {
+    btnIcon.textContent = '📝';
+    btnText.textContent = 'Full Detail'; // กลับเป็นข้อความเต็ม
+    btn.style.background = '#2563eb'; // เปลี่ยนสีปุ่มให้โดดเด่นว่าอยู่ในโหมดพิเศษ
+    btn.style.color = '#fff';
+  } else {
+    btnIcon.textContent = '👁️';
+    btnText.textContent = 'Summary View';
+    btn.style.background = ''; // คืนค่าสีเดิม
+    btn.style.color = '';
+  }
+}
 function closeRecDetail(){document.getElementById('recDetailModal').classList.remove('open');}
 // ฟังก์ชันสลับโหมด
 function toggleDarkMode() {
