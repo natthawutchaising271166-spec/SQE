@@ -4005,6 +4005,11 @@ body.dark-mode .report-radio:checked + .report-label {
             <option value="RECORDS">RECORDS</option>
           </select>
         </div>
+        <!-- วางโค้ดช่อง Remark นี้ลงใน <div class="add-sup-body"> -->
+<div class="full">
+  <label>💬 Remark / หมายเหตุเพิ่มเติม</label>
+  <textarea id="supRemark" placeholder="บันทึกข้อมูลเพิ่มเติม เช่น สาเหตุเบื้องต้น..." style="width:100%;padding:9px 11px;border-radius:9px;border:1.5px solid var(--border);font-size:.82rem;font-family:'Plus Jakarta Sans','Prompt',sans-serif;color:var(--txt);background:var(--bg2);resize:vertical;min-height:60px;outline:none;transition:all .2s;"></textarea>
+</div>
         <div class="full">
           <label>📷 รูปภาพ (ไม่บังคับ)</label>
           <div class="img-zone" id="addImgZone" onclick="triggerFileInput('addImgInput',updateAddPreview)">
@@ -4716,6 +4721,7 @@ function addSupport() {
     const lot = document.getElementById('supLot').value;
     const ok = document.getElementById('supOk').value;
     const ng = document.getElementById('supNg').value;
+    const remark = document.getElementById('supRemark').value; // ★ เพิ่มบรรทัดนี้
 
     if (!prob) return toast('❌ กรอกรายละเอียดปัญหา');
 
@@ -4735,6 +4741,7 @@ function addSupport() {
         lot,
         ok: ok !== '' ? parseInt(ok) : '',
         ng: ng !== '' ? parseInt(ng) : '',
+        remark: remark, // ★ เพิ่มบรรทัดนี้เพื่อบันทึกลงฐานข้อมูล
         datetime: ts,
         fullTimestamp: ts,
         month,
@@ -4750,6 +4757,9 @@ function addSupport() {
     save();
     toast('🛠️ บันทึก Support แล้ว');
     closeAddSupModal();
+    
+    // ★ เคลียร์ค่าช่อง Remark หลังจากบันทึกเสร็จ
+    document.getElementById('supRemark').value = '';
     
     refreshSupport();
     refreshMasterDashboard();
@@ -5146,7 +5156,6 @@ async function pullFromCloud(silent=false){try{const res=await fetch(`${GOOGLE_S
 function saveLocal(){db._owner=currentUser;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}
 
 function exportSupportToExcel() {
-    // 1. กรองข้อมูลเหมือนที่แสดงในตาราง (กรองวันที่ + ค้นหา)
     let filtered = filterByDateRange(db.support, 'eventDate', 'support');
     
     if (supportSearchTerm) {
@@ -5160,11 +5169,8 @@ function exportSupportToExcel() {
         });
     }
 
-    if (!filtered.length) {
-        return toast('⚠️ ไม่มีข้อมูลสำหรับ Export');
-    }
+    if (!filtered.length) return toast('⚠️ ไม่มีข้อมูลสำหรับ Export');
 
-    // 2. แปลงข้อมูลให้เหมาะกับ Excel (Clean Format)
     const dataForExcel = filtered.map(s => ({
         "วันที่": s.fullTimestamp || s.datetime || s.eventDate || '',
         "รายละเอียดปัญหา": s.problem || '',
@@ -5174,30 +5180,22 @@ function exportSupportToExcel() {
         "OK (ชิ้นดี)": s.ok || 0,
         "NG (ของเสีย)": s.ng || 0,
         "ประเภท Report": s.report || '',
-                "Remark": s.remark || '',
+        "Remark": s.remark || '', // ★ เพิ่มคอลัมน์ Remark
         "หมายเหตุ/ผู้บันทึก": s._user || ''
     }));
 
-    // 3. สร้าง Worksheet และ Workbook
     const ws = XLSX.utils.json_to_sheet(dataForExcel);
-    
-    // ปรับความกว้างคอลัมน์ให้สวยงาม (Optional)
-    ws['!cols'] = [
-        {wch: 20}, {wch: 40}, {wch: 15}, {wch: 15}, 
-        {wch: 12}, {wch: 10}, {wch: 10}, {wch: 15}, {wch: 30}
-    ];
+    ws['!cols'] = [{wch: 20}, {wch: 40}, {wch: 15}, {wch: 15}, {wch: 12}, {wch: 10}, {wch: 10}, {wch: 15}, {wch: 30}, {wch: 20}]; // ★ ปรับความกว้างคอลัมน์ให้รองรับ Remark ยาวๆ
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Support Data");
 
-    // 4. Download File
     const now = new Date();
     const filename = `Support_Report_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate()}.xlsx`;
     
     XLSX.writeFile(wb, filename);
     toast(`📥 Export สำเร็จ: ${filtered.length} รายการ`);
 }
-
 /* ══════════════════════════════════
    GOOGLE SHEETS CONNECTION TEST
 ══════════════════════════════════ */
@@ -6237,7 +6235,6 @@ function openEditSupport(i){
   if(!s) return;
   
   document.getElementById('editIdx').value = i;
-  // ดึงวันที่จริงจาก eventDate ถ้ามี ถ้าไม่มีใช้ month
   document.getElementById('editDate').value = s.eventDate || (s.month ? `${s.month}-01` : '');
   document.getElementById('editProblem').value = s.problem||'';
   document.getElementById('editAction').value = s.action||'Repair';
@@ -6246,6 +6243,7 @@ function openEditSupport(i){
   document.getElementById('editOk').value = s.ok!==undefined && s.ok!=='' ? s.ok : '';
   document.getElementById('editNg').value = s.ng!==undefined && s.ng!=='' ? s.ng : '';
   document.getElementById('editReport').value = s.report||'VF';
+  document.getElementById('editRemark').value = s.remark || ''; // ★ โหลดค่า Remark เดิมมาแสดง
   
   _pendingEditImg = undefined;
   const existImg = imageMap[s.id];
@@ -6269,6 +6267,7 @@ function saveEditSupport(){
   
   const ok_val = document.getElementById('editOk').value;
   const ng_val = document.getElementById('editNg').value;
+  const remark_val = document.getElementById('editRemark').value; // ★ รับค่า Remark จากช่องแก้ไข
   
   db.support[i].problem = document.getElementById('editProblem').value;
   db.support[i].action = document.getElementById('editAction').value;
@@ -6277,9 +6276,9 @@ function saveEditSupport(){
   db.support[i].ok = ok_val!=='' ? parseInt(ok_val) : '';
   db.support[i].ng = ng_val!=='' ? parseInt(ng_val) : '';
   db.support[i].report = document.getElementById('editReport').value;
+  db.support[i].remark = remark_val; // ★ อัปเดตค่า Remark ลงฐานข้อมูล
   db.support[i].month = month;
-  db.support[i].eventDate = di; // ***สำคัญ: อัปเดต eventDate***
-  db.support[i].remark = document.getElementById('editRemark').value || '';
+  db.support[i].eventDate = di;
   db.support[i]._editedAt = fullTimestamp();
   db.support[i]._user = currentUser;
   
@@ -6293,6 +6292,7 @@ function saveEditSupport(){
   toast('✅ อัปเดตข้อมูลแล้ว');
   document.getElementById('editModal').style.display = 'none';
   refreshSupport();
+  refreshMasterDashboard();
 }
 function closeEditModal(e){if(!e||e.target===document.getElementById('editModal'))document.getElementById('editModal').style.display='none';}
 
@@ -6865,7 +6865,6 @@ function openRecDetail(idx) {
   const rptColor = s.report === 'RP' ? '#dc2626' : s.report === 'VF' ? '#2563eb' : '#d97706';
   const isWip = st.cls === 'sp-status-wip';
 
-  // คำนวณค่าต่างๆ (เก็บไว้ใช้)
   const okVal = (s.ok !== undefined && s.ok !== '') ? parseInt(s.ok) : 0;
   const ngVal = (s.ng !== undefined && s.ng !== '') ? parseInt(s.ng) : 0;
   const totalInspected = okVal + ngVal;
@@ -6875,91 +6874,40 @@ function openRecDetail(idx) {
 
   el.innerHTML = `
     <div class="rec-report-layout">
-      
-      <!-- ═══ HEADER (SPLIT LAYOUT) ═══ -->
+      <!-- Header -->
       <div class="rec-problem-header compact">
-        
-        <!-- ซ้าย: ข้อมูลปัญหา -->
         <div class="rec-ph-left">
           <div class="rec-ph-eyebrow">⚠️ Problem Detail</div>
           <div class="rec-ph-title">${s.problem || '—'}</div>
-          
-          <!-- Meta Info (วันที่/ผู้บันทึก) -->
           <div class="rec-ph-meta">
             <div class="rec-ph-meta-item">📅 <b>${s.fullTimestamp || s.datetime || '—'}</b></div>
             <div class="rec-ph-meta-item">👤 <b>${s._user || '—'}</b></div>
           </div>
-
-          <!-- Badges (Action/Severity/Report Type) -->
           <div class="rec-info-inline" style="justify-content:flex-start;flex-wrap:wrap;margin-top:4px;">
             ${s.part ? `<div class="rec-info-item"><span class="rec-part-badge">📦 ${s.part}</span></div>` : ''}
             <div class="rec-info-item"><span class="rec-action-badge">🔧 ${s.action || '—'}</span></div>
-            <div class="rec-info-item">
-              <span class="rec-severity ${ngInfo.severity}">${ngInfo.severityText}</span>
-            </div>
-            <div class="rec-info-item">
-              <span class="badge" style="background:#e2e8f0; color: ${rptColor}; font-weight: 700; padding: 4px 10px; border-radius: 12px; font-size: 0.65rem;">${s.report || '—'}</span>
-            </div>
+            <div class="rec-info-item"><span class="rec-severity ${ngInfo.severity}">${ngInfo.severityText}</span></div>
+            <div class="rec-info-item"><span class="badge" style="background:#e2e8f0; color: ${rptColor}; font-weight: 700; padding: 4px 10px; border-radius: 12px; font-size: 0.65rem;">${s.report || '—'}</span></div>
           </div>
         </div>
-
-        <!-- ขวา: Inspection Result + NG Rate (ย้ายมาใหม่) -->
         <div class="rec-ph-right">
-          
-          <!-- Result Chips (LOT/OK/NG) -->
           <div class="rec-result-row compact">
-            ${s.lot ? `
-            <div class="rec-result-chip rec-result-chip-lot compact">
-              <div class="rec-result-num rec-result-num-lot compact">${s.lot}</div>
-              <div class="rec-result-lbl rec-result-lbl-lot compact">ORDER</div>
-            </div>
-            ` : ''}
-            <div class="rec-result-chip rec-result-chip-ok compact">
-              <div class="rec-result-num rec-result-num-ok compact">${okVal}</div>
-              <div class="rec-result-lbl rec-result-lbl-ok compact">OK</div>
-            </div>
-            <div class="rec-result-chip rec-result-chip-ng compact">
-              <div class="rec-result-num rec-result-num-ng compact">${ngVal}</div>
-              <div class="rec-result-lbl rec-result-lbl-ng compact">NG</div>
-            </div>
+            ${s.lot ? `<div class="rec-result-chip rec-result-chip-lot compact"><div class="rec-result-num rec-result-num-lot compact">${s.lot}</div><div class="rec-result-lbl rec-result-lbl-lot compact">ORDER</div></div>` : ''}
+            <div class="rec-result-chip rec-result-chip-ok compact"><div class="rec-result-num rec-result-num-ok compact">${okVal}</div><div class="rec-result-lbl rec-result-lbl-ok compact">OK</div></div>
+            <div class="rec-result-chip rec-result-chip-ng compact"><div class="rec-result-num rec-result-num-ng compact">${ngVal}</div><div class="rec-result-lbl rec-result-lbl-ng compact">NG</div></div>
           </div>
-
-          <!-- NG Rate Bar -->
-          ${totalInspected > 0 ? `
-          <div class="rec-ng-rate-section">
-            <div class="rec-ng-rate-bar-track">
-              <div class="rec-ng-rate-bar-fill ${ngInfo.level}" style="width: ${Math.min(ngInfo.rate, 100)}%;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
-             
-              <div class="rec-ng-rate-pct ${ngInfo.level}">${ngInfo.rate}% NG</div>
-            </div>
-          </div>
-          ` : ''}
-
+          ${totalInspected > 0 ? `<div class="rec-ng-rate-section"><div class="rec-ng-rate-bar-track"><div class="rec-ng-rate-bar-fill ${ngInfo.level}" style="width: ${Math.min(ngInfo.rate, 100)}%;"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;"><div class="rec-ng-rate-pct ${ngInfo.level}">${ngInfo.rate}% NG</div></div></div>` : ''}
         </div>
       </div>
 
-      <!-- ═══ BODY (VERTICAL STACK) ═══ -->
+      <!-- Body -->
       <div class="rec-body-row">
-        
-        <!-- รูปภาพ: ขยายเต็มจอ (แทนที่ส่วน Stats) -->
         <div class="rec-col-img">
-          ${recImg ? `
-            <img src="${recImg}" onclick="imgZoomOrChange(event, '${s.id}', ${idx})" title="คลิกเพื่อซูม" style="width:100%;height:100%;object-fit:contain;">
-          ` : `
-            <div class="rec-col-img-empty" onclick="openQuickImgEdit('${s.id}', ${idx})">
-              <div class="rec-col-img-empty-icon">🖼️</div>
-              <div class="rec-col-img-empty-text">เพิ่มรูปภาพ</div>
-              <div class="rec-col-img-empty-sub">คลิกเพื่ออัปโหลด</div>
-            </div>
-          `}
+          ${recImg ? `<img src="${recImg}" onclick="imgZoomOrChange(event, '${s.id}', ${idx})" title="คลิกเพื่อซูม" style="width:100%;height:100%;object-fit:contain;">` : `<div class="rec-col-img-empty" onclick="openQuickImgEdit('${s.id}', ${idx})"><div class="rec-col-img-empty-icon">🖼️</div><div class="rec-col-img-empty-text">เพิ่มรูปภาพ</div><div class="rec-col-img-empty-sub">คลิกเพื่ออัปโหลด</div></div>`}
         </div>
-
-        <!-- ส่วนข้อมูลอื่นๆ (Remarks + Status Footer) -->
         <div class="rec-col-right">
           
-          <!-- Remark -->
+          <!-- ★ เพิ่มส่วนแสดง Remark ตรงนี้ -->
           <div class="rec-remark-box compact">
             <div class="rec-remark-label">💬 Remark</div>
             ${s.remark && s.remark.trim()
@@ -6968,11 +6916,13 @@ function openRecDetail(idx) {
             }
           </div>
 
-          <!-- Footer (Report Type / Status) -->
           <div class="rec-footer-bar compact">
-            <div class="rec-footer-left">
+            <div class="rec-footer-left"></div>
+            <div class="rec-footer-right"></div>
           </div>
         </div>
+      </div>
+    </div>
   `;
 
   document.getElementById('recDetailModal').classList.add('open');
