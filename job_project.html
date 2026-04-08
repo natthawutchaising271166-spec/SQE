@@ -3146,6 +3146,73 @@ body.dark-mode .report-radio:checked + .report-label {
   color: #fff;
   border-color: rgba(255,255,255,0.1);
 }
+/* ────────────────────────────────────
+   COLLAPSE / SUMMARY MODE CSS
+──────────────────────────────────── */
+/* 1. ปุ่ม Toggle ด้านขวาบน */
+.btn-toggle-detail {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.btn-toggle-detail:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* 2. Container ที่ครอบเนื้อหาที่ต้องการซ่อน */
+/* (เราจะสร้าง div นี้ใน JS ทีหลัง) */
+#recDetailCollapsibleArea {
+  transition: all 0.3s ease;
+}
+
+/* 3. สถานะเมื่อกดปุ่มซ่อน (Summary Mode) */
+.is-summary-mode .rec-problem-header {
+  display: none !important; /* ซ่อนหัวข้อปัญหา */
+}
+
+.is-summary-mode .rec-col-right {
+  display: none !important; /* ซ่อนข้อมูลขวา (Remark, Info) */
+}
+
+/* 4. ปรับรูปภาพให้โตและตรงกลางเมื่อซ่อนรายละเอียด (เพื่อความสวยงามของ Report) */
+.is-summary-mode .rec-body-row {
+  display: block !important; /* เปลี่ยนจาก flex เป็น block */
+}
+.is-summary-mode .rec-col-img {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 320px !important; /* กำหนดความสูงคงที่ เพื่อให้ขนาดเท่ากันทุกรายการ */
+  min-height: 320px !important;
+  border-right: none !important;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+.is-summary-mode .rec-col-img img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important; /* แสดงรูปครบ */
+}
+
+/* 5. ปรับ Result Chips ให้จัดวางใหม่ตรงกลาง */
+.is-summary-mode .rec-result-row.compact {
+  justify-content: center; /* จัดกลาง */
+  margin-top: 16px;
+}
+
+/* Dark Mode สำหรับปุ่ม */
+body.dark-mode .btn-toggle-detail {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
 </style>
 
 </head>
@@ -4712,111 +4779,92 @@ function delDailyConfirm(id) {
 /* ─────────────────────────────────
    2. SUPPORT PRODUCTION
 ───────────────────────────────── */
+/* ─────────────────────────────────
+   SUPPORT PRODUCTION (ADD/SAVE)
+   ฟังก์ชันบันทึกข้อมูลใหม่ (แก้ไขแล้ว)
+───────────────────────────────── */
 function addSupport() {
+    // 1. ดึงค่าจาก Input ทั้งหมด
     const prob = document.getElementById('supProblem').value;
     const act = document.getElementById('supAction').value;
     const part = document.getElementById('supPart').value;
-    const rep = document.getElementById('supReport').value;
-    const di = document.getElementById('supDate').value;
     const lot = document.getElementById('supLot').value;
     const ok = document.getElementById('supOk').value;
     const ng = document.getElementById('supNg').value;
-    const remark = document.getElementById('supRemark').value; // ★ เพิ่มบรรทัดนี้
+    const rep = document.getElementById('supReport').value;
+    const remark = document.getElementById('supRemark').value; // ดึงค่า Remark
+    const di = document.getElementById('supDate').value;
 
-    if (!prob) return toast('❌ กรอกรายละเอียดปัญหา');
+    // 2. Validation: ตรวจสอบว่ากรอกข้อมูลครบถูกต้องหรือยัง
+    if (!prob || prob.trim() === '') {
+        toast('❌ กรุณาระบุรายละเอียดปัญหา');
+        return; // หยุดการทำงานถ้าไม่มีปัญหา
+    }
 
+    // 3. จัดรูปแบบวันที่และเวลา (Timestamp)
     const ts = fullTimestamp();
     const now = new Date();
+    // ถ้าไม่ได้เลือกวันที่ ให้ใช้วันที่ปัจจุบัน
     const d = di ? new Date(di) : now;
     const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    // ใช้ eventDate (YYYY-MM-DD) สำหรับการกรองข้อมูล
     const eventDate = di || now.toISOString().split('T')[0];
 
+    // 4. สร้าง ID ใหม่ (Unique ID)
     const newId = Date.now().toString();
-    db.support.push({
+
+    // 5. สร้าง Object ข้อมูลใหม่
+    const newRecord = {
         id: newId,
         problem: prob,
         action: act,
-        part,
+        part: part,
+        lot: lot,
+        ok: ok !== '' ? parseInt(ok) : '', // แปลงเป็นตัวเลข ถ้ามีค่า
+        ng: ng !== '' ? parseInt(ng) : '', // แปลงเป็นตัวเลข ถ้ามีค่า
         report: rep,
-        lot,
-        ok: ok !== '' ? parseInt(ok) : '',
-        ng: ng !== '' ? parseInt(ng) : '',
-        remark: remark, // ★ เพิ่มบรรทัดนี้เพื่อบันทึกลงฐานข้อมูล
+        remark: remark, // ★ บันทึกค่า Remark ลงฐานข้อมูล
         datetime: ts,
         fullTimestamp: ts,
-        month,
-        eventDate,
+        month: month,
+        eventDate: eventDate, // สำคัญสำหรับ Filter วันที่
         _user: currentUser
-    });
+    };
 
+    // 6. เพิ่มข้อมูลลงใน Database (db.support)
+    db.support.push(newRecord);
+
+    // 7. จัดการรูปภาพ (ถ้ามีการอัปโหลดไว้ชั่วคราว)
     if (_pendingAddImg && typeof _pendingAddImg === 'string' && _pendingAddImg.startsWith('data:')) {
         saveImage(newId, _pendingAddImg);
     }
-    _pendingAddImg = null;
+    _pendingAddImg = null; // ล้างค่าตัวแปรรูปภาพชั่วคราว
+
+    // 8. บันทึกข้อมูล (Save Process)
+    saveLocal();     // บันทึกลง LocalStorage ทันที
+    schedulePush();  // สั่ง Sync ขึ้น Google Sheet
+
+    // 9. ★ รีเซทฟอร์ม (Clear Form) - ส่วนแก้ไขปัญหาไม่เคลียร์ข้อมูล ★
+    document.getElementById('supProblem').value = '';
+    document.getElementById('supPart').value = '';
+    document.getElementById('supLot').value = '';
+    document.getElementById('supOk').value = '';
+    document.getElementById('supNg').value = '';
+    document.getElementById('supRemark').value = ''; // เคลียร์ช่อง Remark
     
-    save();
-    toast('🛠️ บันทึก Support แล้ว');
-    closeAddSupModal();
+    // ตั้งค่าวันที่กลับเป็น "วันนี้" เพื่อความสะดวกในการบันทึกครั้งต่อไป
+    document.getElementById('supDate').value = new Date().toISOString().split('T')[0];
     
-    // ★ เคลียร์ค่าช่อง Remark หลังจากบันทึกเสร็จ
-    document.getElementById('supRemark').value = '';
-    
-    refreshSupport();
-    refreshMasterDashboard();
-}
-
-function delSupportConfirm(i) {
-    robotConfirm('ลบ Support record นี้?', () => {
-        const s = db.support[i];
-        if (s && s.id) removeImage(s.id);
-        db.support.splice(i, 1);
-        save();
-        toast('🗑 ลบแล้ว');
-        
-        refreshSupport();
-        refreshMasterDashboard();
-    });
-}
-
-function saveEditSupport() {
-    const i = parseInt(document.getElementById('editIdx').value);
-    if (isNaN(i) || !db.support[i]) return toast('❌ ข้อมูลไม่ถูกต้อง');
-
-    const di = document.getElementById('editDate').value;
-    const d = di ? new Date(di) : new Date();
-    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const ok_val = document.getElementById('editOk').value;
-    const ng_val = document.getElementById('editNg').value;
-
-    db.support[i].problem = document.getElementById('editProblem').value;
-    db.support[i].action = document.getElementById('editAction').value;
-    db.support[i].part = document.getElementById('editPart').value;
-    db.support[i].lot = document.getElementById('editLot').value;
-    db.support[i].ok = ok_val !== '' ? parseInt(ok_val) : '';
-    db.support[i].ng = ng_val !== '' ? parseInt(ng_val) : '';
-    db.support[i].report = document.getElementById('editReport').value;
-    db.support[i].month = month;
-    db.support[i].eventDate = di;
-    db.support[i]._editedAt = fullTimestamp();
-    db.support[i]._user = currentUser;
-
-    const recId = db.support[i].id;
-    if (recId) {
-        if (_pendingEditImg === null) {
-            removeImage(recId);
-            refreshSupportImagesOnly();
-        } else if (typeof _pendingEditImg === 'string' && _pendingEditImg.startsWith('data:')) {
-            saveImage(recId, _pendingEditImg);
-            refreshSupportImagesOnly();
-        }
+    // เรียกฟังก์ชันรีเซทรูปภาพ (จากโค้ดเดิมของคุณ)
+    if(typeof resetAddImgZone === 'function'){
+        resetAddImgZone();
     }
-        document.getElementById('editRemark').value = s.remark || '';
-    _pendingEditImg = undefined;
-    
-    save();
-    toast('✅ อัปเดตข้อมูลแล้ว');
-    document.getElementById('editModal').style.display = 'none';
-    
+
+    // 10. แจ้งเตือนและปิดหน้าต่าง
+    toast('✅ บันทึกข้อมูลเรียบร้อย');
+    closeAddSupModal();
+
+    // 11. รีเฟรชหน้าจอแสดงผล
     refreshSupport();
     refreshMasterDashboard();
 }
@@ -5152,7 +5200,66 @@ function showSyncStatus(msg,color='#22c55e'){const el=document.getElementById('s
 function getDataLen(o){return Object.values(o).reduce((a,c)=>a+(Array.isArray(c)?c.length:0),0);}
 function schedulePush(){clearTimeout(pushTimer);pushTimer=setTimeout(()=>pushToCloud(),900);}
 async function pushToCloud(){db._owner=currentUser;db._lastModified=Date.now();saveLocal();try{await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:currentUser,data:db})});showSyncStatus('☁️ บันทึกขึ้น Cloud แล้ว','#22c55e');}catch(e){showSyncStatus('⚠️ Cloud push ล้มเหลว','#f59e0b');}}
-async function pullFromCloud(silent=false){try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();if(r.status==='success'&&r.data){const cloud=r.data;if(cloud._owner&&cloud._owner!==currentUser){if(!silent)console.warn('Wrong user data');return false;}const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);if(cloudMod>localMod||cloudLen>localLen){cloud._owner=currentUser;db=cloud;saveLocal();return true;}}}catch(e){}return false;}
+/* ══════════════════════════════════
+   CLOUD SYNC (MODIFIED - MASTER-SLAVE MODE)
+══════════════════════════════════ */
+function getDataLen(o){return Object.values(o).reduce((a,c)=>a+(Array.isArray(c)?c.length:0),0);}
+function schedulePush(){clearTimeout(pushTimer);pushTimer=setTimeout(()=>pushToCloud(),900);}
+async function pushToCloud(){db._owner=currentUser;db._lastModified=Date.now();saveLocal();try{await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:currentUser,data:db})});showSyncStatus('☁️ บันทึกขึ้น Cloud แล้ว','#22c55e');}catch(e){showSyncStatus('⚠️ Cloud push ล้มเหลว','#f59e0b');}}
+
+async function pullFromCloud(silent=false){
+  try{
+    // ★ สำคัญ: ต้องมี &t=${Date.now()} ต่อท้ายเสมอ
+    const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
+    const r=await res.json();
+    
+    if(r.status==='success'&&r.data){
+      const cloud=r.data;
+      
+      // ✅ เช็คว่าเจ้าของข้อมูลตรงกันไหม
+      if(cloud._owner&&cloud._owner!==currentUser){
+        if(!silent) console.warn('Wrong user data');
+        return false;
+      }
+
+      // --- ดึงค่า Key ต่างๆ ---
+      const cloudLen = getDataLen(cloud);
+      const localLen = getDataLen(db);
+      const cloudMod = cloud._lastModified || 0;
+      const localMod = db._lastModified || 0;
+
+      // --- LOGIC: Cloud เป็น Master ---
+      let synced = false;
+
+      // 1. ถ้า Cloud แก้ไขล่าสุด (ใหม่กว่า Local) -> อัปเดตทันที
+      if (cloudMod > localMod) {
+        cloud._owner = currentUser;
+        db = cloud;
+        saveLocal();
+        if(!silent) toast('🔄 อัปเดตข้อมูลล่าสุดจาก Cloud');
+        synced = true;
+      }
+      // 2. ถ้า Cloud มีข้อมูลมากกว่า Local -> ดึงข้อมูลมา (เผื่อกรณีเพิ่มรายการ)
+      else if (cloudLen > localLen) {
+        cloud._owner = currentUser;
+        db = cloud;
+        saveLocal();
+        if(!silent) toast('📥 ดึงข้อมูลใหม่จาก Cloud สำเร็จ');
+        synced = true;
+      }
+      // 3. ถ้า Local มากกว่า Cloud (Local เก่ากว่าหรือยังไม่ได้ Sync ขึ้นไป)
+      else {
+        if(!silent) console.log('⏳ Local data is current or waiting to push.');
+        synced = false;
+      }
+
+      return synced;
+    }
+  }catch(e){
+    console.error("Pull error", e);
+  }
+  return false;
+}
 function saveLocal(){db._owner=currentUser;localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}
 
 function exportSupportToExcel() {
@@ -5258,7 +5365,12 @@ function runDashboardEntrance(){
   // Flash sync status green
   setTimeout(()=>showSyncStatus('✅ พร้อมใช้งาน — ข้อมูล Real-time','#22c55e'),600);
 }
-
+/* ══════════════════════════════════
+   START POLLING WRAPPER (FIX MISSING FUNCTION)
+══════════════════════════════════ */
+function startPolling() {
+  pollLoop();
+}
 window.addEventListener('load', async () => {
   
   // ═══════════════════════════════════════════════════
@@ -5347,18 +5459,121 @@ window.addEventListener('load', async () => {
  
 });
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-async function syncWithGoogleSheets(){if(document.getElementById('syncBtn').classList.contains('loading'))return;setBtnLoading(true,'⏳ SYNCING...');showSyncStatus('🔄 กำลัง Sync...','#f59e0b');try{const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);const r=await res.json();if(r.status==='success'&&r.data){const cloud=r.data;if(!cloud._owner||cloud._owner===currentUser){const cloudMod=cloud._lastModified||0,localMod=db._lastModified||0;const cloudLen=getDataLen(cloud),localLen=getDataLen(db);if(cloudMod>localMod||cloudLen>localLen){cloud._owner=currentUser;db=cloud;saveLocal();refreshAllPages();showSyncStatus('✅ ดึงข้อมูลจาก Cloud','#22c55e');toast('✅ Sync: โหลดจาก Cloud');}else{await pushToCloud();showSyncStatus('☁️ อัปโหลดขึ้น Cloud','#22c55e');toast('✅ Sync: อัปโหลดขึ้น Cloud');}}}else{await pushToCloud();}setText('dash-timestamp','Sync: '+fullTimestamp());}catch(e){showSyncStatus('❌ Sync ล้มเหลว','#dc2626');toast('❌ Sync ล้มเหลว');}finally{setBtnLoading(false);}}
-function startPolling(){
-  // Poll main DB every 30s
-  setInterval(async()=>{
-    const updated=await pullFromCloud(true);
-    if(updated){refreshAllPages();showSyncStatus('🔔 อัปเดตข้อมูลจากอุปกรณ์อื่น','#60a5fa');setText('dash-timestamp','Real-time: '+fullTimestamp());}
-  },30000);
-  // Poll images every 60s
-  setInterval(async()=>{
-    const imgUpdated=await pullImagesFromCloud(true);
-    if(imgUpdated) showSyncStatus('📷 รูปภาพอัปเดต Real-time','#60a5fa');
-  },60000);
+
+async function syncWithGoogleSheets() {
+  // 1. ตรวจสอบว่ากำลังทำงานอยู่หรือไม่ (ป้องกันกดซ้ำ)
+  if (document.getElementById('syncBtn').classList.contains('loading')) return;
+
+  // 2. ตั้งค่า UI ให้อยู่ในสถานะกำลังทำงาน
+  setBtnLoading(true, '⏳ SYNCING...');
+  showSyncStatus('🔄 กำลัง Sync...', '#f59e0b');
+
+  try {
+    // 3. ดึงข้อมูลจาก Cloud เพื่อเปรียบเทียบเวลาแก้ไขล่าสุด (Timestamp)
+    const res = await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
+    const r = await res.json();
+
+    if (r.status === 'success' && r.data) {
+      const cloud = r.data;
+
+      // ตรวจสอบว่าข้อมูลเป็นของ User คนนี้หรือไม่
+      if (!cloud._owner || cloud._owner === currentUser) {
+        const cloudMod = cloud._lastModified || 0;
+        const localMod = db._lastModified || 0;
+        const cloudLen = getDataLen(cloud);
+        const localLen = getDataLen(db);
+
+        // 4. LOGIC: เปรียบเทียบข้อมูล
+        // ถ้า Cloud ใหม่กว่า หรือ มีข้อมูลมากกว่า Local -> ดึงข้อมูลลงมา (Download)
+        if (cloudMod > localMod || cloudLen > localLen) {
+          cloud._owner = currentUser;
+          db = cloud;
+          saveLocal();
+          refreshAllPages();
+          showSyncStatus('✅ ดึงข้อมูลจาก Cloud', '#22c55e');
+          toast('✅ Sync: โหลดจาก Cloud');
+        } 
+        // ถ้า Local ใหม่กว่าหรือเท่ากัน -> อัปโหลดขึ้น Cloud (Upload)
+        else {
+          await pushToCloud();
+          showSyncStatus('☁️ อัปโหลดขึ้น Cloud', '#22c55e');
+          toast('✅ Sync: อัปโหลดขึ้น Cloud');
+        }
+      }
+    } else {
+      // กรณีข้อมูลบน Cloud ผิดพลาด หรือเป็นครั้งแรก -> ให้ Upload ไปก่อน
+      await pushToCloud();
+    }
+
+    // ★★★ ส่วนปรับปรุงใหม่: Force Pull ทันทีหลัง Sync เสร็จ ★★★
+    // หลังจากอัปโหลด/ดาวน์โหลดเสร็จ ให้ดึงข้อมูลใหม่อีกครั้งทันที
+    // เพื่อให้มั่นใจว่าข้อมูลในหน้าจอเป็นเวอร์ชั่นล่าสุด โดยไม่ต้องรอ Poll Loop ถัดไป
+    const freshData = await pullFromCloud(true);
+    if (freshData) {
+      refreshAllPages();
+      showSyncStatus('🔄 อัปเดตข้อมูลล่าสุดแล้ว', '#60a5fa');
+    }
+
+    // อัปเดตเวลาที่หัวจอ
+    setText('dash-timestamp', 'Sync: ' + fullTimestamp());
+
+  } catch (e) {
+    // จัดการ Error กรณีเชื่อมต่อล้มเหลว
+    console.error("Sync error:", e);
+    showSyncStatus('❌ Sync ล้มเหลว', '#dc2626');
+    toast('❌ Sync ล้มเหลว');
+  } finally {
+    // 5. คืนค่าปุ่มให้กลับสู่สภาพปกติ (ไม่ว่าจะสำเร็จหรือล้มเหลวก็ตาม)
+    setBtnLoading(false);
+  }
+}
+/* ══════════════════════════════════
+   AUTO POLLING (FAST MODE - 5 SECONDS)
+══════════════════════════════════ */
+let isPolling = false; // สถานะป้องกันการดึงข้อมูลซ้ำซ้อน
+
+async function pollLoop() {
+  // ถ้าหน้าเว็บถูกซ่อนอยู่ (User ไม่ได้ดู) ให้ลดความถี่การ Poll เพื่อประหยัดแบต/ทรัพยากร
+  if (document.hidden) {
+    setTimeout(pollLoop, 15000); // ถ้าซ่อนอยู่ ให้ดึงทุก 15 วินาที
+    return;
+  }
+
+  if (isPolling) return; // ป้องกันกรณีรันซ้ำ
+  isPolling = true;
+
+  try {
+    // 1. ดึงข้อมูลหลัก (DB)
+    const updated = await pullFromCloud(true);
+    if (updated) {
+      refreshAllPages(); // รีเฟรชหน้าจอทันทีที่ข้อมูลเปลี่ยน
+      showSyncStatus('🔔 อัปเดตข้อมูลจากอุปกรณ์อื่น (Real-time)', '#60a5fa');
+      setText('dash-timestamp', 'Sync: ' + fullTimestamp());
+      
+      // เล่นเสียงแจ้งเตือนเบาๆ (ถ้ามีไฟล์เสียง) หรือสั่นเบาๆ
+      if (navigator.vibrate) navigator.vibrate(50); 
+    }
+
+    // 2. ดึงรูปภาพ (ทำแยกเพราะใหญ่)
+    // เช็คว่าครบ 1 นาทีแล้วไหม ก่อนดึงรูปใหม่ (เพื่อประหยัด Bandwidth)
+    const imgUpdated = await pullImagesFromCloud(true);
+    if (imgUpdated) showSyncStatus('📷 รูปภาพอัปเดต Real-time', '#60a5fa');
+
+  } catch (e) {
+    console.warn("Polling error:", e);
+  }
+
+  isPolling = false;
+
+  // 3. คำนวณเวลาในการ Poll รอบถัดไป (Jitter System)
+  // ฐานเวลา 2.5 วินาที + สุ่มเพิ่ม 0 ถึง 1.5 วินาที (รวม 2.5 - 4 วินาที)
+  // การใส่ Jitter ช่วยให้ 10 เครื่องไม่ยิง Request พร้อมกันตรงๆ
+  const baseDelay = 2500; 
+  const randomJitter = Math.floor(Math.random() * 1500); 
+  const nextDelay = baseDelay + randomJitter;
+
+  // เรียกตัวเองซ้ำ (Recursive) หลังจากครบเวลา
+  setTimeout(pollLoop, nextDelay);
 }
 function setBtnLoading(on,txt='🔄 SYNC CLOUD'){const b=document.getElementById('syncBtn');b.classList.toggle('loading',on);b.innerText=txt;b.disabled=on;}
 
@@ -6169,57 +6384,6 @@ function openAddSupModal(){
 }
 function closeAddSupModal(){document.getElementById('addSupModal').classList.remove('open');}
 
-
-
-// 2. แก้ไขการเพิ่มข้อมูลใหม่ให้มี eventDate
-function addSupport(){
-  const prob = document.getElementById('supProblem').value,
-    act = document.getElementById('supAction').value,
-    part = document.getElementById('supPart').value,
-    rep = document.getElementById('supReport').value,
-    di = document.getElementById('supDate').value,
-    lot = document.getElementById('supLot').value,
-    ok = document.getElementById('supOk').value,
-    ng = document.getElementById('supNg').value;
-    
-  if(!prob) return toast('❌ กรอกรายละเอียดปัญหา');
-  
-  const ts = fullTimestamp();
-  const now = new Date();
-  // ใช้วันที่จาก Input ถ้ามี ถ้าไม่มีใช้วันปัจจุบัน
-  const d = di ? new Date(di) : now;
-  const month = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  // ***สำคัญ: สร้าง eventDate เป็น YYYY-MM-DD***
-  const eventDate = di || now.toISOString().split('T')[0];
-  
-  const newId = Date.now().toString();
-  db.support.push({
-    id: newId,
-    problem: prob,
-    action: act,
-    part,
-    report: rep,
-    lot,
-    ok: ok!==''?parseInt(ok):'',
-    ng: ng!==''?parseInt(ng):'',
-    datetime: ts,
-    fullTimestamp: ts,
-    month,
-    eventDate, // เพิ่ม field นี้เข้าไป
-    _user: currentUser
-  });
-  
-  if(_pendingAddImg && typeof _pendingAddImg==='string' && _pendingAddImg.startsWith('data:')){
-    saveImage(newId, _pendingAddImg);
-  }
-  _pendingAddImg = null;
-  save();
-  toast('🛠️ บันทึก Support แล้ว');
-  closeAddSupModal();
-  refreshSupport();
-  if(isActive('master-dash')) refreshMasterDashboard();
-}
-
 function delSupportConfirm(i){
   const s=db.support[i];
   robotConfirm('ลบ Support record นี้?',()=>{
@@ -6927,7 +7091,32 @@ function openRecDetail(idx) {
 
   document.getElementById('recDetailModal').classList.add('open');
 }
-
+/* ══════════════════════════════════
+   TOGGLE SUMMARY MODE FUNCTION
+   ฟังก์ชันสลับโหมด แสดงผล/ซ่อนรายละเอียด
+══════════════════════════════════ */
+function toggleSummaryMode() {
+  const panel = document.querySelector('.rec-detail-panel');
+  const btn = document.getElementById('btnToggleSummary');
+  const btnText = btn.querySelector('span:last-child'); // ตัวหนังสือ
+  const btnIcon = btn.querySelector('span:first-child'); // ไอคอน
+  
+  // 1. สลับ Class
+  const isSummary = panel.classList.toggle('is-summary-mode');
+  
+  // 2. เปลี่ยนข้อความปุ่ม
+  if (isSummary) {
+    btnIcon.textContent = '📝';
+    btnText.textContent = 'Full Detail'; // กลับเป็นข้อความเต็ม
+    btn.style.background = '#2563eb'; // เปลี่ยนสีปุ่มให้โดดเด่นว่าอยู่ในโหมดพิเศษ
+    btn.style.color = '#fff';
+  } else {
+    btnIcon.textContent = '👁️';
+    btnText.textContent = 'Summary View';
+    btn.style.background = ''; // คืนค่าสีเดิม
+    btn.style.color = '';
+  }
+}
 function closeRecDetail(){document.getElementById('recDetailModal').classList.remove('open');}
 // ฟังก์ชันสลับโหมด
 function toggleDarkMode() {
