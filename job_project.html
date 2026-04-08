@@ -5209,51 +5209,45 @@ async function pushToCloud(){db._owner=currentUser;db._lastModified=Date.now();s
 
 async function pullFromCloud(silent=false){
   try{
-    // ★ สำคัญ: ต้องมี &t=${Date.now()} ต่อท้ายเสมอ
+    // ★ ต้องมี t=${Date.now()} เพื่อบังคับไม่ให้ใช้ Cache
     const res=await fetch(`${GOOGLE_SCRIPT_URL}?user=${encodeURIComponent(currentUser)}&t=${Date.now()}`);
     const r=await res.json();
     
     if(r.status==='success'&&r.data){
       const cloud=r.data;
       
-      // ✅ เช็คว่าเจ้าของข้อมูลตรงกันไหม
+      // ✅ เช็คเจ้าของข้อมูล
       if(cloud._owner&&cloud._owner!==currentUser){
         if(!silent) console.warn('Wrong user data');
         return false;
       }
 
-      // --- ดึงค่า Key ต่างๆ ---
       const cloudLen = getDataLen(cloud);
       const localLen = getDataLen(db);
       const cloudMod = cloud._lastModified || 0;
       const localMod = db._lastModified || 0;
 
-      // --- LOGIC: Cloud เป็น Master ---
       let synced = false;
 
-      // 1. ถ้า Cloud แก้ไขล่าสุด (ใหม่กว่า Local) -> อัปเดตทันที
+      // --- LOGIC ใหม่ที่เข้มงวดขึ้น ---
+      
+      // 1. ถ้าเวลาบน Cloud ใหม่กว่า -> อัปเดต
       if (cloudMod > localMod) {
+        synced = true;
+      }
+      // 2. (สำคัญ) ถ้าจำนวนข้อมูลไม่เท่ากัน (ไม่ว่าจะมากกว่าหรือน้อยกว่า) -> อัปเดตทันที
+      // แก้จาก > เป็น !== เพื่อดักจับทั้งการเพิ่มและการลบ
+      else if (cloudLen !== localLen) {
+        synced = true;
+      }
+
+      if (synced) {
         cloud._owner = currentUser;
         db = cloud;
         saveLocal();
         if(!silent) toast('🔄 อัปเดตข้อมูลล่าสุดจาก Cloud');
-        synced = true;
+        return true; // คืนค่า true ให้ Poll Loop รู้ว่าต้อง Refresh หน้าจอ
       }
-      // 2. ถ้า Cloud มีข้อมูลมากกว่า Local -> ดึงข้อมูลมา (เผื่อกรณีเพิ่มรายการ)
-      else if (cloudLen > localLen) {
-        cloud._owner = currentUser;
-        db = cloud;
-        saveLocal();
-        if(!silent) toast('📥 ดึงข้อมูลใหม่จาก Cloud สำเร็จ');
-        synced = true;
-      }
-      // 3. ถ้า Local มากกว่า Cloud (Local เก่ากว่าหรือยังไม่ได้ Sync ขึ้นไป)
-      else {
-        if(!silent) console.log('⏳ Local data is current or waiting to push.');
-        synced = false;
-      }
-
-      return synced;
     }
   }catch(e){
     console.error("Pull error", e);
@@ -5528,46 +5522,52 @@ async function syncWithGoogleSheets() {
 let isPolling = false; // สถานะป้องกันการดึงข้อมูลซ้ำซ้อน
 
 async function pollLoop() {
-  // ถ้าหน้าเว็บถูกซ่อนอยู่ (User ไม่ได้ดู) ให้ลดความถี่การ Poll เพื่อประหยัดแบต/ทรัพยากร
   if (document.hidden) {
-    setTimeout(pollLoop, 15000); // ถ้าซ่อนอยู่ ให้ดึงทุก 15 วินาที
+    // ถ้าซ่อนอยู่ ให้ Poll น้อยลง แต่ไม่หยุดสนิท
+    setTimeout(pollLoop, 15000);
     return;
   }
 
-  if (isPolling) return; // ป้องกันกรณีรันซ้ำ
+  if (isPolling) {
+    // Safety Net: ถ้าค้างอยู่นานกว่า 10 วินาที ให้บังคับ Reset
+    if (window.pollStuckTimer) {
+        clearTimeout(window.pollStuckTimer);
+    }
+    window.pollStuckTimer = setTimeout(() => {
+        console.warn("Polling stuck detected, forcing reset...");
+        isPolling = false;
+        pollLoop();
+    }, 10000);
+    return; 
+  }
+  
+  // Clear safety timer ถ้าเริ่มทำงานได้
+  if (window.pollStuckTimer) clearTimeout(window.pollStuckTimer);
+
   isPolling = true;
 
   try {
-    // 1. ดึงข้อมูลหลัก (DB)
     const updated = await pullFromCloud(true);
     if (updated) {
-      refreshAllPages(); // รีเฟรชหน้าจอทันทีที่ข้อมูลเปลี่ยน
+      refreshAllPages();
       showSyncStatus('🔔 อัปเดตข้อมูลจากอุปกรณ์อื่น (Real-time)', '#60a5fa');
       setText('dash-timestamp', 'Sync: ' + fullTimestamp());
-      
-      // เล่นเสียงแจ้งเตือนเบาๆ (ถ้ามีไฟล์เสียง) หรือสั่นเบาๆ
       if (navigator.vibrate) navigator.vibrate(50); 
     }
 
-    // 2. ดึงรูปภาพ (ทำแยกเพราะใหญ่)
-    // เช็คว่าครบ 1 นาทีแล้วไหม ก่อนดึงรูปใหม่ (เพื่อประหยัด Bandwidth)
     const imgUpdated = await pullImagesFromCloud(true);
     if (imgUpdated) showSyncStatus('📷 รูปภาพอัปเดต Real-time', '#60a5fa');
 
   } catch (e) {
     console.warn("Polling error:", e);
+  } finally {
+    // สำคัญ: ให้แน่ใจว่า isPolling จะถูกปลดล็อกเสมอ
+    isPolling = false;
   }
 
-  isPolling = false;
-
-  // 3. คำนวณเวลาในการ Poll รอบถัดไป (Jitter System)
-  // ฐานเวลา 2.5 วินาที + สุ่มเพิ่ม 0 ถึง 1.5 วินาที (รวม 2.5 - 4 วินาที)
-  // การใส่ Jitter ช่วยให้ 10 เครื่องไม่ยิง Request พร้อมกันตรงๆ
   const baseDelay = 2500; 
   const randomJitter = Math.floor(Math.random() * 1500); 
   const nextDelay = baseDelay + randomJitter;
-
-  // เรียกตัวเองซ้ำ (Recursive) หลังจากครบเวลา
   setTimeout(pollLoop, nextDelay);
 }
 function setBtnLoading(on,txt='🔄 SYNC CLOUD'){const b=document.getElementById('syncBtn');b.classList.toggle('loading',on);b.innerText=txt;b.disabled=on;}
@@ -7385,6 +7385,21 @@ if (supDashModal) {
   });
   observer.observe(supDashModal, { attributes: true, attributeFilter: ['class'] });
 }
+/* ══════════════════════════════════
+   VISIBILITY API (FIX FOR TABLET/MOBILE)
+   เมื่อผู้ใช้กลับมาดูหน้าจอ ให้ดึงข้อมูลทันที
+══════════════════════════════════ */
+document.addEventListener("visibilitychange", () => {
+  // เมื่อหน้าจอกลับมาโชว์ (visible)
+  if (!document.hidden) {
+    console.log("User returned to tab, forcing immediate poll...");
+    // ยกเลิก Timer เก่า (ถ้ามี) เพื่อไม่ให้ดึงซ้ำซ้อน
+    if (window.currentPollTimeout) clearTimeout(window.currentPollTimeout);
+    
+    // ดึงข้อมูลทันที 1 ครั้ง
+    pollLoop(); 
+  }
+});
 </script>
 </body>
 </html>
