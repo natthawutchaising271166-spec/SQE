@@ -5365,7 +5365,12 @@ function runDashboardEntrance(){
   // Flash sync status green
   setTimeout(()=>showSyncStatus('✅ พร้อมใช้งาน — ข้อมูล Real-time','#22c55e'),600);
 }
-
+/* ══════════════════════════════════
+   START POLLING WRAPPER (FIX MISSING FUNCTION)
+══════════════════════════════════ */
+function startPolling() {
+  pollLoop();
+}
 window.addEventListener('load', async () => {
   
   // ═══════════════════════════════════════════════════
