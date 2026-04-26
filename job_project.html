@@ -4513,26 +4513,37 @@ function deleteImageFromDB(recordId) {
    IMAGE COMPRESSION (TO BLOB)
 ══════════════════════════════════ */
 // บีบอัดและแปลงเป็น Blob (Binary File) ให้ขนาดเล็กที่สุด
+/* ══════════════════════════════════
+   IMAGE COMPRESSION (TO BLOB) - SHARP & OPTIMIZED
+══════════════════════════════════ */
 function compressToBlob(file, callback) {
     const reader = new FileReader();
     reader.onload = (ev) => {
         const img = new Image();
         img.onload = () => {
-            const MAX = 720; // 📉 ลดขนาดความกว้างสูงสุดลงมาที่ 720px
+            // 1. ⬆️ เพิ่มความละเอียดเป็น 1280px (คมชัดระดับ HD อ่านตัวหนังสือออกชัดเจน)
+            const MAX = 1280; 
             let w = img.width, h = img.height;
             if (w > MAX || h > MAX) {
                 if (w > h) { h = Math.round(h * (MAX / w)); w = MAX; }
                 else { w = Math.round(w * (MAX / h)); h = MAX; }
             }
+            
             const canvas = document.createElement('canvas');
             canvas.width = w; canvas.height = h;
             const ctx = canvas.getContext('2d');
+            
+            // 2. 🌟 บังคับให้การย่อรูปรักษาความคมชัดของขอบ (Anti-aliasing) ภาพจะไม่เบลอ
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
             ctx.drawImage(img, 0, 0, w, h);
             
-            // 📉 ลดคุณภาพ (Quality) ลงเหลือ 0.6 จะช่วยประหยัดพื้นที่ IndexedDB ได้มหาศาล
+            // 3. 🌟 เปลี่ยนจาก 'image/jpeg' เป็น 'image/webp' และปรับ Quality เป็น 0.75
+            // WEBP จะได้ไฟล์ขนาดประมาณ 100KB - 250KB ต่อรูป แต่คมชัดกว่า JPEG มาก
             canvas.toBlob((blob) => {
                 callback(blob);
-            }, 'image/jpeg', 0.6);
+            }, 'image/webp', 0.75);
         };
         img.src = ev.target.result;
     };
