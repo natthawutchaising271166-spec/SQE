@@ -6,10 +6,15 @@
 <title>WAP Pearl & Sunset 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=DM+Mono:wght@400;500&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- SheetJS for Excel Export -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+
+</script>
+<!-- ให้วางส่วน CSS (เดิมของคุณ) ตรงนี้ -->
 <style>
-:root{
+
+:root{<!-- ให้วางส่วน CSS (เดิมของคุณ) ตรงนี้ -->
   /* ─── Azure Blue Design System ─── */
   --b50:#eff6ff;--b100:#dbeafe;--b200:#bfdbfe;--b300:#93c5fd;
   --b400:#60a5fa;--b500:#3b82f6;--b600:#2563eb;--b700:#1d4ed8;
@@ -228,6 +233,11 @@ body::before{
 .sb-btn-sync{background:var(--grad);color:#fff;box-shadow:0 4px 14px var(--primary-glow)}
 .sb-btn-sync:hover{box-shadow:0 10px 28px rgba(37,99,235,.48)}
 .sb-btn-sync.loading{opacity:.55;cursor:not-allowed;transform:none!important}
+/* ▼▼▼ เพิ่ม 3 บรรทัดนี้ลงไป ▼▼▼ */
+.sb-btn-load {background:linear-gradient(135deg,#059669,#047857);color:#fff;box-shadow:0 4px 14px rgba(5,150,105,.3)}
+.sb-btn-load:hover {box-shadow:0 10px 28px rgba(5,150,105,.48)}
+.sb-btn-load.loading {opacity:.55;cursor:not-allowed;transform:none!important;animation:pulse-ss 1.5s infinite;}
+/* ▲▲▲ จบส่วนที่เพิ่ม ▲▲▲ */
 .sb-btn-home{background:var(--bg2);color:var(--txt3);border:1px solid var(--border)}
 .add-sup-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);background:#fff;border-radius:0 0 var(--r-xl) var(--r-xl);flex-shrink:0;}
 .add-sup-btn-cancel{padding:9px 18px;border-radius:var(--r);border:1.5px solid var(--border);background:var(--bg2);color:var(--txt3);font-size:.78rem;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans','Prompt',sans-serif;transition:all .2s;}
@@ -3417,15 +3427,25 @@ body.dark-mode .sup-img-none:hover { background: rgba(37,99,235,.15); border-col
     </nav>
   </div>
 <div class="sb-footer">
-  <!-- 1. ปุ่ม Sync (อยู่บนสุด) -->
-  <button id="syncBtn" class="sb-btn sb-btn-sync" onclick="syncWithGoogleSheets()">🔄 SYNC CLOUD</button>
-  
-  <!-- 2. ปุ่ม Hall of Fame (อยู่ตรงกลาง) -->
+  <!-- แบ่ง 2 ปุ่มเรียงคู่กันให้ประหยัดพื้นที่และดูสวยงาม -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 2px;">
+    <button id="syncBtn" class="sb-btn sb-btn-sync" onclick="syncToSupabase()" title="อัปโหลดข้อมูลในเครื่องขึ้น Cloud">
+        ☁️ Sync
+    </button>
+    <button id="loadBtn" class="sb-btn sb-btn-load" onclick="loadFromSupabaseComplete()" title="ดาวน์โหลดข้อมูลจาก Cloud ทับข้อมูลในเครื่อง">
+        📥 Load
+    </button>
+  </div>
+
+  <!-- ปุ่มดูสถานะซิงค์ -->
+  <span id="syncStatus" style="display:none;"></span>
+    
+  <!-- ปุ่ม Hall of Fame -->
   <button class="achieve-btn" onclick="openHallOfFame()">
     🏆 Hall of Fame
   </button>
-  
-  <!-- 3. ปุ่ม Home (อยู่ล่างสุด) -->
+    
+  <!-- ปุ่ม Home -->
   <button class="sb-btn sb-btn-home" onclick="window.location.href='index.html'">🏠 หน้าหลัก</button>
 </div>
   </div>
@@ -4350,11 +4370,388 @@ body.dark-mode .sup-img-none:hover { background: rgba(37,99,235,.15); border-col
 
 
 <script>
+
 /* ══════════════════════════════════
-   WAP SYSTEM - 100% OFFLINE EDITION
-   (SUPPORT 1,000+ IMAGES VIA INDEXED_DB)
+   SUPABASE COMPLETE SYNC SYSTEM
 ══════════════════════════════════ */
 
+const SUPABASE_URL = 'https://dyhpjyokvtwejayptwyk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5aHBqeW9rdnR3ZWpheXB0d3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNzE4MjcsImV4cCI6MjA5Mjg0NzgyN30.KSU9-0zZ3w7Z6wmOTqVvZZv4_Y0cMYOfp_ZyWWB7UCQ';
+const BUCKET_NAME = 'wap-images';
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ──────────────────────────────────
+   HELPER: SAFE UPSERT WITH DEDUPLICATION (FIXED)
+   <<--- ย้ายส่วนนี้มาวางบนสุดของ Script ก่อน syncToSupabase
+────────────────────────────────── */
+const safeUpsert = async (tableName, data, conflictCols) => {
+    if (!data || data.length === 0) {
+        console.log(`⚠️ ${tableName}: No data to sync.`);
+        return { success: true, skipped: true };
+    }
+
+    // ✅ FIX: ตรวจสอบก่อนว่า Object แรกมี property 'id' หรือไม่
+    let uniqueData = data;
+    if (data.length > 0 && data[0].hasOwnProperty('id')) {
+        const originalLength = data.length;
+        uniqueData = Array.from(new Map(data.map(item => [item.id, item])).values());
+        
+        if (uniqueData.length !== originalLength) {
+            console.warn(`⚠️ ${tableName}: ลบข้อมูลซ้ำ ${originalLength - uniqueData.length} รายการ`);
+        }
+    } else {
+        console.log(`ℹ️ ${tableName}: Skipping local deduplication (No ID field found, relying on DB conflict resolution)`);
+    }
+
+    try {
+        const { error } = await sb.from(tableName).upsert(uniqueData, { onConflict: conflictCols });
+        if (error) throw error;
+        console.log(`✅ ${tableName}: Synced ${uniqueData.length} rows.`);
+        return { success: true, count: uniqueData.length };
+    } catch (err) {
+        console.error(`❌ ${tableName} Error:`, err);
+        // ต้องเพิ่ม errorList หรือจัดการ error ตรงนี้ด้วยถ้าคุณต้องการให้รายงาน error ในปุ่ม sync
+        return { success: false, error: err.message };
+    }
+};
+/* ──────────────────────────────────
+   1. UPLOAD TO SUPABASE (FIXED - REMOVE DUPLICATES)
+────────────────────────────────── */
+async function syncToSupabase() {
+    try {
+        setBtnLoading(true, '☁️ Syncing...');
+        setLoading('📤 เตรียมข้อมูล...', 'กำลังจัดการรูปภาพ', 10);
+
+        let successCount = 0;
+        let errorList = [];
+        const totalTables = 6; 
+
+        // --------------------------------------------------
+        // 1. SYNC IMAGES (รูปภาพ)
+        // --------------------------------------------------
+        let uploadCount = 0;
+        let totalImagesToUpload = 0;
+        for (let i = 0; i < db.support.length; i++) {
+            if (await getBlobFromDB(db.support[i].id)) totalImagesToUpload++;
+        }
+
+        for (let i = 0; i < db.support.length; i++) {
+            const s = db.support[i];
+            const blob = await getBlobFromDB(s.id);
+            if (blob) {
+                setLoadingPct(10 + Math.floor((uploadCount / Math.max(totalImagesToUpload, 1)) * 20));
+                setBtnLoading(true, `☁️ อัปโหลดรูป ${uploadCount + 1}/${totalImagesToUpload}`);
+                const filePath = `${currentUser}/${s.id}.webp`;
+
+                const { error: uploadError } = await sb.storage.from(BUCKET_NAME).upload(filePath, blob, {
+                    cacheControl: '3600',
+                    upsert: true,
+                    contentType: 'image/webp'
+                });
+                if (uploadError) {
+                    console.warn(`Image Upload Skip ID:${s.id}`, uploadError);
+                } else {
+                    const { data: publicUrlData } = sb.storage.from(BUCKET_NAME).getPublicUrl(filePath);
+                    db.support[i].imageUrl = publicUrlData.publicUrl;
+                    uploadCount++;
+                }
+            }
+        }
+        console.log(`✅ Images Synced: ${uploadCount}/${totalImagesToUpload}`);
+        setLoadingPct(30);
+
+
+
+        // --------------------------------------------------
+        // 2. SYNC SUPPORT RECORDS
+        // --------------------------------------------------
+        if (db.support.length > 0) {
+            const supportData = db.support.map(s => ({
+                id: s.id, user_id: currentUser, problem: s.problem, action: s.action, part: s.part,
+                lot: s.lot, ok_qty: s.ok || 0, ng_qty: s.ng || 0, report_type: s.report, remark: s.remark,
+                event_date: s.eventDate || null, month: s.month, full_timestamp: s.fullTimestamp, image_url: s.imageUrl, edited_at: s._editedAt
+            }));
+            await safeUpsert('support_records', supportData, 'id');
+        }
+
+        // --------------------------------------------------
+        // 3. SYNC DAILY REPORTS
+        // --------------------------------------------------
+        if (db.daily.length > 0) {
+            const dailyData = db.daily.map((d, i) => ({
+                id: d.id || (d.date + '_' + d.type + '_' + i),
+                user_id: currentUser,
+                date: d.date,
+                type: d.type,
+                note: d.note,
+                full_timestamp: d.fullTimestamp
+            }));
+            await safeUpsert('daily_reports', dailyData, 'id');
+        }
+
+        // --------------------------------------------------
+        // 4. SYNC 5S RECORDS
+        // --------------------------------------------------
+        if (db.s5.length > 0) {
+            const s5Data = db.s5.map(s => ({
+                id: s.id, user_id: currentUser, area: s.area, issue_count: s.count || 0, detail: s.detail,
+                owner: s.owner, date: s.date || null, month: s.month, full_timestamp: s.fullTimestamp
+            }));
+            await safeUpsert('s5_records', s5Data, 'id');
+        }
+
+        // --------------------------------------------------
+        // 5. SYNC SPECIAL JOBS
+        // --------------------------------------------------
+        if (db.special.length > 0) {
+            const specialData = db.special.map(s => ({
+                id: s.id, user_id: currentUser, project: s.project || s.job, assigned_by: s.by,
+                result: s.result, date: s.date || null, full_timestamp: s.fullTimestamp
+            }));
+            await safeUpsert('special_jobs', specialData, 'id');
+        }
+
+        // --------------------------------------------------
+        // 6. SYNC SKILL MATRIX
+        // --------------------------------------------------
+        if (db.skills.length > 0) {
+            const skillData = db.skills.map(s => ({
+                user_id: currentUser, skill_name: s.name, skill_value: s.value || 0, updated_at: s.updatedAt
+            }));
+            await safeUpsert('skill_matrix', skillData, 'user_id,skill_name');
+        }
+
+        // --------------------------------------------------
+        // 7. SYNC ACHIEVEMENTS
+        // --------------------------------------------------
+        if (Object.keys(db.badges).length > 0) {
+            const badgeData = Object.keys(db.badges).map(key => ({
+                user_id: currentUser, badge_id: key, unlocked_at: db.badges[key].unlockedAt
+            }));
+            await safeUpsert('achievements', badgeData, 'user_id,badge_id');
+        }
+
+        // --------------------------------------------------
+        // 8. LOG SYNC HISTORY
+        // --------------------------------------------------
+        try {
+            await sb.from('sync_log').insert({
+                user_id: currentUser, action: 'sync_to_cloud_relational',
+                details: { images: uploadCount, records: db.support.length, errors: errorList }
+            });
+        } catch (logErr) {
+            console.warn('Log skipped', logErr);
+        }
+
+        hideLoading();
+        setBtnLoading(false, '☁️ Sync Cloud');
+
+        if (errorList.length === 0) {
+            toast('✅ ซิงค์ข้อมูลทุกหมวดหมู่สำเร็จ!');
+            showSyncStatus('✅ Sync ล่าสุดเมื่อ ' + new Date().toLocaleTimeString(), '#22c55e');
+        } else {
+            console.error("Sync Errors:", errorList);
+            toast(`⚠️ Sync บางส่วนล้มเหลว: ${errorList.length} รายการ`);
+            showSyncStatus('⚠️ Sync ไม่สมบูรณ์', '#f59e0b');
+        }
+
+    } catch (err) {
+        console.error('Critical Sync Error:', err);
+        hideLoading();
+        setBtnLoading(false, '☁️ Sync Cloud');
+        toast(`❌ เกิดข้อผิดพลาดระบบ: ${err.message}`);
+        showSyncStatus('❌ Sync ผิดพลาด', '#dc2626');
+    }
+}
+
+/* ──────────────────────────────────
+   2. DOWNLOAD FROM SUPABASE (ประกอบข้อมูลกลับมาให้แอพ)
+────────────────────────────────── */
+async function loadFromSupabaseComplete() {
+    try {
+        // เปิด Loading ของปุ่ม Load
+        setBtnLoading(true, '📥 Loading...', 'loadBtn');
+        setLoading('☁️ ดึงข้อมูลจาก Cloud...', 'กำลังดึงทีละตาราง', 20);
+
+        const loadedDB = emptyDB(); // เตรียม DB ก้อนใหม่
+
+        // ดึงข้อมูลพร้อมกันทุกตาราง (Promise.all เพื่อความเร็ว)
+        const[supRes, dailyRes, s5Res, specRes, skillRes, badgeRes] = await Promise.all([
+            sb.from('support_records').select('*').eq('user_id', currentUser),
+            sb.from('daily_reports').select('*').eq('user_id', currentUser),
+            sb.from('s5_records').select('*').eq('user_id', currentUser),
+            sb.from('special_jobs').select('*').eq('user_id', currentUser),
+            sb.from('skill_matrix').select('*').eq('user_id', currentUser),
+            sb.from('achievements').select('*').eq('user_id', currentUser)
+        ]);
+
+        setLoadingPct(50);
+
+        // แมปข้อมูลกลับเข้า Structure ของ JavaScript
+        if (supRes.data) {
+            loadedDB.support = supRes.data.map(d => ({
+                id: d.id, problem: d.problem, action: d.action, part: d.part, lot: d.lot,
+                ok: d.ok_qty, ng: d.ng_qty, report: d.report_type, remark: d.remark,
+                eventDate: d.event_date, month: d.month, fullTimestamp: d.full_timestamp,
+                imageUrl: d.image_url, _editedAt: d.edited_at, _user: d.user_id
+            }));
+        }
+
+        if (dailyRes.data) {
+            loadedDB.daily = dailyRes.data.map(d => ({
+                id: d.id, date: d.date, type: d.type, note: d.note, fullTimestamp: d.full_timestamp, _user: d.user_id
+            }));
+        }
+
+        if (s5Res.data) {
+            loadedDB.s5 = s5Res.data.map(d => ({
+                id: d.id, area: d.area, count: d.issue_count, detail: d.detail, owner: d.owner,
+                date: d.date, month: d.month, fullTimestamp: d.full_timestamp, _user: d.user_id
+            }));
+        }
+
+        if (specRes.data) {
+            loadedDB.special = specRes.data.map(d => ({
+                id: d.id, project: d.project, job: d.project, by: d.assigned_by, result: d.result,
+                date: d.date, fullTimestamp: d.full_timestamp, _user: d.user_id
+            }));
+        }
+
+        if (skillRes.data) {
+            loadedDB.skills = skillRes.data.map(d => ({
+                name: d.skill_name, value: d.skill_value, updatedAt: d.updated_at, _user: d.user_id
+            }));
+        }
+
+        if (badgeRes.data) {
+            badgeRes.data.forEach(b => {
+                loadedDB.badges[b.badge_id] = { unlocked: true, unlockedAt: b.unlocked_at };
+            });
+        }
+
+        // นำข้อมูลที่ประกอบเสร็จแล้วแทนที่ในระบบ
+        db = loadedDB;
+        saveLocal();
+
+        setLoadingPct(70);
+        setLoading('🖼️ กำลังโหลดรูปภาพ...', 'ดาวน์โหลดภาพลงแคชเครื่อง', 70);
+
+        // โหลดรูปภาพจาก URL ลงแคช (IndexedDB)
+        if (db.support && idb) {
+            const txClear = idb.transaction(['images'], 'readwrite');
+            await new Promise(r => { txClear.objectStore('images').clear().onsuccess = r; });
+
+            for (let i = 0; i < db.support.length; i++) {
+                const s = db.support[i];
+                if (s.imageUrl) {
+                    try {
+                        setLoadingPct(70 + Math.floor((i / db.support.length) * 30));
+                        const response = await fetch(s.imageUrl);
+                        const blob = await response.blob();
+                        await saveImageToDB(s.id, blob, true);
+                    } catch (e) {
+                        console.warn(`Load image failed for ${s.id}:`, e);
+                    }
+                }
+            }
+        }
+
+        await loadAllImagesFromDB();
+        refreshAllPages();
+        refreshSupportImagesOnly();
+        
+        hideLoading();
+        
+        // ✅ แก้ไขตรงนี้: ปิดสถานะ Loading ของปุ่ม Load
+        setBtnLoading(false, '📥 Load', 'loadBtn'); 
+        toast(`✅ ดึงข้อมูลสำเร็จ!`);
+        showSyncStatus('✅ โหลดข้อมูลครบทุกตาราง', '#22c55e');
+        
+        return true;
+
+    } catch (err) {
+        console.error('Load Error:', err);
+        hideLoading();
+        
+        // ✅ แก้ไขตรงนี้ด้วย: ปิดสถานะ Loading ของปุ่ม Load ตอนเกิด Error
+        setBtnLoading(false, '📥 Load', 'loadBtn'); 
+        toast(`❌ โหลด Cloud ล้มเหลว`);
+        return false;
+    }
+}
+
+/* ──────────────────────────────────
+   3. DELETE DATA FROM CLOUD 
+────────────────────────────────── */
+async function deleteImageFromSupabase(recordId) {
+    try {
+        const filePath = `${currentUser}/${recordId}.webp`;
+        await sb.storage.from(BUCKET_NAME).remove([filePath]);
+        
+        // ถ้าต้องการให้ลบออกจาก Database ทันทีตอนกดปุ่ม 🗑 ก็เพิ่มโค้ดนี้:
+        // await sb.from('support_records').delete().eq('id', recordId);
+    } catch (err) {
+        console.error('Delete image cloud error:', err);
+    }
+}
+
+const _originalDeleteImageFromDB = deleteImageFromDB;
+deleteImageFromDB = async function(recordId) {
+    await _originalDeleteImageFromDB(recordId); // ลบในเครื่อง
+    await deleteImageFromSupabase(recordId);    // ลบบนคลาวด์
+};
+
+// -------------------------------------------------------------
+// * เมื่อต้องการโหลดข้อมูลอัตโนมัติ ให้ใช้ loadFromSupabaseComplete() ทันที
+// -------------------------------------------------------------
+/* ──────────────────────────────────
+   6. BATCH EXPORT/IMPORT
+────────────────────────────────── */
+async function batchExportToCSV() {
+    const csv = db.support.map(s => ({
+        'วันที่': s.fullTimestamp || s.datetime || '',
+        'ปัญหา': s.problem || '',
+        'รูป URL': s.imageUrl || '',
+        'OK': s.ok || 0,
+        'NG': s.ng || 0,
+        'Report': s.report || '',
+        'Remark': s.remark || ''
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(csv);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Support');
+    XLSX.writeFile(wb, `Support_${currentUser}_${Date.now()}.csv`);
+}
+
+/* ──────────────────────────────────
+   7. INITIALIZE ON APP START
+────────────────────────────────── */
+async function initSupabaseSync() {
+    try {
+        console.log('🔄 Initializing Supabase...');
+        
+        // โหลดจาก Cloud ก่อน
+        const loaded = await loadFromSupabaseComplete();
+        
+        if (!loaded) {
+            console.log('No cloud data, using local');
+            db = loadLocalDB();
+        }
+        
+        // เปิด Auto-sync
+        enableAutoSync();
+        
+    } catch (err) {
+        console.error('Init Error:', err);
+        db = loadLocalDB(); // Fallback
+    }
+}
+
+// เรียกใช้ตอน App พร้อม
+// สามารถเพิ่มในส่วน window load event
 const currentUser=(sessionStorage.getItem('currentUser')||'Master Operator').trim();
 document.getElementById('displayUserName').innerHTML=currentUser+' <span class="online-dot"></span>';
 
@@ -4710,54 +5107,119 @@ function resetEditImgZone(txt='คลิกเพื่อเลือก/เป
 
 
 /* ══════════════════════════════════
-   BACKUP & RESTORE SYSTEM (OFFLINE ASYNC)
-   *เนื่องจากรูปอยู่ใน IndexedDB การ Export ต้องทำแบบพิเศษ*
+   SYNC TO SUPABASE (Upload Images & Data)
 ══════════════════════════════════ */
+
+// Helper: ดึง Blob จาก IndexedDB ตรงๆ เพื่อเอาไปอัปโหลด
+function getBlobFromDB(recordId) {
+    return new Promise((resolve, reject) => {
+        if (!idb) return resolve(null);
+        const transaction = idb.transaction(['images'], 'readonly');
+        const store = transaction.objectStore('images');
+        const request = store.get(recordId);
+
+        request.onsuccess = (e) => {
+            const record = e.target.result;
+            if (record && record.blob) {
+                resolve(record.blob);
+            } else {
+                resolve(null);
+            }
+        };
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+
 async function exportDB() {
-  try {
-    if(!idb) throw new Error("IndexedDB not ready");
-    setLoading('📦 กำลังรวมข้อมูล...', 'อาจใช้เวลาสักครู่หากมีรูปเยอะ', 20);
-    const exportData = JSON.parse(JSON.stringify(db)); // Clone text data
-    exportData.images = {};
-    
-    // ดึงรูปจาก IndexedDB มาแปลงเป็น Base64 ใส่ไฟล์ Backup
-    const tx = idb.transaction(['images'], 'readonly');
-    const store = tx.objectStore('images');
-    const req = store.getAll();
-    
-    req.onsuccess = async (e) => {
-        const records = e.target.result;
-        for (let i = 0; i < records.length; i++) {
-            setLoadingPct(20 + ((i/records.length)*60));
-            // แปลง Blob เป็น Base64 สำหรับการ Export ไฟล์
-            const base64 = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(records[i].blob);
-            });
-            exportData.images[records[i].id] = base64;
+    try {
+        setBtnLoading(true, '🔍 ตรวจสอบข้อมูล...');
+        
+        // 1. สำเนาข้อมูล DB เพื่อป้องกันการแก้ไขตอนใช้งานจริง
+        const exportData = JSON.parse(JSON.stringify(db));
+        
+        // 2. เตรียมข้อมูลสำหรับอัปโหลดรูป
+        const supportIds = exportData.support.map(s => s.id);
+        let uploadCount = 0;
+        
+        // นับจำนวนรูปที่มี Blob จริงใน IndexedDB
+        let totalImagesToUpload = 0;
+        for(let i=0; i<db.support.length; i++) {
+            const s = db.support[i];
+            const hasBlob = await getBlobFromDB(s.id);
+            if(hasBlob) totalImagesToUpload++;
         }
-        
-        setLoadingPct(90);
-        const dataStr = JSON.stringify(exportData);
-        const blobFile = new Blob([dataStr], { type: "application/json" });
-        const url = URL.createObjectURL(blobFile);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `WAP_Complete_Backup_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a); 
-        a.click(); 
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
+
+        // 3. วนลูปอัปโหลดรูปภาพ (Sequential loop เพื่อความเสถียร)
+        for (let i = 0; i < db.support.length; i++) {
+            const s = db.support[i];
+            
+            // ดึง Blob จาก IndexedDB
+            const blob = await getBlobFromDB(s.id);
+
+            if (blob) {
+                // แสดง Progress
+                const progressPct = 10 + Math.floor((uploadCount / Math.max(totalImagesToUpload, 1)) * 40); 
+                setLoadingPct(progressPct);
+                setBtnLoading(true, `☁️ อัปโหลดรูป (${uploadCount + 1}/${totalImagesToUpload})...`);
+
+                // กำหนดชื่อไฟล์: user_id/record_id.webp
+                const filePath = `${currentUser}/${s.id}.webp`;
+
+                // อัปโหลดไป Supabase Storage
+                const { data: uploadData, error: uploadError } = await sb
+                    .storage
+                    .from('wap-images')
+                    .upload(filePath, blob, {
+                        cacheControl: '3600',
+                        upsert: true, // เขียนทับไฟล์เดิม
+                        contentType: 'image/webp'
+                    });
+
+                if (uploadError) {
+                    console.error(`Upload Error for ${s.id}:`, uploadError);
+                    // ถ้าอัปโหลดไม่สำเร็จ ข้ามไปรูปถัดไป หรือแจ้งเตือน (ตรงนี้ข้ามไปเพื่อให้ Sync ข้อความได้)
+                    continue; 
+                }
+
+                // ดึง Public URL มาเก็บในข้อมูล JSON
+                const { data: publicUrlData } = sb.storage.from('wap-images').getPublicUrl(filePath);
+                
+                // อัปเดตข้อมูลใน exportData ว่ามีรูปนี้อยู่ที่ไหน (เปลี่ยนจาก Local Blob เป็น URL)
+                if (exportData.support[i]) {
+                    exportData.support[i].imageUrl = publicUrlData.publicUrl;
+                    // ลบข้อมูลเก่าถ้ามี (เพื่อประหยัดพื้นที่ Database)
+                    delete exportData.support[i].localBlobData; 
+                }
+                uploadCount++;
+            }
+        }
+
+        // 4. บันทึกข้อมูลทั้งหมด (JSON) ลง Table
+        setLoadingPct(80);
+        setBtnLoading(true, '💾 บันทึกฐานข้อมูล...');
+
+        const { error: dbError } = await sb
+            .from('user_snapshots')
+            .upsert({ 
+                id: currentUser, 
+                payload: exportData,
+                updated_at: new Date()
+            }, { onConflict: 'id' });
+
+        if (dbError) throw dbError;
+
+        setLoadingPct(100);
         hideLoading();
-        toast('💾 สำรองข้อมูลและรูปภาพสำเร็จ!');
-    };
-  } catch (e) {
-    console.error(e);
-    hideLoading();
-    toast('❌ สำรองข้อมูลล้มเหลว');
-  }
+        setBtnLoading(false, '☁️ Sync Cloud');
+        
+        toast(`✅ อัปเดต Cloud สำเร็จ!\nรูปภาพ: ${uploadCount} ไฟล์\nข้อมูล: ถูกบันทึกแล้ว`);
+
+    } catch (e) {
+        console.error(e);
+        hideLoading();
+        setBtnLoading(false, '☁️ Sync Cloud');
+        toast('❌ อัปเดตล้มเหลว: ' + e.message);
+    }
 }
 
 function importDB(event) {
@@ -4916,24 +5378,30 @@ function hideLoading(){document.getElementById('loadingOverlay').classList.add('
 let syncStatusTimer=null;
 function showSyncStatus(msg,color='#22c55e'){const el=document.getElementById('syncStatus');el.innerHTML=`<span class="ss-dot" style="background:${color};"></span>${msg}`;el.style.display='block';clearTimeout(syncStatusTimer);syncStatusTimer=setTimeout(()=>{el.style.display='none';},4500);}
 
-function setBtnLoading(on,txt='💾 สำรองข้อมูล'){
-    const b=document.getElementById('syncBtn');
+function setBtnLoading(on, txt='💾 สำรองข้อมูล', btnId='syncBtn'){
+    const b=document.getElementById(btnId);
     if(!b) return;
     b.classList.toggle('loading',on);
     b.innerText=txt;
     b.disabled=on;
 }
 
-/* ══════════════════════════════════
-   CORE CRUD OPERATIONS
-══════════════════════════════════ */
+let autoSyncTimer = null;
+
 function save(){
   db._owner=currentUser;
   db._lastModified=Date.now();
-  saveLocal();
+  saveLocal(); // เซฟลงเครื่องก่อน (Offline First)
   runAIAnalytics();
   if(isActive('master-dash'))refreshMasterDashboard();
   checkAchievements();
+  
+  // เพิ่มระบบ Auto-Sync: หน่วงเวลา 2 วินาทีหลังจากเซฟลงเครื่อง เพื่อส่งขึ้น Supabase
+  clearTimeout(autoSyncTimer);
+  showSyncStatus('⏳ รอส่งขึ้น Cloud...', '#f59e0b');
+  autoSyncTimer = setTimeout(() => {
+      syncToSupabase();
+  }, 2000);
 }
 
 function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
@@ -4960,11 +5428,26 @@ function addDaily() {
 }
 
 function delDailyConfirm(id) {
-    robotConfirm('ยืนยันลบรายการนี้?', () => {
+    robotConfirm('ยืนยันลบรายการนี้?', async () => {
         const idx = db.daily.findIndex(d => (d.id || d.date + '_' + d.type) === id);
         if (idx > -1) {
-            db.daily.splice(idx, 1); save(); toast('🗑 ลบข้อมูลแล้ว'); refreshDashboard(); refreshMasterDashboard();
-        } else toast('⚠️ ไม่พบข้อมูล');
+            const recId = db.daily[idx].id;
+            if (recId) {
+                // ลบออกจากฐานข้อมูล Supabase
+                try {
+                    await sb.from('daily_reports').delete().eq('id', recId);
+                } catch (e) {
+                    console.error('Cloud Delete Error:', e);
+                }
+            }
+            db.daily.splice(idx, 1); 
+            save(); 
+            toast('🗑 ลบข้อมูลแล้ว'); 
+            refreshDashboard(); 
+            refreshMasterDashboard();
+        } else {
+            toast('⚠️ ไม่พบข้อมูล');
+        }
     });
 }
 
@@ -5026,12 +5509,34 @@ function openAddSupModal(){
 }
 function closeAddSupModal(){document.getElementById('addSupModal').classList.remove('open');}
 
-function delSupportConfirm(i){
-  const s=db.support[i];
-  robotConfirm('ลบ Support record นี้?', async ()=>{
-    if(s&&s.id) await deleteImageFromDB(s.id);
-    db.support.splice(i,1);
-    save(); toast('🗑 ลบแล้ว'); refreshSupport();
+function delSupportConfirm(i) {
+  const s = db.support[i];
+  robotConfirm('ลบ Support record นี้?', async () => {
+    if (s && s.id) {
+        // 1. ลบรูปภาพออกจากเครื่องและหน้าจอ (IndexedDB)
+        await deleteImageFromDB(s.id);
+        
+        // 2. ลบรูปภาพออกจาก Supabase Storage
+        try {
+            const filePath = `${currentUser}/${s.id}.webp`;
+            await sb.storage.from(BUCKET_NAME).remove([filePath]);
+        } catch(e) {
+            console.error('Cloud Storage Delete Error:', e);
+        }
+        
+        // 3. ลบข้อมูล Text ออกจาก Supabase Database
+        try {
+            await sb.from('support_records').delete().eq('id', s.id);
+        } catch(e) {
+            console.error('Cloud DB Delete Error:', e);
+        }
+    }
+    
+    db.support.splice(i, 1);
+    save(); 
+    toast('🗑 ลบรายการและรูปภาพแล้ว'); 
+    refreshSupport(); 
+    refreshMasterDashboard();
   });
 }
 
@@ -5110,9 +5615,22 @@ function add5S() {
     refresh5S(); refreshMasterDashboard();
 }
 function del5SConfirm(id) {
-    robotConfirm('ลบรายการ 5S นี้?', () => {
+    robotConfirm('ลบรายการ 5S นี้?', async () => {
         const idx = db.s5.findIndex(s => s.id === id);
-        if (idx > -1) { db.s5.splice(idx, 1); save(); toast('🗑 ลบข้อมูล 5S แล้ว'); refresh5S(); refreshMasterDashboard(); }
+        if (idx > -1) { 
+            // ลบออกจากฐานข้อมูล Supabase
+            try { 
+                await sb.from('s5_records').delete().eq('id', id); 
+            } catch(e) { 
+                console.error('Cloud Delete Error:', e); 
+            }
+            
+            db.s5.splice(idx, 1); 
+            save(); 
+            toast('🗑 ลบข้อมูล 5S แล้ว'); 
+            refresh5S(); 
+            refreshMasterDashboard(); 
+        }
     });
 }
 
@@ -5124,8 +5642,39 @@ function addSkill() {
     if (idx > -1) db.skills[idx].value = val; else db.skills.push({ name: n.value, value: val, _user: currentUser, updatedAt: fullTimestamp() });
     save(); toast('📈 อัปเดต Skill Matrix'); n.value = ''; v.value = ''; refreshSkills(); refreshMasterDashboard();
 }
-function delSkillConfirm(name) { robotConfirm(`ลบทักษะ "${name}"?`, () => { db.skills = db.skills.filter(s => s.name !== name); save(); toast('🗑 ลบทักษะแล้ว'); refreshSkills(); refreshMasterDashboard(); }); }
-function clearAllSkills() { robotConfirm('ล้างทักษะทั้งหมด? จะถูกลบถาวร', () => { db.skills =[]; save(); toast('🗑 ล้างทักษะทั้งหมด'); refreshSkills(); refreshMasterDashboard(); }); }
+function delSkillConfirm(name) { 
+    robotConfirm(`ลบทักษะ "${name}"?`, async () => { 
+        // ลบออกจากฐานข้อมูล Supabase
+        try { 
+            await sb.from('skill_matrix').delete().eq('user_id', currentUser).eq('skill_name', name); 
+        } catch(e) { 
+            console.error('Cloud Delete Error:', e); 
+        }
+        
+        db.skills = db.skills.filter(s => s.name !== name); 
+        save(); 
+        toast('🗑 ลบทักษะแล้ว'); 
+        refreshSkills(); 
+        refreshMasterDashboard(); 
+    }); 
+}
+
+function clearAllSkills() { 
+    robotConfirm('ล้างทักษะทั้งหมด? จะถูกลบถาวร', async () => { 
+        // ลบทุกทักษะของ User นี้ออกจาก Supabase
+        try { 
+            await sb.from('skill_matrix').delete().eq('user_id', currentUser); 
+        } catch(e) { 
+            console.error('Cloud Delete Error:', e); 
+        }
+        
+        db.skills =[]; 
+        save(); 
+        toast('🗑 ล้างทักษะทั้งหมดแล้ว'); 
+        refreshSkills(); 
+        refreshMasterDashboard(); 
+    }); 
+}
 
 /* 5. SPECIAL JOBS */
 function addSpecial() {
@@ -5138,7 +5687,25 @@ function addSpecial() {
     save(); toast('⭐ บันทึก Special Job แล้ว'); document.getElementById('specProject').value = ''; document.getElementById('specBy').value = ''; document.getElementById('specResult').value = '';
     refreshSpecial(); refreshMasterDashboard();
 }
-function delSpecialConfirm(i) { robotConfirm('ลบโครงการพิเศษนี้?', () => { db.special.splice(i, 1); save(); toast('🗑 ลบโครงการแล้ว'); refreshSpecial(); refreshMasterDashboard(); }); }
+function delSpecialConfirm(i) { 
+    const s = db.special[i];
+    robotConfirm('ลบโครงการพิเศษนี้?', async () => { 
+        if (s && s.id) {
+            // ลบออกจากฐานข้อมูล Supabase
+            try { 
+                await sb.from('special_jobs').delete().eq('id', s.id); 
+            } catch(e) { 
+                console.error('Cloud Delete Error:', e); 
+            }
+        }
+        
+        db.special.splice(i, 1); 
+        save(); 
+        toast('🗑 ลบโครงการแล้ว'); 
+        refreshSpecial(); 
+        refreshMasterDashboard(); 
+    }); 
+}
 
 /* ══════════════════════════════════
    EXCEL EXPORT (Text Only)
@@ -5152,11 +5719,21 @@ function exportSupportToExcel() {
         });
     }
     if (!filtered.length) return toast('⚠️ ไม่มีข้อมูลสำหรับ Export');
+    
+    // 🌟 แก้ไขจุดที่ 6: เอาวันที่ไปใส่ใน Excel 🌟
     const dataForExcel = filtered.map(s => ({
-        "วันที่": s.fullTimestamp || s.datetime || s.eventDate || '', "รายละเอียดปัญหา": s.problem || '', "การแก้ไข": s.action || '',
-        "Group Part": s.part || '', "LOT": s.lot || '', "OK (ชิ้นดี)": s.ok || 0, "NG (ของเสีย)": s.ng || 0, "ประเภท Report": s.report || '',
-        "Remark": s.remark || '', "หมายเหตุ/ผู้บันทึก": s._user || ''
+        "วันที่": s.eventDate ? dateOnly(s.eventDate) : (s.datetime || s.fullTimestamp || ''), 
+        "รายละเอียดปัญหา": s.problem || '', 
+        "การแก้ไข": s.action || '',
+        "Group Part": s.part || '', 
+        "LOT": s.lot || '', 
+        "OK (ชิ้นดี)": s.ok || 0, 
+        "NG (ของเสีย)": s.ng || 0, 
+        "ประเภท Report": s.report || '',
+        "Remark": s.remark || '', 
+        "หมายเหตุ/ผู้บันทึก": s._user || ''
     }));
+    
     const ws = XLSX.utils.json_to_sheet(dataForExcel);
     ws['!cols'] =[{wch: 20}, {wch: 40}, {wch: 15}, {wch: 15}, {wch: 12}, {wch: 10}, {wch: 10}, {wch: 15}, {wch: 30}, {wch: 20}]; 
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Support Data");
@@ -5322,9 +5899,15 @@ function refreshDashboard(){
     const daily_sorted =[...db.daily].sort((a,b)=>new Date(a.date)-new Date(b.date));
     const cumulMap = {}; let runLv = 0, runHol = 0;
     daily_sorted.forEach(d => { if(d.type==='leave') runLv++; else runHol++; const runOff = runLv+runHol; const baseDays = 250; const runWork = baseDays - runOff; cumulMap[d.id||d.date+'_'+d.type] = { pw: Math.max(0, Math.round((runWork/baseDays)*100)), po: Math.round((runOff/baseDays)*100) }; });
-    tb.innerHTML = [...filteredDaily].reverse().map((d) => {
+    
+    // 🌟 แก้ไขจุดที่ 3: เรียงตามวันที่ลา/หยุด (ล่าสุดไปเก่าสุด) 🌟
+    const sortedDaily = [...filteredDaily].sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+    
+    tb.innerHTML = sortedDaily.map((d) => {
       const key = d.id||d.date+'_'+d.type; const cm = cumulMap[key]||{pw:'-', po:'-'};
-      return `<tr><td style="white-space:nowrap;font-size:.75rem;">${d.fullTimestamp||dateOnly(d.date)}</td><td><span class="badge ${d.type==='leave'?'badge-lv':'badge-hol'}">${d.type==='leave'?'ลางาน':'วันหยุด'}</span></td><td style="font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${cm.pw}%</td><td style="font-weight:700;color:var(--red);font-family:'DM Mono',monospace;">${cm.po}%</td><td style="font-size:.72rem;color:var(--txt3);">${d.note||'—'}</td><td style="text-align:center;"><button class="btn-del" onclick="delDailyConfirm('${d.id||d.date+'_'+d.type}')" title="ลบ">🗑</button></td></tr>`;
+      const displayDate = d.date ? dateOnly(d.date) : (d.fullTimestamp || '—');
+      
+      return `<tr><td style="white-space:nowrap;font-size:.75rem; font-weight:600;">${displayDate}</td><td><span class="badge ${d.type==='leave'?'badge-lv':'badge-hol'}">${d.type==='leave'?'ลางาน':'วันหยุด'}</span></td><td style="font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${cm.pw}%</td><td style="font-weight:700;color:var(--red);font-family:'DM Mono',monospace;">${cm.po}%</td><td style="font-size:.72rem;color:var(--txt3);">${d.note||'—'}</td><td style="text-align:center;"><button class="btn-del" onclick="delDailyConfirm('${d.id||d.date+'_'+d.type}')" title="ลบ">🗑</button></td></tr>`;
     }).join('');
   }
 
@@ -5384,12 +5967,18 @@ function refreshSupport(){
   if(!filtered.length){
     tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก หรือไม่ตรงกับคำค้นหา</div></td></tr>`;
   } else {
-    tb.innerHTML =[...filtered].reverse().map((s)=>{
+    // 🌟 แก้ไขจุดที่ 1: เรียงตามวันที่ (ล่าสุดไปเก่าสุด) และจัดรูปแบบวันที่ 🌟
+    const sortedSupport =[...filtered].sort((a,b) => new Date(b.eventDate || b.datetime || 0) - new Date(a.eventDate || a.datetime || 0));
+    
+    tb.innerHTML = sortedSupport.map((s)=>{
       const realIdx = db.support.indexOf(s); const bc = s.report==='RP'?'badge-rp':s.report==='VF'?'badge-vf':'badge-rec';
       const okCell = s.ok!==undefined && s.ok!=='' ? `<span class="ok-chip">✓ ${s.ok}</span>` : '<span style="color:var(--txt4);">—</span>';
       const ngCell = s.ng!==undefined && s.ng!=='' ? `<span class="ng-chip">✗ ${s.ng}</span>` : '<span style="color:var(--txt4);">—</span>';
+      
+      const displayDate = s.eventDate ? dateOnly(s.eventDate) : (s.datetime || s.fullTimestamp || '—');
+      
       return `<tr>
-        <td class="td-ts" style="padding-left:14px;">${s.fullTimestamp||s.datetime||'—'}</td>
+        <td class="td-ts" style="padding-left:14px; font-weight:600;">${displayDate}</td>
         <td style="min-width:280px;width:32%;font-size:.79rem;line-height:1.65;word-break:break-word;white-space:normal;color:var(--txt);padding-top:10px;padding-bottom:10px;">${s.problem||'—'}</td>
         <td style="font-size:.73rem;">${s.action||'—'}</td>
         <td style="font-weight:700;color:var(--txt2);font-size:.76rem;">${s.part||'—'}</td>
@@ -5458,7 +6047,10 @@ function refresh5S(){
   setText('top-owners', to ? to[0] : '—'); setText('top-areas', ta ? ta[0] : '—');
 
   if(!filtered.length){ tb.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--txt4);padding:24px;">ไม่มีข้อมูลในช่วงเวลานี้</td></tr>`; } else {
-    tb.innerHTML = [...filtered].reverse().map(s => `<tr><td>${s.area||'—'}</td><td style="font-family:'DM Mono',monospace;">${s.count||0}</td><td>${s.detail||'—'}</td><td>${s.owner||'—'}</td><td style="font-size:.72rem;color:var(--txt4);">${s.fullTimestamp||'—'}</td><td style="text-align:center;"><button class="btn-del" onclick="del5SConfirm('${s.id}')" title="ลบ">🗑</button></td></tr>`).join('');
+    // 🌟 แก้ไขจุดที่ 5: เรียงตามวันที่และแสดงวันที่ 5S ให้ถูก 🌟
+    const sorted5S = [...filtered].sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+    
+    tb.innerHTML = sorted5S.map(s => `<tr><td>${s.area||'—'}</td><td style="font-family:'DM Mono',monospace;">${s.count||0}</td><td>${s.detail||'—'}</td><td>${s.owner||'—'}</td><td style="font-size:.72rem;font-weight:600;color:var(--txt2);">${s.date ? dateOnly(s.date) : (s.fullTimestamp || '—')}</td><td style="text-align:center;"><button class="btn-del" onclick="del5SConfirm('${s.id}')" title="ลบ">🗑</button></td></tr>`).join('');
   }
   build5SChart(filtered); build5SAreaBars(aM); 
 }
@@ -5533,8 +6125,13 @@ function refreshSpecial(){
   
   if(!filtered.length){ tb.innerHTML = `<tr><td colspan="7"><div class="sp-empty"><div class="sp-empty-icon">⭐</div><div class="sp-empty-txt">ไม่มีข้อมูลในช่วงเวลาที่เลือก</div></div></td></tr>`; return; }
   
-  tb.innerHTML = [...filtered].reverse().map((s, i) => {
-    const idx = db.special.indexOf(s); const st = deriveStatus(s.result); const aColor = getAssignorColor(s.by); const dateDisplay = s.fullTimestamp || s.date || '—';
+  // 🌟 แก้ไขจุดที่ 4: เรียงตามวันที่โปรเจกต์ 🌟
+  const sortedSpecial = [...filtered].sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+  
+  tb.innerHTML = sortedSpecial.map((s, i) => {
+    const idx = db.special.indexOf(s); const st = deriveStatus(s.result); const aColor = getAssignorColor(s.by); 
+    const dateDisplay = s.date ? dateOnly(s.date) : (s.fullTimestamp || '—');
+    
     return `<tr class="sp-row-new" style="animation-delay:${i*0.04}s"><td><div class="sp-row-num">${filtered.length-i}</div></td><td><div style="font-weight:700;font-size:.8rem;color:var(--txt);">${s.project||s.job||'—'}</div></td><td><div class="sp-date-pill" title="${dateDisplay}">📅 ${dateDisplay}</div></td><td><div class="sp-assignor-tag" style="color:${aColor};background:${aColor}15;border-color:${aColor}30;"><span style="width:7px;height:7px;border-radius:50%;background:${aColor};flex-shrink:0;"></span>${s.by||'—'}</div></td><td><div class="sp-status ${st.cls}">${st.txt}</div></td><td><div class="sp-result-txt">${s.result||'—'}</div></td><td style="text-align:center;"><button class="sp-del-btn" onclick="delSpecialConfirm(${idx})" title="ลบ">🗑</button></td></tr>`;
   }).join('');
 }
@@ -5593,7 +6190,8 @@ function openRecDetail(idx) {
       <div class="rec-problem-header compact">
         <div class="rec-ph-left">
           <div class="rec-ph-eyebrow">⚠️ Problem Detail</div><div class="rec-ph-title">${s.problem || '—'}</div>
-          <div class="rec-ph-meta"><div class="rec-ph-meta-item">📅 <b>${s.fullTimestamp || s.datetime || '—'}</b></div><div class="rec-ph-meta-item">👤 <b>${s._user || '—'}</b></div></div>
+          <!-- 🌟 แก้ไขจุดที่ 2: วันที่ในหน้าต่าง Detail 🌟 -->
+          <div class="rec-ph-meta"><div class="rec-ph-meta-item">📅 <b>${s.eventDate ? dateOnly(s.eventDate) : (s.fullTimestamp || s.datetime || '—')}</b></div><div class="rec-ph-meta-item">👤 <b>${s._user || '—'}</b></div></div>
           <div class="rec-info-inline" style="justify-content:flex-start;flex-wrap:wrap;margin-top:4px;">
             ${s.part ? `<div class="rec-info-item"><span class="rec-part-badge">📦 ${s.part}</span></div>` : ''}
             <div class="rec-info-item"><span class="rec-action-badge">🔧 ${s.action || '—'}</span></div>
@@ -5764,44 +6362,59 @@ function enableFullScreen() {
 
 // ผูก Event รอการคลิกครั้งแรกบนหน้าจอ
 document.addEventListener('click', enableFullScreen);
+
 /* ══════════════════════════════════
-   BOOTSTRAP (INITIALIZATION) - ป้องกันหน้าค้าง 100%
+   BOOTSTRAP (INITIALIZATION) - โหลดข้อมูลจาก Supabase
 ══════════════════════════════════ */
 window.addEventListener('load', async () => {
   document.addEventListener('contextmenu', e => e.preventDefault());
-  
-  setLoading('📴 โหมด Offline Enterprise...', 'กำลังจัดเตรียมฐานข้อมูล', 10);
-  setBtnLoading(true,'⏳ โหลด...');
 
-  // 🔴 FAILSAFE SYSTEM: บังคับให้หลุดจากหน้าโหลดหากเกิน 2.5 วินาที (ป้องกัน iframe blocks)
+  setLoading('📴 เชื่อมต่อ Cloud Database...', 'กำลังดึงข้อมูลล่าสุดจาก Supabase', 10);
+
   try {
-      await Promise.race([
-          (async () => {
-              await initIndexedDB(); // <--- แก้ไขจุดที่ 1
-              setLoadingPct(50);
-              await loadAllImagesFromDB(); // <--- แก้ไขจุดที่ 2
-              setLoadingPct(80);
-          })(),
-          new Promise(resolve => setTimeout(resolve, 2500))
-      ]);
+    // โหลดโครงสร้าง IndexedDB ไว้ก่อน
+    await initIndexedDB();
+    setLoadingPct(30);
+
+    // ดึงข้อมูลทั้งหมดจาก Supabase (ทุกตาราง)
+    const hasCloudData = await loadFromSupabaseComplete();
+
+    if (hasCloudData) {
+      setLoadingPct(80);
+      setLoading('☁️ โหลดข้อมูลจาก Cloud สำเร็จ', 'กำลังเตรียมระบบ', 80);
+    } else {
+      // ถ้าบน Cloud ไม่มีข้อมูล ให้โหลดจากเครื่อง (Local) แทน
+      db = loadLocalDB();
+      setLoadingPct(80);
+      await loadAllImagesFromDB();
+    }
+
   } catch (err) {
-      console.warn('DB Fallback Activated. Error: ', err);
+    console.warn('Init Fallback:', err);
+    db = loadLocalDB(); // Fallback ไป Local ถ้าเน็ตหลุด
   }
 
+  // รีเฟรชหน้าจอทั้งหมดให้ข้อมูลแสดงผล
   refreshAllPages();
   refreshSupportImagesOnly();
   setLoadingPct(100);
 
-  setTimeout(() => { hideLoading(); setBtnLoading(false, '💾 สำรองข้อมูล'); runDashboardEntrance(); }, 500);
-  
-  // ระบบซิงค์ข้อมูลระหว่างแท็บแบบ Real-time
+  setTimeout(() => {
+    hideLoading();
+    setBtnLoading(false, '☁️ Sync Cloud');
+    runDashboardEntrance();
+  }, 500);
+
+  // ระบบซิงค์ข้อมูลระหว่างแท็บแบบ Real-time (ในกรณีเปิดหลายหน้าต่าง)
   window.addEventListener('storage', (e) => {
     if (e.key === STORAGE_KEY) {
-      db = loadLocalDB(); refreshAllPages();
+      db = loadLocalDB();
+      refreshAllPages();
       showSyncStatus('🔄 ข้อมูลอัปเดตจากหน้าต่างอื่น', '#60a5fa');
     }
   });
 });
+
 </script>
 </body>
 </html>
