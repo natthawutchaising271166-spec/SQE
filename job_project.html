@@ -13,8 +13,7 @@
 </script>
 <!-- ให้วางส่วน CSS (เดิมของคุณ) ตรงนี้ -->
 <style>
-
-:root{<!-- ให้วางส่วน CSS (เดิมของคุณ) ตรงนี้ -->
+:root {
   /* ─── Azure Blue Design System ─── */
   --b50:#eff6ff;--b100:#dbeafe;--b200:#bfdbfe;--b300:#93c5fd;
   --b400:#60a5fa;--b500:#3b82f6;--b600:#2563eb;--b700:#1d4ed8;
@@ -3452,14 +3451,7 @@ body.dark-mode .sup-img-none:hover { background: rgba(37,99,235,.15); border-col
 </aside>
 
 <!-- ════════════════════════════════
-     MAIN
-════════════════════════════════ -->
-<div class="main-wrap">
-  <!-- ... ส่วนบนของ Sidebar ... -->
-</aside>
-
-<!-- ════════════════════════════════
-     MAIN (ส่วนนี้แหละที่ต้องแก้)
+     MAIN WRAP & TOPBAR
 ════════════════════════════════ -->
 <div class="main-wrap">
 
@@ -4382,6 +4374,7 @@ const BUCKET_NAME = 'wap-images';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+
 /* ──────────────────────────────────
    HELPER: SAFE UPSERT WITH DEDUPLICATION (FIXED)
    <<--- ย้ายส่วนนี้มาวางบนสุดของ Script ก่อน syncToSupabase
@@ -4416,6 +4409,11 @@ const safeUpsert = async (tableName, data, conflictCols) => {
         return { success: false, error: err.message };
     }
 };
+// ฟังก์ชันสำหรับหาวันที่ปัจจุบัน (YYYY-MM-DD) ตามเวลา Local Time (ไทย)
+function getLocalYYYYMMDD(d = new Date()) {
+    const tzOffset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - tzOffset).toISOString().split('T')[0];
+}
 /* ──────────────────────────────────
    1. UPLOAD TO SUPABASE (FIXED - REMOVE DUPLICATES)
 ────────────────────────────────── */
@@ -4741,8 +4739,7 @@ async function initSupabaseSync() {
             db = loadLocalDB();
         }
         
-        // เปิด Auto-sync
-        enableAutoSync();
+ 
         
     } catch (err) {
         console.error('Init Error:', err);
@@ -5130,152 +5127,163 @@ function getBlobFromDB(recordId) {
     });
 }
 
+/* ══════════════════════════════════
+   6. BATCH EXPORT/IMPORT (FULL BACKUP TEXT + IMAGES)
+══════════════════════════════════ */
+
+// Helper: แปลง Blob เป็น Base64
+function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+// 🟢 ฟังก์ชัน BACKUP: สร้างไฟล์ .json ลงเครื่อง (รวมข้อความ + รูปภาพ)
 async function exportDB() {
     try {
-        setBtnLoading(true, '🔍 ตรวจสอบข้อมูล...');
-        
-        // 1. สำเนาข้อมูล DB เพื่อป้องกันการแก้ไขตอนใช้งานจริง
-        const exportData = JSON.parse(JSON.stringify(db));
-        
-        // 2. เตรียมข้อมูลสำหรับอัปโหลดรูป
-        const supportIds = exportData.support.map(s => s.id);
-        let uploadCount = 0;
-        
-        // นับจำนวนรูปที่มี Blob จริงใน IndexedDB
-        let totalImagesToUpload = 0;
-        for(let i=0; i<db.support.length; i++) {
-            const s = db.support[i];
-            const hasBlob = await getBlobFromDB(s.id);
-            if(hasBlob) totalImagesToUpload++;
-        }
+        setBtnLoading(true, '📦 เตรียมไฟล์...', 'exportBtn'); // ถ้าปุ่มคุณไม่มี id ให้ผ่านไป
+        setLoading('📦 กำลังสร้างไฟล์ Backup...', 'รวบรวมข้อความและรูปภาพทั้งหมด', 10);
 
-        // 3. วนลูปอัปโหลดรูปภาพ (Sequential loop เพื่อความเสถียร)
-        for (let i = 0; i < db.support.length; i++) {
-            const s = db.support[i];
+        // 1. สำเนาข้อมูล Text Data ปัจจุบัน
+        const backupData = JSON.parse(JSON.stringify(db));
+        backupData.images = {}; // สร้าง object ว่างสำหรับเก็บรูป
+
+        // 2. ดึงรูปภาพทั้งหมดจาก IndexedDB
+        let imgCount = 0;
+        let totalItems = backupData.support.length;
+        
+        for (let i = 0; i < totalItems; i++) {
+            const s = backupData.support[i];
+            const blob = await getBlobFromDB(s.id); // ดึงรูปจาก IndexedDB
             
-            // ดึง Blob จาก IndexedDB
-            const blob = await getBlobFromDB(s.id);
-
             if (blob) {
-                // แสดง Progress
-                const progressPct = 10 + Math.floor((uploadCount / Math.max(totalImagesToUpload, 1)) * 40); 
-                setLoadingPct(progressPct);
-                setBtnLoading(true, `☁️ อัปโหลดรูป (${uploadCount + 1}/${totalImagesToUpload})...`);
-
-                // กำหนดชื่อไฟล์: user_id/record_id.webp
-                const filePath = `${currentUser}/${s.id}.webp`;
-
-                // อัปโหลดไป Supabase Storage
-                const { data: uploadData, error: uploadError } = await sb
-                    .storage
-                    .from('wap-images')
-                    .upload(filePath, blob, {
-                        cacheControl: '3600',
-                        upsert: true, // เขียนทับไฟล์เดิม
-                        contentType: 'image/webp'
-                    });
-
-                if (uploadError) {
-                    console.error(`Upload Error for ${s.id}:`, uploadError);
-                    // ถ้าอัปโหลดไม่สำเร็จ ข้ามไปรูปถัดไป หรือแจ้งเตือน (ตรงนี้ข้ามไปเพื่อให้ Sync ข้อความได้)
-                    continue; 
-                }
-
-                // ดึง Public URL มาเก็บในข้อมูล JSON
-                const { data: publicUrlData } = sb.storage.from('wap-images').getPublicUrl(filePath);
-                
-                // อัปเดตข้อมูลใน exportData ว่ามีรูปนี้อยู่ที่ไหน (เปลี่ยนจาก Local Blob เป็น URL)
-                if (exportData.support[i]) {
-                    exportData.support[i].imageUrl = publicUrlData.publicUrl;
-                    // ลบข้อมูลเก่าถ้ามี (เพื่อประหยัดพื้นที่ Database)
-                    delete exportData.support[i].localBlobData; 
-                }
-                uploadCount++;
+                // แปลงรูปเป็น Base64 String เพื่อให้อยู่ใน JSON ได้
+                const base64 = await blobToBase64(blob);
+                backupData.images[s.id] = base64;
+                imgCount++;
             }
+            // อัปเดต % หน้าจอ
+            setLoadingPct(10 + Math.floor((i / Math.max(totalItems, 1)) * 70));
         }
 
-        // 4. บันทึกข้อมูลทั้งหมด (JSON) ลง Table
-        setLoadingPct(80);
-        setBtnLoading(true, '💾 บันทึกฐานข้อมูล...');
-
-        const { error: dbError } = await sb
-            .from('user_snapshots')
-            .upsert({ 
-                id: currentUser, 
-                payload: exportData,
-                updated_at: new Date()
-            }, { onConflict: 'id' });
-
-        if (dbError) throw dbError;
-
-        setLoadingPct(100);
-        hideLoading();
-        setBtnLoading(false, '☁️ Sync Cloud');
+        // 3. สร้างไฟล์ JSON และสั่งให้เบราว์เซอร์ดาวน์โหลด
+        setLoadingPct(90);
+        setLoading('💾 กำลังสร้างไฟล์...', 'กรุณารอสักครู่', 90);
         
-        toast(`✅ อัปเดต Cloud สำเร็จ!\nรูปภาพ: ${uploadCount} ไฟล์\nข้อมูล: ถูกบันทึกแล้ว`);
+        const jsonString = JSON.stringify(backupData);
+        const jsonBlob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(jsonBlob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        const now = new Date();
+        a.download = `WAP_FullBackup_${currentUser}_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate()}.json`;
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        hideLoading();
+        toast(`✅ Backup สำเร็จ!\nข้อมูล ${totalItems} รายการ | รูปภาพ ${imgCount} รูป`);
 
     } catch (e) {
-        console.error(e);
+        console.error("Backup Error:", e);
         hideLoading();
-        setBtnLoading(false, '☁️ Sync Cloud');
-        toast('❌ อัปเดตล้มเหลว: ' + e.message);
+        toast('❌ เกิดข้อผิดพลาดในการ Backup: ' + e.message);
     }
 }
 
+// 🟢 ฟังก์ชัน RESTORE: นำเข้าไฟล์ .json (กู้คืนข้อความ + รูปภาพ)
 function importDB(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    try {
-      setLoading('📦 กำลังกู้คืนข้อมูล...', 'อาจใช้เวลาสักครู่หากมีรูปเยอะ', 50);
-      const importedData = JSON.parse(e.target.result);
-      if (!importedData._owner || !importedData.support) { hideLoading(); return toast('❌ ไฟล์ไม่ถูกต้อง'); }
-      
-      if (confirm('⚠️ การกู้คืนจะเขียนทับข้อมูลปัจจุบันและรูปภาพทั้งหมด\nยืนยันการกู้คืนไฟล์นี้ใช่หรือไม่?')) {
-        
-        // กู้คืนข้อมูล Text
-        db.daily = importedData.daily ||[];
-        db.s5 = importedData.s5 ||[];
-        db.skills = importedData.skills ||[];
-        db.special = importedData.special ||[];
-        db.support = importedData.support ||[];
-        db.badges = importedData.badges || {};
-        db._owner = currentUser;
-        db._lastModified = Date.now();
-        saveLocal();
-
-        // กู้คืนรูปภาพเข้า IndexedDB
-        if(importedData.images && idb) {
-            // ล้างฐานข้อมูลเก่าก่อน
-            const txClear = idb.transaction(['images'], 'readwrite');
-            txClear.objectStore('images').clear();
-            await new Promise(r => txClear.oncomplete = r);
-
-            // บันทึกรูปลงฐานข้อมูลใหม่
-            const keys = Object.keys(importedData.images);
-            for(let i=0; i<keys.length; i++) {
-                const id = keys[i];
-                const base64 = importedData.images[id];
-                const res = await fetch(base64);
-                const blob = await res.blob();
-                // ใส่ true เพื่อข้ามการรีเฟรชหน้าจอรัวๆ (แก้ค้าง)
-                await saveImageToDB(id, blob, true);
-                setLoadingPct(50 + ((i/keys.length)*40));
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            setLoading('📦 กำลังกู้คืนข้อมูล...', 'อาจใช้เวลาสักครู่หากมีรูปเยอะ', 10);
+            
+            const importedData = JSON.parse(e.target.result);
+            if (!importedData.support) { 
+                hideLoading(); 
+                return toast('❌ ไฟล์ไม่ถูกต้อง หรือไม่ใช่ไฟล์ Backup ของระบบนี้'); 
             }
+            
+            if (confirm(`⚠️ คำเตือน!\nการกู้คืนจะ "เขียนทับ (Overwrite)" ข้อมูลและรูปภาพปัจจุบันในเครื่องทั้งหมด\n\nคุณแน่ใจหรือไม่ที่จะกู้คืนไฟล์นี้?`)) {
+                
+                // 1. กู้คืนข้อมูล Text ลง LocalStorage
+                db.daily = importedData.daily || [];
+                db.s5 = importedData.s5 ||[];
+                db.skills = importedData.skills || [];
+                db.special = importedData.special ||[];
+                db.support = importedData.support ||[];
+                db.badges = importedData.badges || {};
+                db._owner = currentUser;
+                db._lastModified = Date.now();
+                saveLocal();
+
+                setLoadingPct(30);
+
+                // 2. กู้คืนรูปภาพลง IndexedDB
+                if (importedData.images && idb) {
+                    setLoading('🖼️ กำลังแตกไฟล์รูปภาพ...', 'กรุณาห้ามปิดหน้าจอ', 30);
+                    
+                    // ล้าง IndexedDB เก่าก่อนเพื่อป้องกันขยะ
+                    const txClear = idb.transaction(['images'], 'readwrite');
+                    txClear.objectStore('images').clear();
+                    await new Promise(r => txClear.oncomplete = r);
+
+                    const imgKeys = Object.keys(importedData.images);
+                    
+                    // วนลูปเซฟรูปลง DB
+                    for (let i = 0; i < imgKeys.length; i++) {
+                        const id = imgKeys[i];
+                        const base64Str = importedData.images[id];
+                        
+                        try {
+                            // แปลง Base64 กลับเป็น Blob
+                            const res = await fetch(base64Str);
+                            const blob = await res.blob();
+                            
+                            // เซฟลง IndexedDB (ใส่ true เพื่อไม่ให้หน้าจอกระตุกตอนเซฟทีละรูป)
+                            await saveImageToDB(id, blob, true);
+                        } catch (imgErr) {
+                            console.warn(`Restore Image Failed for ID: ${id}`, imgErr);
+                        }
+                        
+                        setLoadingPct(30 + Math.floor((i / imgKeys.length) * 60));
+                    }
+                }
+                
+                setLoadingPct(95);
+                
+                // 3. รีโหลดระบบเพื่อแสดงผลใหม่
+                await loadAllImagesFromDB();
+                refreshAllPages();
+                refreshSupportImagesOnly(); 
+                
+                hideLoading();
+                toast('✅ กู้คืนข้อมูลและรูปภาพสำเร็จ!');
+                
+                // ส่งข้อมูลที่กู้คืนมา ขึ้น Supabase ทันที
+                showSyncStatus('⏳ กำลัง Sync ข้อมูลใหม่ขึ้น Cloud...', '#f59e0b');
+                setTimeout(() => syncToSupabase(), 1500);
+
+            } else { 
+                hideLoading(); 
+            }
+        } catch (err) { 
+            console.error(err);
+            hideLoading(); 
+            toast('❌ ไฟล์ข้อมูลเสียหาย หรือไม่สามารถอ่านได้'); 
         }
-        
-        await loadAllImagesFromDB();
-        refreshAllPages();
-        refreshSupportImagesOnly(); // รีเฟรชตารางครั้งเดียวตอนจบ
-        hideLoading();
-        toast('✅ กู้คืนข้อมูลสำเร็จ!');
-      } else { hideLoading(); }
-    } catch (err) { hideLoading(); toast('❌ ไฟล์ข้อมูลเสียหาย'); }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
 }
 
 
@@ -5451,7 +5459,6 @@ function delDailyConfirm(id) {
     });
 }
 
-/* 2. SUPPORT PRODUCTION */
 async function addSupport() {
     const prob = document.getElementById('supProblem').value;
     const act = document.getElementById('supAction').value;
@@ -5470,7 +5477,7 @@ async function addSupport() {
     const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     const newId = Date.now().toString();
 
-    // 1. ลองบันทึกรูปก่อน เพื่อเช็คว่าเบราว์เซอร์เต็มหรือไม่
+    // 1. ลองบันทึกรูปก่อน เพื่อเช็คว่า IndexedDB เต็มหรือไม่
     if (_pendingAddImgBlob) {
         try {
             await saveImageToDB(newId, _pendingAddImgBlob);
@@ -5479,27 +5486,33 @@ async function addSupport() {
         }
     }
 
-    // 2. ถ้าเซฟรูปลง ค่อยบันทึกข้อความ
+    // 2. เซฟข้อความ
     db.support.push({
-        id: newId, problem: prob, action: act, part: part, lot: lot, ok: ok !== '' ? parseInt(ok) : '', ng: ng !== '' ? parseInt(ng) : '', report: rep, remark: remark,
-        datetime: ts, fullTimestamp: ts, month: month, eventDate: di || new Date().toISOString().split('T')[0], _user: currentUser
+        id: newId, problem: prob, action: act, part: part, lot: lot, 
+        ok: ok !== '' ? parseInt(ok) : '', ng: ng !== '' ? parseInt(ng) : '', 
+        report: rep, remark: remark,
+        datetime: ts, fullTimestamp: ts, month: month, 
+        eventDate: di || getLocalYYYYMMDD(), // แก้บั๊ก Timezone
+        _user: currentUser
     });
 
     try {
         save(); // เซฟลง localStorage
     } catch(err) {
-        // ถ้าเซฟข้อความไม่ลง ให้ลบรูปที่พึ่งเพิ่มเมื่อกี้ทิ้ง
+        // ถ้าเซฟข้อความไม่ลง ให้ถอยกลับโดยการลบรูปที่พึ่งเพิ่มเมื่อกี้ทิ้ง
         deleteImageFromDB(newId);
         return; 
     }
     
-    document.getElementById('supProblem').value = ''; document.getElementById('supPart').value = ''; document.getElementById('supLot').value = '';
-    document.getElementById('supOk').value = ''; document.getElementById('supNg').value = ''; document.getElementById('supRemark').value = '';
-    document.getElementById('supDate').value = new Date().toISOString().split('T')[0];
+    // เคลียร์ฟอร์ม['supProblem','supPart','supLot','supOk','supNg','supRemark'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('supDate').value = getLocalYYYYMMDD();
+    
     if(typeof resetAddImgZone === 'function') resetAddImgZone();
-closeSidebar();
-    toast('✅ บันทึกข้อมูลออฟไลน์เรียบร้อย');
-    closeAddSupModal(); refreshSupport(); refreshMasterDashboard();
+    closeAddSupModal();
+    
+    toast('✅ บันทึกข้อมูลเรียบร้อย');
+    refreshSupport(); 
+    refreshMasterDashboard();
 }
 
 function openAddSupModal(){
@@ -6261,7 +6274,7 @@ function updateDarkModeUI(isDark) {
     setTimeout(() => updateDarkModeUI(true), 10); 
   } 
 })();
-(function() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.body.classList.add('dark-mode'); setTimeout(() => updateDarkModeUI(true), 10); } })();
+
 
 /* ══════════════════════════════════
    ACHIEVEMENTS ENGINE
@@ -6318,7 +6331,12 @@ function runDashboardEntrance(){
 function adjustSkillGrid(){const grid=document.getElementById('skillChartGrid');if(!grid)return;if(window.innerWidth<900)grid.style.gridTemplateColumns='1fr';else if(window.innerWidth<1200)grid.style.gridTemplateColumns='1fr 1fr';else grid.style.gridTemplateColumns='1fr 1.1fr 0.9fr';}
 window.addEventListener('resize',adjustSkillGrid);adjustSkillGrid();
 
-(function(){const sd=document.getElementById('specDate');if(sd)sd.value=new Date().toISOString().split('T')[0];const dd=document.getElementById('dailyDate');if(dd)dd.value=new Date().toISOString().split('T')[0];const supD=document.getElementById('supDate');if(supD)supD.value=new Date().toISOString().split('T')[0];})();
+(function(){
+    const today = getLocalYYYYMMDD();
+    const sd = document.getElementById('specDate'); if(sd) sd.value = today;
+    const dd = document.getElementById('dailyDate'); if(dd) dd.value = today;
+    const supD = document.getElementById('supDate'); if(supD) supD.value = today;
+})();
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
 function startLocalPolling() {
