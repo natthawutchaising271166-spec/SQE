@@ -6119,7 +6119,8 @@ async function login() {
     passInput.style.borderColor = 'var(--accent-red)';
     shake(passInput); toast('⛔ รหัสผ่านไม่ถูกต้อง'); return;
   }
-
+ // 🟢 เพิ่มคำสั่งเปิดเต็มจอตรงนี้! ทันทีที่รหัสผ่านถูกต้องและผู้ใช้คลิก
+  enterFullscreen();
   // 2. ซ่อนฟอร์ม และแสดงแผง Progress Bar
   $id('loginBtn').disabled = true;
   $id('loginForm').style.display = 'none';
@@ -7458,6 +7459,34 @@ window.exportToExcel = function() {
     toast('❌ เกิดข้อผิดพลาดในการดาวน์โหลด Excel');
   }
 };
+// ฟังก์ชันสำหรับเปิดโหมดเต็มจอ
+function enterFullscreen() {
+  const doc = document.documentElement;
+  try {
+    if (doc.requestFullscreen) {
+      doc.requestFullscreen();
+    } else if (doc.webkitRequestFullscreen) { /* สำหรับ Safari */
+      doc.webkitRequestFullscreen();
+    } else if (doc.msRequestFullscreen) { /* สำหรับ IE11 */
+      doc.msRequestFullscreen();
+    }
+  } catch (err) {
+    console.warn("Fullscreen API ถูกบล็อก:", err);
+  }
+}
+
+// ฟังก์ชันสำหรับสลับโหมดเต็มจอ (เปิด/ปิด)
+function toggleFullscreen() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    enterFullscreen();
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+}
 </script>
 </body>
 </html>
