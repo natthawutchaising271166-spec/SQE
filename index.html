@@ -4639,6 +4639,26 @@ html.dark-mode ::-webkit-scrollbar { width: 8px; height: 8px; }
 html.dark-mode ::-webkit-scrollbar-track { background: #0f172a; }
 html.dark-mode ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 html.dark-mode ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* Style สำหรับแถวที่กำลังแก้ไข */
+.is-editing {
+  background-color: var(--bg-hover) !important; /* สีพื้นหลังอ่อนๆ */
+  border-left: 4px solid var(--blue-600) !important; /* เส้นสีน้ำเงินชี้ทางด้านซ้าย */
+  box-shadow: 0 4px 12px rgba(37,99,235,0.15); /* เงาจางๆ */
+  transition: all 0.2s ease;
+}
+
+/* ทำให้ตัวอักษรในแถวที่กำลังแก้ไขดูชัดขึ้น */
+.is-editing td {
+  color: var(--text-900) !important;
+  font-weight: 600;
+}
+
+/* Dark Mode Support */
+html.dark-mode .is-editing {
+  background-color: rgba(37, 99, 235, 0.15) !important;
+  border-left-color: var(--blue-400) !important;
+}
 </style>
 </head>
 <body>
@@ -4992,10 +5012,11 @@ html.dark-mode ::-webkit-scrollbar-thumb:hover { background: #475569; }
           </select>
         </div>
 
-        <button type="submit" id="submitBtn" class="btn"
-          style="padding:1rem;font-weight:700;font-size:.75rem;letter-spacing:.04em;border-radius:var(--r-sm)">
-          ✦ Commit Data
-        </button>
+<!-- ปุ่ม Submit เดียว เพื่อให้ JS ควบคุมการแสดงผลปุ่ม Cancel -->
+<button type="submit" id="submitBtn" class="btn"
+  style="padding:1rem;font-weight:700;font-size:.75rem;letter-spacing:.04em;border-radius:var(--r-sm)">
+  ✦ Commit Data
+</button>
       </form>
     </aside>
 
@@ -6319,8 +6340,16 @@ async function handleFormSubmit(e) {
 window.editRecord = function(id) {
   const r = records.find(x => x.id === id);
   if (!r) return;
-  
+
+  // ❗ 1. ลบไฮไลท์แถวเดิมทิ้งก่อน (ถ้ามี)
+  document.querySelectorAll('tr.is-editing').forEach(el => el.classList.remove('is-editing'));
+
+  // ❗ 2. ล้างปุ่ม Cancel Copy ออกก่อน (ถ้ามี)
+  if($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
+
   editingId = r.id;
+  
+  // 3. เติมข้อมูลลงฟอร์ม
   if($id('inputDate')) $id('inputDate').value = r.date;
   if($id('shift')) $id('shift').value = r.shift;
   if($id('lineNo')) $id('lineNo').value = r.line;
@@ -6335,25 +6364,111 @@ window.editRecord = function(id) {
   
   handleJudgment(r.judgment);
   
+  // 4. อัปเดตปุ่ม Submit
   const btn = $id('submitBtn');
   if(btn) {
     btn.innerHTML = '📝 อัปเดตข้อมูล (Update)';
     btn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+  }
+
+  // ✅ 5. สร้างปุ่มยกเลิก (Cancel)
+  if(!$id('cancelEditBtn')) {
+    const cancelBtn = document.createElement('button');
+    cancelBtn.id = 'cancelEditBtn';
+    cancelBtn.className = 'btn';
+    cancelBtn.innerHTML = '✖ ยกเลิกแก้ไข';
+    cancelBtn.style.cssText = 'padding:1rem; font-weight:700; font-size:.75rem; border-radius:var(--r-sm); background:#fee2e2; border:1.5px solid #ef4444; color:#ef4444; margin-top:0.5rem; width:100%; cursor:pointer; transition:all .2s;';
     
-    if(!$id('cancelEditBtn')) {
-      const cancelBtn = document.createElement('button');
-      cancelBtn.id = 'cancelEditBtn';
-      cancelBtn.className = 'btn';
-      cancelBtn.innerHTML = '✖ ยกเลิก';
-      cancelBtn.style.cssText = 'padding:1rem; font-weight:700; font-size:.75rem; border-radius:var(--r-sm); background:var(--bg-input); border:1.5px solid var(--border); color:var(--text-500); margin-top:0.5rem; width:100%;';
-      cancelBtn.onclick = cancelEdit;
-      btn.parentNode.appendChild(cancelBtn);
-    }
+    cancelBtn.onmouseover = function() { this.style.background = '#fecaca'; };
+    cancelBtn.onmouseout = function() { this.style.background = '#fee2e2'; };
+    
+    cancelBtn.onclick = cancelEdit;
+    btn.parentNode.appendChild(cancelBtn);
+  }
+
+  // ✅ 6. เลื่อนตารางไปหาแถวที่เลือก + Highlight
+  const tableContainer = $id('tableContainer');
+  const rowIndex = records.findIndex(r => r.id === id);
+  
+  if(rowIndex >= 0 && tableContainer) {
+    const rowHeight = 70; // ความสูงแต่ละแถวตามโค้ดเดิม
+    
+    // Scroll ลงไปหาแถวนั้น (ลบออก 50px เพื่อให้แถวไม่ติดขอบบน)
+    tableContainer.scrollTo({ 
+      top: (rowIndex * rowHeight) - 50, 
+      behavior: 'smooth' 
+    });
+
+    // ใช้ setTimeout สักครู่เพื่อรอให้ Table Render เสร็จ (Virtual Scroll)
+    setTimeout(() => {
+      const targetRow = document.querySelector(`tr[data-rid="${id}"]`);
+      if(targetRow) {
+        targetRow.classList.add('is-editing');
+      }
+    }, 300); // รอ 0.3 วินาที
   }
 };
 
-function cancelEdit() {
-  editingId = null;
+// ฟังก์ชันสำหรับคัดลอกข้อมูล (Clone)
+window.copyRecord = function(id) {
+  const r = records.find(x => x.id === id);
+  if (!r) return;
+
+  // ❗ ล้างปุ่ม Cancel อื่นๆ ก่อน
+  if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
+
+  // ✅ 1. รีเซ็ต Filter เป็น ALL
+  setFilter('ALL');
+
+  // 2. เติมข้อมูลลงฟอร์ม
+  if($id('inputDate')) $id('inputDate').value = new Date().toISOString().split('T')[0];
+  if($id('shift')) $id('shift').value = r.shift;
+  if($id('lineNo')) $id('lineNo').value = r.line;
+  
+  if($id('refNo')) {
+    $id('refNo').value = ''; 
+    $id('refNo').focus();
+  }
+
+  if($id('supplier')) $id('supplier').value = r.supplier;
+  if($id('partNo')) $id('partNo').value = r.partNo;
+  if($id('partOn')) $id('partOn').value = r.partName || '';
+  if($id('qty')) $id('qty').value = r.qty;
+  if($id('defectName')) $id('defectName').value = r.defect;
+  if($id('remark')) $id('remark').value = r.remark;
+  
+  if($id('judgmentSelect')) {
+    $id('judgmentSelect').value = r.judgment;
+    handleJudgment(r.judgment);
+  }
+
+  const btn = $id('submitBtn');
+  
+  // ✅ 3. กลับเป็นปุ่ม "Commit Data" ปกติ (สีเขียว)
+  if(btn) {
+    btn.innerHTML = '✦ Commit Data'; // ข้อความตัวเดิม
+    btn.style.background = '';       // สีตัวเดิม (จาก CSS หรือค่าเริ่มต้น)
+  }
+
+  // ✅ 4. ยังคงสร้างปุ่ม "ยกเลิกการคัดลอก" ไว้เพื่อล้างข้อมูลหากไม่ต้องการบันทึก
+  if(!$id('cancelCopyBtn')) {
+    const cancelBtn = document.createElement('button');
+    cancelBtn.id = 'cancelCopyBtn';
+    cancelBtn.className = 'btn';
+    cancelBtn.innerHTML = '✖ ยกเลิกการคัดลอก';
+    cancelBtn.style.cssText = 'padding:1rem; font-weight:700; font-size:.75rem; border-radius:var(--r-sm); background:#fee2e2; border:1.5px solid #ef4444; color:#ef4444; margin-top:0.5rem; width:100%; cursor:pointer; transition:all .2s;';
+    
+    cancelBtn.onmouseover = function() { this.style.background = '#fecaca'; };
+    cancelBtn.onmouseout = function() { this.style.background = '#fee2e2'; };
+    
+    cancelBtn.onclick = cancelCopy;
+    btn.parentNode.appendChild(cancelBtn);
+  }
+
+  toast('📋 คัดลอกข้อมูลแล้ว พร้อมบันทึกใหม่');
+};
+
+function cancelCopy() {
   if($id('claimForm')) $id('claimForm').reset();
   if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
   handleJudgment('');
@@ -6363,8 +6478,30 @@ function cancelEdit() {
     btn.innerHTML = '✦ Commit Data';
     btn.style.background = '';
   }
-  const cancelBtn = $id('cancelEditBtn');
-  if(cancelBtn) cancelBtn.remove();
+  
+  // ✅ แก้ไขตรงนี้: ให้ลบปุ่ม Cancel ทั้งแบบ Edit และ Copy เผื่อไว้
+  if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
+  if($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
+}
+function cancelEdit() {
+  editingId = null;
+  
+  if($id('claimForm')) $id('claimForm').reset();
+  if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
+  handleJudgment('');
+  
+  const btn = $id('submitBtn');
+  if(btn) {
+    btn.innerHTML = '✦ Commit Data';
+    btn.style.background = '';
+  }
+  
+  // ❗ ลบปุ่มยกเลิกทั้งหมด
+  if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
+  if($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
+
+  // ✅ ลบไฮไลท์แถวทิ้ง (สำคัญมาก!)
+  document.querySelectorAll('tr.is-editing').forEach(el => el.classList.remove('is-editing'));
 }
 
 // --- ลบข้อมูล (แถวเดียว) ---
@@ -6588,8 +6725,18 @@ function renderVisibleRows() {
         <span class="status-badge" style="${s.s}"><span style="width:5px;height:5px;border-radius:50%;background:${s.dot};display:inline-block"></span>${r.judgment}</span>
       </td>
       <td style="text-align:right; display:flex; gap:5px; justify-content:flex-end;">
+  
+        
+        <!-- 🟢 ปุ่ม Copy (ใหม่) -->
+        <button onclick="copyRecord('${safeId}')" class="btn" title="คัดลอกข้อมูล" style="background:#10b981;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
         <button onclick="editRecord('${safeId}')" class="btn" style="background:#3b82f6;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
         <button onclick="showSingleDeleteModal('${safeId}')" class="btn" style="background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      
       </td>
     </tr>`;
   });
