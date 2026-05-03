@@ -6952,78 +6952,40 @@ function renderTickerTape(data) {
   tickerEl.innerHTML = `<div class="ticker-content">${html}${html}</div>`;
 }
 
-// ค้นหาฟังก์ชัน getChartData เดิม และแทนที่ด้วยโค้ดนี้
 function getChartData(rawRecords, startVal, endVal) {
-  // หากไม่มีการระบุช่วงวันที่เลย ให้แสดงแบบ รายเดือน (ค่าเริ่มต้น)
-  if (!startVal && !endVal) {
-    const currentYear = new Date().getFullYear();
-    const months =['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const currentYear = new Date().getFullYear();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  
+  // สร้างโครงสร้างข้อมูล 12 เดือน
+  const monthlyData = Array.from({length: 12}, (_, i) => ({
+    monthStr: `${currentYear}-${String(i+1).padStart(2,'0')}`,
+    label: months[i],
+    type: 'monthly', // ระบุว่าเป็นแบบรายเดือน
+    totalQty: 0, 
+    totalLot: 0,
+    SF: { qty: 0, lot: 0 }, 
+    VENDOR: { qty: 0, lot: 0 }, 
+    CTC: { qty: 0, lot: 0 }, 
+    CAN_USE: { qty: 0, lot: 0 }
+  }));
+
+  // วนลูปข้อมูลที่ได้รับมา (rawRecords จะถูก Filter จาก Dashboard อยู่แล้ว)
+  rawRecords.forEach(r => {
+    if (!r.date) return;
+    const mIndex = new Date(r.date).getMonth();
+    const mBox = monthlyData[mIndex];
     
-    const monthlyData = Array.from({length: 12}, (_, i) => ({
-      monthStr: `${currentYear}-${String(i+1).padStart(2,'0')}`, label: months[i],
-      type: 'monthly', // แท็กไว้บอกว่าเป็นรายเดือน
-      totalQty: 0, totalLot: 0,
-      SF: { qty: 0, lot: 0 }, VENDOR: { qty: 0, lot: 0 }, CTC: { qty: 0, lot: 0 }, CAN_USE: { qty: 0, lot: 0 }
-    }));
+    mBox.totalQty += r.qty; 
+    mBox.totalLot += 1;
+    
+    if (r.judgment === 'SF') { mBox.SF.qty += r.qty; mBox.SF.lot += 1; }
+    else if (r.judgment === 'VENDOR FAULT') { mBox.VENDOR.qty += r.qty; mBox.VENDOR.lot += 1; }
+    else if (r.judgment === 'CTC') { mBox.CTC.qty += r.qty; mBox.CTC.lot += 1; }
+    else if (r.judgment === 'CAN USE') { mBox.CAN_USE.qty += r.qty; mBox.CAN_USE.lot += 1; }
+  });
 
-    rawRecords.forEach(r => {
-      if (!r.date) return;
-      const mIndex = new Date(r.date).getMonth();
-      const mBox = monthlyData[mIndex];
-      mBox.totalQty += r.qty; mBox.totalLot += 1;
-      if (r.judgment === 'SF') { mBox.SF.qty += r.qty; mBox.SF.lot += 1; }
-      else if (r.judgment === 'VENDOR FAULT') { mBox.VENDOR.qty += r.qty; mBox.VENDOR.lot += 1; }
-      else if (r.judgment === 'CTC') { mBox.CTC.qty += r.qty; mBox.CTC.lot += 1; }
-      else if (r.judgment === 'CAN USE') { mBox.CAN_USE.qty += r.qty; mBox.CAN_USE.lot += 1; }
-    });
-
-    globalRichChartData = monthlyData;
-    return { labels: monthlyData.map(m => m.label), data: monthlyData.map(m => m.totalQty), isDaily: false };
-  } 
-  // หากมีการระบุวันที่ (ช่องใดช่องหนึ่งหรือสองช่อง) ให้แสดงแบบ รายวัน
-  else {
-    // หาจุดเริ่มต้นและสิ้นสุด (ถ้าไม่ได้ใส่วันใดวันนึง ให้ใช้วันที่มาก/น้อยสุดจากข้อมูลแทน)
-    let start = startVal ? new Date(startVal) : new Date(Math.min(...rawRecords.map(r => new Date(r.date))));
-    let end = endVal ? new Date(endVal) : new Date(Math.max(...rawRecords.map(r => new Date(r.date))));
-
-    // กันเหนียวกรณีข้อมูลว่าง
-    if (isNaN(start.getTime())) start = new Date();
-    if (isNaN(end.getTime())) end = new Date();
-
-    // สลับวันที่ถ้า start มากกว่า end
-    if (start > end) { const temp = start; start = end; end = temp; }
-
-    const dailyData =[];
-    let currentDate = new Date(start);
-
-    // สร้าง Array รายวันตั้งแต่วันเริ่ม ถึง วันสิ้นสุด (รวมวันที่ไม่มีข้อมูลให้เป็น 0)
-    while (currentDate <= end) {
-      const dateStr = currentDate.toISOString().split('T')[0];
-      dailyData.push({
-        dateStr: dateStr, label: dateStr,
-        type: 'daily', // แท็กไว้บอกว่าเป็นรายวัน
-        totalQty: 0, totalLot: 0,
-        SF: { qty: 0, lot: 0 }, VENDOR: { qty: 0, lot: 0 }, CTC: { qty: 0, lot: 0 }, CAN_USE: { qty: 0, lot: 0 }
-      });
-      currentDate.setDate(currentDate.getDate() + 1); // บวกไปทีละ 1 วัน
-    }
-
-    // เอาข้อมูลมายัดใส่ในวันนั้นๆ
-    rawRecords.forEach(r => {
-      if (!r.date) return;
-      const targetDay = dailyData.find(d => d.dateStr === String(r.date).substring(0, 10));
-      if (targetDay) {
-        targetDay.totalQty += r.qty; targetDay.totalLot += 1;
-        if (r.judgment === 'SF') { targetDay.SF.qty += r.qty; targetDay.SF.lot += 1; }
-        else if (r.judgment === 'VENDOR FAULT') { targetDay.VENDOR.qty += r.qty; targetDay.VENDOR.lot += 1; }
-        else if (r.judgment === 'CTC') { targetDay.CTC.qty += r.qty; targetDay.CTC.lot += 1; }
-        else if (r.judgment === 'CAN USE') { targetDay.CAN_USE.qty += r.qty; targetDay.CAN_USE.lot += 1; }
-      }
-    });
-
-    globalRichChartData = dailyData;
-    return { labels: dailyData.map(d => d.label), data: dailyData.map(d => d.totalQty), isDaily: true };
-  }
+  globalRichChartData = monthlyData;
+  return { labels: monthlyData.map(m => m.label), data: monthlyData.map(m => m.totalQty), isDaily: false };
 }
 
 /* ══════════════════════════════════════════════════════════════
