@@ -4833,9 +4833,10 @@ html.dark-mode .is-editing {
           <label class="lo-label">Access Key</label>
           <input type="password" id="loginPass" placeholder="••••••" class="lo-in">
         </div>
-        <button id="loginBtn" onclick="login()" class="lo-btn">
-          Sign In to Dashboard →
-        </button>
+<!-- ✅ เพิ่ม id เพื่อให้ JS เรียกใช้งานได้ง่ายขึ้น -->
+<button id="loginBtn" onclick="handleLoginClick()" class="lo-btn">
+  Sign In to Dashboard →
+</button>
       </div>
 
       <div id="loProgress">
@@ -5108,10 +5109,8 @@ html.dark-mode .is-editing {
   </div>
 </div>
 
-
 <!-- ═══════════════════════════════════════════════════════════
-     DASHBOARD MODAL — STOCK MARKET × CAR COCKPIT HYBRID
-     Premium Financial Dashboard with Automotive Gauges
+     DASHBOARD MODAL — STOCK MARKET × CAR COCKPIT HYBRID (ฉบับสมบูรณ์)
 ═══════════════════════════════════════════════════════════ -->
 <div id="dashboardModal" onclick="closeDashboard()">
 <div class="cockpit-dash" onclick="event.stopPropagation()">
@@ -5180,7 +5179,6 @@ html.dark-mode .is-editing {
           <span class="stat-pct" id="heroPct">100%</span>
         </div>
         <div class="hero-sparkline" id="heroSparkline"></div>
-        
       </div>
       
 <!-- MAIN SPEEDOMETER — PASS RATE (SPORT STYLE) -->
@@ -5246,7 +5244,7 @@ html.dark-mode .is-editing {
       <path d="M 15 100 A 85 85 0 1 1 185 100" fill="none" stroke="#1e293b" stroke-width="14" stroke-linecap="round"/>
       
       <!-- 4. Tick Marks Container -->
-      <g id="gaugeTicks" transform="translate(100, 100)"></g>
+      <g id="gaugeTicks"></g>
       
       <!-- 5. Progress Arc (เส้นสีที่วิ่ง) -->
       <path id="mainGaugeArc" d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#gaugeGradient)" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 267" filter="url(#neonGlow)" style="transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1)"/>
@@ -5613,6 +5611,7 @@ html.dark-mode .is-editing {
   </div>
 </div>
 </div>
+
 <!-- ═══════════════════════════════════════════════════
      SINGLE DELETE CONFIRMATION MODAL (ลบรายการเดียว)
 ═══════════════════════════════════════════════════ -->
@@ -5630,174 +5629,6 @@ html.dark-mode .is-editing {
     </div>
   </div>
 </div>
-
-<!-- ═══════════════════════════════════════════════════
-     DASHBOARD MODAL — STOCK MARKET × CAR COCKPIT HYBRID
-═══════════════════════════════════════════════════ -->
-<div id="dashboardModal" onclick="closeDashboard()">
-  <div class="cockpit-dash" onclick="event.stopPropagation()">
-    
-    <!-- ═════════════════════════════════════════════════════
-         TOP BAR — TRADING TERMINAL STYLE
-    ═════════════════════════════════════════════════════ -->
-    <div class="dash-topbar-cockpit">
-      <div class="topbar-left">
-        <div class="brand-glow">
-          <svg width="28" height="28" viewBox="0 0 50 50" fill="none">
-            <circle stroke="#10b981" stroke-width="3" cx="25" cy="25" r="17" stroke-dasharray="100" stroke-dashoffset="100" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
-            <line stroke="#10b981" stroke-width="3" stroke-linecap="round" x1="35" y1="35" x2="44" y2="44" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
-          </svg>
-        </div>
-        <div class="brand-info">
-          <div class="brand-title">SQE <span style="color:#10b981">ANALYTICS</span></div>
-          <div class="brand-subtitle">
-            <span id="dashUser" style="color:#f59e0b;font-weight:800"></span>
-            <span class="live-dot"></span>
-            <span id="dashTime">--:--:--</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="topbar-ticker" id="tickerTape">
-        <!-- Ticker items will be injected by JS -->
-      </div>
-      
-      <div class="topbar-controls">
-        <div class="control-group">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#64748b"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          <input type="date" id="dashStart" onchange="refreshDash()" class="control-input">
-          <span style="color:#475569">→</span>
-          <input type="date" id="dashEnd" onchange="refreshDash()" class="control-input">
-        </div>
-        <select id="dashVendor" onchange="refreshDash()" class="control-select"></select>
-        <button onclick="resetDashFilters()" class="control-btn" title="Reset">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-        </button>
-        <button onclick="closeDashboard()" class="control-btn close">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- ═════════════════════════════════════════════════════
-         MAIN BODY — COCKPIT LAYOUT
-    ═════════════════════════════════════════════════════ -->
-    <div class="cockpit-body">
-      
-      <!-- ═════════════════════════════════════════════════════
-         LEFT PANEL — HERO KPI + PASS RATE
-      ═════════════════════════════════════════════════════ -->
-      <div class="cockpit-left">
-        <!-- Hero KPI -->
-        <div class="hero-kpi-card">
-          <div class="hero-header"><span class="hero-title">Total PCS</span><span class="hero-icon">📦</span></div>
-          <div class="hero-value" id="heroTotalQty">0</div>
-          <div class="hero-footer">
-            <span class="stat-sub"><span id="heroLot">0</span> Lots</span>
-            <span class="stat-pct" id="heroPct">100%</span>
-          </div>
-          <div class="hero-sparkline" id="heroSparkline"></div>
-        </div>
-
-        <!-- Main Speedometer (Pass Rate) -->
-        <div class="gauge-cluster main-gauge">
-          <div class="gauge-ring" id="mainGaugeRing">
-            <!-- ตัวเลขกลางวง -->
-            <div class="gauge-center">
-              <div class="gauge-value" id="mainGaugeValue" style="font-size: clamp(1.8rem, 5vw, 2.8rem);">0%</div>
-            </div>
-            <!-- SVG Structure -->
-            <svg viewBox="0 0 200 200" class="gauge-svg" style="position: relative; z-index: 10;">
-              <defs>
-                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style="stop-color:#ef4444"/><stop offset="35%" style="stop-color:#f59e0b"/><stop offset="70%" style="stop-color:#84cc16"/><stop offset="100%" style="stop-color:#10b981"/>
-                </linearGradient>
-                <linearGradient id="mainNeedleGradient" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ffffff"/><stop offset="40%" style="stop-color:#e2e8f0"/><stop offset="100%" style="stop-color:#64748b"/></linearGradient>
-                <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
-                <filter id="needleGlow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="3" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
-                <linearGradient id="mainGlassReflect" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.15)"/><stop offset="40%" style="stop-color:rgba(255,255,255,0.05)"/><stop offset="100%" style="stop-color:transparent"/></linearGradient>
-                <linearGradient id="outerRingGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#1e293b"/><stop offset="50%" style="stop-color:#334155"/><stop offset="100%" style="stop-color:#1e293b"/></linearGradient>
-              </defs>
-              <circle cx="100" cy="100" r="95" fill="none" stroke="url(#outerRingGradient)" stroke-width="3"/>
-              <circle cx="100" cy="100" r="88" fill="none" stroke="#0f172a" stroke-width="2" opacity="0.5"/>
-              <path d="M 15 100 A 85 85 0 1 1 185 100" fill="none" stroke="#1e293b" stroke-width="14" stroke-linecap="round"/>
-              <g id="gaugeTicks" transform="translate(100, 100)"></g>
-              <path id="mainGaugeArc" d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#gaugeGradient)" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 267" filter="url(#neonGlow)"/>
-              <g class="gauge-numbers" font-family="Sora" font-size="11" font-weight="700" fill="#64748b">
-                <text x="18" y="120" text-anchor="middle">0</text><text x="32" y="65" text-anchor="middle">20</text><text x="70" y="35" text-anchor="middle">40</text><text x="130" y="35" text-anchor="middle">60</text><text x="168" y="65" text-anchor="middle">80</text><text x="182" y="120" text-anchor="middle">100</text>
-              </g>
-              <g id="gaugeNeedle" style="transform-origin: 100px 100px; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
-                <polygon points="100,18 94,88 100,100 106,88" fill="url(#mainNeedleGradient)" filter="url(#needleGlow)"/>
-                <circle cx="100" cy="100" r="12" fill="#0f172a" stroke="#475569" stroke-width="2"/>
-                <circle cx="100" cy="100" r="5" fill="#10b981" filter="url(#needleGlow)"/>
-              </g>
-              <ellipse cx="100" cy="60" rx="60" ry="30" fill="url(#mainGlassReflect)" opacity="0.5"/>
-              <circle cx="25" cy="85" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="175" cy="85" r="2" fill="rgba(255,255,255,0.1)"/>
-            </svg>
-          </div>
-          <div class="gauge-trend" id="mainGaugeTrend" style="margin-top: 0;">
-            <span class="trend-arrow">▲</span><span class="trend-value">Good</span>
-          </div>
-        </div>
-
-        <!-- Mini Gauges Row (SF, Vendor, CTC) -->
-        <!-- ... (Paste your original Mini Gauges HTML here unchanged) ... -->
-        <div class="gauge-row">
-            <!-- SF, VENDOR, CTC Mini Gauge HTML code goes here exactly as original -->
-        </div>
-      </div>
-      
-      <!-- ═════════════════════════════════════════════════════
-         CENTER PANEL — STATS + CHART + BOTTOM ROW
-      ═════════════════════════════════════════════════════ -->
-      <div class="cockpit-center">
-        <!-- Stats Row -->
-        <div class="stats-row">
-            <!-- Stats HTML code goes here exactly as original -->
-        </div>
-        
-        <!-- Main Chart -->
-        <div class="chart-panel main-chart">
-          <div class="chart-header">
-             <!-- Chart Header HTML code goes here exactly as original -->
-          </div>
-          <div class="chart-body"><canvas id="mainTrendChart"></canvas></div>
-        </div>
-        
-        <!-- Bottom Row (Incident Feed + Top Lines) -->
-        <div class="cockpit-bottom-row">
-            <!-- Incident Feed HTML code goes here exactly as original -->
-            <!-- Top Line HTML code goes here exactly as original -->
-        </div>
-
-      </div>
-
-      <!-- ═════════════════════════════════════════════════════
-         RIGHT PANEL — MARKET LEADERS
-      ═════════════════════════════════════════════════════ -->
-      <div class="cockpit-right">
-        <!-- Top Suppliers -->
-        <div class="market-panel">...</div>
-        <!-- Top Defects -->
-        <div class="market-panel">...</div>
-        <!-- Top Parts -->
-        <div class="market-panel compact">...</div>
-      </div>   
-
-    </div> <!-- End cockpit-body -->
-  </div> <!-- End cockpit-dash -->
-</div> <!-- End dashboardModal -->
-
-<!-- ═══════════════════════════════════════════════════
-     DATALISTS
-═══════════════════════════════════════════════════ -->
-<datalist id="inspectorList"></datalist>
-<datalist id="lineList"></datalist>
-<datalist id="refList"></datalist>
-<datalist id="supList"></datalist>
-<datalist id="ptList"></datalist>
-<datalist id="lotList"></datalist>
-<datalist id="defectList"></datalist>
 
 <style>
 @keyframes modalPop {
@@ -6244,7 +6075,12 @@ function openJobProject() {
 function isDuplicate(ref) {
   const r = String(ref).trim();
   if (!r) return false;
-  return records.some(x => String(x.ref).trim() === r && x.inspector === currentUser);
+  // เพิ่มเงื่อนไขเช็คว่าต้องไม่ใช่ ID เดียวกับที่กำลังแก้ไขอยู่
+  return records.some(x => 
+    String(x.ref).trim() === r && 
+    x.inspector === currentUser && 
+    x.id !== editingId 
+  );
 }
 
 function getMyRecords() {
@@ -6376,7 +6212,9 @@ window.editRecord = function(id) {
   }
 
   // ✅ 5. สร้างปุ่มยกเลิก (Cancel)
-  if(!$id('cancelEditBtn')) {
+    // ✅ FIX: เช็คให้ชัดเจนว่าถ้ายังไม่มีปุ่ม จึงค่อยสร้าง
+  const existingCancelBtn = $id('cancelEditBtn');
+  if(!existingCancelBtn) {
     const cancelBtn = document.createElement('button');
     cancelBtn.id = 'cancelEditBtn';
     cancelBtn.className = 'btn';
@@ -6752,6 +6590,12 @@ function renderVisibleRows() {
 function renderTable() {
   const filtered = getCurrentFilteredData();
   virtualTableState.allRows = filtered;
+  
+  // ✅ FIX: บังคับให้ Scroll กลับมาที่บนสุด (แถวที่ 0) เสมอเมื่อมีการค้นหาหรือกด Filter
+  // ป้องกันปัญหาหน้าจอขาวหรือข้อมูลหาย
+  const tableContainer = $id('tableContainer');
+  if(tableContainer) tableContainer.scrollTop = 0;
+
   virtualTableState.visibleStart = 0;
   virtualTableState.visibleEnd = filtered.length > 50 ? 50 : filtered.length; 
   renderVisibleRows();
@@ -6780,6 +6624,7 @@ function refreshAll() {
   animNum('qtyCTC', ctc); if($id('lotCTC')) $id('lotCTC').textContent = ctcL; if($id('pctCTC')) $id('pctCTC').textContent = pct(ctc, tQ);
   animNum('qtyCanUse', ok); if($id('lotCanUse')) $id('lotCanUse').textContent = okL; if($id('pctCanUse')) $id('pctCanUse').textContent = pct(ok, tQ);
 
+   updateDatalists(); // เพิ่มบรรทัดนี้ลงไปท้ายฟังก์ชัน
   renderTable();
 }
 
@@ -6803,11 +6648,17 @@ function openDashboard() {
   const modal = $id('dashboardModal');
   if (modal) modal.style.display = 'flex';
   
-  // ✅ แก้ไข: อัปเดตชื่อและเวลาแบบครอบคลุมทุกจุด
+  // อัปเดตชื่อและเวลา
   document.querySelectorAll('#dashUser').forEach(el => el.textContent = currentUser);
   document.querySelectorAll('#dashTime').forEach(el => el.textContent = new Date().toLocaleTimeString('en-GB'));
 
-  // พยายามวาดกราฟครั้งแรก (เร็วที่สุดเท่าที่ทำได้)
+  // ✅ เพิ่มเติม: สั่งให้วาดเส้นขีดบอกค่าให้ทุกหน้าปัดทันทีที่เปิด
+  drawGaugeTicks('gaugeTicks', 85, true);      // Main Gauge
+  drawGaugeTicks('sfGaugeTicks', 75);         // SF Gauge
+  drawGaugeTicks('vendorGaugeTicks', 75);    // Vendor Gauge
+  drawGaugeTicks('ctcGaugeTicks', 75);       // CTC Gauge
+
+  // พยายามวาดกราฟครั้งแรก
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
         refreshDash();
@@ -6820,17 +6671,60 @@ function openDashboard() {
     gsap.fromTo('.dash-topbar', { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 });
   }
 
-  setTimeout(() => {
-    forceRefresh();
-  }, 500);
+    // เริ่มการคำนวณข้อมูลใหม่หลังจาก Modal ปรากฏ (ใช้หน่วงเวลาเล็กน้อยเพื่อให้ UI ดูลื่นไหล)
+    setTimeout(() => {
+        refreshDash();
+    }, 400); 
+
+    // แอนิเมชันตอนเปิด (ถ้ามี GSAP)
+    if (typeof gsap !== 'undefined') {
+        gsap.fromTo('.dash-topbar-cockpit', { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 });
+        gsap.fromTo('.cockpit-body', { opacity: 0, scale: 0.98 }, { opacity: 1, scale: 1, duration: 0.5, delay: 0.2 });
+    }
 }
 
 function closeDashboard() {
-  if (typeof gsap !== 'undefined') {
-    gsap.to('#dashboardModal', { opacity: 0, duration: 0.3, onComplete: () => { if($id('dashboardModal')) $id('dashboardModal').style.display = 'none'; } });
-  } else {
-    if($id('dashboardModal')) $id('dashboardModal').style.display = 'none';
-  }
+    // 1. ทำแอนิเมชันปิด (ถ้ามี GSAP) หรือซ่อน Modal ทันที
+    if (typeof gsap !== 'undefined') {
+        gsap.to('#dashboardModal', { 
+            opacity: 0, 
+            duration: 0.3, 
+            onComplete: () => { 
+                if($id('dashboardModal')) $id('dashboardModal').style.display = 'none'; 
+                
+                // --- ส่วนที่เพิ่มใหม่: รีเฟรชฟิลเตอร์ทั้งหมดเมื่อปิดเสร็จ ---
+                finalizeResetOnExit();
+            } 
+        });
+    } else {
+        if($id('dashboardModal')) $id('dashboardModal').style.display = 'none';
+        
+        // --- กรณีไม่มี GSAP ให้รีเฟรชทันที ---
+        finalizeResetOnExit();
+    }
+}
+
+// ฟังก์ชันภายในสำหรับจัดการการรีเซ็ตเมื่อออกจากหน้า Dashboard
+function finalizeResetOnExit() {
+    // 1. ล้างค่าในช่อง Input/Select ของ Dashboard ให้ว่าง
+    if($id('dashStart')) $id('dashStart').value = '';
+    if($id('dashEnd')) $id('dashEnd').value = '';
+    if($id('dashVendor')) $id('dashVendor').value = 'ALL';
+
+    // 2. รีเซ็ต Filter ของตารางหน้าหลัก (Main Table) ให้กลับเป็น 'ALL'
+    // เพื่อให้ผู้ใช้กลับมาเห็นข้อมูลทั้งหมดบนหน้าจอหลัก
+    setFilter('ALL');
+
+    // 3. รีเฟรชตารางหน้าหลักและ KPI หลัก
+    refreshAll();
+
+    // 4. ล้างค่าการค้นหา (Search Box) หน้าหลัก
+    if($id('searchInput')) {
+        $id('searchInput').value = '';
+        renderTable(); // วาดตารางใหม่แบบไม่มีคำค้นหา
+    }
+
+    console.log("[System] Dashboard closed and filters refreshed to default.");
 }
 
 function populateDashFilters() {
@@ -6857,76 +6751,127 @@ function resetDashFilters() {
 }
 
 window.refreshDash = function() {
-  populateDashFilters(); 
+    // 1. ดึงข้อมูลพื้นฐานและค่าจากตัวกรอง (Filters)
+    populateDashFilters(); // อัปเดตรายชื่อ Vendor ใน Dropdown
+    const allMyRecords = getMyRecords();
+    const startVal = $id('dashStart') ? $id('dashStart').value : '';
+    const endVal = $id('dashEnd') ? $id('dashEnd').value : '';
+    const vendorFilter = $id('dashVendor') ? $id('dashVendor').value : 'ALL';
 
-  const allMyRecords = getMyRecords();
-  const startVal = $id('dashStart') ? $id('dashStart').value : '';
-  const endVal = $id('dashEnd') ? $id('dashEnd').value : '';
-  const vendorFilter = $id('dashVendor') ? $id('dashVendor').value : 'ALL';
+    // 2. เริ่มกระบวนการกรองข้อมูล (Data Filtering)
+    let displayData = allMyRecords.filter(r => {
+        let matchDate = true;
+        let matchVendor = true;
+        const rDate = r.date ? String(r.date).substring(0, 10) : ""; 
 
-  let displayData = allMyRecords.filter(r => {
-    let matchDate = true;
-    let matchVendor = true;
-    const rDate = r.date ? String(r.date).substring(0, 10) : ""; 
+        // กรองตามช่วงวันที่
+        if (startVal || endVal) {
+            if (!rDate) matchDate = false; 
+            else {
+                if (startVal && rDate < startVal) matchDate = false;
+                if (endVal && rDate > endVal) matchDate = false;
+            }
+        }
+        // กรองตามชื่อ Vendor
+        if (vendorFilter && vendorFilter !== 'ALL') {
+            matchVendor = (r.supplier === vendorFilter);
+        }
+        return matchDate && matchVendor;
+    });
 
-    if (startVal || endVal) {
-      if (!rDate) matchDate = false; 
-      else {
-        if (startVal && rDate < startVal) matchDate = false;
-        if (endVal && rDate > endVal) matchDate = false;
-      }
+    // 3. เตรียมตัวแปรสำหรับคำนวณ KPI
+    let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
+    let lotSf = 0, lotVen = 0, lotCtc = 0, lotOk = 0;
+
+    // คำนวณผลรวม QTY และจำนวน Lots แบ่งตามประเภท Judgment
+    displayData.forEach(r => {
+        const qty = parseInt(r.qty) || 0;
+        tQ += qty;
+        
+        if (r.judgment === 'SF') { 
+            sf += qty; lotSf++; 
+        } else if (r.judgment === 'VENDOR FAULT') { 
+            ven += qty; lotVen++; 
+        } else if (r.judgment === 'CTC') { 
+            ctc += qty; lotCtc++; 
+        } else if (r.judgment === 'CAN USE') { 
+            ok += qty; lotOk++; 
+        }
+    });
+
+    // 4. คำนวณเปอร์เซ็นต์ (Percentages)
+    const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
+    const calcPct = (val) => tQ > 0 ? Math.round((val / tQ) * 100) : 0;
+
+    // 5. อัปเดตตัวเลข KPI บนหน้าจอ (พร้อมแอนิเมชัน)
+    animNum('heroTotalQty', tQ);
+    if($id('heroLot')) $id('heroLot').textContent = displayData.length.toLocaleString();
+    if($id('heroPct')) $id('heroPct').textContent = passPct + '%';
+
+    // อัปเดต Stat Cards 4 ช่องกลาง
+    animNum('dashStatSF', sf); 
+    if($id('dashLotSF')) $id('dashLotSF').textContent = lotSf;
+    if($id('dashPctSF')) $id('dashPctSF').textContent = calcPct(sf) + '%';
+
+    animNum('dashStatCTC', ctc); 
+    if($id('dashLotCTC')) $id('dashLotCTC').textContent = lotCtc;
+    if($id('dashPctCTC')) $id('dashPctCTC').textContent = calcPct(ctc) + '%';
+
+    animNum('dashStatCanUse', ok); 
+    if($id('dashLotCanUse')) $id('dashLotCanUse').textContent = lotOk;
+    if($id('dashPctCanUse')) $id('dashPctCanUse').textContent = calcPct(ok) + '%';
+
+    animNum('dashStatVendor', ven); 
+    if($id('dashLotVendor')) $id('dashLotVendor').textContent = lotVen;
+    if($id('dashPctVendor')) $id('dashPctVendor').textContent = calcPct(ven) + '%';
+
+    // 6. อัปเดตหน้าปัด (Gauges Update)
+    // หน้าปัดใหญ่ Pass Rate
+    updateMainGauge(passPct);
+    
+    // หน้าปัดเล็ก 3 อัน (SF, Vendor, CTC)
+    updateMiniGauge('sf', sf, tQ);
+    updateMiniGauge('vendor', ven, tQ);
+    updateMiniGauge('ctc', ctc, tQ);
+
+    // 7. อัปเดตรายการจัดอันดับ (Top Lists)
+    renderList('supplierList', displayData, 'supplier');   // อันดับ Supplier
+    renderList('dashDefectList', displayData, 'defect');   // อันดับ Defect
+    renderList('partList', displayData, 'partNo');         // อันดับ Part Number
+
+    // 8. อัปเดต Incident Feed & อื่นๆ
+    renderIncidentFeed(displayData);  // รายการเหตุการณ์ล่าสุด
+    renderTopLines(displayData);      // อันดับสายการผลิต (Line)
+    renderTickerTape(displayData);    // แถบวิ่งด้านบน
+
+    // 9. อัปเดตส่วนของกราฟ (Chart Update)
+    // ดึงข้อมูลที่จัดกลุ่มตามวันที่/เดือนมาใช้
+    const chartDataObj = getChartData(displayData, startVal, endVal);
+    
+    // ถ้ายังไม่มี Instance ของกราฟให้สร้างใหม่ ถ้ามีแล้วให้อัปเดตข้อมูล
+    if (!mainTrendChartInstance) {
+        initMainChart(); // ฟังก์ชันสร้างกราฟครั้งแรก
+    } else {
+        // อัปเดต Labels และ Data ของกราฟ
+        mainTrendChartInstance.data.labels = chartDataObj.labels;
+        mainTrendChartInstance.data.datasets[0].data = chartDataObj.data;
+        
+        // ปรับแต่งการแสดงผลแกน X ให้เหมาะกับจำนวนข้อมูล (Daily vs Monthly)
+        mainTrendChartInstance.options.scales.x.ticks.maxTicksLimit = chartDataObj.isDaily ? 10 : 12;
+        
+        mainTrendChartInstance.update('active'); // อัปเดตพร้อมแอนิเมชัน
     }
-    if (vendorFilter && vendorFilter !== 'ALL') matchVendor = (r.supplier === vendorFilter);
-    return matchDate && matchVendor;
-  });
+    
+    // อัปเดตสถิติข้างกราฟ (High, Low, Avg)
+    updateChartStats(chartDataObj.data); 
 
-  // ... (ส่วนคำนวณ KPI และอัปเดต UI ต่างๆ เหมือนเดิม) ...
-  
-  // คัดตอนคำนวณและอัปเดต KPI
-  let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
-  let lotSf = 0, lotVen = 0, lotCtc = 0, lotOk = 0;
-
-  displayData.forEach(r => {
-    tQ += r.qty;
-    if (r.judgment === 'SF') { sf += r.qty; lotSf++; }
-    else if (r.judgment === 'VENDOR FAULT') { ven += r.qty; lotVen++; }
-    else if (r.judgment === 'CTC') { ctc += r.qty; lotCtc++; }
-    else if (r.judgment === 'CAN USE') { ok += r.qty; lotOk++; }
-  });
-
-  // ... (โค้ดอัปเดต DOM ต่างๆ เหมือนเดิม) ...
-  
-  // ตัวอย่างส่วนอัปเดตหน้าปัด
-  animNum('heroTotalQty', tQ);
-  if($id('heroLot')) $id('heroLot').textContent = displayData.length.toLocaleString();
-  const passPct = tQ > 0 ? Math.round(((ok) / tQ) * 100) : 0; 
-  if($id('heroPct')) $id('heroPct').textContent = passPct + '%';
-  
-  updateMainGauge(passPct);
-  updateMiniGauge('sf', sf, tQ);
-  updateMiniGauge('vendor', ven, tQ);
-  updateMiniGauge('ctc', ctc, tQ);
-
-  // ... (ส่วนอัปเดตกราฟ) ...
-  
-  const chartDataObj = getChartData(displayData);
-  
-  if (!mainTrendChartInstance) {
-    initMainChart();
-  } else {
-    mainTrendChartInstance.data.labels = chartDataObj.labels;
-    mainTrendChartInstance.data.datasets[0].data = chartDataObj.data;
-    mainTrendChartInstance.update();
-  }
-  
-  updateChartStats(chartDataObj.data); 
-
-  // ✅ FIX 2: บังคับให้ Chart ปรับขนาดใหม่ (Safety Net)
-  // แม้จะใช้ requestAnimationFrame แล้ว การเรียก .resize() ช่วยให้มั่นใจว่ากราฟจะเต็มพื้นที่เสมอ
-  if (mainTrendChartInstance) {
-     mainTrendChartInstance.resize();
-  }
-}
+    // บังคับให้กราฟคำนวณขนาดพื้นที่ใหม่ (ป้องกันกราฟแบน)
+    if (mainTrendChartInstance) {
+        setTimeout(() => mainTrendChartInstance.resize(), 100);
+    }
+    
+    console.log(`[Dashboard] Refreshed: ${displayData.length} records found.`);
+};
 
 // --- Gauges ---
 function updateMainGauge(pct) {
@@ -7084,12 +7029,11 @@ function getChartData(rawRecords, startVal, endVal) {
 /* ══════════════════════════════════════════════════════════════
    DASHBOARD & CHART LOGIC
 ═════════════════════════════════════════════════════════════════ */
-
 function initMainChart() {
   const ctx = $id('mainTrendChart');
   if (!ctx) return;
 
-  // ✅ FIX: ถ้ากราฟเดิมมีอยู่ ให้ทำลายทิ้งก่อน (ป้องกัน Canvas Glitch)
+  // ถ้ากราฟเดิมมีอยู่ ให้ทำลายทิ้งก่อน
   if (mainTrendChartInstance) {
     mainTrendChartInstance.destroy();
     mainTrendChartInstance = null;
@@ -7118,8 +7062,8 @@ function initMainChart() {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false, // ✅ สำคัญมาก ต้องเป็น false เพื่อให้ยืดตาม Container
-      animation: { duration: 800, easing: 'easeOutQuart' }, // ลด animation duration นิดหน่อยเพื่อความรวดเร็ว
+      maintainAspectRatio: false,
+      animation: { duration: 800, easing: 'easeOutQuart' },
       interaction: { mode: 'index', intersect: false },
       layout: { padding: { top: 10, right: 20, left: 10, bottom: 0 } },
       plugins: {
@@ -7132,7 +7076,6 @@ function initMainChart() {
           borderWidth: 1, padding: 12, boxPadding: 6, usePointStyle: true,
           callbacks: {
             title: (context) => {
-              // เช็คว่าข้อมูลชุดแรกถูกแท็กเป็นแบบรายวันหรือไม่
               const isDaily = globalRichChartData[0] && globalRichChartData[0].type === 'daily';
               return isDaily ? '📅 Date: ' + context[0].label : '📊 Month: ' + context[0].label;
             },
@@ -7153,14 +7096,23 @@ function initMainChart() {
         }
       },
       scales: {
-        x: { border: { display: false }, grid: { display: false }, ticks: { color: tickColor, font: { family: 'Sora', size: 10, weight: '600' } } },
+        // ✅ แก้ไขตรงนี้: ให้แสดง Ticks แต่จำกัดจำนวนไม่ให้เยอะ
+        x: { 
+          border: { display: false }, 
+          grid: { display: false }, 
+          ticks: { 
+            color: tickColor, 
+            font: { family: 'Sora', size: 10, weight: '600' },
+            maxTicksLimit: 12,
+            autoSkip: true,
+            maxRotation: 0
+          } 
+        },
         y: { border: { display: false }, grid: { display: false }, ticks: { display: false } }
       }
     }
   });
 
-  // ✅ FIX: บังคับให้ Resize ทันทีหลังจากสร้าง Chart เสร็จ
-  // เพื่อให้มั่นใจว่า Canvas วาดตัวเองให้เต็มพื้นที่ทันที
   if (mainTrendChartInstance) {
     mainTrendChartInstance.resize();
   }
@@ -7191,7 +7143,7 @@ window.refreshDash = function() {
     return matchDate && matchVendor;
   });
 
-  // Calculate KPIs (โค้ดเดิม) ...
+  // คัดตอนคำนวณและอัปเดต KPI
   let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
   let lotSf = 0, lotVen = 0, lotCtc = 0, lotOk = 0;
   displayData.forEach(r => {
@@ -7230,21 +7182,15 @@ window.refreshDash = function() {
   renderTopLines(displayData);   
   renderTickerTape(displayData); 
 
-  // ============================================
-  // แก้ไขตรงนี้: ส่งค่า startVal และ endVal ไปให้กราฟ
-  // ============================================
+  // รับข้อมูลกราฟ
   const chartDataObj = getChartData(displayData, startVal, endVal);
   
   if (!mainTrendChartInstance) {
     initMainChart();
-    // ถ้าตอนโหลดครั้งแรกเป็นโหมดรายวัน ให้ปิดแกน X
-    if(mainTrendChartInstance) {
-      mainTrendChartInstance.options.scales.x.ticks.display = !chartDataObj.isDaily;
-      mainTrendChartInstance.update();
-    }
   } else {
-    // ปิดการแสดงผลตัวหนังสือแกน X ถ้ารูปแบบเป็นรายวัน (isDaily = true)
-    mainTrendChartInstance.options.scales.x.ticks.display = !chartDataObj.isDaily;
+    // ✅ แก้ไขตรงนี้: อัปเดตการตั้งค่า X-Axis ให้แสดงวันที่ได้ถูกต้อง
+    mainTrendChartInstance.options.scales.x.ticks.maxTicksLimit = chartDataObj.isDaily ? 12 : 12;
+    mainTrendChartInstance.options.scales.x.ticks.autoSkip = true;
     
     mainTrendChartInstance.data.labels = chartDataObj.labels;
     mainTrendChartInstance.data.datasets[0].data = chartDataObj.data;
@@ -7258,16 +7204,49 @@ window.refreshDash = function() {
   }
 }
 
+function updateDatalists() {
+  const myR = getMyRecords();
+  const fields = {
+    'inspectorList': 'inspector',
+    'lineList': 'line',
+    'refList': 'ref',
+    'supList': 'supplier',
+    'ptList': 'partNo',
+    'lotList': 'partName',
+    'defectList': 'defect'
+  };
+
+  for (const [id, key] of Object.entries(fields)) {
+    const list = document.getElementById(id);
+    if (!list) continue;
+    // ดึงค่าที่ไม่ซ้ำกัน (Unique Values)
+    const uniqueValues = [...new Set(myR.map(r => r[key]).filter(Boolean))];
+    list.innerHTML = uniqueValues.map(v => `<option value="${escapeHtml(v)}">`).join('');
+  }
+}
+
 function updateChartStats(dataArray) {
+  // ✅ FIX: ตรวจสอบว่ามีข้อมูลไหม ก่อนคำนวณ Min/Max/Avg ป้องกัน NaN
   if (!dataArray || dataArray.length === 0) {
     if($id('statHigh')) $id('statHigh').textContent = '0';
     if($id('statLow')) $id('statLow').textContent = '0';
     if($id('statAvg')) $id('statAvg').textContent = '0';
     return;
   }
-  animNum('statHigh', Math.max(...dataArray));
-  animNum('statLow', Math.min(...dataArray));
-  animNum('statAvg', Math.round(dataArray.reduce((a, b) => a + b, 0) / dataArray.length));
+  
+  // กรองค่าที่เป็นตัวเลขจริงๆ ก่อนคำนวณ (ป้องกันค่าว่าง/Null)
+  const cleanData = dataArray.filter(n => typeof n === 'number' && !isNaN(n));
+  
+  if (cleanData.length === 0) {
+    if($id('statHigh')) $id('statHigh').textContent = '0';
+    if($id('statLow')) $id('statLow').textContent = '0';
+    if($id('statAvg')) $id('statAvg').textContent = '0';
+    return;
+  }
+
+  animNum('statHigh', Math.max(...cleanData));
+  animNum('statLow', Math.min(...cleanData));
+  animNum('statAvg', Math.round(cleanData.reduce((a, b) => a + b, 0) / cleanData.length));
 }
 
 
@@ -7673,19 +7652,70 @@ window.exportToExcel = function() {
     toast('❌ เกิดข้อผิดพลาดในการดาวน์โหลด Excel');
   }
 };
+
+/* ════════════════════════════════════════════════════════════
+   HELPER: วาดเส้นขีดบอกค่ารอบหน้าปัด (Tick Marks)
+═════════════════════════════════════════════════════════════════ */
+function drawGaugeTicks(elementId, radius, isMain = false) {
+  const container = document.getElementById(elementId);
+  if (!container) return;
+
+  // ล้างเส้นเก่าออกก่อน (กรณี redraw)
+  container.innerHTML = '';
+
+  const cx = 100; // จุดศูนย์กลาง X
+  const cy = 100; // จุดศูนย์กลาง Y
+  const totalTicks = 20; // จำนวนเส้นขีดทั้งหมด (0, 5, 10, 15... 100)
+  const startAngle = Math.PI; // เริ่มที่ 180 องศา (ซ้ายสุด)
+  const endAngle = 2 * Math.PI; // จบที่ 360 องศา (ขวาสุด)
+
+  for (let i = 0; i <= totalTicks; i++) {
+    const angle = startAngle + (endAngle - startAngle) * (i / totalTicks);
+    const isMajor = i % 2 === 0; // เส้นหลัก (0, 10, 20...) และเส้นรอง (5, 15...)
+    
+    const innerR = isMajor ? radius - 10 : radius - 5;
+    const outerR = radius;
+
+    const x1 = cx + innerR * Math.cos(angle);
+    const y1 = cy + innerR * Math.sin(angle);
+    const x2 = cx + outerR * Math.cos(angle);
+    const y2 = cy + outerR * Math.sin(angle);
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    
+    // ตั้งค่าสีและความหนาของเส้น
+    line.setAttribute("stroke", isMajor ? "#64748b" : "#334155");
+    line.setAttribute("stroke-width", isMajor ? "2.5" : "1");
+    line.setAttribute("stroke-linecap", "round");
+
+    container.appendChild(line);
+  }
+}
+
 // ฟังก์ชันสำหรับเปิดโหมดเต็มจอ
 function enterFullscreen() {
   const doc = document.documentElement;
+  // ✅ FIX: ตรวจสอบก่อนว่ายังไม่ได้อยู่ในโหมดเต็มจอ จึงค่อยสั่งเปิด
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    return; 
+  }
+
   try {
     if (doc.requestFullscreen) {
-      doc.requestFullscreen();
-    } else if (doc.webkitRequestFullscreen) { /* สำหรับ Safari */
+      doc.requestFullscreen().catch(err => {
+        console.log("Fullscreen prevented:", err);
+      });
+    } else if (doc.webkitRequestFullscreen) { /* Safari */
       doc.webkitRequestFullscreen();
-    } else if (doc.msRequestFullscreen) { /* สำหรับ IE11 */
+    } else if (doc.msRequestFullscreen) { /* IE11 */
       doc.msRequestFullscreen();
     }
   } catch (err) {
-    console.warn("Fullscreen API ถูกบล็อก:", err);
+    console.warn("Fullscreen API error:", err);
   }
 }
 
@@ -7700,6 +7730,46 @@ function toggleFullscreen() {
       document.webkitExitFullscreen();
     }
   }
+}
+// ฟังก์ชันลูกเพื่อป้องกันการกดซ้ำ
+function handleLoginClick() {
+  const btn = $id('loginBtn');
+  // ถ้าปุ่มถูก Disabled ไว้แล้ว ให้หยุดการทำงานทันที
+  if(btn && btn.disabled) return;
+  
+  // เรียกฟังก์ชัน login จริง
+  login();
+}
+function resetDashboardState() {
+    // 1. รีเซตตัวเลือก Filter (Input/Select)
+    if($id('dashStart')) $id('dashStart').value = '';
+    if($id('dashEnd')) $id('dashEnd').value = '';
+    if($id('dashVendor')) $id('dashVendor').value = 'ALL';
+
+    // 2. รีเซตตัวเลข KPI ให้เป็น 0 ทันที (ไม่ต้องรอแอนิเมชัน)
+    const kpiIds = ['heroTotalQty', 'heroLot', 'dashStatSF', 'dashStatCTC', 'dashStatCanUse', 'dashStatVendor'];
+    kpiIds.forEach(id => {
+        const el = $id(id);
+        if(el) el.textContent = '0';
+    });
+
+    // 3. รีเซตหน้าปัด (Gauges) ให้กลับไปจุดเริ่มต้น
+    updateMainGauge(0);
+    updateMiniGauge('sf', 0, 100);
+    updateMiniGauge('vendor', 0, 100);
+    updateMiniGauge('ctc', 0, 100);
+
+    // 4. ล้างรายการใน List ต่างๆ ให้ว่างเปล่า
+    const listIds = ['supplierList', 'dashDefectList', 'partList', 'incidentList', 'topLineList', 'tickerTape'];
+    listIds.forEach(id => {
+        if($id(id)) $id(id).innerHTML = '';
+    });
+
+    // 5. ทำลายกราฟเก่าทิ้ง (เพื่อป้องกัน Error: Canvas is already in use)
+    if (mainTrendChartInstance) {
+        mainTrendChartInstance.destroy();
+        mainTrendChartInstance = null;
+    }
 }
 </script>
 </body>
