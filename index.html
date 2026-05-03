@@ -6049,6 +6049,10 @@ async function initApp(inspector) {
   try {
     await initDB();
     records = await dbGetAll();
+    
+    // ✅ เพิ่มบรรทัดนี้: เก็บไว้เฉพาะข้อมูลของ User ที่ Login อยู่เท่านั้น (ล้างข้อมูลคนอื่นทิ้ง)
+    records = records.filter(r => r.inspector === currentUser);
+
     refreshAll(); 
 
     showInitOverlay('กำลังเชื่อมต่อ Database...', 'Syncing...');
@@ -7434,7 +7438,9 @@ async function importExcel(input) {
 
         const newRecord = {
           id: generateUUID(), date: parseExcelDate(getVal('date')) || defaultDate,
-          shift: getVal('shift') || defaultShift, inspector: getVal('inspector') || currentUser,
+          shift: getVal('shift') || defaultShift, 
+          // ✅ แก้ตรงนี้: บังคับให้เป็นของ User ที่ Login อยู่เท่านั้น ไม่สนใจคอลัมน์ใน Excel
+          inspector: currentUser, 
           ref: ref, line: getVal('line') || defaultLine, supplier: getVal('supplier') || 'Unknown Supplier',
           partNo: getVal('partNo') || '-', partName: getVal('partName') || '', qty: qtyVal,
           defect: getVal('defect') || '-', remark: getVal('remark') || '', judgment: finalJudgment, _isOffline: true 
