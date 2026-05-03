@@ -3726,6 +3726,32 @@ canvas {
 .btn-success {
   animation: btnSuccess 0.7s ease-out;
 }
+/* ✅ FIX: ปรับขนาด Mini Gauges บนมือถือแนวนอน */
+@media (max-width: 768px) and (orientation: landscape) {
+  .gauge-row {
+    grid-template-columns: repeat(3, 1fr); /* ยังคง 3 คอลัมน์ แต่ย่อตัว */
+    gap: 0.5rem;
+  }
+
+  .mini-gauge {
+    padding: 0.4rem 0.2rem !important;
+    min-height: 120px !important;
+  }
+
+  .mini-gauge-value {
+    font-size: 1.1rem !important;
+  }
+
+  .mini-gauge-label {
+    font-size: 0.5rem !important;
+    letter-spacing: 0.05em;
+  }
+  
+  /* ซ่อน Sparkline ถ้าพื้นที่แคบเกินไป */
+  .mini-gauge-sparkline {
+    display: none;
+  }
+}
 /* ─────────────────────────────────────────────────────
    PROBLEM 1: .row-deleting uses animation "rowDeletePulse"
    but @keyframes rowDeletePulse was missing
@@ -3810,22 +3836,7 @@ canvas {
     box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); 
   }
 }
-  /* ═══ ADD THESE AT THE END ═══ */
-  @keyframes rowDeletePulse {
-    0%, 100% { opacity: 0.5; transform: translateX(0); }
-    50% { opacity: 0.3; transform: translateX(-5px); }
-  }
-  
-  @keyframes btnSuccess {
-    0% { transform: scale(1); }
-    30% { transform: scale(1.05); box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
-    100% { transform: scale(1); }
-  }
-  <!-- ═══════════════════════════════════════════════════
-     ADDITIONAL CSS CLASSES (ที่ควรอยู่ใน <style> ใน <head>)
-═══════════════════════════════════════════════════ -->
-<!--
-เพิ่ม CSS เหล่านี้ใน <style> block ใน <head>:
+
 
 /* Datalists hidden */
 datalist { display: none; }
@@ -4658,6 +4669,555 @@ html.dark-mode ::-webkit-scrollbar-thumb:hover { background: #475569; }
 html.dark-mode .is-editing {
   background-color: rgba(37, 99, 235, 0.15) !important;
   border-left-color: var(--blue-400) !important;
+}
+/* ═══════════════════════════════════════════════════
+   21. UTILITY ANIMATIONS & FIXES (Corrected)
+═══════════════════════════════════════════════════ */
+
+/* ✅ แก้ไข: Keyframes ที่ขาดหายไป */
+@keyframes rowDeletePulse {
+  0%, 100% { opacity: 0.5; transform: translateX(0); }
+  50% { opacity: 0.3; transform: translateX(-5px); }
+}
+
+@keyframes btnSuccess {
+  0% { transform: scale(1); box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); }
+  30% { transform: scale(1.05); box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+  100% { transform: scale(1); box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); }
+}
+
+/* ✅ เพิ่มเติม: Animations เสริม */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
+}
+
+/* ✅ Utility Classes */
+datalist { display: none; }
+
+/* Mascot animations */
+.mascot-float { animation: mascotFloat 3s ease-in-out infinite; }
+.mascot-sway { animation: mascotSway 2s ease-in-out infinite; transform-origin: bottom center; }
+
+@keyframes mascotFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes mascotSway { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+
+/* qDraw animation for SVG */
+.q-draw-anim { animation: qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1); }
+@keyframes qDraw { to { stroke-dashoffset: 0; } }
+
+/* Gauge needle transition */
+.gauge-needle { transform-origin: center center; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.mini-gauge-needle { transform-origin: 100px 100px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* Delete modal styles */
+.del-title {
+  font-family: var(--font-head);
+  font-weight: 800;
+  color: var(--text-900);
+  font-size: 1.05rem;
+  margin-bottom: .35rem;
+}
+
+.del-desc {
+  color: var(--text-400);
+  font-size: .75rem;
+  font-weight: 500;
+  margin-bottom: 1.4rem;
+  line-height: 1.5;
+}
+
+.del-btns {
+  display: flex;
+  gap: .65rem;
+}
+
+.del-btn-cancel {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border);
+  color: var(--text-500);
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: .7rem;
+  padding: .8rem;
+  border-radius: var(--r-sm);
+  letter-spacing: .03em;
+}
+
+.del-btn-confirm {
+  flex: 1;
+  background: linear-gradient(135deg,#dc2626,#ef4444);
+  color: #fff;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: .7rem;
+  padding: .8rem;
+  border-radius: var(--r-sm);
+  letter-spacing: .03em;
+  box-shadow: 0 4px 14px rgba(239,68,68,.35);
+}
+
+.del-note {
+  margin-top: .75rem;
+  font-size: .6rem;
+  color: var(--text-300);
+  font-family: var(--font-mono);
+}
+
+/* Progress bar container */
+.del-prog-bar-container {
+  margin-top: 1rem;
+  height: 4px;
+  background: var(--blue-100);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.del-prog-bar {
+  height: 100%;
+  background: linear-gradient(90deg,var(--blue-600),var(--blue-400));
+  border-radius: 99px;
+  transition: width .5s cubic-bezier(.22,.68,0,1.2);
+  width: 0%;
+}
+
+.del-prog-icon {
+  font-size: 2.5rem;
+  margin-bottom: .75rem;
+}
+
+.del-prog-title {
+  color: var(--text-900);
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: .95rem;
+  margin-bottom: .3rem;
+}
+
+.del-prog-sub {
+  color: var(--text-400);
+  font-weight: 500;
+  font-size: .7rem;
+}
+
+/* Login form styles */
+.lo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lo-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.lo-progress {
+  display: none;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 1.1rem;
+}
+
+.lo-version {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  color: var(--text-300);
+  text-align: center;
+  margin-top: .3rem;
+}
+
+.lo-brand-title {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--text-900);
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+
+.lo-brand-title span {
+  color: var(--blue-600);
+}
+
+.lo-brand-subtitle {
+  font-size: .6rem;
+  color: var(--text-400);
+  font-weight: 600;
+  letter-spacing: .04em;
+  font-family: var(--font-head);
+}
+
+.lo-footer {
+  margin-top: 1.4rem;
+  font-size: .6rem;
+  color: var(--text-200);
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+/* App header */
+.app-header {
+  display: grid;
+  grid-template-columns: 2.8fr 9.2fr;
+  gap: .9rem;
+  flex-shrink: 0;
+}
+
+/* Brand card */
+.brand-card {
+  position: relative;
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.3);
+}
+
+.brand-info {
+  z-index: 1;
+  position: relative;
+}
+
+.brand-title {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -.02em;
+}
+
+.brand-title span {
+  opacity: .85;
+}
+
+.brand-clock {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  color: rgba(255,255,255,.6);
+  margin-top: .15rem;
+}
+
+.sync-pulse {
+  margin-top: .4rem;
+}
+
+/* Brand buttons */
+.brand-btn {
+  position: absolute;
+  top: .75rem;
+  z-index: 2;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  color: rgba(255,255,255,.8);
+  border-radius: 8px;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: all .2s;
+  font-size: .7rem;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-head);
+  font-weight: 600;
+}
+
+.brand-btn:hover {
+  background: rgba(255,255,255,.25);
+}
+
+.theme-btn {
+  right: .75rem;
+}
+
+.logout-btn {
+  right: 45px;
+}
+
+/* KPI grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: .75rem;
+}
+
+.kpi-total { --kpi-grad: linear-gradient(90deg,#475569,#94a3b8); --kpi-pale: rgba(71,85,105,.04); }
+.kpi-sf { --kpi-grad: linear-gradient(90deg,#ea580c,#f97316); --kpi-pale: rgba(249,115,22,.05); }
+.kpi-vendor { --kpi-grad: linear-gradient(90deg,#dc2626,#ef4444); --kpi-pale: rgba(239,68,68,.05); }
+.kpi-ctc { --kpi-grad: linear-gradient(90deg,var(--blue-700),var(--blue-500)); --kpi-pale: rgba(59,130,246,.05); }
+.kpi-canuse { --kpi-grad: linear-gradient(90deg,#059669,#10b981); --kpi-pale: rgba(16,185,129,.05); }
+
+.kpi-sf .kpi-value, .kpi-sf .kpi-lot-num, .kpi-sf .kpi-pct { color: var(--accent-or); }
+.kpi-vendor .kpi-value, .kpi-vendor .kpi-lot-num, .kpi-vendor .kpi-pct { color: var(--accent-red); }
+.kpi-ctc .kpi-value, .kpi-ctc .kpi-lot-num, .kpi-ctc .kpi-pct { color: var(--blue-600); }
+.kpi-canuse .kpi-value, .kpi-canuse .kpi-lot-num, .kpi-canuse .kpi-pct { color: var(--accent-grn); }
+
+/* App body */
+.app-body {
+  display: flex;
+  gap: .9rem;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 310px;
+  flex-shrink: 0;
+  padding: 1.2rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: .85rem;
+  border-bottom: 1.5px solid var(--blue-100);
+}
+
+.sidebar-title {
+  font-family: var(--font-head);
+  font-size: .7rem;
+  font-weight: 800;
+  color: var(--text-900);
+}
+
+.sidebar-subtitle {
+  font-size: .6rem;
+  color: var(--text-400);
+  margin-top: 1px;
+}
+
+.user-badge {
+  background: var(--blue-600);
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: .6rem;
+  font-weight: 700;
+  font-family: var(--font-head);
+}
+
+/* Claim form */
+.claim-form {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-right: .1rem;
+}
+
+.form-section {
+  background: var(--bg-input);
+  border-radius: var(--r-sm);
+  padding: .75rem;
+  border: 1px solid var(--border);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .45rem;
+  margin-top: .5rem;
+}
+
+.form-date {
+  padding: .65rem .85rem;
+  font-size: .75rem;
+  font-weight: 600;
+  margin-bottom: .5rem;
+}
+
+.form-textarea {
+  resize: none;
+  margin-top: .5rem;
+}
+
+.form-judgment {
+  padding: .75rem .85rem;
+  font-size: .75rem;
+  font-weight: 700;
+  border-width: 2px;
+}
+
+.submit-btn {
+  padding: 1rem;
+  font-weight: 700;
+  font-size: .75rem;
+  letter-spacing: .04em;
+  border-radius: var(--r-sm);
+}
+
+/* Main panel */
+.main-panel {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Toolbar */
+.toolbar-filters {
+  display: flex;
+  gap: .4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.toolbar-btns {
+  display: flex;
+  gap: .45rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: .65rem;
+  pointer-events: none;
+  color: var(--text-300);
+}
+
+.toolbar-btn {
+  padding: .45rem 1rem;
+  border-radius: 99px;
+  font-family: var(--font-head);
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+
+.sync-btn {
+  background: var(--accent-grn);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  box-shadow: 0 3px 10px rgba(16,185,129,.3);
+}
+
+.dash-btn {
+  background: linear-gradient(135deg,var(--blue-700),var(--blue-500));
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(37,99,235,.3);
+}
+
+.job-btn {
+  background: linear-gradient(135deg,#7c3aed,#8b5cf6);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(124,58,237,.25);
+}
+
+.import-btn, .export-btn {
+  background: #f8faff;
+  border: 1.5px solid var(--border);
+  color: var(--text-600);
+}
+
+.import-btn {
+  color: var(--blue-700);
+}
+
+.clear-btn {
+  background: rgba(239,68,68,.07);
+  border: 1.5px solid rgba(239,68,68,.2);
+  color: var(--accent-red);
+  padding: .45rem .6rem;
+}
+
+/* Table wrapper */
+.table-wrapper {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Empty state */
+.empty-state {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  gap: 1rem;
+}
+
+.empty-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  color: var(--text-500);
+  font-size: .9rem;
+}
+
+.empty-subtitle {
+  font-size: .75rem;
+  color: var(--text-300);
+}
+
+/* Dashboard modal */
+.dashboard-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: stretch;
+  justify-content: stretch;
+  background: rgba(15,23,42,.4);
+  backdrop-filter: blur(12px);
+  z-index: 5000;
+}
+
+/* Dashboard accent */
+.brand-accent {
+  color: #10b981;
+}
+
+.dash-user {
+  color: #f59e0b;
+  font-weight: 800;
+}
+
+.control-sep {
+  color: #475569;
 }
 </style>
 </head>
@@ -5975,8 +6535,10 @@ async function login() {
     passInput.style.borderColor = 'var(--accent-red)';
     shake(passInput); toast('⛔ รหัสผ่านไม่ถูกต้อง'); return;
   }
- // 🟢 เพิ่มคำสั่งเปิดเต็มจอตรงนี้! ทันทีที่รหัสผ่านถูกต้องและผู้ใช้คลิก
+
+  // ✅ ✅ FIX: เปิดโหมดเต็มจอทันทีที่รหัสผ่านถูกต้อง ✅ ✅
   enterFullscreen();
+
   // 2. ซ่อนฟอร์ม และแสดงแผง Progress Bar
   $id('loginBtn').disabled = true;
   $id('loginForm').style.display = 'none';
@@ -6211,22 +6773,12 @@ window.editRecord = function(id) {
     btn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
   }
 
-  // ✅ 5. สร้างปุ่มยกเลิก (Cancel)
-    // ✅ FIX: เช็คให้ชัดเจนว่าถ้ายังไม่มีปุ่ม จึงค่อยสร้าง
-  const existingCancelBtn = $id('cancelEditBtn');
-  if(!existingCancelBtn) {
-    const cancelBtn = document.createElement('button');
-    cancelBtn.id = 'cancelEditBtn';
-    cancelBtn.className = 'btn';
-    cancelBtn.innerHTML = '✖ ยกเลิกแก้ไข';
-    cancelBtn.style.cssText = 'padding:1rem; font-weight:700; font-size:.75rem; border-radius:var(--r-sm); background:#fee2e2; border:1.5px solid #ef4444; color:#ef4444; margin-top:0.5rem; width:100%; cursor:pointer; transition:all .2s;';
-    
-    cancelBtn.onmouseover = function() { this.style.background = '#fecaca'; };
-    cancelBtn.onmouseout = function() { this.style.background = '#fee2e2'; };
-    
-    cancelBtn.onclick = cancelEdit;
-    btn.parentNode.appendChild(cancelBtn);
-  }
+ // ✅ ใช้โค้ดใหม่
+if(!$id('cancelEditBtn')) {
+  const cancelBtn = spawnCancelButton('ยกเลิกแก้ไข', cancelEdit);
+  cancelBtn.id = 'cancelEditBtn';
+  btn.parentNode.appendChild(cancelBtn);
+}
 
   // ✅ 6. เลื่อนตารางไปหาแถวที่เลือก + Highlight
   const tableContainer = $id('tableContainer');
@@ -6293,19 +6845,11 @@ window.copyRecord = function(id) {
   }
 
   // ✅ 4. ยังคงสร้างปุ่ม "ยกเลิกการคัดลอก" ไว้เพื่อล้างข้อมูลหากไม่ต้องการบันทึก
-  if(!$id('cancelCopyBtn')) {
-    const cancelBtn = document.createElement('button');
-    cancelBtn.id = 'cancelCopyBtn';
-    cancelBtn.className = 'btn';
-    cancelBtn.innerHTML = '✖ ยกเลิกการคัดลอก';
-    cancelBtn.style.cssText = 'padding:1rem; font-weight:700; font-size:.75rem; border-radius:var(--r-sm); background:#fee2e2; border:1.5px solid #ef4444; color:#ef4444; margin-top:0.5rem; width:100%; cursor:pointer; transition:all .2s;';
-    
-    cancelBtn.onmouseover = function() { this.style.background = '#fecaca'; };
-    cancelBtn.onmouseout = function() { this.style.background = '#fee2e2'; };
-    
-    cancelBtn.onclick = cancelCopy;
-    btn.parentNode.appendChild(cancelBtn);
-  }
+if(!$id('cancelCopyBtn')) {
+  const cancelBtn = spawnCancelButton('ยกเลิกการคัดลอก', cancelCopy);
+  cancelBtn.id = 'cancelCopyBtn';
+  btn.parentNode.appendChild(cancelBtn);
+}
 
   toast('📋 คัดลอกข้อมูลแล้ว พร้อมบันทึกใหม่');
 };
@@ -6588,16 +7132,25 @@ function renderVisibleRows() {
 }
 
 function renderTable() {
+  // 1. ดึงข้อมูลที่ผ่านการกรอง (Search + Filter Button)
   const filtered = getCurrentFilteredData();
+  
+  // 2. อัปเดตข้อมูล Global State
   virtualTableState.allRows = filtered;
   
   // ✅ FIX: บังคับให้ Scroll กลับมาที่บนสุด (แถวที่ 0) เสมอเมื่อมีการค้นหาหรือกด Filter
-  // ป้องกันปัญหาหน้าจอขาวหรือข้อมูลหาย
+  // ป้องกันปัญหา Virtual Scroll วิ่งหาย ทำให้หน้าจอขาว
   const tableContainer = $id('tableContainer');
-  if(tableContainer) tableContainer.scrollTop = 0;
+  if(tableContainer) {
+    tableContainer.scrollTop = 0;
+  }
 
+  // ✅ FIX: รีเซ็ตจุดเริ่มต้นและจุดสิ้นสุดของการแสดงผล
+  // เพื่อให้แน่ใจว่าวาดแถว 0-50 แรกเสมอ
   virtualTableState.visibleStart = 0;
   virtualTableState.visibleEnd = filtered.length > 50 ? 50 : filtered.length; 
+  
+  // 3. วาดแถวที่ต้องการ
   renderVisibleRows();
 }
 
@@ -6750,129 +7303,6 @@ function resetDashFilters() {
   toast('🔄 Reset Filters');
 }
 
-window.refreshDash = function() {
-    // 1. ดึงข้อมูลพื้นฐานและค่าจากตัวกรอง (Filters)
-    populateDashFilters(); // อัปเดตรายชื่อ Vendor ใน Dropdown
-    const allMyRecords = getMyRecords();
-    const startVal = $id('dashStart') ? $id('dashStart').value : '';
-    const endVal = $id('dashEnd') ? $id('dashEnd').value : '';
-    const vendorFilter = $id('dashVendor') ? $id('dashVendor').value : 'ALL';
-
-    // 2. เริ่มกระบวนการกรองข้อมูล (Data Filtering)
-    let displayData = allMyRecords.filter(r => {
-        let matchDate = true;
-        let matchVendor = true;
-        const rDate = r.date ? String(r.date).substring(0, 10) : ""; 
-
-        // กรองตามช่วงวันที่
-        if (startVal || endVal) {
-            if (!rDate) matchDate = false; 
-            else {
-                if (startVal && rDate < startVal) matchDate = false;
-                if (endVal && rDate > endVal) matchDate = false;
-            }
-        }
-        // กรองตามชื่อ Vendor
-        if (vendorFilter && vendorFilter !== 'ALL') {
-            matchVendor = (r.supplier === vendorFilter);
-        }
-        return matchDate && matchVendor;
-    });
-
-    // 3. เตรียมตัวแปรสำหรับคำนวณ KPI
-    let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
-    let lotSf = 0, lotVen = 0, lotCtc = 0, lotOk = 0;
-
-    // คำนวณผลรวม QTY และจำนวน Lots แบ่งตามประเภท Judgment
-    displayData.forEach(r => {
-        const qty = parseInt(r.qty) || 0;
-        tQ += qty;
-        
-        if (r.judgment === 'SF') { 
-            sf += qty; lotSf++; 
-        } else if (r.judgment === 'VENDOR FAULT') { 
-            ven += qty; lotVen++; 
-        } else if (r.judgment === 'CTC') { 
-            ctc += qty; lotCtc++; 
-        } else if (r.judgment === 'CAN USE') { 
-            ok += qty; lotOk++; 
-        }
-    });
-
-    // 4. คำนวณเปอร์เซ็นต์ (Percentages)
-    const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
-    const calcPct = (val) => tQ > 0 ? Math.round((val / tQ) * 100) : 0;
-
-    // 5. อัปเดตตัวเลข KPI บนหน้าจอ (พร้อมแอนิเมชัน)
-    animNum('heroTotalQty', tQ);
-    if($id('heroLot')) $id('heroLot').textContent = displayData.length.toLocaleString();
-    if($id('heroPct')) $id('heroPct').textContent = passPct + '%';
-
-    // อัปเดต Stat Cards 4 ช่องกลาง
-    animNum('dashStatSF', sf); 
-    if($id('dashLotSF')) $id('dashLotSF').textContent = lotSf;
-    if($id('dashPctSF')) $id('dashPctSF').textContent = calcPct(sf) + '%';
-
-    animNum('dashStatCTC', ctc); 
-    if($id('dashLotCTC')) $id('dashLotCTC').textContent = lotCtc;
-    if($id('dashPctCTC')) $id('dashPctCTC').textContent = calcPct(ctc) + '%';
-
-    animNum('dashStatCanUse', ok); 
-    if($id('dashLotCanUse')) $id('dashLotCanUse').textContent = lotOk;
-    if($id('dashPctCanUse')) $id('dashPctCanUse').textContent = calcPct(ok) + '%';
-
-    animNum('dashStatVendor', ven); 
-    if($id('dashLotVendor')) $id('dashLotVendor').textContent = lotVen;
-    if($id('dashPctVendor')) $id('dashPctVendor').textContent = calcPct(ven) + '%';
-
-    // 6. อัปเดตหน้าปัด (Gauges Update)
-    // หน้าปัดใหญ่ Pass Rate
-    updateMainGauge(passPct);
-    
-    // หน้าปัดเล็ก 3 อัน (SF, Vendor, CTC)
-    updateMiniGauge('sf', sf, tQ);
-    updateMiniGauge('vendor', ven, tQ);
-    updateMiniGauge('ctc', ctc, tQ);
-
-    // 7. อัปเดตรายการจัดอันดับ (Top Lists)
-    renderList('supplierList', displayData, 'supplier');   // อันดับ Supplier
-    renderList('dashDefectList', displayData, 'defect');   // อันดับ Defect
-    renderList('partList', displayData, 'partNo');         // อันดับ Part Number
-
-    // 8. อัปเดต Incident Feed & อื่นๆ
-    renderIncidentFeed(displayData);  // รายการเหตุการณ์ล่าสุด
-    renderTopLines(displayData);      // อันดับสายการผลิต (Line)
-    renderTickerTape(displayData);    // แถบวิ่งด้านบน
-
-    // 9. อัปเดตส่วนของกราฟ (Chart Update)
-    // ดึงข้อมูลที่จัดกลุ่มตามวันที่/เดือนมาใช้
-    const chartDataObj = getChartData(displayData, startVal, endVal);
-    
-    // ถ้ายังไม่มี Instance ของกราฟให้สร้างใหม่ ถ้ามีแล้วให้อัปเดตข้อมูล
-    if (!mainTrendChartInstance) {
-        initMainChart(); // ฟังก์ชันสร้างกราฟครั้งแรก
-    } else {
-        // อัปเดต Labels และ Data ของกราฟ
-        mainTrendChartInstance.data.labels = chartDataObj.labels;
-        mainTrendChartInstance.data.datasets[0].data = chartDataObj.data;
-        
-        // ปรับแต่งการแสดงผลแกน X ให้เหมาะกับจำนวนข้อมูล (Daily vs Monthly)
-        mainTrendChartInstance.options.scales.x.ticks.maxTicksLimit = chartDataObj.isDaily ? 10 : 12;
-        
-        mainTrendChartInstance.update('active'); // อัปเดตพร้อมแอนิเมชัน
-    }
-    
-    // อัปเดตสถิติข้างกราฟ (High, Low, Avg)
-    updateChartStats(chartDataObj.data); 
-
-    // บังคับให้กราฟคำนวณขนาดพื้นที่ใหม่ (ป้องกันกราฟแบน)
-    if (mainTrendChartInstance) {
-        setTimeout(() => mainTrendChartInstance.resize(), 100);
-    }
-    
-    console.log(`[Dashboard] Refreshed: ${displayData.length} records found.`);
-};
-
 // --- Gauges ---
 function updateMainGauge(pct) {
   const val = $id('mainGaugeValue');
@@ -6952,15 +7382,19 @@ function renderTickerTape(data) {
   tickerEl.innerHTML = `<div class="ticker-content">${html}${html}</div>`;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   GET CHART DATA (Safe & Consistent)
+   คำนวณข้อมูลรายเดือนและอัปเดตตัวแปร Global สำหรับ Tooltip
+═════════════════════════════════════════════════════════════════ */
 function getChartData(rawRecords, startVal, endVal) {
   const currentYear = new Date().getFullYear();
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
-  // สร้างโครงสร้างข้อมูล 12 เดือน
+  // ✅ เริ่มต้นสร้างโครงสร้างข้อมูล 12 เดือน (เคลียร์ค่าเก่า)
   const monthlyData = Array.from({length: 12}, (_, i) => ({
     monthStr: `${currentYear}-${String(i+1).padStart(2,'0')}`,
     label: months[i],
-    type: 'monthly', // ระบุว่าเป็นแบบรายเดือน
+    type: 'monthly',
     totalQty: 0, 
     totalLot: 0,
     SF: { qty: 0, lot: 0 }, 
@@ -6969,23 +7403,34 @@ function getChartData(rawRecords, startVal, endVal) {
     CAN_USE: { qty: 0, lot: 0 }
   }));
 
-  // วนลูปข้อมูลที่ได้รับมา (rawRecords จะถูก Filter จาก Dashboard อยู่แล้ว)
-  rawRecords.forEach(r => {
-    if (!r.date) return;
-    const mIndex = new Date(r.date).getMonth();
-    const mBox = monthlyData[mIndex];
-    
-    mBox.totalQty += r.qty; 
-    mBox.totalLot += 1;
-    
-    if (r.judgment === 'SF') { mBox.SF.qty += r.qty; mBox.SF.lot += 1; }
-    else if (r.judgment === 'VENDOR FAULT') { mBox.VENDOR.qty += r.qty; mBox.VENDOR.lot += 1; }
-    else if (r.judgment === 'CTC') { mBox.CTC.qty += r.qty; mBox.CTC.lot += 1; }
-    else if (r.judgment === 'CAN USE') { mBox.CAN_USE.qty += r.qty; mBox.CAN_USE.lot += 1; }
-  });
+  // วนลูปเก็บข้อมูลจาก rawRecords (ที่ Filter แล้ว)
+  if (rawRecords && Array.isArray(rawRecords)) {
+      rawRecords.forEach(r => {
+        if (!r.date) return;
+        const mIndex = new Date(r.date).getMonth();
+        // ตรวจสอบ Index ป้องกันหายนอก Array
+        if (mIndex >= 0 && mIndex < 12) {
+            const mBox = monthlyData[mIndex];
+            mBox.totalQty += (parseInt(r.qty) || 0); 
+            mBox.totalLot += 1;
+            
+            if (r.judgment === 'SF') { mBox.SF.qty += r.qty; mBox.SF.lot += 1; }
+            else if (r.judgment === 'VENDOR FAULT') { mBox.VENDOR.qty += r.qty; mBox.VENDOR.lot += 1; }
+            else if (r.judgment === 'CTC') { mBox.CTC.qty += r.qty; mBox.CTC.lot += 1; }
+            else if (r.judgment === 'CAN USE') { mBox.CAN_USE.qty += r.qty; mBox.CAN_USE.lot += 1; }
+        }
+      });
+  }
 
+  // ✅ สำคัญ: อัปเดต Global Variable ทุกครั้ง
   globalRichChartData = monthlyData;
-  return { labels: monthlyData.map(m => m.label), data: monthlyData.map(m => m.totalQty), isDaily: false };
+  
+  // คืนค่า Labels และ Data สำหรับกราฟ
+  return { 
+      labels: monthlyData.map(m => m.label), 
+      data: monthlyData.map(m => m.totalQty), 
+      isDaily: false 
+  };
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -7036,29 +7481,38 @@ function initMainChart() {
           bodyColor: isDark ? '#e2e8f0' : '#334155',
           borderColor: isDark ? 'rgba(16, 185, 129, 0.4)' : 'rgba(226, 232, 240, 0.8)',
           borderWidth: 1, padding: 12, boxPadding: 6, usePointStyle: true,
-          callbacks: {
-            title: (context) => {
-              const isDaily = globalRichChartData[0] && globalRichChartData[0].type === 'daily';
-              return isDaily ? '📅 Date: ' + context[0].label : '📊 Month: ' + context[0].label;
-            },
-            label: () => null,
-            afterBody: (context) => {
-              const rich = globalRichChartData[context[0].dataIndex];
-              if(!rich || rich.totalQty === 0) return ['No Data'];
-              const getPct = (val) => ((val / rich.totalQty) * 100).toFixed(1) + '%';
-              return[
-                `TOTAL : ${rich.totalQty.toLocaleString()} PCS | ${rich.totalLot} Lots`, `---------------------------------`,
-                `🔴 VENDOR : ${rich.VENDOR.qty.toLocaleString()} PCS | ${rich.VENDOR.lot} L | ${getPct(rich.VENDOR.qty)}`,
-                `🟠 SF FAULT : ${rich.SF.qty.toLocaleString()} PCS | ${rich.SF.lot} L | ${getPct(rich.SF.qty)}`,
-                `🔵 CTC : ${rich.CTC.qty.toLocaleString()} PCS | ${rich.CTC.lot} L | ${getPct(rich.CTC.qty)}`,
-                `🟢 CAN USE : ${rich.CAN_USE.qty.toLocaleString()} PCS | ${rich.CAN_USE.lot} L | ${getPct(rich.CAN_USE.qty)}`
-              ];
-            }
-          }
+callbacks: {
+  title: (context) => {
+    // ✅ FIX: เช็คว่ามีข้อมูลหรือไม่ก่อนอ่านค่า dataIndex
+    if (!context || !context.length || !globalRichChartData) return 'No Data';
+    
+    const rich = globalRichChartData[context[0].dataIndex];
+    if(!rich) return 'Unknown Date';
+    
+    const isDaily = rich.type === 'daily';
+    return isDaily ? '📅 Date: ' + rich.label : '📊 Month: ' + rich.label;
+  },
+  label: () => null,
+  afterBody: (context) => {
+    // ✅ FIX: เช็คความปลอดภัยก่อนคำนวณเปอร์เซ็นต์
+    if (!context || !context.length || !globalRichChartData) return ['No Data available'];
+    
+    const rich = globalRichChartData[context[0].dataIndex];
+    if(!rich || rich.totalQty === 0) return ['No Data available'];
+
+    const getPct = (val) => ((val / rich.totalQty) * 100).toFixed(1) + '%';
+    return[
+      `TOTAL : ${rich.totalQty.toLocaleString()} PCS | ${rich.totalLot} Lots`, `---------------------------------`,
+      `🔴 VENDOR : ${rich.VENDOR.qty.toLocaleString()} PCS | ${rich.VENDOR.lot} L | ${getPct(rich.VENDOR.qty)}`,
+      `🟠 SF FAULT : ${rich.SF.qty.toLocaleString()} PCS | ${rich.SF.lot} L | ${getPct(rich.SF.qty)}`,
+      `🔵 CTC : ${rich.CTC.qty.toLocaleString()} PCS | ${rich.CTC.lot} L | ${getPct(rich.CTC.qty)}`,
+      `🟢 CAN USE : ${rich.CAN_USE.qty.toLocaleString()} PCS | ${rich.CAN_USE.lot} L | ${getPct(rich.CAN_USE.qty)}`
+    ];
+  }
+}
         }
       },
       scales: {
-        // ✅ แก้ไขตรงนี้: ให้แสดง Ticks แต่จำกัดจำนวนไม่ให้เยอะ
         x: { 
           border: { display: false }, 
           grid: { display: false }, 
@@ -7080,91 +7534,122 @@ function initMainChart() {
   }
 }
 
-// ค้นหาฟังก์ชัน window.refreshDash = function() {...} เดิม และแก้ส่วนการสร้าง/อัปเดต Chart ด้านล่างนี้
+/* ══════════════════════════════════════════════════════════════
+   MASTER DASHBOARD REFRESH (Consolidated)
+   รวม Logic การคำนวณและอัปเดตหน้า Dashboard ทั้งหมด
+═════════════════════════════════════════════════════════════════ */
 window.refreshDash = function() {
-  populateDashFilters(); 
+    // 1. ตั้งค่า Filter และดึงข้อมูลพื้นฐาน
+    populateDashFilters(); // อัปเดตรายชื่อ Vendor ใน Dropdown
+    const allMyRecords = getMyRecords();
+    const startVal = $id('dashStart') ? $id('dashStart').value : '';
+    const endVal = $id('dashEnd') ? $id('dashEnd').value : '';
+    const vendorFilter = $id('dashVendor') ? $id('dashVendor').value : 'ALL';
 
-  const allMyRecords = getMyRecords();
-  const startVal = $id('dashStart') ? $id('dashStart').value : '';
-  const endVal = $id('dashEnd') ? $id('dashEnd').value : '';
-  const vendorFilter = $id('dashVendor') ? $id('dashVendor').value : 'ALL';
+    // 2. กรองข้อมูล (Filtering)
+    let displayData = allMyRecords.filter(r => {
+        let matchDate = true;
+        let matchVendor = true;
+        const rDate = r.date ? String(r.date).substring(0, 10) : ""; 
 
-  let displayData = allMyRecords.filter(r => {
-    let matchDate = true;
-    let matchVendor = true;
-    const rDate = r.date ? String(r.date).substring(0, 10) : ""; 
+        // กรองตามวันที่
+        if (startVal || endVal) {
+            if (!rDate) matchDate = false; 
+            else {
+                if (startVal && rDate < startVal) matchDate = false;
+                if (endVal && rDate > endVal) matchDate = false;
+            }
+        }
+        // กรองตาม Vendor
+        if (vendorFilter && vendorFilter !== 'ALL') {
+            matchVendor = (r.supplier === vendorFilter);
+        }
+        return matchDate && matchVendor;
+    });
 
-    if (startVal || endVal) {
-      if (!rDate) matchDate = false; 
-      else {
-        if (startVal && rDate < startVal) matchDate = false;
-        if (endVal && rDate > endVal) matchDate = false;
-      }
-    }
-    if (vendorFilter && vendorFilter !== 'ALL') matchVendor = (r.supplier === vendorFilter);
-    return matchDate && matchVendor;
-  });
+    // 3. คำนวณ Aggregates (คำนวณครั้งเดียวเพื่อประสิทธิภาพ)
+    let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
+    let lotSf = 0, lotVen = 0, lotCtc = 0, lotOk = 0;
 
-  // คัดตอนคำนวณและอัปเดต KPI
-  let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
-  let lotSf = 0, lotVen = 0, lotCtc = 0, lotOk = 0;
-  displayData.forEach(r => {
-    tQ += r.qty;
-    if (r.judgment === 'SF') { sf += r.qty; lotSf++; }
-    else if (r.judgment === 'VENDOR FAULT') { ven += r.qty; lotVen++; }
-    else if (r.judgment === 'CTC') { ctc += r.qty; lotCtc++; }
-    else if (r.judgment === 'CAN USE') { ok += r.qty; lotOk++; }
-  });
+    displayData.forEach(r => {
+        const qty = parseInt(r.qty) || 0;
+        tQ += qty;
+        
+        if (r.judgment === 'SF') { sf += qty; lotSf++; }
+        else if (r.judgment === 'VENDOR FAULT') { ven += qty; lotVen++; }
+        else if (r.judgment === 'CTC') { ctc += qty; lotCtc++; }
+        else if (r.judgment === 'CAN USE') { ok += qty; lotOk++; }
+    });
 
-  animNum('heroTotalQty', tQ);
-  if($id('heroLot')) $id('heroLot').textContent = displayData.length.toLocaleString();
-  const passPct = tQ > 0 ? Math.round(((ok) / tQ) * 100) : 0; 
-  if($id('heroPct')) $id('heroPct').textContent = passPct + '%';
-  
-  updateMainGauge(passPct);
-  updateMiniGauge('sf', sf, tQ);
-  updateMiniGauge('vendor', ven, tQ);
-  updateMiniGauge('ctc', ctc, tQ);
+    // 4. อัปเดตตัวเลข KPI (DOM Elements)
+    const passPct = tQ > 0 ? Math.round(((ok) / tQ) * 100) : 0;
+    const calcPct = (val) => tQ > 0 ? Math.round((val/tQ)*100) + '%' : '0%';
 
-  animNum('dashStatSF', sf); if($id('dashLotSF')) $id('dashLotSF').textContent = lotSf;
-  animNum('dashStatCTC', ctc); if($id('dashLotCTC')) $id('dashLotCTC').textContent = lotCtc;
-  animNum('dashStatCanUse', ok); if($id('dashLotCanUse')) $id('dashLotCanUse').textContent = lotOk;
-  animNum('dashStatVendor', ven); if($id('dashLotVendor')) $id('dashLotVendor').textContent = lotVen;
-  
-  const pct = (val) => tQ > 0 ? Math.round((val/tQ)*100) + '%' : '0%';
-  if($id('dashPctSF')) $id('dashPctSF').textContent = pct(sf);
-  if($id('dashPctCTC')) $id('dashPctCTC').textContent = pct(ctc);
-  if($id('dashPctCanUse')) $id('dashPctCanUse').textContent = pct(ok);
-  if($id('dashPctVendor')) $id('dashPctVendor').textContent = pct(ven);
+    // Hero KPI
+    animNum('heroTotalQty', tQ);
+    if($id('heroLot')) $id('heroLot').textContent = displayData.length.toLocaleString();
+    if($id('heroPct')) $id('heroPct').textContent = passPct + '%';
 
-  renderList('supplierList', displayData, 'supplier');
-  renderList('dashDefectList', displayData, 'defect');
-  renderList('partList', displayData, 'partNo');
-  renderIncidentFeed(displayData);
-  renderTopLines(displayData);   
-  renderTickerTape(displayData); 
+    // Stats Row (4 cards)
+    animNum('dashStatSF', sf); 
+    if($id('dashLotSF')) $id('dashLotSF').textContent = lotSf;
+    if($id('dashPctSF')) $id('dashPctSF').textContent = calcPct(sf);
 
-  // รับข้อมูลกราฟ
-  const chartDataObj = getChartData(displayData, startVal, endVal);
-  
-  if (!mainTrendChartInstance) {
-    initMainChart();
-  } else {
-    // ✅ แก้ไขตรงนี้: อัปเดตการตั้งค่า X-Axis ให้แสดงวันที่ได้ถูกต้อง
-    mainTrendChartInstance.options.scales.x.ticks.maxTicksLimit = chartDataObj.isDaily ? 12 : 12;
-    mainTrendChartInstance.options.scales.x.ticks.autoSkip = true;
+    animNum('dashStatCTC', ctc); 
+    if($id('dashLotCTC')) $id('dashLotCTC').textContent = lotCtc;
+    if($id('dashPctCTC')) $id('dashPctCTC').textContent = calcPct(ctc);
+
+    animNum('dashStatCanUse', ok); 
+    if($id('dashLotCanUse')) $id('dashLotCanUse').textContent = lotOk;
+    if($id('dashPctCanUse')) $id('dashPctCanUse').textContent = calcPct(ok);
+
+    animNum('dashStatVendor', ven); 
+    if($id('dashLotVendor')) $id('dashLotVendor').textContent = lotVen;
+    if($id('dashPctVendor')) $id('dashPctVendor').textContent = calcPct(ven);
+
+    // 5. อัปเดต Gauges (หน้าปัด)
+    updateMainGauge(passPct);
+    updateMiniGauge('sf', sf, tQ);
+    updateMiniGauge('vendor', ven, tQ);
+    updateMiniGauge('ctc', ctc, tQ);
+
+    // 6. อัปเดต Lists & Feed (รายการ)
+    renderList('supplierList', displayData, 'supplier');
+    renderList('dashDefectList', displayData, 'defect');
+    renderList('partList', displayData, 'partNo');
+    renderIncidentFeed(displayData);
+    renderTopLines(displayData);   
+    renderTickerTape(displayData); 
+
+    // 7. อัปเดต Charts (กราฟ)
+    // ดึงข้อมูลกราฟ (กรุ๊ปตามเดือน)
+    const chartDataObj = getChartData(displayData, startVal, endVal);
     
-    mainTrendChartInstance.data.labels = chartDataObj.labels;
-    mainTrendChartInstance.data.datasets[0].data = chartDataObj.data;
-    mainTrendChartInstance.update();
-  }
-  
-  updateChartStats(chartDataObj.data); 
-  
-  if (mainTrendChartInstance) {
-     mainTrendChartInstance.resize();
-  }
-}
+    if (!mainTrendChartInstance) {
+        initMainChart(); // สร้างกราฟครั้งแรกถ้ายังไม่มี
+    }
+
+    if (mainTrendChartInstance) {
+        // ตั้งค่าตัวเลือกแกน X
+        mainTrendChartInstance.options.scales.x.ticks.maxTicksLimit = chartDataObj.isDaily ? 12 : 12;
+        mainTrendChartInstance.options.scales.x.ticks.autoSkip = true;
+        
+        // ส่งข้อมูลเข้ากราฟ
+        mainTrendChartInstance.data.labels = chartDataObj.labels;
+        mainTrendChartInstance.data.datasets[0].data = chartDataObj.data;
+        
+        // อัปเดตกราฟ
+        mainTrendChartInstance.update('none'); 
+        
+        // บังคับให้กราฟปรับขนาดใหม่ (Fix ปัญหากราฟแบน)
+        mainTrendChartInstance.resize();
+    }
+    
+    // 8. อัปเดตสถิติข้างกราฟ (High/Low/Avg)
+    updateChartStats(chartDataObj.data); 
+
+    console.log(`[Dashboard] Refreshed: ${displayData.length} records found.`);
+};
 
 function updateDatalists() {
   const myR = getMyRecords();
@@ -7310,17 +7795,52 @@ function guessQtyColumn(rawData, headerRowIdx) {
 
 function parseExcelDate(excelValue) {
   if (!excelValue) return null;
+  
+  // 1. กรณีเป็น Excel Serial Number (เลขทศนิยม)
   if (!isNaN(excelValue)) {
     const excelEpoch = new Date(1899, 11, 30);
     const dateObj = new Date(excelEpoch.getTime() + excelValue * 86400000);
+    // ✅ FIX: ตัดเวลาทิ้ง เพื่อป้องกันปัญหา Timezone shift
     return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
   }
+  
   const str = String(excelValue).trim();
-  if (str.match(/^\d{4}-\d{2}-\d{2}$/)) return str;
-  const parts = str.split(/[\/\-]/);
+  
+  // 2. กรณีเป็น Text Format
+  if (str.match(/^\d{4}-\d{2}-\d{2}$/)) return str; // YYYY-MM-DD
+  
+  const parts = str.split(/[\/\-]/); // รองรับทั้ง / และ -
+  
   if (parts.length === 3) {
-    if (parts[2].length === 4) return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-    if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+    const p1 = parseInt(parts[0]);
+    const p2 = parseInt(parts[1]);
+    const p3 = parseInt(parts[2]);
+    
+    // ✅ FIX: ตรวจสอบว่าตัวไหนคือปี (ค่า >= 1000 หรือค่ามี 4 หลัก)
+    // เพื่อรองรับทั้ง DD/MM/YYYY และ MM/DD/YYYY อัตโนมัติ
+    if (parts[2].length === 4) {
+      // Format แบบเอาปีไว้ท้าย: DD/MM/YYYY หรือ MM/DD/YYYY
+      // สมมติให้เป็น DD/MM/YYYY (มาตรฐานไทย/ยุโรป) เป็นหลัก
+      // ถ้า p1 > 12 แปลว่า p1 คือวันที่ (เช่น 13/01/2024)
+      // ถ้า p1 <= 12 และ p2 > 12 แปลว่า p1 คือเดือน (เช่น 01/13/2024)
+      
+      let d = p1, m = p2, y = p3;
+      
+      if (p1 > 12) { 
+        // p1 แน่นอนเป็นวันที่
+      } else if (p2 > 12) {
+        // p2 แน่นอนเป็นวันที่ -> สลับกัน
+        d = p2; m = p1;
+      }
+      // ถ้า p1 <= 12 และ p2 <= 12 ยากจะทาย แต่ให้ถือว่า p1=วัน, p2=เดือน
+      
+      return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    } 
+    
+    if (parts[0].length === 4) {
+      // Format แบบเอาปีไว้หน้า: YYYY/MM/DD
+      return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+    }
   }
   return null;
 }
@@ -7732,6 +8252,19 @@ function resetDashboardState() {
         mainTrendChartInstance.destroy();
         mainTrendChartInstance = null;
     }
+}
+// ✅ Helper: สร้างปุ่มยกเลิก (Cancel Button) แบบรวมศูนย์
+function spawnCancelButton(text, onClickCallback) {
+  const btn = document.createElement('button');
+  btn.className = 'btn'; // ใช้คลาสเดิม
+  btn.innerHTML = `✖ ${text}`;
+  btn.style.cssText = 'padding:1rem; font-weight:700; font-size:.75rem; border-radius:var(--r-sm); background:#fee2e2; border:1.5px solid #ef4444; color:#ef4444; margin-top:0.5rem; width:100%; cursor:pointer; transition:all .2s;';
+  
+  btn.onmouseover = function() { this.style.background = '#fecaca'; };
+  btn.onmouseout = function() { this.style.background = '#fee2e2'; };
+  
+  btn.onclick = onClickCallback;
+  return btn;
 }
 </script>
 </body>
