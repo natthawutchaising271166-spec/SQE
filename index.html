@@ -2345,55 +2345,81 @@ html.dark-mode .lo-in:focus {
   text-shadow: 0 0 6px rgba(71, 85, 105, 0.3);
 }
 
+/* คอนเทนเนอร์ Trend (ย่อให้เล็กลง) */
 .gauge-trend {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 6px;
-  padding: 5px 14px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(52, 211, 153, 0.04));
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: 99px;
-  position: relative;
-  z-index: 5;
-  pointer-events: none;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  gap: 4px;
+  padding: 2px 10px; /* ลดความกว้าง/สูง */
+  background: rgba(30, 41, 59, 0.5); /* โปร่งแสงมากขึ้นเพื่อความแพง */
+  border-radius: 6px;
+  border: 1px solid currentColor; /* ขอบสีเดียวกับตัวอักษร */
+  transition: all 0.4s ease;
+  margin-top: 2px;
 }
 
+/* สามเหลี่ยมไอคอน (จิ๋ว) */
 .trend-arrow {
-  font-size: 0.75rem;
-  filter: drop-shadow(0 0 4px currentColor);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 7px solid currentColor; /* เล็กลงกว่าเดิม 30% */
 }
 
+/* ข้อความสถานะ (จิ๋วแต่คม) */
 .trend-value {
-  font-family: 'Orbitron', 'Sora', monospace;
-  font-size: 0.65rem;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.6rem; /* เล็กพิเศษ */
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
 }
 
-.gauge-legend {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  flex-wrap: wrap;
+/* เปอร์เซ็นต์ตัวเลขในหน้าปัด (ย่อขนาด) */
+.gauge-value {
+  font-size: 1.6rem !important; /* ลดจาก 2.8rem ลงมา */
+  letter-spacing: -0.02em;
 }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.6rem;
-  color: #64748b;
-  font-weight: 600;
+/* --- การแมตช์สี (Color Harmony) --- */
+.status-excellent { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+.status-good { color: #f97316; background: rgba(249, 115, 22, 0.1); } /* สีส้มตามรูปคุณ */
+.status-warning { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.status-critical { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+
+/* --- สถานะต่างๆ (Dynamic States) --- */
+
+/* ดีมาก (90-100%) */
+.gauge-trend.status-excellent {
+  border-color: #10b981;
+  color: #10b981;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
 }
 
-.legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+/* ปกติ (75-89%) */
+.gauge-trend.status-good {
+  border-color: #34d399; /* สีเขียวอ่อนแบบในรูป */
+  color: #fb923c;       /* ตัวหนังสือสีส้มแบบในรูป */
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
+}
+
+/* ควรระวัง (50-74%) */
+.gauge-trend.status-warning {
+  border-color: #f59e0b;
+  color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+}
+
+/* วิกฤต (< 50%) */
+.gauge-trend.status-critical {
+  border-color: #ef4444;
+  color: #ef4444;
+  animation: trendAlert 1s infinite alternate;
+}
+
+@keyframes trendAlert {
+  from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+  to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
 }
 
 /* ═════════════════════════════════════════════
@@ -4531,24 +4557,34 @@ datalist { display: none; }
   animation: labelFlicker 3s ease-in-out infinite;
 }
 /* ═══════════════════════════════════════════════════
-   STATUS DOT (จุดสถานะบันทึกลง Cloud แล้ว)
+   STATUS INDICATORS (SYNC STATUS)
 ═══════════════════════════════════════════════════ */
 .saved-indicator {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background-color: #10b981; /* สีเขียว */
-  margin-right: 8px; 
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
-  animation: dotPulse 2s infinite;
+  margin-right: 10px;
+  flex-shrink: 0;
+  position: relative;
 }
 
-@keyframes dotPulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(16, 185, 129, 0.6); }
-  50% { opacity: 0.7; box-shadow: 0 0 10px rgba(16, 185, 129, 0.8); }
+/* สถานะสำเร็จ (สีเขียว) - อยู่บน Cloud แล้ว */
+.sync-success {
+  background-color: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+/* สถานะรอดำเนินการ (สีเหลือง) - บันทึกแค่ในเครื่อง */
+.sync-pending {
+  background-color: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  animation: syncPulseYellow 1.5s infinite ease-in-out;
+}
+
+@keyframes syncPulseYellow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.3); }
 }
 /* ═════════════════════════════════════════════════
    DASHBOARD NEW ENHANCEMENTS CSS
@@ -5219,6 +5255,40 @@ datalist { display: none; }
 .control-sep {
   color: #475569;
 }
+/* กลุ่มตัวเลขรอบหน้าปัด */
+.gauge-numbers text {
+  fill: #f1f5f9 !important; /* สีขาวนวล (สว่างแต่ไม่แสบตา) */
+  font-family: 'Inter', 'Sora', sans-serif;
+  font-size: 11px; /* ขนาดกำลังดี */
+  font-weight: 800; /* ตัวหนาพิเศษเพื่อให้ชัด */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* เพิ่มเงาหลังตัวเลขให้ลอยออกมา */
+}
+
+/* ปรับปรุงพื้นหลังหน้าปัดให้มืดลงเล็กน้อยเพื่อให้ขีดและตัวเลขเด่นขึ้น */
+.gauge-cluster.main-gauge {
+  background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.05);
+}
+/* ตัวเลขบนสเกลหน้าปัด */
+.gauge-scale-num {
+  fill: #94a3b8; /* สีเทา Slate-400 ดูนุ่มนวลแต่ชัดเจน */
+  font-family: 'Sora', sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  pointer-events: none;
+  transition: fill 0.3s ease;
+}
+
+/* ทำให้เลข 0 และ 100 ดูเด่นขึ้น */
+.gauge-scale-num:first-of-type, 
+.gauge-scale-num:last-of-type {
+  fill: #f1f5f9;
+}
+
+/* เอฟเฟกต์หน้าปัดหลัก */
+.main-gauge .gauge-scale-num {
+  font-size: 10px; /* หน้าปัดใหญ่ขึ้น ตัวเลขก็ใหญ่ขึ้นตาม */
+}
 </style>
 </head>
 <body>
@@ -5753,6 +5823,13 @@ datalist { display: none; }
   <!-- SVG Structure (Sport Style) -->
   <svg viewBox="0 0 200 200" class="gauge-svg" style="position: relative; z-index: 10;">
       <defs>
+  <!-- ตัวทำเรืองแสงบางๆ -->
+  <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="1.5" result="blur" />
+    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+  </filter>
+</defs>
+
         <!-- Gradient สีแบบ Heatmap -->
         <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" style="stop-color:#ef4444"/>
@@ -5809,16 +5886,6 @@ datalist { display: none; }
       <!-- 5. Progress Arc (เส้นสีที่วิ่ง) -->
       <path id="mainGaugeArc" d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#gaugeGradient)" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 267" filter="url(#neonGlow)" style="transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1)"/>
       
-      <!-- 6. Numbers (ตัวเลขรอบวง) -->
-      <g class="gauge-numbers" font-family="Orbitron, Sora" font-size="11" font-weight="700" fill="#64748b">
-        <text x="18" y="120" text-anchor="middle">0</text>
-        <text x="32" y="65" text-anchor="middle">20</text>
-        <text x="70" y="35" text-anchor="middle">40</text>
-        <text x="130" y="35" text-anchor="middle">60</text>
-        <text x="168" y="65" text-anchor="middle">80</text>
-        <text x="182" y="120" text-anchor="middle">100</text>
-      </g>
-      
       <!-- 7. Needle Group (เข็ม) -->
       <g id="gaugeNeedle" style="transform-origin: 100px 100px; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
          <!-- เข็มแบบสามเหลี่ยมคม (Sport Style) -->
@@ -5840,12 +5907,11 @@ datalist { display: none; }
   </div>
 
   <!-- Trend อยู่นอกวงกลม -->
-  <div class="gauge-trend" id="mainGaugeTrend" style="margin-top: 0;">
-    <span class="trend-arrow">▲</span>
-    <span class="trend-value">Good</span>
-  </div>
+<div class="gauge-trend" id="mainGaugeTrend">
+  <div class="trend-arrow"></div> <!-- ใช้ CSS วาดสามเหลี่ยม -->
+  <span class="trend-value">Good</span>
 </div>
-      
+</div>
        <!-- MINI GAUGES ROW (SPORT STYLE) -->
 <div class="gauge-row">
   
@@ -5854,6 +5920,13 @@ datalist { display: none; }
     <div class="mini-gauge-display">
       <svg viewBox="0 0 200 200" class="mini-gauge-svg">
         <defs>
+  <!-- ตัวทำเรืองแสงบางๆ -->
+  <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="1.5" result="blur" />
+    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+  </filter>
+</defs>
+
           <!-- Gradient สีสำหรับแถบ -->
           <linearGradient id="sfGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style="stop-color:#f97316"/>
@@ -5893,15 +5966,6 @@ datalist { display: none; }
         <!-- 4. Tick Marks (ขีดรอบวง) -->
         <g id="sfGaugeTicks"></g>
         
-        <!-- 5. Numbers (ตัวเลขรอบวง) -->
-        <g class="gauge-numbers" font-family="Sora" font-size="9" font-weight="700" fill="#64748b">
-          <text x="30" y="115" text-anchor="middle">0</text>
-          <text x="45" y="70" text-anchor="middle">25</text>
-          <text x="100" y="45" text-anchor="middle">50</text>
-          <text x="155" y="70" text-anchor="middle">75</text>
-          <text x="170" y="115" text-anchor="middle">100</text>
-        </g>
-        
         <!-- 6. Needle Group (เข็ม) -->
         <g id="sfGaugeNeedle" style="transform-origin: 100px 100px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
            <!-- เข็มแบบสามเหลี่ยมคม -->
@@ -5940,15 +6004,7 @@ datalist { display: none; }
         <path d="M 25 100 A 75 75 0 1 1 175 100" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
         <g id="vendorGaugeTicks"></g>
         <path id="vendorGaugeArc" d="M 25 100 A 75 75 0 0 1 175 100" fill="none" stroke="url(#vendorGradient)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 235" filter="url(#miniGlowVendor)" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
-        
-        <g class="gauge-numbers" font-family="Sora" font-size="9" font-weight="700" fill="#64748b">
-          <text x="30" y="115" text-anchor="middle">0</text>
-          <text x="45" y="70" text-anchor="middle">25</text>
-          <text x="100" y="45" text-anchor="middle">50</text>
-          <text x="155" y="70" text-anchor="middle">75</text>
-          <text x="170" y="115" text-anchor="middle">100</text>
-        </g>
-        
+               
         <g id="vendorGaugeNeedle" style="transform-origin: 100px 100px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
            <polygon points="100,30 96,95 100,100 104,95" fill="url(#needleGradientSf)" filter="url(#miniGlowVendor)"/>
            <circle cx="100" cy="100" r="8" class="mini-hub"/>
@@ -5981,14 +6037,6 @@ datalist { display: none; }
         <path d="M 25 100 A 75 75 0 1 1 175 100" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
         <g id="ctcGaugeTicks"></g>
         <path id="ctcGaugeArc" d="M 25 100 A 75 75 0 0 1 175 100" fill="none" stroke="url(#ctcGradient)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 235" filter="url(#miniGlowCtc)" style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)"/>
-        
-        <g class="gauge-numbers" font-family="Sora" font-size="9" font-weight="700" fill="#64748b">
-          <text x="30" y="115" text-anchor="middle">0</text>
-          <text x="45" y="70" text-anchor="middle">25</text>
-          <text x="100" y="45" text-anchor="middle">50</text>
-          <text x="155" y="70" text-anchor="middle">75</text>
-          <text x="170" y="115" text-anchor="middle">100</text>
-        </g>
         
         <g id="ctcGaugeNeedle" style="transform-origin: 100px 100px; transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
            <polygon points="100,30 96,95 100,100 104,95" fill="url(#needleGradientSf)" filter="url(#miniGlowCtc)"/>
@@ -6470,22 +6518,21 @@ async function syncToCloud(isInitial = false) {
   let pushSuccess = true;
   
   // 1. ส่งข้อมูลที่สร้างใหม่ตอนออฟไลน์ขึ้น Cloud
-  const unsyncedRecords = records.filter(r => r._isOffline === true);
+  const unsyncedRecords = records.filter(r => r._isSaved === false);
   if (unsyncedRecords.length > 0) {
     const dataToPush = unsyncedRecords.map(r => {
-      const { _isOffline, _isDeleted, ...cleanData } = r;
+      const { _isOffline, _isSaved, _isDeleted, ...cleanData } = r;
       return cleanData;
     });
     pushSuccess = await pushToSupabase(dataToPush);
   }
 
-  // 2. จัดการข้อมูลที่ถูกสั่งลบตอนออฟไลน์ (ดึงจากฐานข้อมูลเครื่อง เพราะมันหายไปจาก records แล้ว)
+  // 2. จัดการข้อมูลที่ถูกสั่งลบตอนออฟไลน์
   const allLocalData = await dbGetAll();
   const deletedRecords = allLocalData.filter(r => r._isDeleted === true);
   for (let r of deletedRecords) {
     const delSuccess = await deleteFromSupabase(r.id);
     if (delSuccess) {
-      // ลบทิ้งจาก Local ถาวร
       await new Promise((resolve) => {
         const tx = db.transaction(IDB_STORE, 'readwrite');
         tx.objectStore(IDB_STORE).delete(String(r.id));
@@ -6494,15 +6541,18 @@ async function syncToCloud(isInitial = false) {
     }
   }
 
-  // 3. โหลดข้อมูลล่าสุดจาก Cloud กลับมาทับ Local
+  // 3. โหลดข้อมูลล่าสุดจาก Cloud มาทับ Local (ข้อมูลจาก Cloud ทุกตัวจะถือว่า _isSaved = true)
   const cloudData = await fetchFromSupabase(currentUser);
   if (cloudData) {
     if (pushSuccess) {
-      records = cloudData;
+      // ✅ ข้อมูลจาก Cloud ทั้งหมดให้เป็นสถานะ Sync Success (เขียว)
+      records = cloudData.map(r => ({ ...r, _isSaved: true }));
     } else {
-      const offlineStill = records.filter(r => r._isOffline === true);
-      let merged =[...cloudData];
-      offlineStill.forEach(off => { if (!merged.find(c => c.id === off.id)) merged.push(off); });
+      const offlineStill = records.filter(r => r._isSaved === false);
+      let merged = cloudData.map(r => ({ ...r, _isSaved: true }));
+      offlineStill.forEach(off => { 
+        if (!merged.find(c => c.id === off.id)) merged.push(off); 
+      });
       records = merged;
     }
     
@@ -6696,21 +6746,24 @@ async function handleFormSubmit(e) {
     defect: $id('defectName').value,
     remark: $id('remark').value,
     judgment: jdg,
-    _isSaved: false,
-    _isOffline: false
+    _isSaved: false,    // เริ่มต้นเป็น false (เหลือง)
+    _isOffline: false   // เริ่มต้นเป็น false
   };
 
-  // Push ขึ้น Cloud
+  // ✅ พยายามส่งขึ้น Cloud
   if (isOnline && getSupabase()) {
     const success = await pushToSupabase([rowData]);
     if (success) {
-      rowData._isSaved = true;
+      rowData._isSaved = true;  // ส่งสำเร็จ (เขียว)
+      rowData._isOffline = false;
       toast(editingId ? '✅ อัปเดตบนระบบ Cloud สำเร็จ' : '✅ บันทึกข้อมูลขึ้น Cloud สำเร็จ');
     } else {
+      rowData._isSaved = false; // ส่งไม่สำเร็จ (เหลือง)
       rowData._isOffline = true; 
       toast('⚠️ บันทึกคลาวด์ล้มเหลว เซฟลงเครื่องแทน');
     }
   } else {
+    rowData._isSaved = false;   // ออฟไลน์ (เหลือง)
     rowData._isOffline = true;
     toast('💾 บันทึกแบบออฟไลน์เรียบร้อย');
   }
@@ -6724,7 +6777,6 @@ async function handleFormSubmit(e) {
   }
   await dbPutBulk([rowData]);  
 
-  // รีเซ็ตหน้าจอแต่เก็บค่ายอดฮิตไว้
   const keepDate = $id('inputDate').value;
   const keepShift = $id('shift').value;
   const keepLine = $id('lineNo').value;
@@ -7032,31 +7084,106 @@ function setFilter(type) {
 }
 
 function getCurrentFilteredData() {
-  const searchEl = $id('searchInput');
-  const search = searchEl ? searchEl.value.toLowerCase() : '';
+  const searchEl = document.getElementById('searchInput');
+  const searchValue = searchEl ? searchEl.value.toLowerCase().trim() : '';
   
-  const myR = getMyRecords().sort((a, b) => {
-    const dateA = a.date || '0000-00-00';
-    const dateB = b.date || '0000-00-00';
-    return dateA > dateB ? -1 : (dateA < dateB ? 1 : 0);
-  });
+  // 1. ตัวช่วยล้างค่า: normalize ตัวเลขและตัวอักษร
+  const normAlphaNum = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9ก-๙]/gi, '');
+  const normOnlyDigits = (s) => String(s || '').replace(/[^0-9]/g, '');
 
-  const filtered =[];
-  for (let i = 0; i < myR.length; i++) {
-    const r = myR[i];
+  // 2. ฟังก์ชันพิเศษ: แปลงวันที่ 1 ชุด ให้เป็นคำค้นหาหลายรูปแบบ (Date Metadata)
+  const getDateMetadata = (dateStr) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    const yThai = y + 543; // แปลงเป็น พ.ศ.
+
+    const monthsEn = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+    const monthsEnShort = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+    const monthsTh = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+    const monthsThShort = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+
+    return [
+      dateStr,                                      // 2026-05-04
+      `${day}/${m}/${y}`,                           // 4/5/2026
+      `${String(day).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`, // 04/05/2026
+      `${day} ${monthsEn[m-1]}`,                    // 4 may
+      `${day} ${monthsTh[m-1]}`,                    // 4 พฤษภาคม
+      monthsEn[m-1], monthsEnShort[m-1],            // may
+      monthsTh[m-1], monthsThShort[m-1],            // พฤษภาคม
+      yThai.toString(),                             // 2569 (พ.ศ.)
+      `${String(day).padStart(2, '0')}${String(m).padStart(2, '0')}` // 0405
+    ].join(" ").toLowerCase();
+  };
+
+  const searchTerms = searchValue ? searchValue.split(/\s+/) : [];
+  const myR = getMyRecords();
+  const results = [];
+
+  for (let r of myR) {
     if (filterType !== 'ALL' && r.judgment !== filterType) continue;
-    
-    const safeStr = (val) => val ? String(val) : '';
-    const text = (
-      safeStr(r.ref) + " " + safeStr(r.supplier) + " " + safeStr(r.partNo) + " " + 
-      safeStr(r.partName) + " " + safeStr(r.defect) + " " + safeStr(r.remark) + " " + 
-      safeStr(r.judgment) + " " + safeStr(r.date) + " " + safeStr(r.shift) + " " + safeStr(r.line)
-    ).toLowerCase();
-    
-    if (search && !text.includes(search)) continue;
-    filtered.push(r);
+
+    const dateMeta = getDateMetadata(r.date); // สร้างคำค้นหาจากวันที่
+    const fields = {
+      ref: String(r.ref || '').toLowerCase(),
+      supplier: String(r.supplier || '').toLowerCase(),
+      partNo: String(r.partNo || '').toLowerCase(),
+      partName: String(r.partName || '').toLowerCase(),
+      defect: String(r.defect || '').toLowerCase(),
+      line: String(r.line || '').toLowerCase(),
+      remark: String(r.remark || '').toLowerCase()
+    };
+
+    let relevanceScore = 0;
+    let matchAllTerms = true;
+
+    if (searchTerms.length > 0) {
+      for (let term of searchTerms) {
+        const termAlpha = normAlphaNum(term);
+        const termDigits = normOnlyDigits(term);
+        
+        const refAlpha = normAlphaNum(fields.ref);
+        const refDigits = normOnlyDigits(fields.ref);
+
+        // --- เช็คการ Match ---
+        // 1. Match ปกติในทุกฟิลด์ + ข้อมูลวันที่
+        const isBasicMatch = Object.values(fields).some(v => v.includes(term)) || dateMeta.includes(term);
+        
+        // 2. Match วันที่แบบ Normalized (กรณีพิมพ์ 04/05 แล้วใน metadata มี 04/05/2026)
+        const isDateMatch = dateMeta.includes(term);
+
+        // 3. Match Ref/PartNo แบบ Fuzzy (เหมือนเวอร์ชันก่อนหน้า)
+        const isAlphaMatch = refAlpha.includes(termAlpha) || termAlpha.includes(refAlpha);
+        const isNumericMatch = termDigits.length > 1 && (refDigits.includes(termDigits) || termDigits.includes(refDigits));
+
+        if (!isBasicMatch && !isAlphaMatch && !isNumericMatch) {
+          matchAllTerms = false;
+          break;
+        }
+
+        // --- การคำนวณคะแนนความแม่นยำ ---
+        if (fields.ref === term) relevanceScore += 5000;
+        if (isDateMatch) relevanceScore += 2500; // ให้คะแนนวันที่สูง
+        if (isNumericMatch) relevanceScore += 2000;
+        if (fields.supplier.includes(term)) relevanceScore += 500;
+      }
+    } else {
+      relevanceScore = new Date(r.date || 0).getTime();
+    }
+
+    if (matchAllTerms) {
+      results.push({ ...r, _score: relevanceScore });
+    }
   }
-  return filtered;
+
+  return results.sort((a, b) => {
+    if (b._score !== a._score) return b._score - a._score;
+    return new Date(b.date) - new Date(a.date);
+  });
 }
 
 function renderVisibleRows() {
@@ -7094,9 +7221,15 @@ function renderVisibleRows() {
     const safeId = String(r.id).replace(/"/g, '&quot;');
     const disp = (v) => (!v || v === '-') ? '<span style="color:#cbd5e1">-</span>' : escapeHtml(v);
 
+    // ✅ ส่วนที่ปรับปรุง: เช็คสถานะการซิงค์
+    let syncClass = r._isSaved ? 'sync-success' : 'sync-pending';
+    let syncTitle = r._isSaved ? 'บันทึกบนคลาวด์แล้ว (Synced)' : 'บันทึกในเครื่องแล้ว รอการซิงค์ (Pending Sync)';
+
     html += `<tr class="group vis" data-rid="${safeId}">
       <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">
-        ${r._isSaved ? '<span class="saved-indicator"></span>' : ''} ${disp(r.date)}
+        <div style="display:flex; align-items:center;">
+          <span class="saved-indicator ${syncClass}" title="${syncTitle}"></span> ${disp(r.date)}
+        </div>
       </td>
       <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${disp(r.shift)}</div><div style="font-size:.65rem;color:var(--text-400)">L: ${disp(r.line)}</div></td>
       <td><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">#${disp(r.ref)}</span></td>
@@ -7111,9 +7244,6 @@ function renderVisibleRows() {
         <span class="status-badge" style="${s.s}"><span style="width:5px;height:5px;border-radius:50%;background:${s.dot};display:inline-block"></span>${r.judgment}</span>
       </td>
       <td style="text-align:right; display:flex; gap:5px; justify-content:flex-end;">
-  
-        
-        <!-- 🟢 ปุ่ม Copy (ใหม่) -->
         <button onclick="copyRecord('${safeId}')" class="btn" title="คัดลอกข้อมูล" style="background:#10b981;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -7122,7 +7252,6 @@ function renderVisibleRows() {
         </button>
         <button onclick="editRecord('${safeId}')" class="btn" style="background:#3b82f6;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
         <button onclick="showSingleDeleteModal('${safeId}')" class="btn" style="background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-      
       </td>
     </tr>`;
   });
@@ -7305,12 +7434,63 @@ function resetDashFilters() {
 
 // --- Gauges ---
 function updateMainGauge(pct) {
-  const val = $id('mainGaugeValue');
-  if(val) val.textContent = pct + '%';
-  const arc = $id('mainGaugeArc');
-  if(arc) { const circ = 267; arc.style.strokeDasharray = `${(pct/100)*circ} ${circ}`; }
-  const needle = $id('gaugeNeedle');
-  if(needle) { const rot = -90 + (pct * 1.8); needle.style.transform = `rotate(${rot}deg)`; }
+  const valDisplay = document.getElementById('mainGaugeValue');
+  const trendBox = document.getElementById('mainGaugeTrend');
+  const trendText = trendBox ? trendBox.querySelector('.trend-value') : null;
+  const trendArrow = trendBox ? trendBox.querySelector('.trend-arrow') : null;
+
+  // 1. Logic การเลือกสีและสถานะ
+  let statusClass = '';
+  let statusText = '';
+  let statusColor = '';
+  let rotation = '0deg';
+
+  if (pct >= 90) {
+    statusClass = 'status-excellent';
+    statusText = 'Excellent';
+    statusColor = '#10b981';
+  } else if (pct >= 75) {
+    statusClass = 'status-good';
+    statusText = 'Good';
+    statusColor = '#f97316'; // สีส้มอมแดง
+  } else if (pct >= 50) {
+    statusClass = 'status-warning';
+    statusText = 'Fair';
+    statusColor = '#f59e0b';
+    rotation = '90deg';
+  } else {
+    statusClass = 'status-critical';
+    statusText = 'Critical';
+    statusColor = '#ef4444';
+    rotation = '180deg';
+  }
+
+  // 2. อัปเดตตัวเลขหลัก (เปลี่ยนสีให้เข้ากับสถานะ)
+  if(valDisplay) {
+    valDisplay.textContent = pct + '%';
+    valDisplay.style.color = statusColor; // เปลี่ยนสีตัวเลขให้แมตช์กับ Badge
+    valDisplay.style.filter = `drop-shadow(0 0 8px ${statusColor}44)`; // เพิ่มเงาเรืองแสงบางๆ
+  }
+
+  // 3. อัปเดตหน้าปัดและเข็ม
+  const arc = document.getElementById('mainGaugeArc');
+  if(arc) {
+    const circ = 267;
+    arc.style.strokeDasharray = `${(pct/100)*circ} ${circ}`;
+    arc.style.stroke = statusColor; // เปลี่ยนสีแถบวิ่งตามสถานะ
+  }
+
+  const needle = document.getElementById('gaugeNeedle');
+  if(needle) {
+    needle.style.transform = `rotate(${-90 + (pct * 1.8)}deg)`;
+  }
+
+  // 4. อัปเดต Trend Badge
+  if (trendBox && trendText && trendArrow) {
+    trendBox.className = 'gauge-trend ' + statusClass;
+    trendText.textContent = statusText;
+    trendArrow.style.transform = `rotate(${rotation})`;
+  }
 }
 
 function updateMiniGauge(type, val, total) {
@@ -8141,21 +8321,19 @@ window.exportToExcel = function() {
 function drawGaugeTicks(elementId, radius, isMain = false) {
   const container = document.getElementById(elementId);
   if (!container) return;
-
-  // ล้างเส้นเก่าออกก่อน (กรณี redraw)
   container.innerHTML = '';
 
-  const cx = 100; // จุดศูนย์กลาง X
-  const cy = 100; // จุดศูนย์กลาง Y
-  const totalTicks = 20; // จำนวนเส้นขีดทั้งหมด (0, 5, 10, 15... 100)
-  const startAngle = Math.PI; // เริ่มที่ 180 องศา (ซ้ายสุด)
-  const endAngle = 2 * Math.PI; // จบที่ 360 องศา (ขวาสุด)
+  const cx = 100, cy = 100;
+  const totalTicks = 20; // แบ่ง 20 ขีด (ขีดละ 5 หน่วย)
+  const startAngle = Math.PI; // 180 องศา (ซ้าย)
+  const endAngle = 2 * Math.PI; // 360 องศา (ขวา)
 
   for (let i = 0; i <= totalTicks; i++) {
     const angle = startAngle + (endAngle - startAngle) * (i / totalTicks);
-    const isMajor = i % 2 === 0; // เส้นหลัก (0, 10, 20...) และเส้นรอง (5, 15...)
+    const isMajor = i % 2 === 0; // ขีดหลักทุกๆ 10 หน่วย (0, 10, 20...)
     
-    const innerR = isMajor ? radius - 10 : radius - 5;
+    // 1. วาดเส้นขีด (Ticks)
+    const innerR = isMajor ? radius - 10 : radius - 6;
     const outerR = radius;
 
     const x1 = cx + innerR * Math.cos(angle);
@@ -8164,17 +8342,30 @@ function drawGaugeTicks(elementId, radius, isMain = false) {
     const y2 = cy + outerR * Math.sin(angle);
 
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", x1);
-    line.setAttribute("y1", y1);
-    line.setAttribute("x2", x2);
-    line.setAttribute("y2", y2);
-    
-    // ตั้งค่าสีและความหนาของเส้น
-    line.setAttribute("stroke", isMajor ? "#64748b" : "#334155");
-    line.setAttribute("stroke-width", isMajor ? "2.5" : "1");
-    line.setAttribute("stroke-linecap", "round");
-
+    line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+    line.setAttribute("stroke", isMajor ? "#f8fafc" : "#64748b");
+    line.setAttribute("stroke-width", isMajor ? "2" : "1");
     container.appendChild(line);
+
+    // 2. วางตัวเลขที่ท้ายขีดหลัก (เฉพาะขีดหลัก 0, 20, 40, 60, 80, 100)
+    if (isMajor && (i % 4 === 0 || i === totalTicks)) {
+      const value = Math.round((i / totalTicks) * 100);
+      
+      // กำหนดระยะห่างจากขีด (ยิ่งลบเยอะ ยิ่งเข้าหาจุดศูนย์กลาง)
+      const textR = radius - 22; 
+      
+      const tx = cx + textR * Math.cos(angle);
+      const ty = cy + textR * Math.sin(angle);
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", tx);
+      text.setAttribute("y", ty + 4); // +4 เพื่อให้กึ่งกลางตัวอักษรพอดีกับสายตา
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("class", "gauge-scale-num");
+      text.textContent = value;
+      container.appendChild(text);
+    }
   }
 }
 
@@ -8266,6 +8457,163 @@ function spawnCancelButton(text, onClickCallback) {
   btn.onclick = onClickCallback;
   return btn;
 }
+/* ══════════════════════════════════════════════════════════════
+   INSTANT AI SMART FILL (v4.3 - Full Form Reset)
+═════════════════════════════════════════════════════════════════ */
+
+let aiBrain = { partNoMap: {}, partNameMap: {} };
+
+function updateAIBrain() {
+    const myRecords = getMyRecords();
+    if (!myRecords || myRecords.length === 0) return;
+    aiBrain.partNoMap = {}; aiBrain.partNameMap = {};
+    const tempStore = {};
+    myRecords.forEach(r => {
+        const pNo = String(r.partNo || "").trim();
+        const pName = String(r.partName || "").trim();
+        if (pNo) { if (!tempStore[pNo]) tempStore[pNo] = []; tempStore[pNo].push(r); }
+        if (pName) { if (!tempStore[pName]) tempStore[pName] = []; tempStore[pName].push(r); }
+    });
+    const getMode = (arr, key) => {
+        const counts = {}; let max = 0, result = null;
+        arr.forEach(item => {
+            const val = item[key];
+            if (val && val !== '-' && val !== '') {
+                counts[val] = (counts[val] || 0) + 1;
+                if (counts[val] > max) { max = counts[val]; result = val; }
+            }
+        });
+        return result;
+    };
+    for (let key in tempStore) {
+        const recordsForKey = tempStore[key];
+        aiBrain.partNoMap[key.toLowerCase()] = aiBrain.partNameMap[key.toLowerCase()] = {
+            supplier: getMode(recordsForKey, 'supplier'),
+            partNo: getMode(recordsForKey, 'partNo'),
+            partName: getMode(recordsForKey, 'partName'),
+            line: getMode(recordsForKey, 'line'),
+            defect: getMode(recordsForKey, 'defect'),
+            judgment: getMode(recordsForKey, 'judgment')
+        };
+    }
+}
+
+function aiInstantFill(inputVal, source) {
+    if (editingId || !inputVal || inputVal.length < 2) return;
+    const targetKey = inputVal.toLowerCase().trim();
+    const suggestion = aiBrain.partNoMap[targetKey] || aiBrain.partNameMap[targetKey];
+
+    if (suggestion) {
+        let hasFilled = false;
+        const fill = (id, newVal) => {
+            const el = $id(id);
+            if (el && newVal && (!el.value || el.value === '-' || el.value === '')) {
+                el.value = newVal; aiHighlightEffect(el); hasFilled = true;
+            }
+        };
+
+        fill('supplier', suggestion.supplier);
+        if (source !== 'partNo') fill('partNo', suggestion.partNo);
+        if (source !== 'partOn') fill('partOn', suggestion.partName);
+        fill('lineNo', suggestion.line);
+        fill('defectName', suggestion.defect);
+
+        const qtyIn = $id('qty');
+        if (qtyIn && (!qtyIn.value || qtyIn.value === '0' || qtyIn.value === '')) {
+            qtyIn.value = 1; aiHighlightEffect(qtyIn); hasFilled = true;
+        }
+
+        if (suggestion.judgment) {
+            const jd = $id('judgmentSelect');
+            if (jd && !jd.value) {
+                jd.value = suggestion.judgment; handleJudgment(suggestion.judgment);
+                aiHighlightEffect(jd); hasFilled = true;
+            }
+        }
+
+        if (hasFilled) {
+            showAiResetButton();
+            const t = $id('toast');
+            if (t) { t.textContent = "✨ AI Auto-fill Active"; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1000); }
+        }
+    }
+}
+
+// --- ฟังก์ชันล้างข้อมูลทั้งหมด ---
+function showAiResetButton() {
+    if ($id('aiResetBtn')) return;
+    const submitBtn = $id('submitBtn');
+    if (!submitBtn) return;
+
+    const resetBtn = document.createElement('button');
+    resetBtn.id = 'aiResetBtn';
+    resetBtn.type = 'button';
+    resetBtn.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-right:5px">
+            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+        ล้างข้อมูลทั้งหมด (Reset Form)
+    `;
+    
+    resetBtn.style.cssText = `
+        width: 100%; padding: 0.8rem; margin-top: 0.5rem;
+        background: #f8fafc; border: 1.5px solid #e2e8f0;
+        color: #64748b; border-radius: var(--r-sm);
+        font-family: var(--font-head); font-weight: 700; font-size: 0.7rem;
+        cursor: pointer; transition: all 0.2s; display: flex;
+        align-items: center; justify-content: center; animation: slideIn 0.3s ease;
+    `;
+    
+    resetBtn.onmouseover = () => { resetBtn.style.background = '#f1f5f9'; resetBtn.style.borderColor = '#cbd5e1'; };
+    resetBtn.onmouseout = () => { resetBtn.style.background = '#f8fafc'; resetBtn.style.borderColor = '#e2e8f0'; };
+    
+    resetBtn.onclick = () => {
+        // 1. ล้างช่อง Input ทั้งหมด
+        const allFields = ['partNo', 'partOn', 'supplier', 'lineNo', 'qty', 'defectName', 'remark', 'refNo'];
+        allFields.forEach(id => { if($id(id)) $id(id).value = ''; });
+        
+        // 2. รีเซ็ต Judgment
+        const jd = $id('judgmentSelect');
+        if (jd) { jd.value = ''; handleJudgment(''); }
+        
+        // 3. แจ้งเตือนและลบปุ่มตัวเองออก
+        toast("🧹 ล้างข้อมูลฟอร์มทั้งหมดแล้ว");
+        resetBtn.remove();
+        if($id('partNo')) $id('partNo').focus(); // โฟกัสช่องแรกใหม่
+    };
+
+    submitBtn.parentNode.insertBefore(resetBtn, submitBtn);
+}
+
+function removeAiResetButton() {
+    const btn = $id('aiResetBtn');
+    if (btn) btn.remove();
+}
+
+function initAISmartFill() {
+    const pNoIn = $id('partNo'), pNameIn = $id('partOn');
+    if (pNoIn) pNoIn.addEventListener('input', function() { aiInstantFill(this.value, 'partNo'); });
+    if (pNameIn) pNameIn.addEventListener('input', function() { aiInstantFill(this.value, 'partOn'); });
+}
+
+function aiHighlightEffect(el) {
+    el.style.backgroundColor = 'rgba(59, 130, 246, 0.15)';
+    setTimeout(() => { el.style.backgroundColor = ''; }, 800);
+}
+
+// Hook เข้ากับระบบเดิม
+const originalRefreshAll = refreshAll;
+refreshAll = function() { originalRefreshAll(); updateAIBrain(); };
+
+// ตรวจจับการกด Submit เพื่อซ่อนปุ่มล้าง
+const originalHandleFormSubmit = handleFormSubmit;
+handleFormSubmit = async function(e) {
+    const res = await originalHandleFormSubmit(e);
+    removeAiResetButton();
+    return res;
+};
+
+initAISmartFill();
 </script>
 </body>
 </html>
