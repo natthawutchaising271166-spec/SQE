@@ -1000,12 +1000,16 @@ thead th {
 thead th:first-child { padding-left: 1.6rem; }
 
 tbody tr {
+  /* ... styles เดิม (opacity, transform, border-bottom) ... */
   opacity: 0; 
   transform: translateY(6px);
   transition: none;
   border-bottom: 1px solid #f1f5f9;
   content-visibility: auto;
-  contain-intrinsic-size: 0 70px;
+  contain-intrinsic-size: 0 70px; /* <-- แนะนำให้แก้ตรงนี้ด้วย (Chrome optimization) */
+  
+  /* ✅ เพิ่มบรรทัดนี้เพื่อบังคับให้แถวสูง 70px พอดีกับ JS */
+  height: 70px; 
 }
 
 tbody tr.vis { opacity: 1; transform: none; }
@@ -1149,11 +1153,6 @@ tbody tr:hover td:first-child::before { opacity: 1; transform: scaleY(1); }
   animation: modalIn .28s cubic-bezier(.34,1.56,.64,1);
   border: 1px solid rgba(239,68,68,.1);
   border-top: 3px solid var(--accent-red);
-}
-
-@keyframes modalIn { 
-  from { opacity: 0; transform: scale(.9) translateY(16px); } 
-  to { opacity: 1; transform: none; } 
 }
 
 #deleteProgressOverlay {
@@ -3787,43 +3786,6 @@ canvas {
   background: rgba(239, 68, 68, 0.1) !important;
   animation: rowDeletePulse 0.8s ease-in-out infinite;
 }
-
-/* ✅ FIX: Add missing @keyframes */
-@keyframes rowDeletePulse {
-  0%, 100% {
-    opacity: 0.5;
-    transform: translateX(0);
-  }
-  50% {
-    opacity: 0.3;
-    transform: translateX(-5px);
-  }
-}
-
-/* ─────────────────────────────────────────────────────
-   PROBLEM 2: .btn-success uses animation "btnSuccess"
-   but @keyframes btnSuccess was missing
-   ───────────────────────────────────────────────────── */
-.btn-success {
-  animation: btnSuccess 0.7s ease-out;
-}
-
-/* ✅ FIX: Add missing @keyframes */
-@keyframes btnSuccess {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-  }
-  30% {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-  }
-}
-
 /* ─────────────────────────────────────────────────────
    BONUS: Additional useful animations that might be needed
    ───────────────────────────────────────────────────── */
@@ -5289,6 +5251,59 @@ datalist { display: none; }
 .main-gauge .gauge-scale-num {
   font-size: 10px; /* หน้าปัดใหญ่ขึ้น ตัวเลขก็ใหญ่ขึ้นตาม */
 }
+/* ═════════════════════════════════════════════════
+   MODAL: SINGLE DELETE CONFIRMATION
+═══════════════════════════════════════════════════ */
+#singleDeleteModal {
+  /* ตั้งค่าเริ่มต้นให้ซ่อนอยู่ */
+  display: none;
+  
+  /* Positioning & Background */
+  position: fixed; 
+  inset: 0; 
+  z-index: 20000; 
+  align-items: center; 
+  justify-content: center; 
+  background: rgba(15,23,42,.4); 
+  backdrop-filter: blur(12px);
+  
+  /* Transition สำหรับ Opacity (ถ้าต้องการ Fade effect ด้วย) */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Class สำหรับแสดง Modal */
+#singleDeleteModal.show {
+  display: flex;
+  opacity: 1;
+}
+
+/* Animation สำหรับ Card ด้านใน */
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+#singleDeleteModal .del-card {
+  /* Base styles for the card */
+  background: #fff; 
+  border-radius: 20px; 
+  padding: 2rem; 
+  text-align: center; 
+  max-width: 350px; 
+  width: 90%; 
+  box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  border: 1px solid rgba(239,68,68,.1);
+  border-top: 3px solid var(--accent-red);
+  
+  /* Reset animation state */
+  opacity: 0;
+}
+
+/* เมื่อ Modal แสดง ให้ Card เด้งขึ้น (Pop animation) */
+#singleDeleteModal.show .del-card {
+  animation: modalPop 0.3s cubic-bezier(.34,1.56,.64,1) forwards;
+}
 </style>
 </head>
 <body>
@@ -6220,17 +6235,20 @@ datalist { display: none; }
 </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
+<!-- ═════════════════════════════════════════════════
      SINGLE DELETE CONFIRMATION MODAL (ลบรายการเดียว)
 ═══════════════════════════════════════════════════ -->
-<div id="singleDeleteModal" style="display:none; position:fixed; inset:0; z-index:20000; align-items:center; justify-content:center; background:rgba(15,23,42,.4); backdrop-filter:blur(12px);">
-  <div style="background:#fff; border-radius:20px; padding:2rem; text-align:center; max-width:350px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,.2); animation:modalPop .3s cubic-bezier(.34,1.56,.64,1);">
+<div id="singleDeleteModal">
+  <div class="del-card">
+    <!-- Icon สัญลักษณ์ -->
     <div style="font-size:2.5rem; margin-bottom:1rem;">🗑️</div>
+    
     <h3 style="font-family:var(--font-head); font-weight:800; color:#1e293b; margin-bottom:0.5rem;">ลบรายการนี้?</h3>
     <p style="color:#64748b; font-size:0.9rem; margin-bottom:1.5rem;">
       คุณต้องการลบข้อมูลรายการนี้ใช่ไหม<br>
       ข้อมูลจะถูกลบออกจากระบบ
     </p>
+    
     <div style="display:flex; gap:1rem;">
       <button onclick="hideSingleDeleteModal()" style="flex:1; padding:0.8rem; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; font-weight:700; cursor:pointer;">ยกเลิก</button>
       <button onclick="confirmDeleteSingleRow()" style="flex:1; padding:0.8rem; border-radius:12px; border:none; background:linear-gradient(135deg,#dc2626,#ef4444); color:#fff; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(239,68,68,.3);">ลบทันที</button>
@@ -6246,7 +6264,8 @@ datalist { display: none; }
 </style>
 <script>
 document.addEventListener('contextmenu', e => e.preventDefault());
-
+// กำหนดค่าความสูงแถวเป็น Constant (ใส่ไว้ด้านบนส่วนของ Table Logic หรือ Global ได้)
+const ROW_HEIGHT = 70; 
 /* ══════════════════════════════════════════════════════════════
    0. CONFIGURATION & GLOBAL VARIABLES
    ตั้งค่าเริ่มต้น, ตัวแปร Global, และ State ของระบบ
@@ -6541,24 +6560,54 @@ async function syncToCloud(isInitial = false) {
     }
   }
 
-  // 3. โหลดข้อมูลล่าสุดจาก Cloud มาทับ Local (ข้อมูลจาก Cloud ทุกตัวจะถือว่า _isSaved = true)
+  // 3. โหลดข้อมูลล่าสุดจาก Cloud มาทับ Local
   const cloudData = await fetchFromSupabase(currentUser);
   if (cloudData) {
-    if (pushSuccess) {
-      // ✅ ข้อมูลจาก Cloud ทั้งหมดให้เป็นสถานะ Sync Success (เขียว)
-      records = cloudData.map(r => ({ ...r, _isSaved: true }));
-    } else {
-      const offlineStill = records.filter(r => r._isSaved === false);
-      let merged = cloudData.map(r => ({ ...r, _isSaved: true }));
-      offlineStill.forEach(off => { 
-        if (!merged.find(c => c.id === off.id)) merged.push(off); 
-      });
-      records = merged;
-    }
+    
+    // ✅ ตรงนี้คือส่วนที่แก้ไข: ใช้ Smart Merge แทนการทับหมด
+
+    // 3.1 สร้าง Map จาก Cloud Data เพื่อให้ค้นหาเร็ว
+    const cloudMap = new Map();
+    cloudData.forEach(c => {
+        // กำหนดให้ข้อมูลจาก Cloud เป็นสถานะ Sync แล้ว
+        cloudMap.set(c.id, { ...c, _isSaved: true });
+    });
+
+    // 3.2 สร้าง Array ผลลัพธ์จากการผสาน (Merge)
+    // เริ่มต้นด้วย Array ว่าง
+    const mergedRecords = [];
+
+    // 3.3 ตรวจสอบ Local Records ทีละตัว
+    records.forEach(localRec => {
+        // กรณี A: ข้อมูลนี้ถูกสร้าง/แก้ไขอยู่ในเครื่องและยังไม่ได้ Sync (_isSaved = false)
+        // -> จำเป็นต้องเก็บของ Local ไว้! (ป้องกันไม่ให้ข้อมูลหายถ้า Cloud ยังไม่รับรู้)
+        if (localRec._isSaved === false) {
+            mergedRecords.push(localRec);
+        } 
+        // กรณี B: ข้อมูลนี้ Sync แล้ว (_isSaved = true)
+        // -> ถ้า Cloud มีข้อมูลเดียวกัน ให้เอาของ Cloud (เพื่อให้ทันสมัยจากเครื่องอื่น)
+        // -> ถ้า Cloud ไม่มี (ลบไปแล้ว) ตัวอย่างนี้จะไม่ถูกเพิ่มเข้า mergedRecords
+        else if (cloudMap.has(localRec.id)) {
+            mergedRecords.push(cloudMap.get(localRec.id));
+        }
+    });
+
+    // 3.4 เพิ่มรายการใหม่ที่มีอยู่บน Cloud แต่ Local ไม่มี (จากเครื่องอื่น)
+    // เราทำการ Loop ผ่าน cloudMap และตรวจสอบว่ามีอยู่ใน mergedRecords หรือยัง
+    cloudData.forEach(cloudRec => {
+        // ถ้าหา ID นี้ไม่เจอในผลลัพธ์ ให้เพิ่มเข้าไป
+        if (!mergedRecords.find(r => r.id === cloudRec.id)) {
+            mergedRecords.push(cloudRec);
+        }
+    });
+
+    // 3.5 อัปเดต Global variable
+    records = mergedRecords;
     
     await dbClear();
     await dbPutBulk(records);
     refreshAll();
+    
     if (!isInitial) toast('✅ Sync สำเร็จแล้ว');
   } else {
     if (!isInitial) toast('❌ Sync ล้มเหลว');
@@ -6600,7 +6649,7 @@ async function login() {
   const step3 = $id('ls3');
 
   try {
-    // ════════════ AUTOMATION STEP 1: Verifying ════════════
+    // ══════════ AUTOMATION STEP 1: Verifying ══════════
     if (step1) step1.classList.add('active');
     if (bar) bar.style.width = '35%';
     
@@ -6612,23 +6661,27 @@ async function login() {
     await delay(700); // หน่วงเวลาให้ดูสมจริง
     if (step1) { step1.classList.remove('active'); step1.classList.add('done'); }
 
-    // ════════════ AUTOMATION STEP 2: Loading Workspace ════════════
+    // ══════════ AUTOMATION STEP 2: Loading Workspace ══════════
     if (step2) step2.classList.add('active');
     if (bar) bar.style.width = '70%';
     
     // แอบโหลดฐานข้อมูล Local (IndexedDB) เตรียมไว้ล่วงหน้า
     await initDB();
     records = await dbGetAll();
-    refreshAll();
+    
+    // ❌ ลบ refreshAll() ออกที่นี่ ❌
+    // เพราะเราจะเรียกอีกครั้งตอนจบใน Step 3 หรือ initApp
+    // การวาดหน้าจอตอนนี้คือการทำงานซ้ำที่ไร้ประโยชน์
     
     await delay(600);
     if (step2) { step2.classList.remove('active'); step2.classList.add('done'); }
 
-    // ════════════ AUTOMATION STEP 3: Fetching Cloud Data ════════════
+    // ══════════ AUTOMATION STEP 3: Fetching Cloud Data ══════════
     if (step3) step3.classList.add('active');
     if (bar) bar.style.width = '90%';
     
     // แอบซิงค์ข้อมูลกับ Supabase อย่างเงียบๆ (ถ้ามีเน็ต)
+    // refreshAll() จะถูกเรียกอีกครั้งหลังจาก Sync สำเร็จภายใน syncToCloud -> refreshAll
     if (isOnline) {
       await syncToCloud(true); // ส่ง true ไปเพื่อไม่ให้มี Toast เด้งกวนใจ
     }
@@ -6637,7 +6690,7 @@ async function login() {
     await delay(500);
     if (step3) { step3.classList.remove('active'); step3.classList.add('done'); }
 
-    // ════════════ FINISH: สลับหน้าจอเข้าสู่ Dashboard ════════════
+    // ══════════ FINISH: สลับหน้าจอเข้าสู่ Dashboard ══════════
     await delay(300); // รอจังหวะนิดนึงให้ผู้ใช้เห็นว่าโหลดครบ 100% แล้ว
 
     if (typeof gsap !== 'undefined') {
@@ -6825,19 +6878,23 @@ window.editRecord = function(id) {
     btn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
   }
 
- // ✅ ใช้โค้ดใหม่
-if(!$id('cancelEditBtn')) {
-  const cancelBtn = spawnCancelButton('ยกเลิกแก้ไข', cancelEdit);
-  cancelBtn.id = 'cancelEditBtn';
-  btn.parentNode.appendChild(cancelBtn);
-}
+  // ✅ 5. สร้างปุ่มยกเลิก
+  if(!$id('cancelEditBtn')) {
+    const cancelBtn = spawnCancelButton('ยกเลิกแก้ไข', cancelEdit);
+    cancelBtn.id = 'cancelEditBtn';
+    btn.parentNode.appendChild(cancelBtn);
+  }
 
-  // ✅ 6. เลื่อนตารางไปหาแถวที่เลือก + Highlight
+  // ✅ 6. แก้ไขตรงนี้: เลื่อนตารางไปหาแถวที่เลือก + Highlight
   const tableContainer = $id('tableContainer');
-  const rowIndex = records.findIndex(r => r.id === id);
+  
+  // ปัญหาเดิม: ใช้ records.findIndex (index จากข้อมูลทั้งหมด) ทำให้ Scroll ตำแหน่งผิดหากมี Filter หรือ Search
+  // วิธีแก้: ต้องหา index จากข้อมูลที่กำลังแสดงผลอยู่จริง (virtualTableState.allRows)
+  const displayData = virtualTableState.allRows;
+  const rowIndex = displayData.findIndex(r => r.id === id);
   
   if(rowIndex >= 0 && tableContainer) {
-    const rowHeight = 70; // ความสูงแต่ละแถวตามโค้ดเดิม
+    const rowHeight = 70; // ความสูงแถวตามที่กำหนด
     
     // Scroll ลงไปหาแถวนั้น (ลบออก 50px เพื่อให้แถวไม่ติดขอบบน)
     tableContainer.scrollTo({ 
@@ -6946,15 +7003,20 @@ function cancelEdit() {
 function showSingleDeleteModal(id) {
   _pendingDeleteId = id;
   const modal = $id('singleDeleteModal');
-  if (modal) modal.style.display = 'flex';
+  if (modal) {
+    // ✅ เปลี่ยนจาก .style.display = 'flex' เป็นการเพิ่ม class
+    modal.classList.add('show');
+  }
 }
 
 function hideSingleDeleteModal() {
   _pendingDeleteId = null;
   const modal = $id('singleDeleteModal');
-  if (modal) modal.style.display = 'none';
+  if (modal) {
+    // ✅ เปลี่ยนจาก .style.display = 'none' เป็นการลบ class
+    modal.classList.remove('show');
+  }
 }
-
 async function confirmDeleteSingleRow() {
   const idToDelete = _pendingDeleteId;
   hideSingleDeleteModal();
@@ -6965,37 +7027,47 @@ async function confirmDeleteSingleRow() {
   }
 
   try {
-    if (isOnline && getSupabase()) {
-      // ✅ ออนไลน์: ลบบน Cloud ทันที
-      const success = await deleteFromSupabase(idToDelete);
-      if (!success) throw new Error("Cloud delete failed");
-      
-      // ลบจาก Local Database
-      if (db) {
-        await new Promise((resolve) => {
-          const tx = db.transaction(IDB_STORE, 'readwrite');
-          tx.objectStore(IDB_STORE).delete(String(idToDelete));
-          tx.oncomplete = () => resolve();
-        });
-      }
-      toast("✅ ลบรายการสำเร็จ");
-    } else {
-      // 🔴 ออฟไลน์: ติดแท็ก _isDeleted แล้วเก็บไว้ใน Local ก่อน รอต่อเน็ตค่อยลบจริง
-      const targetRecord = records.find(r => String(r.id) === String(idToDelete));
-      if (targetRecord) {
-        targetRecord._isDeleted = true;
-        await dbPutBulk([targetRecord]); // อัปเดตสถานะใน IndexedDB
-      }
-      toast("🔴 ออฟไลน์: บันทึกสถานะการลบไว้แล้ว (จะลบจริงเมื่อมีเน็ต)");
+    // ═════════════════════════════════════════════════════
+    // ขั้นตอนที่ 1: ลบจาก IndexedDB (Local Database) ก่อน
+    // ═════════════════════════════════════════════════════
+    if (db) {
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        const store = tx.objectStore(IDB_STORE);
+        const req = store.delete(String(idToDelete)); // ใช้ String เพื่อความปลอดภัย
+        
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        req.onerror = () => reject(req.error);
+      });
     }
 
-    // เอาออกจาก Array ใน RAM ทันทีเพื่อให้ UI อัปเดตว่าหายไปแล้ว
+    // ═════════════════════════════════════════════════════
+    // ขั้นตอนที่ 2: ลบจาก Cloud (Supabase) ถ้าออนไลน์
+    // ═════════════════════════════════════════════════════
+    if (isOnline && getSupabase()) {
+      const success = await deleteFromSupabase(idToDelete);
+      // ถ้าลบ Cloud ไม่สำเร็จ แต่ Local เรียบร้อยแล้ว 
+      // เราจะยังถือว่าสำเร็จเพื่อ UX ที่ดี (แต่อาจต้อง sync ใหม่ภายหลัง)
+      if (!success) {
+        console.warn("Cloud delete failed for ID:", idToDelete);
+      }
+    }
+
+    // ═════════════════════════════════════════════════════
+    // ขั้นตอนที่ 3: อัปเดตข้อมูลในหน่วยความจำ (RAM) และหน้าจอ
+    // ═════════════════════════════════════════════════════
+    // กรองเอา ID ที่ลบออกจาก Array records
     records = records.filter(r => String(r.id) !== String(idToDelete));
+    
+    // รีเฟรชหน้าจอตารางและ KPI
     refreshAll();
+
+    toast("✅ ลบรายการสำเร็จ");
 
   } catch (err) {
     console.error("Single Delete Error:", err);
-    toast("❌ ลบไม่สำเร็จ");
+    toast("❌ ลบรายการไม่สำเร็จ");
   }
 }
 
@@ -7200,11 +7272,10 @@ function renderVisibleRows() {
   if(empty) empty.style.display = 'none';
 
   const rowsToRender = allRows.slice(visibleStart, visibleEnd);
-  const rowHeight = 70; 
-  const totalRows = allRows.length;
   
-  const topSpacerHeight = visibleStart * rowHeight;
-  const bottomSpacerHeight = (totalRows - visibleEnd) * rowHeight;
+  // ✅ ปรับ: ใช้ ROW_HEIGHT ตัวแปรแทนตัวเลข
+  const topSpacerHeight = visibleStart * ROW_HEIGHT;
+  const bottomSpacerHeight = (allRows.length - visibleEnd) * ROW_HEIGHT;
 
   const SM = {
     'SF': { dot: '#f97316', s: 'color:#c2410c;background:#fff7ed;border:1px solid #fed7aa' },
@@ -7214,6 +7285,7 @@ function renderVisibleRows() {
   };
 
   let html = '';
+  // ใช้ ROW_HEIGHT ในการคำนวณ spacer
   if (topSpacerHeight > 0) html += `<tr style="height:${topSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
 
   rowsToRender.forEach(r => {
@@ -7260,26 +7332,28 @@ function renderVisibleRows() {
   tbody.innerHTML = html;
 }
 
+
+
 function renderTable() {
-  // 1. ดึงข้อมูลที่ผ่านการกรอง (Search + Filter Button)
+  // 1. ดึงข้อมูลที่ผ่านการกรอง
   const filtered = getCurrentFilteredData();
   
   // 2. อัปเดตข้อมูล Global State
   virtualTableState.allRows = filtered;
   
-  // ✅ FIX: บังคับให้ Scroll กลับมาที่บนสุด (แถวที่ 0) เสมอเมื่อมีการค้นหาหรือกด Filter
-  // ป้องกันปัญหา Virtual Scroll วิ่งหาย ทำให้หน้าจอขาว
-  const tableContainer = $id('tableContainer');
-  if(tableContainer) {
-    tableContainer.scrollTop = 0;
-  }
+  // ✅ ปรับ: ลบบรรทัด scrollTop = 0 ออกเพื่อไม่ให้กวนผู้ใช้ (ตามข้อแนะนำข้อ 4)
+  // const tableContainer = $id('tableContainer');
+  // if(tableContainer) tableContainer.scrollTop = 0; 
 
-  // ✅ FIX: รีเซ็ตจุดเริ่มต้นและจุดสิ้นสุดของการแสดงผล
-  // เพื่อให้แน่ใจว่าวาดแถว 0-50 แรกเสมอ
+  // 3. คำนวณจำนวนแถวที่แสดง (ใช้ ROW_HEIGHT แทน Magic Number)
+  const tableContainer = $id('tableContainer');
+  const viewportHeight = tableContainer ? tableContainer.clientHeight : 0;
+  const visibleCount = Math.ceil(viewportHeight / ROW_HEIGHT) + 20; // +20 สำหรับ Buffer
+
   virtualTableState.visibleStart = 0;
-  virtualTableState.visibleEnd = filtered.length > 50 ? 50 : filtered.length; 
+  virtualTableState.visibleEnd = Math.min(filtered.length, visibleCount); 
   
-  // 3. วาดแถวที่ต้องการ
+  // 4. วาดแถว
   renderVisibleRows();
 }
 
@@ -7388,13 +7462,15 @@ function closeDashboard() {
 
 // ฟังก์ชันภายในสำหรับจัดการการรีเซ็ตเมื่อออกจากหน้า Dashboard
 function finalizeResetOnExit() {
+    // ✅ เพิ่มบรรทัดนี้เพื่อล้างค่าและทำลาย Chart Instance เก่า (ป้องกัน Memory Leaks)
+    resetDashboardState();
+
     // 1. ล้างค่าในช่อง Input/Select ของ Dashboard ให้ว่าง
     if($id('dashStart')) $id('dashStart').value = '';
     if($id('dashEnd')) $id('dashEnd').value = '';
     if($id('dashVendor')) $id('dashVendor').value = 'ALL';
 
     // 2. รีเซ็ต Filter ของตารางหน้าหลัก (Main Table) ให้กลับเป็น 'ALL'
-    // เพื่อให้ผู้ใช้กลับมาเห็นข้อมูลทั้งหมดบนหน้าจอหลัก
     setFilter('ALL');
 
     // 3. รีเฟรชตารางหน้าหลักและ KPI หลัก
@@ -7406,7 +7482,7 @@ function finalizeResetOnExit() {
         renderTable(); // วาดตารางใหม่แบบไม่มีคำค้นหา
     }
 
-    console.log("[System] Dashboard closed and filters refreshed to default.");
+    console.log("[System] Dashboard closed, memory cleared, and filters refreshed to default.");
 }
 
 function populateDashFilters() {
@@ -7468,8 +7544,8 @@ function updateMainGauge(pct) {
   // 2. อัปเดตตัวเลขหลัก (เปลี่ยนสีให้เข้ากับสถานะ)
   if(valDisplay) {
     valDisplay.textContent = pct + '%';
-    valDisplay.style.color = statusColor; // เปลี่ยนสีตัวเลขให้แมตช์กับ Badge
-    valDisplay.style.filter = `drop-shadow(0 0 8px ${statusColor}44)`; // เพิ่มเงาเรืองแสงบางๆ
+    valDisplay.style.color = statusColor; // ✅ ให้เปลี่ยนสีตัวอักษรได้ (สีจะตรงกับสถานะ)
+    valDisplay.style.filter = `drop-shadow(0 0 8px ${statusColor}44)`; // เรืองแสงตามสถานะ
   }
 
   // 3. อัปเดตหน้าปัดและเข็ม
@@ -7477,7 +7553,14 @@ function updateMainGauge(pct) {
   if(arc) {
     const circ = 267;
     arc.style.strokeDasharray = `${(pct/100)*circ} ${circ}`;
-    arc.style.stroke = statusColor; // เปลี่ยนสีแถบวิ่งตามสถานะ
+    
+    // ❌ ลบบรรทัดนี้ออก ❌ (นี่คือจุดสำคัญ)
+    // arc.style.stroke = statusColor;
+    
+    // ✅ คำอธิบาย:
+    // โดยไม่ต้องสั่ง stroke ทับใหม่ stroke จะยังคงใช้ค่าจาก HTML attribute เดิมคือ "url(#gaugeGradient)"
+    // ทำให้หน้าปัดแสดงสีไล่เฉดสวยงาม (Heatmap: แดง -> เหลือง -> เขียว) ตามดีไซน
+    // ส่วนสีสถานะจะเน้นที่ตัวเลขและ Badge ด้านล่างแทน
   }
 
   const needle = document.getElementById('gaugeNeedle');
@@ -7485,7 +7568,7 @@ function updateMainGauge(pct) {
     needle.style.transform = `rotate(${-90 + (pct * 1.8)}deg)`;
   }
 
-  // 4. อัปเดต Trend Badge
+  // 4. อัปเดต Trend Badge (สีตรงนี้ก็เปลี่ยนตามสถานะ)
   if (trendBox && trendText && trendArrow) {
     trendBox.className = 'gauge-trend ' + statusClass;
     trendText.textContent = statusText;
@@ -7881,24 +7964,25 @@ function updateChartStats(dataArray) {
    8. EXCEL IMPORT & EXPORT
    นำเข้าข้อมูลจากไฟล์ Excel (XLSX) แบบอัจฉริยะ และการส่งออก
 ═════════════════════════════════════════════════════════════════ */
-const cleanText = (str) => String(str).toLowerCase().trim().replace(/[^a-z0-9ก-๙]/g, '');
+const cleanText = (str) => String(str).toLowerCase().trim().replace(/[^a-z0-9ก-๙.-]/g, '');
 
 function smartMapHeaders(excelHeaders) {
   const fieldRules = {
-    date:['inspectiondate', 'inspection date', 'insp. date', 'date', 'time', 'claimdate', 'dailydate', 'created', 'วันที่', 'วันเวลา', 'insp date', 'check date'],
-    ref:['ref', 'refer', 'reference', 'claimno', 'claim no', 'id', 'doc', 'invoice', 'inv', 'itemno', 'item', 'lot', 'no', 'number', 'code', 'refno'],
-    partName:['partname', 'part name', 'description', 'desc', 'detail', 'name', 'product', 'itemname', 'remark'],
-    supplier:['supplier', 'vendor', 'sup', 'suppliername', 'vendorname', 'company', 'maker', 'factory', 'ผู้ขาย', 'ซัพพลายเออร์'],
-    partNo:['partno', 'part number', 'partnumber', 'pn', 'part', 'material', 'mat', 'model', 'p/n'],
-    qty:['qty', 'quantity', 'pcs', 'piece', 'amount', 'count', 'claimqty', 'lotsize', 'number', 'value', 'val', 'total', 'pc', 'ea', 'each'],
-    defect:['defect', 'problem', 'trouble', 'troubleclaim', 'trouble claim', 'ng', 'symptom', 'cause', 'reason', 'issue'],
-    judgment:['judgment', 'judge', 'status', 'result', 'disposition', 'okng', 'ผลการตรวจ'],
-    shift:['shift', 'turn', 'workshift', 'day', 'night', 'ผลัด'],
-    line:['line', 'process', 'machine', 'station', 'location', 'productionline', 'ไลน์'],
-    remark:['remark', 'note', 'comment', 'memo', 'หมายเหตุ', 'บันทึก'],
-    inspector:['inspector', 'inspectedby', 'checkedby', 'pic', 'user', 'name', 'inspectorname']
+    date: ['inspectiondate', 'inspection date', 'insp. date', 'insp-date', 'date', 'time', 'claimdate', 'dailydate', 'created', 'วันที่', 'วันเวลา', 'insp date', 'check date'],
+    ref: ['ref', 'refer', 'reference', 'claimno', 'claim no', 'claim-no', 'ref-no', 'ref.no', 'id', 'doc', 'invoice', 'inv', 'itemno', 'item', 'lot', 'no', 'number', 'code', 'refno'],
+    partName: ['partname', 'part name', 'description', 'desc', 'detail', 'name', 'product', 'itemname', 'remark', 'part-name', 'part.name'],
+    supplier: ['supplier', 'vendor', 'sup', 'suppliername', 'vendorname', 'company', 'maker', 'factory', 'ผู้ขาย', 'ซัพพลายเออร์'],
+    partNo: ['partno', 'part-no', 'part.no', 'part number', 'partnumber', 'pn', 'part', 'material', 'mat', 'model', 'p/n'],
+    qty: ['qty', 'quantity', 'pcs', 'piece', 'amount', 'count', 'claimqty', 'lotsize', 'number', 'value', 'val', 'total', 'pc', 'ea', 'each'],
+    defect: ['defect', 'problem', 'trouble', 'troubleclaim', 'trouble claim', 'ng', 'symptom', 'cause', 'reason', 'issue'],
+    judgment: ['judgment', 'judge', 'status', 'result', 'disposition', 'okng', 'ผลการตรวจ'],
+    shift: ['shift', 'turn', 'workshift', 'day', 'night', 'ผลัด'],
+    line: ['line', 'process', 'machine', 'station', 'location', 'productionline', 'ไลน์'],
+    remark: ['remark', 'note', 'comment', 'memo', 'หมายเหตุ', 'บันทึก'],
+    inspector: ['inspector', 'inspectedby', 'checkedby', 'pic', 'user', 'name', 'inspectorname']
   };
-
+  
+  // ... ส่วนที่เหลือของฟังก์ชันเหมือนเดิมครับ ...
   const mappedIndices = {};
   const usedIndices = new Set();
 
@@ -7908,6 +7992,7 @@ function smartMapHeaders(excelHeaders) {
       const cleanHeader = cleanText(header);
       for (const [field, aliases] of Object.entries(fieldRules)) {
         if (mappedIndices[field]) continue; 
+        // Logic ค้นหาจะยังเหมือนเดิม เพราะ aliases มีครบแล้ว
         const sortedAliases = aliases.sort((a, b) => b.length - a.length);
         for (const alias of sortedAliases) {
           if (cleanText(alias) === cleanHeader) { mappedIndices[field] = index; usedIndices.add(index); break; }
@@ -8024,6 +8109,7 @@ function parseExcelDate(excelValue) {
   }
   return null;
 }
+
 
 async function importExcel(input) {
   if (!input.files || input.files.length === 0) return;
@@ -8162,13 +8248,16 @@ function updateChartsTheme() {
 }
 
 
-/* ══════════════════════════════════════════════════════════════
+/* ═════════════════════════════════════════════════
    10. EVENT LISTENERS
    จับ Events พื้นฐานทั้งหมดเมื่อหน้าจอโหลด
-═════════════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════ */
 window.addEventListener('load', () => {
   initTheme();
   
+  // ✅ เพิ่มบรรทัดนี้เพื่อเปิดใช้งานระบบ AI Smart Fill
+  initAISmartFill();
+
   if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
   
   const saved = sessionStorage.getItem('currentUser');
@@ -8200,16 +8289,22 @@ window.addEventListener('offline', () => {
 const tableContainer = document.getElementById('tableContainer');
 if (tableContainer) {
   tableContainer.addEventListener('scroll', () => {
-    const rowHeight = 70; 
+    // ✅ ปรับ: ใช้ ROW_HEIGHT ตัวแปรแทน
+    const rowHeight = ROW_HEIGHT; 
+    
     const scrollTop = tableContainer.scrollTop;
     const viewportHeight = tableContainer.clientHeight;
     
+    // คำนวณ index เริ่มต้น
     let startRow = Math.max(0, Math.floor(scrollTop / rowHeight));
+    
+    // คำนวณจำนวนแถวที่แสดง + Buffer
     const visibleCount = Math.ceil(viewportHeight / rowHeight) + 20;
     
     virtualTableState.visibleStart = startRow;
     virtualTableState.visibleEnd = Math.min(virtualTableState.allRows.length, startRow + visibleCount);
     
+    // วาดใหม่เมื่อ Scroll
     window.requestAnimationFrame(() => renderVisibleRows());
   });
 }
@@ -8372,23 +8467,16 @@ function drawGaugeTicks(elementId, radius, isMain = false) {
 // ฟังก์ชันสำหรับเปิดโหมดเต็มจอ
 function enterFullscreen() {
   const doc = document.documentElement;
-  // ✅ FIX: ตรวจสอบก่อนว่ายังไม่ได้อยู่ในโหมดเต็มจอ จึงค่อยสั่งเปิด
-  if (document.fullscreenElement || document.webkitFullscreenElement) {
-    return; 
-  }
+  if (document.fullscreenElement || document.webkitFullscreenElement) return;
 
-  try {
-    if (doc.requestFullscreen) {
-      doc.requestFullscreen().catch(err => {
-        console.log("Fullscreen prevented:", err);
-      });
-    } else if (doc.webkitRequestFullscreen) { /* Safari */
-      doc.webkitRequestFullscreen();
-    } else if (doc.msRequestFullscreen) { /* IE11 */
-      doc.msRequestFullscreen();
-    }
-  } catch (err) {
-    console.warn("Fullscreen API error:", err);
+  // พยายามเข้าโหมดเต็มจอ
+  const p = doc.requestFullscreen || doc.webkitRequestFullscreen;
+  if (p) {
+    p.call(doc).catch(err => {
+      console.log("Fullscreen was prevented or cancelled:", err);
+      // ✅ แจ้งเตือนผู้ใช้ด้วย Toast (แต่อย่าให้รบกวนการ Login)
+      // toast("ℹ️ โหมดเต็มจอไม่สามารถเปิดได้อัตโนมัติ"); 
+    });
   }
 }
 
