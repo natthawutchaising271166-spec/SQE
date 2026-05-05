@@ -5533,7 +5533,6 @@ datalist { display: none; }
           <span class="sdot"></span><span id="syncPulseText">LIVE SYNC</span>
         </div>
       </div>
-
            <!-- Dark Mode Button (อยู่ด้านขวาสุด) -->
       <button onclick="toggleDarkMode()" id="darkModeBtn" title="Toggle Theme"
         style="position:absolute;top:.75rem;right:.75rem;z-index:2;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 8px;cursor:pointer;transition:all .2s;font-size:.7rem;display:flex;align-items:center;gap:3px;font-family:var(--font-head);font-weight:600"
@@ -5543,6 +5542,18 @@ datalist { display: none; }
         <!-- Sun Icon (แสดงตอน Dark Mode) -->
         <svg id="iconSun" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
       </button>
+
+      <!-- ปุ่มเปลี่ยนรหัสผ่าน (Settings) -->
+<button onclick="openChangePassModal()" title="Change Password"
+  style="position:absolute; top:.75rem; right:78px; z-index:2; /* ปรับ right: ให้ห่างจากปุ่มอื่น */
+         background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); color:rgba(255,255,255,.8); 
+         border-radius:8px; padding:5px 8px; cursor:pointer; transition:all .2s; font-size:.7rem; display:flex; align-items:center; gap:3px; 
+         font-family:var(--font-head); font-weight:600;"
+  onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
+  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+  </svg>
+</button>
 
       <!-- Logout Button (เลื่อนมาทางซ้าย 1 ก้าว) -->
       <button onclick="logout()" title="Logout"
@@ -5611,7 +5622,7 @@ datalist { display: none; }
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:.85rem;border-bottom:1.5px solid var(--blue-100)">
         <div>
           <div style="font-family:var(--font-head);font-size:.7rem;font-weight:800;color:var(--text-900)">Entry Terminal</div>
-          <div style="font-size:.6rem;color:var(--text-400);margin-top:1px">ป้อนข้อมูลการตรวจสอบ</div>
+          <div style="font-size:.6rem;color:var(--text-400);margin-top:1px">ป้อนข้อมูล</div>
         </div>
         <span id="currentUserDisp" style="background:var(--blue-600);color:#fff;padding:3px 10px;border-radius:99px;font-size:.6rem;font-weight:700;font-family:var(--font-head)">GUEST</span>
       </div>
@@ -6262,6 +6273,47 @@ datalist { display: none; }
   </div>
 </div>
 
+<!-- ═════════════════════════════════════════════════
+     CHANGE PASSWORD MODAL
+══════════════════════════════════════════════════ -->
+<div id="changePassModal" style="display:none; position:fixed; inset:0; z-index: 20000; align-items:center; justify-content:center; background:rgba(15,23,42,.4); backdrop-filter:blur(12px);">
+  <div class="del-card" style="background:#fff; border-radius:20px; padding:2.5rem; text-align:center; max-width:400px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,.2); border:1px solid rgba(37,99,235,.1);">
+    
+    <!-- Icon -->
+    <div style="font-size:3rem; margin-bottom:1rem;">🔐</div>
+    
+    <h3 style="font-family:var(--font-head); font-weight:800; color:#1e293b; margin-bottom:.5rem;">เปลี่ยนรหัสผ่าน</h3>
+    <p style="color:#64748b; font-size:.9rem; margin-bottom:1.5rem;">
+      กรุณากรอกรหัสผ่านเดิม และรหัสผ่านใหม่ของคุณ
+    </p>
+
+    <!-- Form Inputs -->
+    <div style="display:flex; flex-direction:column; gap:1rem; text-align:left;">
+      
+      <div>
+        <label style="font-size:.7rem; font-weight:700; color:#64748b; margin-bottom:.3rem; display:block;">รหัสผ่านเดิม</label>
+        <input type="password" id="cpOldPass" class="neon-in" placeholder="กรอกรหัสผ่านปัจจุบัน" style="padding:.7rem; width:100%;">
+      </div>
+
+      <div>
+        <label style="font-size:.7rem; font-weight:700; color:#64748b; margin-bottom:.3rem; display:block;">รหัสผ่านใหม่</label>
+        <input type="password" id="cpNewPass" class="neon-in" placeholder="กรอกรหัสผ่านใหม่" style="padding:.7rem; width:100%;">
+      </div>
+
+      <div>
+        <label style="font-size:.7rem; font-weight:700; color:#64748b; margin-bottom:.3rem; display:block;">ยืนยันรหัสผ่านใหม่</label>
+        <input type="password" id="cpConfirmPass" class="neon-in" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง" style="padding:.7rem; width:100%;">
+      </div>
+
+    </div>
+
+    <!-- Buttons -->
+    <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+      <button onclick="closeChangePassModal()" style="flex:1; padding:.8rem; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; font-weight:700; cursor:pointer;">ยกเลิก</button>
+      <button onclick="handleChangePassword()" style="flex:1; padding:.8rem; border-radius:12px; border:none; background:linear-gradient(135deg,var(--blue-700),var(--blue-500)); color:#fff; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(37,99,235,.3);">บันทึกรหัสใหม่</button>
+    </div>
+  </div>
+</div>
 <style>
 @keyframes modalPop {
   from { opacity:0; transform:scale(0.9); }
@@ -8748,6 +8800,89 @@ handleFormSubmit = async function(e) {
 };
 
 initAISmartFill();
+
+// ฟังก์ชันเปิด Modal
+function openChangePassModal() {
+  const modal = document.getElementById('changePassModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    // ล้างค่า Input เก่า
+    document.getElementById('cpOldPass').value = '';
+    document.getElementById('cpNewPass').value = '';
+    document.getElementById('cpConfirmPass').value = '';
+  }
+}
+
+// ฟังก์ชันปิด Modal
+function closeChangePassModal() {
+  const modal = document.getElementById('changePassModal');
+  if (modal) modal.style.display = 'none';
+}
+
+// ฟังก์ชันหลัก: เปลี่ยนรหัสผ่าน
+async function handleChangePassword() {
+  const oldPassInput = document.getElementById('cpOldPass').value;
+  const newPassInput = document.getElementById('cpNewPass').value;
+  const confirmPassInput = document.getElementById('cpConfirmPass').value;
+
+  // 1. ตรวจสอบความถูกต้อง (Client-side)
+  if (!oldPassInput || !newPassInput || !confirmPassInput) {
+    toast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน');
+    return;
+  }
+
+  if (newPassInput !== confirmPassInput) {
+    shake(document.getElementById('cpConfirmPass'));
+    toast('❌ รหัสผ่านใหม่ไม่ตรงกัน');
+    return;
+  }
+
+  if (newPassInput.length < 4) {
+    toast('⚠️ รหัสผ่านใหม่ควรมีอย่างน้อย 4 ตัวอักษร');
+    return;
+  }
+
+  // แสดง Overlay โหลด (เพื่อความสวยงาม หรือใช้ Toast ก็ได้)
+  // toast('⏳ กำลังอัปเดตรหัสผ่าน...');
+
+  try {
+    const sb = getSupabase();
+    if (!sb) throw new Error('ไม่สามารถเชื่อมต่อฐานข้อมูลได้');
+
+    // 2. ดึงข้อมูล User ปัจจุบันจาก Supabase เพื่อเช็ครหัสผ่านเดิม
+    const { data: userData, error: fetchError } = await sb
+      .from('users')
+      .select('*')
+      .eq('email', currentUser) // currentUser คือ Email ที่ Login อยู่
+      .single();
+
+    if (fetchError) throw fetchError;
+    if (!userData) throw new Error('ไม่พบข้อมูลผู้ใช้');
+
+    // 3. ตรวจสอบว่า "รหัสผ่านเดิม" ที่กรอกมา ตรงกับที่มีอยู่ในฐานข้อมูลไหม
+    if (userData.password !== oldPassInput) {
+      shake(document.getElementById('cpOldPass'));
+      toast('⛔ รหัสผ่านเดิมไม่ถูกต้อง');
+      return;
+    }
+
+    // 4. ทำการอัปเดตรหัสผ่านใหม่ลง Supabase
+    const { error: updateError } = await sb
+      .from('users')
+      .update({ password: newPassInput }) // อัปเดตเฉพาะ Field password
+      .eq('email', currentUser);
+
+    if (updateError) throw updateError;
+
+    // 5. สำเร็จ
+    toast('✅ เปลี่ยนรหัสผ่านสำเร็จ');
+    closeChangePassModal();
+
+  } catch (err) {
+    console.error("Change Password Error:", err);
+    toast('❌ ไม่สามารถเปลี่ยนรหัสผ่านได้: ' + err.message);
+  }
+}
 </script>
 </body>
 </html>
