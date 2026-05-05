@@ -5470,10 +5470,16 @@ datalist { display: none; }
       </div>
 
       <div id="loginForm" style="display:flex;flex-direction:column;gap:1rem">
-        <div>
-          <label class="lo-label">Inspector Name</label>
-          <input type="text" id="loginName" list="inspectorList" placeholder="Enter your name" class="lo-in" autofocus autocomplete="off">
-        </div>
+<!-- ...โค้ดด้านบน... -->
+<div>
+  <!-- เปลี่ยน Label และ Placeholder -->
+  <label class="lo-label">Work Email</label>
+  
+  <!-- เปลี่ยน type="text" เป็น type="email" และเพิ่ม autocomplete="email" -->
+  <!-- ลบ list="inspectorList" ออก (เพื่อความปลอดภัย ไม่ให้เดาได้ง่าย) -->
+  <input type="email" id="loginName" placeholder="Monkan.kancun@carrier.com" class="lo-in" autofocus autocomplete="email" style="text-transform: lowercase;">
+</div>
+<!-- ...โค้ดด้านล่าง... -->
         <div>
           <label class="lo-label">Access Key</label>
           <input type="password" id="loginPass" placeholder="••••••" class="lo-in">
@@ -6625,101 +6631,141 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 async function login() {
   const nameInput = $id('loginName');
   const passInput = $id('loginPass');
-  const name = (nameInput.value || '').trim().toUpperCase();
+  
+  // 1. รับค่าและทำให้เป็นตัวพิมพ์เล็กทั้งหมด
+  const email = (nameInput.value || '').trim().toLowerCase(); 
   const pass = passInput.value;
 
-  // 1. ตรวจสอบข้อมูล
-  if (!name) { shake(nameInput); toast('❌ กรุณาระบุชื่อ'); return; }
-  if (pass !== '1234') {
-    passInput.style.borderColor = 'var(--accent-red)';
-    shake(passInput); toast('⛔ รหัสผ่านไม่ถูกต้อง'); return;
-  }
+  // 2. ตรวจสอบรูปแบบอีเมล (Regex)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email) { shake(nameInput); toast('❌ กรุณาระบุอีเมล'); return; }
+  if (!emailRegex.test(email)) { shake(nameInput); toast('❌ รูปแบบอีเมลไม่ถูกต้อง'); return; }
 
-  // ✅ ✅ FIX: เปิดโหมดเต็มจอทันทีที่รหัสผ่านถูกต้อง ✅ ✅
-  enterFullscreen();
-
-  // 2. ซ่อนฟอร์ม และแสดงแผง Progress Bar
+  // ปิดปุ่มกันกดซ้ำ
   $id('loginBtn').disabled = true;
   $id('loginForm').style.display = 'none';
   $id('loProgress').style.display = 'flex';
-
+  
   const bar = $id('loBar');
   const step1 = $id('ls1');
   const step2 = $id('ls2');
   const step3 = $id('ls3');
 
   try {
-    // ══════════ AUTOMATION STEP 1: Verifying ══════════
+    // ═══════════ AUTOMATION STEP 1: Checking Database ══════════
     if (step1) step1.classList.add('active');
     if (bar) bar.style.width = '35%';
+
+    // ดึง Client Supabase
+    const sb = getSupabase();
     
-    // ตั้งค่า User Session
-    sessionStorage.setItem('currentUser', name);
-    currentUser = name;
-    if($id('currentUserDisp')) $id('currentUserDisp').textContent = name;
-    
-    await delay(700); // หน่วงเวลาให้ดูสมจริง
+    if (!sb) {
+        throw new Error("ไม่สามารถเชื่อมต่อ Supabase ได้");
+    }
+
+    // ✅ ✅ ✅ ตรวจสอบจาก Supabase (ตรงนี้คือหัวใจ) ✅ ✅ ✅
+    // ค้นหาผู้ใช้จากตาราง 'users' โดยเทียบ email
+    const { data: userData, error } = await sb
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single(); // .single() ใช้เพื่อดึงเพียง 1 แถว หรือรู้ว่าไม่พบ
+
+    if (error) {
+        // ถ้ารหัส error เป็น PGRST116 แปลว่า "ไม่พบข้อมูล" (User ไม่มีในระบบ)
+        if (error.code === 'PGRST116') {
+             throw new Error("USER_NOT_FOUND");
+        }
+        throw error; // เกิด error อื่นๆ เช่น Database down
+    }
+
+    await delay(500); // จำลองการทำงานให้ดูสวยงาม
     if (step1) { step1.classList.remove('active'); step1.classList.add('done'); }
 
-    // ══════════ AUTOMATION STEP 2: Loading Workspace ══════════
+    // ══════════ AUTOMATION STEP 2: Verifying Password ══════════
     if (step2) step2.classList.add('active');
     if (bar) bar.style.width = '70%';
-    
-    // แอบโหลดฐานข้อมูล Local (IndexedDB) เตรียมไว้ล่วงหน้า
-    await initDB();
-    records = await dbGetAll();
-    
-    // ❌ ลบ refreshAll() ออกที่นี่ ❌
-    // เพราะเราจะเรียกอีกครั้งตอนจบใน Step 3 หรือ initApp
-    // การวาดหน้าจอตอนนี้คือการทำงานซ้ำที่ไร้ประโยชน์
-    
-    await delay(600);
+
+    // ✅ เปรียบเทียบรหัสผ่าน
+    if (userData.password !== pass) {
+        throw new Error("WRONG_PASSWORD");
+    }
+
+    await delay(500);
     if (step2) { step2.classList.remove('active'); step2.classList.add('done'); }
 
-    // ══════════ AUTOMATION STEP 3: Fetching Cloud Data ══════════
+    // ══════════ AUTOMATION STEP 3: Loading Workspace ══════════
     if (step3) step3.classList.add('active');
     if (bar) bar.style.width = '90%';
+
+    // ✅ ✅ ✅ LOGIN สำเร็จ ✅ ✅ ✅
     
-    // แอบซิงค์ข้อมูลกับ Supabase อย่างเงียบๆ (ถ้ามีเน็ต)
-    // refreshAll() จะถูกเรียกอีกครั้งหลังจาก Sync สำเร็จภายใน syncToCloud -> refreshAll
+    // บันทึก Email เป็น Key หลัก (สำคัญมาก: จะใช้อีเมลเป็นตัวแบ่งข้อมูล)
+    currentUser = email; 
+    sessionStorage.setItem('currentUser', email);
+    
+    // ตั้งค่าชื่อผู้ใช้ที่จะแสดงผลบนหน้าจอ (ถ้ามีในฐานข้อมูล ถ้าไม่มีใช้อีเมลแทน)
+    const displayName = userData.display_name || email;
+    
+    // อัปเดต UI ชื่อผู้ใช้
+    if($id('currentUserDisp')) $id('currentUserDisp').textContent = displayName;
+
+    // เตรียมฐานข้อมูล Local
+    await initDB();
+    // ต้องกรองเฉพาะของ User นี้
+    records = await dbGetAll();
+    records = records.filter(r => r.inspector === currentUser);
+
+    // เตรียมซิงค์ข้อมูล
     if (isOnline) {
-      await syncToCloud(true); // ส่ง true ไปเพื่อไม่ให้มี Toast เด้งกวนใจ
+      await syncToCloud(true); // ใช้ true เพื่อไม่ให้แสดง Toast รบกวน
     }
-    
+
     if (bar) bar.style.width = '100%';
     await delay(500);
     if (step3) { step3.classList.remove('active'); step3.classList.add('done'); }
 
-    // ══════════ FINISH: สลับหน้าจอเข้าสู่ Dashboard ══════════
-    await delay(300); // รอจังหวะนิดนึงให้ผู้ใช้เห็นว่าโหลดครบ 100% แล้ว
+    // ══════════ FINISH: สลับหน้าจอ ══════════
+    await delay(300);
 
     if (typeof gsap !== 'undefined') {
       const tl = gsap.timeline();
-      // ย่อและทำโปร่งแสงการ์ดล็อคอิน
       tl.to('#loCard', { scale: 0.9, opacity: 0, y: -20, duration: 0.35, ease: 'power3.in' });
-      // ซ่อนฉากหลัง
       tl.to('#loginOverlay', { opacity: 0, duration: 0.4, ease: 'power2.in', onComplete: () => {
           $id('loginOverlay').style.display = 'none';
       }});
-      // แสดง App Shell แบบเด้งๆ (Back ease)
       tl.to('#appShell', { opacity: 1, duration: 0.6, ease: 'back.out(1.2)', onStart: () => { 
           $id('appShell').style.visibility = 'visible'; 
           $id('appShell').classList.add('visible'); 
+          refreshAll(); // อัปเดตหน้าจอหลัก
       }}, '-=0.1');
     } else {
-      // Fallback กรณีไม่มีไลบรารี GSAP
       $id('loginOverlay').style.display = 'none';
       $id('appShell').style.visibility = 'visible';
       $id('appShell').style.opacity = '1';
+      refreshAll();
     }
 
   } catch (err) {
-    console.error("Login Sequence Error:", err);
-    toast('❌ เกิดข้อผิดพลาดในการโหลดระบบ');
-    // รีเซ็ตฟอร์มกลับมาถ้าพัง
+    // การจัดการ Error ต่างๆ
+    console.error("Login Error:", err);
+    
+    // คืนค่าปุ่มให้กดได้อีกครั้ง
+    $id('loginBtn').disabled = false;
     $id('loginForm').style.display = 'flex';
     $id('loProgress').style.display = 'none';
-    $id('loginBtn').disabled = false;
+
+    if (err.message === 'USER_NOT_FOUND') {
+        shake(nameInput);
+        toast('⛔ ไม่พบอีเมลผู้ใช้งานนี้ในระบบ');
+    } else if (err.message === 'WRONG_PASSWORD') {
+        passInput.style.borderColor = 'var(--accent-red)';
+        shake(passInput); 
+        toast('⛔ รหัสผ่านไม่ถูกต้อง');
+    } else {
+        shake(nameInput);
+        toast('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + err.message);
+    }
   }
 }
 
