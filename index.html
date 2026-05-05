@@ -7614,63 +7614,66 @@ function updateMainGauge(pct) {
   const trendText = trendBox ? trendBox.querySelector('.trend-value') : null;
   const trendArrow = trendBox ? trendBox.querySelector('.trend-arrow') : null;
 
-  // 1. Logic การเลือกสีและสถานะ
-  let statusClass = '';
-  let statusText = '';
+  // 1. กำหนดสีและคำอธิบายตามค่าเปอร์เซ็นต์
   let statusColor = '';
+  let statusText = '';
+  let statusClass = '';
   let rotation = '0deg';
 
   if (pct >= 90) {
-    statusClass = 'status-excellent';
+    statusColor = '#10b981'; // เขียว
     statusText = 'Excellent';
-    statusColor = '#10b981';
+    statusClass = 'status-excellent';
+    rotation = '0deg';
   } else if (pct >= 75) {
-    statusClass = 'status-good';
+    statusColor = '#84cc16'; // เขียวอ่อน
     statusText = 'Good';
-    statusColor = '#f97316'; // สีส้มอมแดง
+    statusClass = 'status-good';
+    rotation = '0deg';
   } else if (pct >= 50) {
-    statusClass = 'status-warning';
+    statusColor = '#f59e0b'; // ส้ม/เหลือง
     statusText = 'Fair';
-    statusColor = '#f59e0b';
+    statusClass = 'status-warning';
     rotation = '90deg';
   } else {
-    statusClass = 'status-critical';
+    statusColor = '#ef4444'; // แดง
     statusText = 'Critical';
-    statusColor = '#ef4444';
+    statusClass = 'status-critical';
     rotation = '180deg';
   }
 
-  // 2. อัปเดตตัวเลขหลัก (เปลี่ยนสีให้เข้ากับสถานะ)
-  if(valDisplay) {
+  // 2. อัปเดตตัวเลขเปอร์เซ็นต์ (เปลี่ยนสีและเงาเรืองแสง)
+  if (valDisplay) {
     valDisplay.textContent = pct + '%';
-    valDisplay.style.color = statusColor; // ✅ ให้เปลี่ยนสีตัวอักษรได้ (สีจะตรงกับสถานะ)
-    valDisplay.style.filter = `drop-shadow(0 0 8px ${statusColor}44)`; // เรืองแสงตามสถานะ
+    valDisplay.style.color = statusColor;
+    valDisplay.style.webkitTextFillColor = statusColor; // สำหรับบาง Browser
+    valDisplay.style.filter = `drop-shadow(0 0 12px ${statusColor}66)`; 
   }
 
-  // 3. อัปเดตหน้าปัดและเข็ม
+  // 3. อัปเดตแถบสีของ Gauge (ขยับเส้นสี)
   const arc = document.getElementById('mainGaugeArc');
-  if(arc) {
-    const circ = 267;
-    arc.style.strokeDasharray = `${(pct/100)*circ} ${circ}`;
-    
-    // ❌ ลบบรรทัดนี้ออก ❌ (นี่คือจุดสำคัญ)
-    // arc.style.stroke = statusColor;
-    
-    // ✅ คำอธิบาย:
-    // โดยไม่ต้องสั่ง stroke ทับใหม่ stroke จะยังคงใช้ค่าจาก HTML attribute เดิมคือ "url(#gaugeGradient)"
-    // ทำให้หน้าปัดแสดงสีไล่เฉดสวยงาม (Heatmap: แดง -> เหลือง -> เขียว) ตามดีไซน
-    // ส่วนสีสถานะจะเน้นที่ตัวเลขและ Badge ด้านล่างแทน
+  if (arc) {
+    const circ = 267; // ค่าความยาวเส้นรอบวงที่ตั้งไว้
+    arc.style.strokeDasharray = `${(pct / 100) * circ} ${circ}`;
   }
 
+  // 4. อัปเดตเข็มไมล์
   const needle = document.getElementById('gaugeNeedle');
-  if(needle) {
+  if (needle) {
     needle.style.transform = `rotate(${-90 + (pct * 1.8)}deg)`;
   }
 
-  // 4. อัปเดต Trend Badge (สีตรงนี้ก็เปลี่ยนตามสถานะ)
+  // 5. อัปเดตกล่องสถานะด้านล่าง (สีขอบ, สีตัวอักษร, และลูกศร)
   if (trendBox && trendText && trendArrow) {
-    trendBox.className = 'gauge-trend ' + statusClass;
+    trendBox.className = 'gauge-trend ' + statusClass; // เปลี่ยน class เพื่อใช้ animation ที่ตั้งไว้
+    trendBox.style.borderColor = statusColor;
+    trendBox.style.color = statusColor;
+    trendBox.style.boxShadow = `0 0 15px ${statusColor}33`;
+    
     trendText.textContent = statusText;
+    trendText.style.color = statusColor;
+    
+    trendArrow.style.borderBottomColor = statusColor; // เปลี่ยนสีลูกศร
     trendArrow.style.transform = `rotate(${rotation})`;
   }
 }
