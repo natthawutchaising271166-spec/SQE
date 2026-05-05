@@ -6791,11 +6791,17 @@ async function login() {
           $id('appShell').classList.add('visible'); 
           refreshAll(); // อัปเดตหน้าจอหลัก
       }}, '-=0.1');
+            // ✅ เพิ่มบรรทัดนี้: สั่งให้เข้า Full Screen เมื่อ Animation จบ
+      tl.call(() => {
+          enterFullscreen(); 
+      });
     } else {
       $id('loginOverlay').style.display = 'none';
       $id('appShell').style.visibility = 'visible';
       $id('appShell').style.opacity = '1';
       refreshAll();
+            // ✅ กรณีไม่มี GSAP ก็สั่งได้เลย
+      enterFullscreen();
     }
 
   } catch (err) {
@@ -7506,35 +7512,30 @@ function openDashboard() {
   document.querySelectorAll('#dashUser').forEach(el => el.textContent = currentUser);
   document.querySelectorAll('#dashTime').forEach(el => el.textContent = new Date().toLocaleTimeString('en-GB'));
 
-  // ✅ เพิ่มเติม: สั่งให้วาดเส้นขีดบอกค่าให้ทุกหน้าปัดทันทีที่เปิด
+  // ✅ ส่วนสำคัญ: สั่งวาดเส้นขีดบอกค่า (Ticks) ทันทีที่ Modal เปิด
   drawGaugeTicks('gaugeTicks', 85, true);      // Main Gauge
   drawGaugeTicks('sfGaugeTicks', 75);         // SF Gauge
   drawGaugeTicks('vendorGaugeTicks', 75);    // Vendor Gauge
   drawGaugeTicks('ctcGaugeTicks', 75);       // CTC Gauge
 
-  // พยายามวาดกราฟครั้งแรก
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-        refreshDash();
-    });
-  });
-
-  // ส่วน Animation หน้าจอ
+  // ส่วน Animation หน้าจอ (เดิม)
   if (typeof gsap !== 'undefined') {
     gsap.to('#dashboardModal', { opacity: 1, duration: 0.3 });
     gsap.fromTo('.dash-topbar', { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 });
   }
 
-    // เริ่มการคำนวณข้อมูลใหม่หลังจาก Modal ปรากฏ (ใช้หน่วงเวลาเล็กน้อยเพื่อให้ UI ดูลื่นไหล)
-    setTimeout(() => {
-        refreshDash();
-    }, 400); 
+  // ✅ ส่วนสำคัญ: ใช้ RequestAnimationFrame 2 ชั้นเพื่อบังคับให้ Render เสร็จก่อนคำนวณ
+  requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+          refreshDash(); // ฟังก์ชันนี้จะไปคำนวณและขยับเข็ม
+      });
+  });
 
-    // แอนิเมชันตอนเปิด (ถ้ามี GSAP)
-    if (typeof gsap !== 'undefined') {
-        gsap.fromTo('.dash-topbar-cockpit', { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 });
-        gsap.fromTo('.cockpit-body', { opacity: 0, scale: 0.98 }, { opacity: 1, scale: 1, duration: 0.5, delay: 0.2 });
-    }
+  // Animation เสริม (เดิม)
+  if (typeof gsap !== 'undefined') {
+      gsap.fromTo('.dash-topbar-cockpit', { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 });
+      gsap.fromTo('.cockpit-body', { opacity: 0, scale: 0.98 }, { opacity: 1, scale: 1, duration: 0.5, delay: 0.2 });
+  }
 }
 
 function closeDashboard() {
@@ -8562,19 +8563,17 @@ function drawGaugeTicks(elementId, radius, isMain = false) {
   }
 }
 
-// ฟังก์ชันสำหรับเปิดโหมดเต็มจอ
+// ฟังก์ชันสำหรับเข้าโหมดเต็มจอ
 function enterFullscreen() {
   const doc = document.documentElement;
-  if (document.fullscreenElement || document.webkitFullscreenElement) return;
-
-  // พยายามเข้าโหมดเต็มจอ
-  const p = doc.requestFullscreen || doc.webkitRequestFullscreen;
-  if (p) {
-    p.call(doc).catch(err => {
-      console.log("Fullscreen was prevented or cancelled:", err);
-      // ✅ แจ้งเตือนผู้ใช้ด้วย Toast (แต่อย่าให้รบกวนการ Login)
-      // toast("ℹ️ โหมดเต็มจอไม่สามารถเปิดได้อัตโนมัติ"); 
-    });
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    const p = doc.requestFullscreen || doc.webkitRequestFullscreen;
+    if (p) {
+      p.call(doc).catch(err => {
+        // แค่ log error ไว้ ไม่ต้องแจ้งเตือน บางเบราว์เซอร์อาจบล็อก
+        console.log("Fullscreen request was blocked:", err);
+      });
+    }
   }
 }
 
@@ -8592,6 +8591,8 @@ function toggleFullscreen() {
 }
 // ฟังก์ชันลูกเพื่อป้องกันการกดซ้ำ
 function handleLoginClick() {
+  // ✅ เพิ่มบรรทัดนี้ไว้บนสุด เพื่อสั่งเต็มจอทันทีที่คลิก
+  enterFullscreen();
   const btn = $id('loginBtn');
   // ถ้าปุ่มถูก Disabled ไว้แล้ว ให้หยุดการทำงานทันที
   if(btn && btn.disabled) return;
