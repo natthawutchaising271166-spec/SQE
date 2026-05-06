@@ -5427,6 +5427,273 @@ datalist { display: none; }
     0 0 10px rgba(59, 130, 246, 0.6),
     inset 0 0 5px rgba(59, 130, 246, 0.4);
 }
+/* ══════════════════════════════════════════════════════════════
+   AUDIT TRAIL MODAL STYLES (SAMYO THEME)
+═══════════════════════════════════════════════════════════════ */
+
+/* 1. Modal Container */
+.audit-modal-content {
+  background: #1e293b; /* Slate 800 - Dark Theme Base */
+  width: 720px;
+  max-width: 95vw;
+  max-height: 85vh;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  animation: auditPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes auditPop {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* 2. Header */
+.audit-header {
+  padding: 1.5rem 2rem;
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.audit-title-group h2 {
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.audit-ref-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.audit-close-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #94a3b8;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.audit-close-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  transform: rotate(90deg);
+}
+
+/* 3. Timeline List Container */
+.audit-list-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  position: relative;
+}
+
+/* 4. Timeline Line (Vertical) */
+.audit-timeline-wrapper {
+  position: relative;
+  padding-left: 20px;
+  margin-left: 10px;
+  border-left: 2px dashed #334155;
+}
+
+/* 5. Timeline Item (Each Log) */
+.audit-item {
+  position: relative;
+  margin-bottom: 2.5rem;
+  padding-left: 1.5rem;
+  animation: slideInUp 0.5s ease-out both;
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 6. Timeline Dot (Node) */
+.audit-dot {
+  position: absolute;
+  left: -29px;
+  top: 0;
+  width: 36px;
+  height: 36px;
+  background: #1e293b;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 1), 0 4px 12px rgba(0,0,0,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  z-index: 1;
+}
+
+/* Colors for Actions */
+.audit-dot.insert { background: #10b981; border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+.audit-dot.update { background: #3b82f6; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+.audit-dot.delete { background: #ef4444; border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+
+/* 7. Card Content */
+.audit-card {
+  background: rgba(30, 41, 59, 0.6); /* Semi-transparent dark */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 4px solid #334155;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.audit-card.insert { border-left-color: #10b981; }
+.audit-card.update { border-left-color: #3b82f6; }
+.audit-card.delete { border-left-color: #ef4444; }
+
+/* 8. Card Header */
+.audit-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.audit-badge {
+  font-family: var(--font-head);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 4px 12px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+.audit-badge.insert { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.audit-badge.update { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.audit-badge.delete { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+.audit-timestamp {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* 9. User Info */
+.audit-user-info {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.audit-user-info svg { width: 14px; height: 14px; color: #64748b; }
+
+/* 10. Diff Box (The "Changes Made" section) */
+.audit-diff-box {
+  margin-top: 1rem;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.audit-diff-title {
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.audit-diff-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.2);
+}
+
+.audit-field-name {
+  width: 100px;
+  font-weight: 700;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.audit-diff-values {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* The Samoy Diff Styles */
+.audit-value-old {
+  color: #ef4444; /* Red */
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.audit-diff-arrow {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.audit-value-new {
+  color: #10b981; /* Green */
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom Scrollbar สำหรับ Modal */
+#auditLogList::-webkit-scrollbar { width: 8px; }
+#auditLogList::-webkit-scrollbar-track { background: #0f172a; }
+#auditLogList::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+#auditLogList::-webkit-scrollbar-thumb:hover { background: #475569; }
 </style>
 </head>
 <body>
@@ -6454,6 +6721,33 @@ datalist { display: none; }
     </div>
   </div>
 </div>
+
+<!-- ════════════════════════════════════════════════════════════
+     AUDIT TRAIL MODAL (NEW UPDATE)
+═══════════════════════════════════════════════════════════════ -->
+<div id="auditLogModal" style="display:none; position:fixed; inset:0; z-index: 30000; align-items:center; justify-content:center; background:rgba(15,23,42,.8); backdrop-filter:blur(10px);">
+  
+  <div style="background: #0f172a; width: 680px; max-width: 95vw; max-height: 85vh; border-radius: 16px; display:flex; flex-direction:column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);">
+    
+    <!-- Header -->
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center; background: rgba(30, 41, 59, 0.5); border-radius: 16px 16px 0 0;">
+      <div>
+        <h2 style="font-family: var(--font-head); font-size: 1.1rem; font-weight: 800; color: #f8fafc; margin: 0; letter-spacing: -0.02em;">Audit Trail</h2>
+        <!-- Reference Badge -->
+        <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 2px 8px; border-radius: 6px; margin-top: 6px; display: inline-block; font-weight: 600;">
+          Ref: <span id="auditRefNo">#---</span>
+        </div>
+      </div>
+      <button onclick="closeAuditModal()" style="background: rgba(255,255,255,0.05); border:none; width: 32px; height: 32px; border-radius: 8px; color: #94a3b8; cursor: pointer; display:flex; align-items:center; justify-content:center; font-size: 1.25rem; transition: all 0.2s;">&times;</button>
+    </div>
+
+    <!-- Timeline Body -->
+    <div id="auditLogList" style="flex: 1; overflow-y: auto; padding: 1.5rem; position: relative;">
+        <!-- Logs will be injected here -->
+    </div>
+
+  </div>
+</div>
 <style>
 @keyframes modalPop {
   from { opacity:0; transform:scale(0.9); }
@@ -6691,7 +6985,6 @@ async function deleteFromSupabase(id) {
     return false;
   }
 }
-
 
 /* ══════════════════════════════════════════════════════════════
    3. APP INITIALIZATION & SYNC
@@ -7010,6 +7303,8 @@ function handleJudgment(val) {
 
 // บันทึก หรือ อัปเดตข้อมูลผ่านฟอร์ม
 async function handleFormSubmit(e) {
+  let oldRecord = null;
+  let auditAction = 'INSERT';
   e.preventDefault();
   if (_isInitializing) { toast('⏳ กรุณารอให้ระบบโหลดเสร็จ'); return; }
 
@@ -7064,7 +7359,11 @@ async function handleFormSubmit(e) {
     rowData._isOffline = true;
     toast('💾 บันทึกแบบออฟไลน์เรียบร้อย');
   }
-
+// ⚡ Audit Logic Hook 1/2
+if (editingId) {
+    oldRecord = records.find(r => r.id === editingId);
+    auditAction = 'UPDATE';
+}
   // อัปเดต Local Data
   if (editingId) {
     const index = records.findIndex(r => r.id === editingId);
@@ -7086,6 +7385,8 @@ async function handleFormSubmit(e) {
   if($id('refNo')) $id('refNo').focus();
 
   refreshAll();
+  // ⚡ Audit Logic Hook 2/2: Write Log
+writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
 }
 
 window.editRecord = function(id) {
@@ -7261,52 +7562,45 @@ function hideSingleDeleteModal() {
     modal.classList.remove('show');
   }
 }
+// ⚡ Audit Logic Hook: Backup data before delete
 async function confirmDeleteSingleRow() {
-  const idToDelete = _pendingDeleteId;
-  hideSingleDeleteModal();
-
+  const idToDelete = _pendingDeleteId; // ย้ายขึ้นมาบรรทัดแรก
   if (!idToDelete) { 
     toast("❌ ระบบไม่พบรหัสข้อมูล"); 
     return; 
   }
 
+  // ค้นหาข้อมูลก่อนลบเพื่อเก็บไว้ทำ Audit Log
+  const recordToDelete = records.find(r => String(r.id) === String(idToDelete));
+  
+  hideSingleDeleteModal();
+
   try {
-    // ═════════════════════════════════════════════════════
-    // ขั้นตอนที่ 1: ลบจาก IndexedDB (Local Database) ก่อน
-    // ═════════════════════════════════════════════════════
+    // 1. ลบจาก IndexedDB
     if (db) {
       await new Promise((resolve, reject) => {
         const tx = db.transaction(IDB_STORE, 'readwrite');
         const store = tx.objectStore(IDB_STORE);
-        const req = store.delete(String(idToDelete)); // ใช้ String เพื่อความปลอดภัย
-        
+        const req = store.delete(String(idToDelete));
         tx.oncomplete = () => resolve();
         tx.onerror = () => reject(tx.error);
-        req.onerror = () => reject(req.error);
       });
     }
 
-    // ═════════════════════════════════════════════════════
-    // ขั้นตอนที่ 2: ลบจาก Cloud (Supabase) ถ้าออนไลน์
-    // ═════════════════════════════════════════════════════
+    // 2. ลบจาก Cloud ถ้าออนไลน์
     if (isOnline && getSupabase()) {
-      const success = await deleteFromSupabase(idToDelete);
-      // ถ้าลบ Cloud ไม่สำเร็จ แต่ Local เรียบร้อยแล้ว 
-      // เราจะยังถือว่าสำเร็จเพื่อ UX ที่ดี (แต่อาจต้อง sync ใหม่ภายหลัง)
-      if (!success) {
-        console.warn("Cloud delete failed for ID:", idToDelete);
-      }
+      await deleteFromSupabase(idToDelete);
     }
 
-    // ═════════════════════════════════════════════════════
-    // ขั้นตอนที่ 3: อัปเดตข้อมูลในหน่วยความจำ (RAM) และหน้าจอ
-    // ═════════════════════════════════════════════════════
-    // กรองเอา ID ที่ลบออกจาก Array records
+    // 3. อัปเดต State ในโปรแกรม
     records = records.filter(r => String(r.id) !== String(idToDelete));
     
-    // รีเฟรชหน้าจอตารางและ KPI
-    refreshAll();
+    // 4. เขียน Audit Log (ต้องทำก่อน Refresh หน้าจอ)
+    if (recordToDelete) {
+      await writeAuditLog('DELETE', idToDelete, recordToDelete, null);
+    }
 
+    refreshAll();
     toast("✅ ลบรายการสำเร็จ");
 
   } catch (err) {
@@ -7496,6 +7790,7 @@ function getCurrentFilteredData() {
     }
   }
 
+  // เรียงลำดับตามความแม่นยำ และวันที่ล่าสุด
   return results.sort((a, b) => {
     if (b._score !== a._score) return b._score - a._score;
     return new Date(b.date) - new Date(a.date);
@@ -7568,6 +7863,11 @@ function renderVisibleRows() {
         </button>
         <button onclick="editRecord('${safeId}')" class="btn" style="background:#3b82f6;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
         <button onclick="showSingleDeleteModal('${safeId}')" class="btn" style="background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        <button onclick="openAuditLogModal('${safeId}')" title="ดูประวัติ" style="background:#334155;color:#cbd5e1;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+</button>
       </td>
     </tr>`;
   });
@@ -9093,7 +9393,233 @@ function applyQuickDateFilter(type, btnElement) {
   refreshDash();
   
   // แสดง Toast ยืนยัน (Optional)
-  // toast(`📅 กรองข้อมูล: ${startStr} ถึง ${endStr}`);
+  // t
+  oast(`📅 กรองข้อมูล: ${startStr} ถึง ${endStr}`);
+}
+/* ══════════════════════════════════════════════════════════════
+   FEATURE: IMMUTABLE AUDIT LOG (NEW FUNCTIONS)
+   โค้ดชุดนี้ไม่ได้แก้ไขฟังก์ชันเดิม แต่เป็นฟังก์ชันใหม่ที่เตรียมไว้เรียกใช้
+═══════════════════════════════════════════════════════════════ */
+
+// -----------------------------------------------------
+// 1. Helper: ฟังก์ชันเขียน Log ลง Supabase
+// -----------------------------------------------------
+async function writeAuditLog(action, recordId, oldData, newData) {
+  if (!currentUser || !recordId) return;
+
+  const sb = getSupabase();
+  if (!sb) return;
+
+  try {
+    let changesCount = 0;
+    
+    // คำนวณจำนวน Field ที่เปลี่ยน (ถ้าเป็น UPDATE)
+    if (action === 'UPDATE' && oldData && newData) {
+      const { id, created_at, updated_at, ...cleanOld } = oldData;
+      const { id: _, created_at: __, updated_at: ___, ...cleanNew } = newData;
+      
+      Object.keys(cleanNew).forEach(key => {
+        if (cleanOld[key] !== cleanNew[key]) changesCount++;
+      });
+    } else if (action === 'INSERT') {
+      changesCount = 1; 
+    }
+
+    // ฟังก์ชันล้างข้อมูลที่ไม่ต้องการบันทึก (Internal flags)
+    const cleanPayload = (obj) => {
+        if(!obj) return null;
+        // ลบฟิลด์ที่ไม่ใช่ข้อมูลจริง ออก
+        const { _isSaved, _isOffline, _score, ...rest } = obj;
+        return rest;
+    };
+
+    const logEntry = {
+      record_id: recordId,
+      action: action,
+      inspector: currentUser,
+      old_data: cleanPayload(oldData),
+      new_data: cleanPayload(newData),
+      changes_count: changesCount
+    };
+
+    // ส่งข้อมูล
+    const { error } = await sb.from('audit_logs').insert([logEntry]);
+    
+    if (error) {
+      console.error("[Audit Log Error]", error);
+    } else {
+      // console.log(`[Audit Log] Logged: ${action} on ${recordId}`);
+    }
+
+  } catch (err) {
+    console.error("Audit Log Exception:", err);
+  }
+}
+
+// -----------------------------------------------------
+// 2. Helper: ฟังก์ชันดึงประวัติจาก Supabase
+// -----------------------------------------------------
+async function fetchAuditLogs(recordId) {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  try {
+    const { data, error } = await sb
+      .from('audit_logs')
+      .select('*')
+      .eq('record_id', recordId)
+      .order('created_at', { ascending: true }); // เอาเก่าสุดขึ้นก่อน
+
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error("Fetch Audit Error:", err);
+    return [];
+  }
+}
+
+// -----------------------------------------------------
+// 3. UI: ฟังก์ชันเปิด Modal และวาด Timeline
+// -----------------------------------------------------
+async function openAuditLogModal(id) {
+  const modal = document.getElementById('auditLogModal');
+  const listEl = document.getElementById('auditLogList');
+  const refEl = document.getElementById('auditRefNo');
+  
+  if (!modal) return;
+  modal.style.display = 'flex';
+
+  // ดึงข้อมูล Record จากตัวแปร global 'records' เพื่อแสดง Reference
+  const record = records.find(r => r.id === id);
+  if (refEl && record) refEl.textContent = '#' + (record.ref || 'Unknown');
+
+  // แสดง Loading
+  if (listEl) listEl.innerHTML = '<div style="text-align:center; padding:2rem; color:#64748b;">กำลังโหลดประวัติ...</div>';
+
+  // ดึง Log จาก Supabase
+  const logs = await fetchAuditLogs(id);
+
+  if (!logs || logs.length === 0) {
+    if (listEl) listEl.innerHTML = '<div style="text-align:center; padding:2rem; color:#94a3b8;">ไม่พบประวัติการแก้ไข (No History)</div>';
+    return;
+  }
+
+  // วาด Timeline
+  renderAuditTimeline(logs);
+}
+
+// -----------------------------------------------------
+// 4. UI: ปิด Modal
+// -----------------------------------------------------
+function closeAuditModal() {
+  const modal = document.getElementById('auditLogModal');
+  if (modal) modal.style.display = 'none';
+}
+
+/// ════════════════════════════════════════════════════════════
+// AUDIT TRAIL RENDER (UPDATED)
+// จัดหน้าตรง Screenshot
+// ══════════════════════════════════════════════════════════════
+
+function renderAuditTimeline(data) {
+  const listEl = document.getElementById('auditLogList');
+  if (!listEl) return;
+
+  // 1. Styles mapping
+  const styles = {
+    'INSERT': { border: '#10b981', badgeBg: 'rgba(16, 185, 129, 0.15)', badgeText: '#10b981', badgeLabel: 'CREATED' },
+    'UPDATE': { border: '#3b82f6', badgeBg: 'rgba(59, 130, 246, 0.15)', badgeText: '#3b82f6', badgeLabel: 'UPDATED' },
+    'DELETE': { border: '#ef4444', badgeBg: 'rgba(239, 68, 68, 0.15)', badgeText: '#ef4444', badgeLabel: 'DELETED' }
+  };
+
+  // 2. Container
+  let html = '';
+
+  data.forEach((log, index) => {
+    const s = styles[log.action] || styles['UPDATE'];
+    
+    // 3. Date Format: 06 พ.ค. 69 16:19 (ใช้ TH ถ้าเอาปี พ.ศ. ให้เปลี่ยน 'th-TH' เป็น 'en-GB')
+    const dateStr = new Date(log.created_at).toLocaleString('th-TH', { 
+      day: '2-digit', month: 'short', year: '2-digit', 
+      hour: '2-digit', minute: '2-digit' 
+    });
+
+    // 4. Diff Logic
+    let diffHtml = '';
+    if (log.action === 'UPDATE' && log.old_data && log.new_data) {
+      
+      // Clean keys
+      const { id, created_at, updated_at, ...old } = log.old_data;
+      const { id: _, created_at: __, updated_at: ___, ...newData } = log.new_data;
+      
+      diffHtml = `
+        <div style="margin-top: 1rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 0 0.75rem 0.75rem 0.75rem;">
+          <div style="font-size: 0.7rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+            Changes Made
+          </div>
+      `;
+
+      Object.keys(newData).forEach(key => {
+        if (old[key] !== newData[key]) {
+          diffHtml += `
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; font-family: var(--font-mono);">
+              <div style="width: 60px; font-size: 0.8rem; font-weight: 700; color: #94a3b8;">${key}</div>
+              
+              <div style="flex: 1; display: flex; align-items: center; gap: 0.75rem; background: rgba(0,0,0,0.2); padding: 0.5rem 0.75rem; border-radius: 6px;">
+                <!-- Old Value (Red) -->
+                <div style="color: #ef4444; text-decoration: line-through; opacity: 0.8; font-size: 0.9rem; min-width: 40px; text-align: right;">
+                  ${old[key] || '-'}
+                </div>
+                
+                <!-- Arrow -->
+                <div style="color: #475569; font-size: 0.9rem;">→</div>
+                
+                <!-- New Value (Green) -->
+                <div style="color: #10b981; font-weight: 800; font-size: 1rem; text-shadow: 0 0 10px rgba(16,185,129,0.4); min-width: 40px;">
+                  ${newData[key] || '-'}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      });
+      diffHtml += '</div>';
+    } else if (log.action === 'DELETE') {
+       diffHtml = `<div style="margin-top:1rem; color:#64748b; font-style:italic; font-size:0.8rem; padding-left:0.5rem; border-left:2px solid #334155;">Item removed from database</div>`;
+    }
+
+    // 5. Build Item
+    html += `
+      <div style="position: relative; margin-bottom: 2rem; animation: slideIn 0.3s ease-out both;" style="animation-delay: ${index * 0.1}s">
+        
+        <!-- Card -->
+        <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.08); border-left: 4px solid ${s.border}; border-radius: 10px; padding: 1rem 1.25rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          
+          <!-- Card Header -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <div style="background: ${s.badgeBg}; color: ${s.badgeText}; padding: 4px 12px; border-radius: 4px; font-weight: 700; font-size: 0.7rem; letter-spacing: 0.05em; font-family: var(--font-head);">
+              ${s.badgeLabel}
+            </div>
+            <div style="font-family: var(--font-mono); color: #94a3b8; font-size: 0.75rem;">
+              ${dateStr}
+            </div>
+          </div>
+
+          <!-- User Info -->
+          <div style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            ${escapeHtml(log.inspector || 'Unknown User')}
+          </div>
+
+          <!-- Diff Content -->
+          ${diffHtml}
+        </div>
+
+      </div>
+    `;
+  });
+
+  listEl.innerHTML = html;
 }
 </script>
 </body>
