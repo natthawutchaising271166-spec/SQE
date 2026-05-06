@@ -1961,15 +1961,15 @@ html.dark-mode .lo-in:focus {
 
 /* Topbar */
 .dash-topbar-cockpit {
-  flex: 0 0 auto;
+  flex-wrap: wrap; 
   height: 64px;
-  padding: 0 1.5rem;
+  padding: 0.75rem 1rem;
   background: linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
   border-bottom: 1px solid rgba(59, 130, 246, 0.15);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  justify-content: center;
+  gap: 0.5rem;
   backdrop-filter: blur(20px);
   position: relative;
   z-index: 10;
@@ -2107,11 +2107,12 @@ html.dark-mode .lo-in:focus {
   color: #ef4444;
 }
 
-/* Topbar Controls */
 .topbar-controls {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  flex-wrap: wrap;        /* ให้ไอเท็มขึ้นบรรทัดใหม่อัตโนมัติ */
+  gap: 0.75rem;           /* เว้นระยะห่าง */
+  justify-content: flex-start; /* เริ่มจากซ้ายมือ */
+  align-items: center;    /* จัดกึ่งกลางในแนวแกนขวาง */
 }
 
 /* 1. กล่องครอบวันที่ (Start - End) */
@@ -3712,12 +3713,32 @@ canvas {
     flex-wrap: wrap;
   }
   
-  .dash-topbar-cockpit {
-    flex-wrap: wrap;
-    height: auto;
-    padding: 0.75rem;
-    gap: 0.5rem;
+.dash-topbar-cockpit {
+  flex-wrap: wrap;        /* ให้ขึ้นบรรทัดใหม่ถ้าแคบ */
+  gap: 0.5rem;            /* เว้นช่องว่างระหว่างบรรทัดหรือไอเท็ม */
+  padding: 0.75rem 1rem;  /* กำหนด padding ให้เหมาะสม */
+  justify-content: center; /* จัดกึ่งกลางถ้ามีหลายบรรทัด */
+}
+
+.topbar-controls {
+  display: flex;
+  flex-wrap: wrap;        /* ให้ไอเท็มขึ้นบรรทัดใหม่อัตโนมัติ */
+  gap: 0.75rem;           /* เว้นระยะห่าง */
+  justify-content: flex-start; /* เริ่มจากซ้ายมือ */
+  align-items: center;    /* จัดกึ่งกลางในแนวแกนขวาง */
+}
+
+/* ตัวอย่างปรับขนาดปุ่ม หากขนาดหน้าจอเล็ก */
+@media (max-width: 600px) {
+  .dash-topbar-cockpit, .topbar-controls {
+    justify-content: center; /* กึ่งกลาง */
   }
+  .topbar-controls button, .topbar-controls select, .topbar-controls input {
+    flex: 1 1 100%;   /* ให้เต็มบรรทัด */
+    min-width: auto;
+  }
+}
+
   
   .topbar-ticker {
     order: -1;
@@ -6181,7 +6202,7 @@ datalist { display: none; }
       <div class="brand-info">
         <div class="brand-title">SQE <span style="color:#10b981">ANALYTICS</span></div>
         <div class="brand-subtitle">
-          <span id="dashUser" style="color:#f59e0b;font-weight:800"></span>
+          
           <span class="live-dot"></span>
           <span id="dashTime">--:--:--</span>
         </div>
