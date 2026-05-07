@@ -5715,6 +5715,450 @@ datalist { display: none; }
 #auditLogList::-webkit-scrollbar-track { background: #0f172a; }
 #auditLogList::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 #auditLogList::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+#staffSelector {
+    text-transform: capitalize; /* ทำให้ตัวอักษรแรกเป็นตัวพิมพ์ใหญ่อัตโนมัติ */
+    font-weight: 700;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.2); /* ทำให้พื้นหลังกล่องดูเนียนเข้ากับบัตร */
+    border: none;
+    padding: 2px 10px;
+    border-radius: 5px;
+}
+/* ═══════════════════════════════════════════════
+   STAFF SELECTOR: LOGO-MATCHING EDITION (Emerald & Blue)
+   ═══════════════════════════════════════════════ */
+
+.sc-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* เปลี่ยนจากพื้นหลังทึบ เป็นพื้นหลังโปร่งแสงไล่เฉดให้เข้ากับ Mesh Background */
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.4) 100%);
+    /* ปรับขอบให้เป็นสีเขียวมรกต (Emerald) เหมือนโลโก้ */
+    border: 1px solid rgba(16, 185, 129, 0.4); 
+    border-radius: 12px; /* โค้งมนให้ดูพรีเมียม */
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(12px); /* เอฟเฟกต์กระจกฝ้า */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+/* เอฟเฟกต์ตอน Hover ให้เรืองแสงเหมือนโลโก้ */
+.sc-select-wrapper:hover {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: #10b981; /* สีเขียวสว่าง */
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    transform: translateY(-1px);
+}
+
+/* ไอคอนคน ปรับเป็นสีเขียวมรกตให้เข้ากับคำว่า Support */
+.sc-user-icon {
+    color: #10b981; 
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.5));
+}
+
+#staffSelector {
+    background: transparent;
+    border: none;
+    color: #f8fafc; /* สีขาวนวล */
+    font-family: var(--font-head); /* ใช้ Font เดียวกับโลโก้ */
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    width: 100%;
+    text-transform: capitalize;
+    /* เปลี่ยนสีลูกศร Dropdown ให้เป็นสีฟ้าอมเขียว */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 2px center;
+    padding-right: 20px;
+}
+
+#staffSelector option {
+    background: #0f172a; /* พื้นหลังเมนูสีเข้ม */
+    color: #fff;
+    padding: 12px;
+    font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════
+   ANIMATED COLOR TRANSITION FOR LOGIN
+═══════════════════════════════════════════════════ */
+#loginOverlay {
+    transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lo-card {
+    transition: transform 0.5s ease, box-shadow 0.5s ease, background 0.5s ease, border-color 0.5s ease;
+}
+
+/* สีเริ่มต้น (Blue) สำหรับองค์ประกอบต่างๆ */
+.lo-btn, .lo-brand-icon, .lo-brand-title span, .lo-in {
+    transition: all 0.5s ease;
+}
+
+/* ═══════════════════════════════════════════════════
+   SUPERVISOR THEME (GOLD/AMBER PREMIUM)
+═══════════════════════════════════════════════════ */
+#loginOverlay.is-gold {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 35%, #fcd34d 65%, #fbbf24 100%);
+}
+
+/* Dark mode version of Gold theme */
+html.dark-mode #loginOverlay.is-gold {
+    background: linear-gradient(135deg, #1e1b4b 0%, #451a03 50%, #1e1b4b 100%);
+}
+
+#loginOverlay.is-gold .lo-card {
+    border-color: rgba(245, 158, 11, 0.3);
+    box-shadow: 0 20px 60px rgba(180, 83, 9, 0.15), 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* เปลี่ยนสีปุ่มเป็นสีทอง */
+#loginOverlay.is-gold .lo-btn {
+    background: linear-gradient(135deg, #b45309, #d97706);
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
+}
+#loginOverlay.is-gold .lo-btn:hover {
+    box-shadow: 0 8px 24px rgba(217, 119, 6, 0.5);
+}
+
+/* เปลี่ยนสีไอคอนแบรนด์ */
+#loginOverlay.is-gold .lo-brand-icon {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+}
+
+/* เปลี่ยนสีตัวอักษรเน้น (คำว่า Support) */
+#loginOverlay.is-gold .lo-brand-title span {
+    color: #d97706;
+}
+
+/* เปลี่ยนสีเส้นขอบ Input เมื่อ Focus */
+#loginOverlay.is-gold .lo-in:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+/* ปรับสี Mascot เล็กน้อยให้เข้ากับธีมทอง */
+#loginOverlay.is-gold .mascot-float circle[fill="#3b82f6"] { fill: #f59e0b; }
+#loginOverlay.is-gold .mascot-float line[stroke="#60a5fa"] { stroke: #d97706; }
+#loginOverlay.is-gold .mascot-float rect[fill="#2563eb"] { fill: #b45309; }
+
+/* ═══════════════════════════════════════════════════
+   HEAD MODE: DARK CYBER THEME (สลับเมื่อเป็นหัวหน้า)
+═══════════════════════════════════════════════════ */
+
+/* 1. เปลี่ยนพื้นหลังทั้งหมดเป็นโทนดำสนิทล้ำๆ */
+#loginOverlay.is-head-mode {
+    background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #020617 100%) !important;
+}
+
+/* 2. เปลี่ยนการ์ดลอกอินเป็นกระจกดำ (Black Glassmorphism) */
+#loginOverlay.is-head-mode .lo-card {
+    background: rgba(15, 23, 42, 0.9) !important;
+    backdrop-filter: blur(40px);
+    border: 1px solid rgba(245, 158, 11, 0.4) !important;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 20px rgba(245, 158, 11, 0.15) !important;
+}
+
+/* 3. แก้ไขจุดสำคัญ: เปลี่ยนคำว่า SQE จากดำเป็นขาวบริสุทธิ์ */
+#loginOverlay.is-head-mode h2 {
+    color: #ffffff !important; /* บังคับเป็นสีขาว */
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* 4. เปลี่ยนคำว่า support เป็นสีทองเรืองแสง */
+#loginOverlay.is-head-mode h2 span {
+    color: #f59e0b !important;
+    text-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+}
+
+/* 5. ปรับไอคอนแบรนด์เป็นสีทอง */
+#loginOverlay.is-head-mode .lo-brand-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    box-shadow: 0 0 20px rgba(217, 119, 6, 0.5) !important;
+}
+
+/* 6. ปรับช่อง Input ให้เข้ากับโทนดำ */
+#loginOverlay.is-head-mode .lo-in {
+    background: rgba(2, 6, 23, 0.8) !important;
+    border-color: rgba(245, 158, 11, 0.2) !important;
+    color: #fef3c7 !important;
+}
+
+#loginOverlay.is-head-mode .lo-in:focus {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* 7. ปุ่มกดสีทองอร่าม */
+#loginOverlay.is-head-mode .lo-btn {
+    background: linear-gradient(135deg, #f59e0b, #b45309) !important;
+    color: #000 !important; /* ตัวหนังสือบนปุ่มเป็นสีดำเพื่อให้เด่น */
+    font-weight: 800;
+}
+
+/* 8. ปรับสี Label และข้อความอื่นๆ ให้สว่างขึ้น */
+#loginOverlay.is-head-mode .lo-label, 
+#loginOverlay.is-head-mode .lo-brand p {
+    color: #94a3b8 !important;
+}
+#loginOverlay.is-head-mode .lo-brand-title span {
+    color: #f59e0b; /* สีทองคำ */
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+/* ปรับแต่งไอคอนแบรนด์ */
+#loginOverlay.is-head-mode .lo-brand-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.6);
+}
+
+/* ตัวเลือกบทบาท (Role Toggle) ตอนเป็นโหมดหัวหน้า */
+#loginOverlay.is-head-mode #roleSuper {
+    background: #f59e0b !important;
+    color: #000 !important;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+}
+#loginOverlay.is-head-mode #roleStaff {
+    color: rgba(245, 158, 11, 0.5) !important;
+}
+
+/* ปรับสี Mascot Robot ให้เป็นสีทอง */
+#loginOverlay.is-head-mode .mascot-float rect[fill="#f0f6ff"] { fill: #1e1b4b; }
+#loginOverlay.is-head-mode .mascot-float circle[fill="#3b82f6"] { fill: #f59e0b; }
+#loginOverlay.is-head-mode .mascot-float line[stroke="#60a5fa"] { stroke: #f59e0b; }
+#loginOverlay.is-head-mode .mascot-float path[stroke="#60a5fa"] { stroke: #f59e0b; }
+
+/* เมื่อสลับเป็นโหมดหัวหน้างาน (is-head-mode) */
+#loginOverlay.is-head-mode .lo-form-col h2 {
+    color: #ffffff !important; /* บังคับให้ SQE เป็นสีขาว */
+    transition: color 0.5s ease;
+}
+
+/* ส่วนของคำว่า support ให้เป็นสีทองสว่าง */
+#loginOverlay.is-head-mode .lo-form-col h2 span {
+    color: #f59e0b !important; 
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+/* แถม: ปรับสีตัวหนังสือ "Intelligence Platform" ให้สว่างขึ้นด้วย */
+#loginOverlay.is-head-mode .lo-brand p {
+    color: #94a3b8 !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   NEW: LOGIN ULTRA-UPGRADE STYLES
+═══════════════════════════════════════════════════ */
+
+/* พื้นหลังแบบ Dynamic Gradient */
+#loginOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #f0f4ff; /* Fallback */
+    background: radial-gradient(circle at 50% 50%, #f8faff 0%, #e0e8ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Cyber Grid Background */
+.lo-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
+    transform: perspective(500px) rotateX(60deg) translateY(-100px);
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    from { background-position: 0 0; }
+    to { background-position: 0 50px; }
+}
+
+/* Login Card อัพเกรดความพรีเมียม */
+.lo-card {
+    position: relative;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 32px;
+    padding: 3.5rem;
+    width: 540px;
+    max-width: 95vw;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+    display: flex;
+    gap: 2.5rem;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* โหมดหัวหน้า (Head Mode) - Midnight Command */
+#loginOverlay.is-head-mode {
+    background: #020617;
+}
+
+#loginOverlay.is-head-mode .lo-grid {
+    background-image: 
+        linear-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245, 158, 11, 0.1) 1px, transparent 1px);
+}
+
+#loginOverlay.is-head-mode .lo-card {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(245, 158, 11, 0.3);
+    box-shadow: 
+        0 0 40px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(245, 158, 11, 0.1) inset;
+}
+
+#loginOverlay.is-head-mode .lo-in {
+    background: rgba(2, 6, 23, 0.6);
+    border-color: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+/* ปุ่มกดสไตล์นีออน */
+.lo-btn {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    border-radius: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 1.2rem;
+    box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+    overflow: hidden;
+}
+
+#loginOverlay.is-head-mode .lo-btn {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
+    box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.5);
+}
+
+/* Role Selector Toggle อัพเกรด */
+.role-toggle {
+    display: flex;
+    background: rgba(0,0,0,0.05);
+    padding: 0.4rem;
+    border-radius: 18px;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.role-tab {
+    flex: 1;
+    padding: 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-align: center;
+    cursor: pointer;
+    z-index: 1;
+    transition: 0.3s;
+    color: #64748b;
+}
+
+.role-tab.active { color: #fff; }
+#loginOverlay.is-head-mode .role-tab.active { color: #000; }
+
+.role-slider {
+    position: absolute;
+    top: 0.4rem;
+    bottom: 0.4rem;
+    left: 0.4rem;
+    width: calc(50% - 0.4rem);
+    background: #2563eb;
+    border-radius: 14px;
+    transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#loginOverlay.is-head-mode .role-slider {
+    transform: translateX(100%);
+    background: #f59e0b;
+}
+
+/* Animated Floating Shapes */
+.lo-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 1;
+    animation: floatOrb 20s infinite alternate;
+}
+
+@keyframes floatOrb {
+    from { transform: translate(0, 0); }
+    to { transform: translate(100px, 50px); }
+}
+
+/* ═══════════════════════════════════════════════════
+   NEW CYBER MASCOT STYLES
+═══════════════════════════════════════════════════ */
+.mascot-container {
+    filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.4));
+    transition: all 0.5s ease;
+}
+
+#loginOverlay.is-head-mode .mascot-container {
+    filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.5));
+}
+
+.cyber-eye {
+    animation: eyePulse 2s infinite;
+}
+
+@keyframes eyePulse {
+    0%, 100% { opacity: 1; filter: brightness(1.2) drop-shadow(0 0 5px currentColor); }
+    50% { opacity: 0.7; filter: brightness(0.8); }
+}
+
+.hover-glow {
+    animation: hoverGlow 3s ease-in-out infinite;
+}
+
+@keyframes hoverGlow {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50% { transform: translateY(-5px); opacity: 0.8; }
+}
+
+.core-spin {
+    transform-origin: center;
+    animation: coreRotate 4s linear infinite;
+}
+
+@keyframes coreRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+@keyframes eyePulse {
+    0%, 100% { 
+        opacity: 1; 
+        /* ใช้ currentColor เพื่อให้เปลี่ยนสีตามคำสั่ง JS (eye.style.color) */
+        filter: brightness(1.2) drop-shadow(0 0 5px currentColor); 
+    }
+    50% { 
+        opacity: 0.7; 
+        filter: brightness(0.8); 
+    }
+}
 </style>
 </head>
 <body>
@@ -5800,119 +6244,109 @@ datalist { display: none; }
 }
 </style>
 
-<!-- ═══════════════════════════════════════════════════
-     LOGIN OVERLAY - Enterprise Portal
-═══════════════════════════════════════════════════ -->
 <div id="loginOverlay">
-  <div class="lo-lines"></div>
-  <div class="lo-geo"></div>
-  <div class="lo-shape s1"></div>
-  <div class="lo-shape s2"></div>
-  <div class="lo-shape s3"></div>
+    <!-- พื้นหลังล้ำยุค -->
+    <div class="lo-grid"></div>
+    <div class="lo-orb" style="width: 400px; height: 400px; background: rgba(59, 130, 246, 0.15); top: -100px; left: -100px;"></div>
+    <div class="lo-orb" style="width: 300px; height: 300px; background: rgba(139, 92, 246, 0.1); bottom: -50px; right: -50px;"></div>
 
-  <div class="lo-card" id="loCard">
-    <!-- Mascot: Robot holding key -->
-    <div class="lo-mascot-col">
-      <svg class="mascot-float" width="90" height="120" viewBox="0 0 90 120" fill="none">
-        <!-- Head -->
-        <rect x="12" y="12" width="66" height="50" rx="14" fill="#fff" stroke="#bfdbfe" stroke-width="2"/>
-        <!-- Head inner glow -->
-        <rect x="16" y="16" width="58" height="42" rx="10" fill="#f0f6ff"/>
-        <!-- Antenna -->
-        <line x1="45" y1="12" x2="45" y2="3" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="45" cy="2" r="3" fill="#3b82f6"/>
-        <circle cx="45" cy="2" r="1.5" fill="#fff"/>
-        <!-- Eyes -->
-        <rect x="20" y="24" width="20" height="14" rx="5" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
-        <rect x="50" y="24" width="20" height="14" rx="5" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
-        <!-- Eye displays -->
-        <rect x="24" y="27" width="12" height="8" rx="3" fill="#2563eb"/>
-        <rect x="54" y="27" width="12" height="8" rx="3" fill="#2563eb"/>
-        <!-- Eye shine -->
-        <rect x="25.5" y="28.5" width="4" height="3" rx="1" fill="rgba(255,255,255,.5)"/>
-        <rect x="55.5" y="28.5" width="4" height="3" rx="1" fill="rgba(255,255,255,.5)"/>
-        <!-- Smile -->
-        <path d="M28 48 Q45 56 62 48" stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <!-- Body -->
-        <rect x="8" y="66" width="74" height="46" rx="14" fill="#fff" stroke="#bfdbfe" stroke-width="2"/>
-        <!-- Chest panel -->
-        <rect x="18" y="76" width="54" height="26" rx="8" fill="#f0f6ff" stroke="#dbeafe" stroke-width="1"/>
-        <!-- Status lights -->
-        <circle cx="30" cy="87" r="4.5" fill="#10b981" opacity=".8"/>
-        <circle cx="45" cy="87" r="4.5" fill="#3b82f6" opacity=".8"/>
-        <circle cx="60" cy="87" r="4.5" fill="#f59e0b" opacity=".8"/>
-        <!-- Battery bar -->
-        <rect x="24" y="96" width="42" height="3" rx="1.5" fill="#dbeafe"/>
-        <rect x="24" y="96" width="30" height="3" rx="1.5" fill="#3b82f6"/>
-        <!-- Arms -->
-        <rect x="0" y="70" width="10" height="36" rx="5" fill="#fff" stroke="#bfdbfe" stroke-width="1.5"/>
-        <rect x="80" y="70" width="10" height="36" rx="5" fill="#fff" stroke="#bfdbfe" stroke-width="1.5"/>
-        <!-- Key in right hand -->
-        <circle cx="86" cy="112" r="5.5" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-        <line x1="90" y1="112" x2="100" y2="112" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="96" y1="112" x2="96" y2="117" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
-        <line x1="100" y1="112" x2="100" y2="117" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
-        <!-- Legs -->
-        <rect x="18" y="114" width="22" height="16" rx="7" fill="#fff" stroke="#bfdbfe" stroke-width="1.5"/>
-        <rect x="50" y="114" width="22" height="16" rx="7" fill="#fff" stroke="#bfdbfe" stroke-width="1.5"/>
-      </svg>
-      <!-- Online badge -->
-      <div>
-        <div class="lo-badge-online"><span class="sdot"></span>ONLINE</div>
-        <div style="font-family:var(--font-mono);font-size:.55rem;color:var(--text-300);text-align:center;margin-top:.3rem">v4.0</div>
-      </div>
+    <div class="lo-card" id="loCard">
+        <!-- ฝั่งซ้าย: Mascot และ Status -->
+<!-- ฝั่งซ้าย: Mascot และ Status -->
+<div class="lo-mascot-col" style="width: 120px;">
+    <div class="mascot-container">
+        <svg class="mascot-float" width="100" height="120" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- ส่วนหัว (Head) -->
+            <path d="M25 40C25 26.1929 36.1929 15 50 15C63.8071 15 75 26.1929 75 40V45H25V40Z" fill="url(#headGrad)" />
+            <rect x="30" y="32" width="40" height="8" rx="4" class="cyber-eye" fill="#3b82f6" id="mascotEye" />
+            
+                <!-- ตา (ต้องมี id="mascotEye") -->
+    <rect id="mascotEye" x="30" y="32" width="40" height="8" rx="4" class="cyber-eye" fill="#3b82f6" />
+            <!-- ร่างกาย (Body) -->
+            <rect x="30" y="50" width="40" height="35" rx="10" fill="url(#bodyGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            
+            <!-- Energy Core (แกนพลังงาน) -->
+            <circle cx="50" cy="67" r="8" fill="rgba(0,0,0,0.3)" />
+            <circle cx="50" cy="67" r="5" class="core-spin" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="8 4" id="mascotCore" />
+            
+            <!-- แขนลอยตัว (Floating Arms) -->
+            <rect x="15" y="55" width="8" height="20" rx="4" fill="url(#headGrad)" opacity="0.8" class="hover-glow" />
+            <rect x="77" y="55" width="8" height="20" rx="4" fill="url(#headGrad)" opacity="0.8" class="hover-glow" style="animation-delay: -1.5s;" />
+
+            <!-- ฐาน Hologram ด้านล่าง -->
+            <ellipse cx="50" cy="105" rx="30" ry="8" fill="rgba(59, 130, 246, 0.2)" class="hover-glow" id="mascotBase" />
+            <path d="M30 105L50 90L70 105" stroke="#3b82f6" stroke-width="1" opacity="0.3" id="mascotLine" />
+
+            <!-- Definitions สำหรับ Gradients -->
+            <defs>
+                <linearGradient id="headGrad" x1="25" y1="15" x2="75" y2="45" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#f8fafc" />
+                    <stop offset="1" stop-color="#cbd5e1" />
+                </linearGradient>
+                <linearGradient id="bodyGrad" x1="30" y1="50" x2="70" y2="85" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#f1f5f9" />
+                    <stop offset="1" stop-color="#94a3b8" />
+                </linearGradient>
+            </defs>
+        </svg>
     </div>
-
-    <!-- Form -->
-    <div class="lo-form-col">
-      <div class="lo-brand" style="margin-bottom:1.5rem">
-        <div class="lo-brand-icon">
-          <svg width="22" height="22" viewBox="0 0 50 50" fill="none">
-            <circle stroke="#fff" stroke-width="4.5" cx="25" cy="25" r="18" stroke-dasharray="100" stroke-dashoffset="100" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
-            <line stroke="#fff" stroke-width="4.5" stroke-linecap="round" x1="35" y1="35" x2="44" y2="44" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
-          </svg>
-        </div>
-        <div>
-          <h2 style="font-family:var(--font-head);font-weight:800;font-size:1.5rem;color:var(--text-900);letter-spacing:-.02em;line-height:1">
-            SQE <span style="color:var(--blue-600)">support</span>
-          </h2>
-          <p style="font-size:.6rem;color:var(--text-400);font-weight:600;letter-spacing:.04em;font-family:var(--font-head)">Intelligence Platform · v4.0</p>
-        </div>
-      </div>
-
-      <div id="loginForm" style="display:flex;flex-direction:column;gap:1rem">
-<!-- ...โค้ดด้านบน... -->
-<div>
-  <!-- เปลี่ยน Label และ Placeholder -->
-  <label class="lo-label">Work Email</label>
-  
-  <!-- เปลี่ยน type="text" เป็น type="email" และเพิ่ม autocomplete="email" -->
-  <!-- ลบ list="inspectorList" ออก (เพื่อความปลอดภัย ไม่ให้เดาได้ง่าย) -->
-  <input type="email" id="loginName" placeholder="Monkan.kancun@carrier.com" class="lo-in" autofocus autocomplete="email" style="text-transform: lowercase;">
+    
+    <div style="margin-top: 1rem; text-align: center;">
+        <div class="lo-badge-online"><span class="sdot"></span>SYSTEM LIVE</div>
+        <div style="font-family: var(--font-mono); font-size: 0.6rem; color: #94a3b8; margin-top: 0.5rem; letter-spacing: 2px;">NEURAL LINK v4.5</div>
+    </div>
 </div>
-<!-- ...โค้ดด้านล่าง... -->
-        <div>
-          <label class="lo-label">Access Key</label>
-          <input type="password" id="loginPass" placeholder="••••••" class="lo-in">
-        </div>
-<!-- ✅ เพิ่ม id เพื่อให้ JS เรียกใช้งานได้ง่ายขึ้น -->
-<button id="loginBtn" onclick="handleLoginClick()" class="lo-btn">
-  Sign In to Dashboard →
-</button>
-      </div>
 
-      <div id="loProgress">
-        <div class="lo-bar-t"><div class="lo-bar" id="loBar"></div></div>
-        <div class="lo-step" id="ls1"><div class="lo-dot">1</div><span>Verifying credentials…</span></div>
-        <div class="lo-step" id="ls2"><div class="lo-dot">2</div><span>Loading workspace…</span></div>
-        <div class="lo-step" id="ls3"><div class="lo-dot">3</div><span>Fetching cloud data…</span></div>
-      </div>
+        <!-- ฝั่งขวา: ฟอร์มลอกอิน -->
+        <div class="lo-form-col">
+            <div class="lo-brand">
+                <div class="lo-brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 50 50">
+                        <circle stroke="#fff" stroke-width="4" cx="25" cy="25" r="18" />
+                        <line stroke="#fff" stroke-width="4" x1="35" y1="35" x2="44" y2="44" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="sora" style="font-weight: 800; font-size: 1.8rem; letter-spacing: -0.03em;">
+                        SQE <span style="color: #2563eb;" id="brandAccent">Support</span>
+                    </h2>
+                    <p style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">Intelligence Platform</p>
+                </div>
+            </div>
 
-      <p style="margin-top:1.4rem;font-size:.6rem;color:var(--text-200);font-family:var(--font-mono);text-align:center">
-        Authorized Personnel Only · Encrypted · Secure
-      </p>
+            <!-- Role Selector -->
+            <div class="role-toggle">
+                <div class="role-slider"></div>
+                <div class="role-tab active" id="tabStaff" onclick="setLoginRole('staff')">STAFF</div>
+                <div class="role-tab" id="tabSuper" onclick="setLoginRole('supervisor')">HEAD</div>
+            </div>
+
+<!-- ส่วนของฟอร์มลอกอิน -->
+<div id="loginForm">
+    <div class="lo-field">
+        <label class="lo-label">ACCESS TERMINAL (EMAIL)</label>
+        <input type="email" id="loginName" placeholder="name@carrier.com" class="lo-in">
     </div>
-  </div>
+    
+    <!-- ตรวจสอบตรงนี้: ต้องครอบทั้ง label และ input -->
+    <div id="passField" style="margin-top: 1rem;">
+        <label class="lo-label">SECURITY KEY</label>
+        <input type="password" id="loginPass" placeholder="••••••••" class="lo-in">
+    </div>
+
+    <button id="loginBtn" onclick="handleLoginClick()" class="lo-btn" style="width: 100%; margin-top: 2rem;">
+        Initialize Session →
+    </button>
+</div>
+
+            <!-- Progress Bar (ซ่อนไว้แสดงตอนโหลด) -->
+            <div id="loProgress" style="display: none;">
+                <div class="lo-bar-t"><div class="lo-bar" id="loBar"></div></div>
+                <div class="lo-step" id="ls1"><div class="lo-dot">1</div><span>Encrypting Link...</span></div>
+                <div class="lo-step" id="ls2"><div class="lo-dot">2</div><span>Authenticating...</span></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -5934,16 +6368,82 @@ datalist { display: none; }
         </svg>
       </div>
 
-      <div style="z-index:1;position:relative">
-        <h1 style="font-family:var(--font-head);font-size:1.15rem;font-weight:800;color:#fff;letter-spacing:-.02em">
-          SQE <span style="opacity:.85">support</span>
+<!-- ภายใน #brandCard: จัด layout แบบกระจายหัว-ท้าย -->
+<div style="z-index:1; position:relative; display: flex; flex-direction: column; justify-content: space-between; height: 100%; width: 100%;">
+    
+    <!-- ส่วนบน: ชื่อแอป และ นาฬิกา/Sync -->
+    <div>
+        <h1 style="font-family:var(--font-head); font-size:1.1rem; font-weight:800; color:#fff; letter-spacing:-.02em; line-height: 1.1;">
+            SQE <span style="opacity:.85">support</span>
         </h1>
-
-        <p id="liveClock" style="font-family:var(--font-mono);font-size:.6rem;color:rgba(255,255,255,.6);margin-top:.15rem"></p>
-        <div id="syncPulse" style="margin-top:.4rem">
-          <span class="sdot"></span><span id="syncPulseText">LIVE SYNC</span>
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+            <p id="liveClock" style="font-family:var(--font-mono); font-size:.55rem; color:rgba(255,255,255,0.5);"></p>
+            <div id="syncPulse" style="display: flex; align-items: center; gap: 4px;">
+                <span class="sdot" style="width: 5px; height: 5px;"></span>
+                <span id="syncPulseText" style="font-size: 0.55rem; font-weight: 700; color: #10b981;">LIVE</span>
+            </div>
         </div>
-      </div>
+    </div>
+
+    <!-- ส่วนล่าง: SUPERVISOR CONSOLE (จัดให้ชิดขอบล่างและกะทัดรัดที่สุด) -->
+    <div id="supervisorConsole" style="display:none; flex-direction: column; gap: 2px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px;">
+        <label style="font-family: var(--font-head); font-size: 0.48rem; font-weight: 800; color: rgba(255,255,255,0.4); letter-spacing: 0.05em; text-transform: uppercase;">
+            Viewing Data As
+        </label>
+        
+<!-- แทนที่ <select> เดิมด้วยโค้ดนี้ -->
+<div class="sc-select-wrapper">
+    <!-- ✨ ไอคอน User (คน) -->
+    <svg class="sc-user-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+
+    <!-- Input เลือกพนักงาน -->
+    <select id="staffSelector" onchange="switchView(this.value)" class="sc-premium-select">
+        <!-- รายชื่อพนักงานจะถูกใส่โดย JS -->
+    </select>
+</div>
+    </div>
+</div>
+
+<style>
+/* กิมมิกไอคอน: ให้มีการเรืองแสงอ่อนๆ และกระพริบเบาๆ เหมือนระบบ Security */
+.sc-gimmick-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6; /* สีฟ้าสดใส */
+    filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6));
+    animation: scPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes scPulse {
+    0%, 100% { opacity: 0.6; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* ปรับแต่ง Select ให้เนียนและชื่อชัดเจน */
+.sc-premium-select:hover {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+}
+
+.sc-premium-select option {
+    background: #0f172a; /* พื้นหลังสีเข้มทึบเพื่อให้ชื่อชัดที่สุดเมื่อเปิดเมนู */
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 10px;
+}
+
+/* เมื่อชื่อถูกเลือก ให้ชื่อเด่นออกมาด้วย Ambient Light */
+.sc-premium-select:focus {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+</style>
            <!-- Dark Mode Button (อยู่ด้านขวาสุด) -->
       <button onclick="toggleDarkMode()" id="darkModeBtn" title="Toggle Theme"
         style="position:absolute;top:.75rem;right:.75rem;z-index:2;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 8px;cursor:pointer;transition:all .2s;font-size:.7rem;display:flex;align-items:center;gap:3px;font-family:var(--font-head);font-weight:600"
@@ -6033,9 +6533,8 @@ datalist { display: none; }
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:.85rem;border-bottom:1.5px solid var(--blue-100)">
         <div>
           <div style="font-family:var(--font-head);font-size:.7rem;font-weight:800;color:var(--text-900)">Entry Terminal</div>
-          <div style="font-size:.6rem;color:var(--text-400);margin-top:1px">ป้อนข้อมูล</div>
+          <div style="font-size:.6rem;color:var(--text-400);margin-top:1px">ป้อนข้อมูลให้ถูกต้องครบถ้วน ขอให้สนุกกับงานทีทำ⭐</div>
         </div>
-        <span id="currentUserDisp" style="background:var(--blue-600);color:#fff;padding:3px 10px;border-radius:99px;font-size:.6rem;font-weight:700;font-family:var(--font-head)">GUEST</span>
       </div>
 
       <form id="claimForm" class="scroll" style="display:flex;flex-direction:column;gap:.6rem;overflow-y:auto;flex-grow:1;padding-right:.1rem">
@@ -6777,14 +7276,18 @@ datalist { display: none; }
 </style>
 <script>
 document.addEventListener('contextmenu', e => e.preventDefault());
-// กำหนดค่าความสูงแถวเป็น Constant (ใส่ไว้ด้านบนส่วนของ Table Logic หรือ Global ได้)
-const ROW_HEIGHT = 70; 
+
+let isSupervisor = false; // สถานะหัวหน้างาน
+let viewingUser = '';    // อีเมลที่หัวหน้ากำลังแอบส่องอยู่ (Impersonating)
+let allStaffList = [];   // รายชื่อพนักงานทั้งหมดที่มีในระบบ
 /* ══════════════════════════════════════════════════════════════
    0. CONFIGURATION & GLOBAL VARIABLES
    ตั้งค่าเริ่มต้น, ตัวแปร Global, และ State ของระบบ
 ═════════════════════════════════════════════════════════════════ */
 const SUPABASE_URL = 'https://xgkjxvljdhpniakgzatf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhna2p4dmxqZGhwbmlha2d6YXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NDkxMjYsImV4cCI6MjA5MzAyNTEyNn0.os0bmAoR7CCefdsuQzGC9eLPnEJ64Ny8rxx0lFMXXAU';
+// กำหนดค่าความสูงแถวเป็น Constant (ใส่ไว้ด้านบนส่วนของ Table Logic หรือ Global ได้)
+const ROW_HEIGHT = 70; 
 let _sbClient = null;
 
 const IDB_NAME = 'Part_Line_Claim';
@@ -6945,14 +7448,21 @@ async function fetchFromSupabase(inspector) {
   if (!sb) return null;
   
   try {
-    let allData =[];
+    let allData = [];
     let fetchMore = true;
     let from = 0;
-    const step = 1000; 
+    const step = 1000; // ดึงทีละ 1000 รายการ
 
     while (fetchMore) {
-      const { data, error } = await sb.from('records').select('*').eq('inspector', inspector).order('date', { ascending: false }).range(from, from + step - 1);
+      const { data, error } = await sb
+        .from('records')
+        .select('*')
+        .eq('inspector', inspector) // ✅ ใช้ eq แทน ilike เพื่อความชัวเจน
+        .order('date', { ascending: false })
+        .range(from, from + step - 1);
+        
       if (error) throw error;
+      
       if (data && data.length > 0) {
         allData = allData.concat(data);
         from += step;
@@ -7013,32 +7523,98 @@ async function deleteFromSupabase(id) {
 ═════════════════════════════════════════════════════════════════ */
 async function initApp(inspector) {
   _isInitializing = true;
-  currentUser = inspector;
-  if($id('currentUserDisp')) $id('currentUserDisp').textContent = inspector;
+  
+  // 1. กำหนดค่าเริ่มต้น (ทำเป็นตัวพิมพ์เล็กเพื่อป้องกันความผิดพลาด)
+  currentUser = inspector.toLowerCase();
+  isSupervisor = sessionStorage.getItem('isSupervisor') === 'true';
 
   try {
+    // 2. เริ่มต้นฐานข้อมูลในเครื่อง (IndexedDB)
     await initDB();
-    records = await dbGetAll();
-    
-    // ✅ เพิ่มบรรทัดนี้: เก็บไว้เฉพาะข้อมูลของ User ที่ Login อยู่เท่านั้น (ล้างข้อมูลคนอื่นทิ้ง)
-    records = records.filter(r => r.inspector === currentUser);
 
+    if (isSupervisor) {
+      // ═══════════════════════════════════════════════════
+      // ✅ [โหมดหัวหน้างาน - SUPERVISOR MODE]
+      // ═══════════════════════════════════════════════════
+      showInitOverlay('กำลังเตรียมข้อมูลหัวหน้างาน...', 'กำลังค้นหาข้อมูล Natthawut...');
+      
+      // แสดง Console สำหรับหัวหน้า
+      if($id('supervisorConsole')) $id('supervisorConsole').style.display = 'flex';
+
+      // โหลดรายชื่อพนักงานเข้า Dropdown (ฟังก์ชันนี้ควรตัดชื่อหน้า @ แล้ว)
+      await loadStaffList(); 
+
+      const selector = $id('staffSelector');
+      if (selector && selector.options.length > 0) {
+        
+        // 🔍 ค้นหา Natthawut ในลิสต์
+        let defaultUser = "";
+        for (let i = 0; i < selector.options.length; i++) {
+            const emailInList = selector.options[i].value.toLowerCase();
+            if (emailInList.includes("natthawut")) {
+                defaultUser = selector.options[i].value;
+                break;
+            }
+        }
+
+        // กำหนดคนที่จะดูข้อมูล: ถ้าเจอ Natthawut ให้เลือกคนนั้น ถ้าไม่เจอให้เอาคนแรก
+        viewingUser = defaultUser || selector.options[0].value;
+        selector.value = viewingUser; // อัปเดตหน้าจอ Dropdown ให้แสดงชื่อที่เลือก
+        
+        // ดึงข้อมูลพนักงานคนนั้นจาก Cloud มาแสดง
+        if (isOnline) {
+          const cloudData = await fetchFromSupabase(viewingUser);
+          records = cloudData || [];
+        } else {
+          toast('⚠️ ออฟไลน์: ไม่สามารถดึงข้อมูลพนักงานคนอื่นได้');
+          records = [];
+        }
+      }
+    } else {
+      // ═══════════════════════════════════════════════════
+      // ✅ [โหมดผู้ทำงานปกติ - STAFF MODE]
+      // ═══════════════════════════════════════════════════
+      viewingUser = currentUser;
+      
+      // ซ่อน Console หัวหน้างาน
+      if ($id('supervisorConsole')) $id('supervisorConsole').style.display = 'none';
+
+      showInitOverlay('กำลังโหลดข้อมูล...', 'กำลังดึงข้อมูลล่าสุดจากระบบ Cloud');
+
+      if (isOnline) {
+        // 1. ดึงข้อมูลของตัวเองจาก Cloud ทันที (แก้ปัญหา Login แล้วข้อมูลว่าง)
+        const cloudData = await fetchFromSupabase(currentUser);
+        
+        if (cloudData && cloudData.length > 0) {
+          records = cloudData;
+          // 2. อัปเดตข้อมูลลง Local DB ในเครื่องด้วย เพื่อให้ใช้งานออฟไลน์ได้ภายหลัง
+          await dbClear();
+          await dbPutBulk(records);
+        } else {
+          // ถ้าบน Cloud ไม่มี ให้ลองดึงจาก Local DB เผื่อมีค้างไว้
+          let allLocalData = await dbGetAll();
+          records = allLocalData.filter(r => r.inspector.toLowerCase() === currentUser);
+        }
+      } else {
+        // กรณีออฟไลน์: ดึงจาก Local DB เท่านั้น
+        let allLocalData = await dbGetAll();
+        records = allLocalData.filter(r => r.inspector.toLowerCase() === currentUser);
+        toast('📶 คุณอยู่ในโหมดออฟไลน์: ใช้ข้อมูลจากแคช');
+      }
+    }
+
+    // 3. อัปเดต UI (KPI Cards, ตาราง, Datalists)
     refreshAll(); 
 
-    showInitOverlay('กำลังเชื่อมต่อ Database...', 'Syncing...');
-
-    if (isOnline) {
-      await syncToCloud(true); 
-    } else {
-      toast('⚠️ ออฟไลน์ ใช้ข้อมูลจากเครื่อง (Local Cache)');
-    }
   } catch (err) {
-    console.error("Init App Error:", err);
-    toast('❌ เกิดข้อผิดพลาดในการโหลดระบบ');
+    console.error("Critical Error in initApp:", err);
+    toast('❌ เกิดข้อผิดพลาดร้ายแรงในการโหลดระบบ');
   } finally {
-    hideInitOverlay();
+    // ปิดหน้าจอโหลด และเปิดให้ใช้งานฟอร์มได้
     refreshAll();
+    hideInitOverlay();
     _isInitializing = false;
+    console.log(`[System] Initialized for: ${viewingUser}`);
   }
 }
 
@@ -7138,16 +7714,22 @@ async function login() {
   const nameInput = $id('loginName');
   const passInput = $id('loginPass');
   
-  // 1. รับค่าและทำให้เป็นตัวพิมพ์เล็กทั้งหมด
   const email = (nameInput.value || '').trim().toLowerCase(); 
   const pass = passInput.value;
 
-  // 2. ตรวจสอบรูปแบบอีเมล (Regex)
+  // 1. ตรวจสอบข้อมูลเบื้องต้น
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email) { shake(nameInput); toast('❌ กรุณาระบุอีเมล'); return; }
   if (!emailRegex.test(email)) { shake(nameInput); toast('❌ รูปแบบอีเมลไม่ถูกต้อง'); return; }
+  
+  // ถ้าเป็น Staff (พนักงาน) ต้องกรอกรหัสผ่าน
+  if (!isSupervisor && !pass) { 
+    shake(passInput); 
+    toast('❌ พนักงานกรุณาระบุรหัสผ่าน'); 
+    return; 
+  }
 
-  // ปิดปุ่มกันกดซ้ำ
+  // ปิดปุ่มและแสดง Progress
   $id('loginBtn').disabled = true;
   $id('loginForm').style.display = 'none';
   $id('loProgress').style.display = 'flex';
@@ -7158,80 +7740,61 @@ async function login() {
   const step3 = $id('ls3');
 
   try {
-    // ═══════════ AUTOMATION STEP 1: Checking Database ══════════
+    // ══════════ STEP 1: Verifying User ══════════
     if (step1) step1.classList.add('active');
     if (bar) bar.style.width = '35%';
 
-    // ดึง Client Supabase
     const sb = getSupabase();
-    
-    if (!sb) {
-        throw new Error("ไม่สามารถเชื่อมต่อ Supabase ได้");
-    }
+    if (!sb) throw new Error("Connection Error");
 
-    // ✅ ✅ ✅ ตรวจสอบจาก Supabase (ตรงนี้คือหัวใจ) ✅ ✅ ✅
-    // ค้นหาผู้ใช้จากตาราง 'users' โดยเทียบ email
     const { data: userData, error } = await sb
       .from('users')
       .select('*')
       .eq('email', email)
-      .single(); // .single() ใช้เพื่อดึงเพียง 1 แถว หรือรู้ว่าไม่พบ
+      .single();
 
-    if (error) {
-        // ถ้ารหัส error เป็น PGRST116 แปลว่า "ไม่พบข้อมูล" (User ไม่มีในระบบ)
-        if (error.code === 'PGRST116') {
-             throw new Error("USER_NOT_FOUND");
-        }
-        throw error; // เกิด error อื่นๆ เช่น Database down
-    }
+    if (error || !userData) throw new Error("USER_NOT_FOUND");
 
-    await delay(500); // จำลองการทำงานให้ดูสวยงาม
+    await delay(500);
     if (step1) { step1.classList.remove('active'); step1.classList.add('done'); }
 
-    // ══════════ AUTOMATION STEP 2: Verifying Password ══════════
+    // ══════════ STEP 2: Logic Security & Role Check ══════════
     if (step2) step2.classList.add('active');
     if (bar) bar.style.width = '70%';
 
-    // ✅ เปรียบเทียบรหัสผ่าน
-    if (userData.password !== pass) {
-        throw new Error("WRONG_PASSWORD");
+    // --- ส่วนแยกเงื่อนไขตามสิทธิ์ (Logic Split) ---
+    const requiredRole = isSupervisor ? 'supervisor' : 'staff';
+
+    // เช็คสิทธิ์ในระบบ (Role Check)
+    if (userData.role !== requiredRole) {
+        throw new Error("ROLE_MISMATCH");
+    }
+
+    // ถ้าเป็น Staff ต้องเช็ครหัสผ่าน | ถ้าเป็น Supervisor ข้ามส่วนนี้ไปเลย
+    if (!isSupervisor) {
+        if (userData.password !== pass) {
+            throw new Error("WRONG_PASSWORD");
+        }
     }
 
     await delay(500);
     if (step2) { step2.classList.remove('active'); step2.classList.add('done'); }
 
-    // ══════════ AUTOMATION STEP 3: Loading Workspace ══════════
+    // ══════════ STEP 3: Preparing Workspace ══════════
     if (step3) step3.classList.add('active');
     if (bar) bar.style.width = '90%';
 
-    // ✅ ✅ ✅ LOGIN สำเร็จ ✅ ✅ ✅
-    
-    // บันทึก Email เป็น Key หลัก (สำคัญมาก: จะใช้อีเมลเป็นตัวแบ่งข้อมูล)
     currentUser = email; 
     sessionStorage.setItem('currentUser', email);
-    
-    // ตั้งค่าชื่อผู้ใช้ที่จะแสดงผลบนหน้าจอ (ถ้ามีในฐานข้อมูล ถ้าไม่มีใช้อีเมลแทน)
-    const displayName = userData.display_name || email;
-    
-    // อัปเดต UI ชื่อผู้ใช้
-    if($id('currentUserDisp')) $id('currentUserDisp').textContent = displayName;
+    sessionStorage.setItem('isSupervisor', isSupervisor); 
 
-    // เตรียมฐานข้อมูล Local
-    await initDB();
-    // ต้องกรองเฉพาะของ User นี้
-    records = await dbGetAll();
-    records = records.filter(r => r.inspector === currentUser);
-
-    // เตรียมซิงค์ข้อมูล
-    if (isOnline) {
-      await syncToCloud(true); // ใช้ true เพื่อไม่ให้แสดง Toast รบกวน
-    }
+    await initApp(email);
 
     if (bar) bar.style.width = '100%';
     await delay(500);
     if (step3) { step3.classList.remove('active'); step3.classList.add('done'); }
 
-    // ══════════ FINISH: สลับหน้าจอ ══════════
+    // ══════════ FINISH: Animations ══════════
     await delay(300);
 
     if (typeof gsap !== 'undefined') {
@@ -7243,40 +7806,31 @@ async function login() {
       tl.to('#appShell', { opacity: 1, duration: 0.6, ease: 'back.out(1.2)', onStart: () => { 
           $id('appShell').style.visibility = 'visible'; 
           $id('appShell').classList.add('visible'); 
-          refreshAll(); // อัปเดตหน้าจอหลัก
+          refreshAll(); 
       }}, '-=0.1');
-            // ✅ เพิ่มบรรทัดนี้: สั่งให้เข้า Full Screen เมื่อ Animation จบ
-      tl.call(() => {
-          enterFullscreen(); 
-      });
     } else {
       $id('loginOverlay').style.display = 'none';
       $id('appShell').style.visibility = 'visible';
       $id('appShell').style.opacity = '1';
       refreshAll();
-            // ✅ กรณีไม่มี GSAP ก็สั่งได้เลย
-      enterFullscreen();
     }
+    enterFullscreen();
 
   } catch (err) {
-    // การจัดการ Error ต่างๆ
     console.error("Login Error:", err);
-    
-    // คืนค่าปุ่มให้กดได้อีกครั้ง
     $id('loginBtn').disabled = false;
     $id('loginForm').style.display = 'flex';
     $id('loProgress').style.display = 'none';
 
     if (err.message === 'USER_NOT_FOUND') {
-        shake(nameInput);
-        toast('⛔ ไม่พบอีเมลผู้ใช้งานนี้ในระบบ');
+        toast('⛔ ไม่พบอีเมลนี้ในระบบ');
     } else if (err.message === 'WRONG_PASSWORD') {
-        passInput.style.borderColor = 'var(--accent-red)';
-        shake(passInput); 
         toast('⛔ รหัสผ่านไม่ถูกต้อง');
+    } else if (err.message === 'ROLE_MISMATCH') {
+        const errorRole = isSupervisor ? 'หัวหน้างาน' : 'พนักงาน';
+        toast(`⚠️ คุณไม่มีสิทธิ์ในโหมด [${errorRole}]`);
     } else {
-        shake(nameInput);
-        toast('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + err.message);
+        toast('❌ ข้อผิดพลาด: ' + err.message);
     }
   }
 }
@@ -7307,7 +7861,12 @@ function isDuplicate(ref) {
 }
 
 function getMyRecords() {
-  return records.filter(r => r.inspector === currentUser);
+  if (isSupervisor) {
+      // หัวหน้าดูตามคนที่เลือกใน Dropdown
+      return records.filter(r => r.inspector.toLowerCase() === viewingUser.toLowerCase());
+  }
+  // พนักงานดูเฉพาะของตัวเอง
+  return records.filter(r => r.inspector.toLowerCase() === currentUser.toLowerCase());
 }
 
 function handleJudgment(val) {
@@ -7583,6 +8142,7 @@ function hideSingleDeleteModal() {
     modal.classList.remove('show');
   }
 }
+
 // ⚡ Audit Logic Hook: Backup data before delete
 async function confirmDeleteSingleRow() {
   const idToDelete = _pendingDeleteId; // ย้ายขึ้นมาบรรทัดแรก
@@ -7923,12 +8483,14 @@ function renderTable() {
 }
 
 function refreshAll() {
-  const d = getMyRecords();
+  // ดึงข้อมูลที่กรองแล้ว (ตามViewingUser)
+  const d = getMyRecords(); 
+  
   let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
   let sfL = 0, venL = 0, ctcL = 0, okL = 0;
 
   d.forEach(r => {
-    tQ += r.qty;
+    tQ += (parseInt(r.qty) || 0);
     if (r.judgment === 'SF') { sf += r.qty; sfL++; }
     else if (r.judgment === 'VENDOR FAULT') { ven += r.qty; venL++; }
     else if (r.judgment === 'CTC') { ctc += r.qty; ctcL++; }
@@ -7937,15 +8499,27 @@ function refreshAll() {
 
   const pct = (v, t) => t > 0 ? Math.round((v / t) * 100) + '%' : '0%';
 
+  // อัปเดตตัวเลขบนการ์ด
   animNum('masterQty', tQ); 
   if($id('masterLot')) $id('masterLot').textContent = d.length;
   
-  animNum('qtySF', sf); if($id('lotSF')) $id('lotSF').textContent = sfL; if($id('pctSF')) $id('pctSF').textContent = pct(sf, tQ);
-  animNum('qtyVendor', ven); if($id('lotVendor')) $id('lotVendor').textContent = venL; if($id('pctVendor')) $id('pctVendor').textContent = pct(ven, tQ);
-  animNum('qtyCTC', ctc); if($id('lotCTC')) $id('lotCTC').textContent = ctcL; if($id('pctCTC')) $id('pctCTC').textContent = pct(ctc, tQ);
-  animNum('qtyCanUse', ok); if($id('lotCanUse')) $id('lotCanUse').textContent = okL; if($id('pctCanUse')) $id('pctCanUse').textContent = pct(ok, tQ);
+  animNum('qtySF', sf); 
+  if($id('lotSF')) $id('lotSF').textContent = sfL; 
+  if($id('pctSF')) $id('pctSF').textContent = pct(sf, tQ);
+  
+  animNum('qtyVendor', ven); 
+  if($id('lotVendor')) $id('lotVendor').textContent = venL; 
+  if($id('pctVendor')) $id('pctVendor').textContent = pct(ven, tQ);
+  
+  animNum('qtyCTC', ctc); 
+  if($id('lotCTC')) $id('lotCTC').textContent = ctcL; 
+  if($id('pctCTC')) $id('pctCTC').textContent = pct(ctc, tQ);
+  
+  animNum('qtyCanUse', ok); 
+  if($id('lotCanUse')) $id('lotCanUse').textContent = okL; 
+  if($id('pctCanUse')) $id('pctCanUse').textContent = pct(ok, tQ);
 
-   updateDatalists(); // เพิ่มบรรทัดนี้ลงไปท้ายฟังก์ชัน
+  updateDatalists(); 
   renderTable();
 }
 
@@ -8774,6 +9348,7 @@ async function importExcel(input) {
     } catch (err) { toast('❌ เกิดข้อผิดพลาด: ' + err.message); } 
     finally { hideInitOverlay(); input.value = ''; }
   };
+  
   reader.readAsArrayBuffer(file);
 }
 
@@ -9642,6 +10217,124 @@ function renderAuditTimeline(data) {
 
   listEl.innerHTML = html;
 }
+
+function setLoginRole(role) {
+    const overlay = document.getElementById('loginOverlay');
+    const brandAccent = document.getElementById('brandAccent');
+    const tabStaff = document.getElementById('tabStaff');
+    const tabSuper = document.getElementById('tabSuper');
+    const passField = document.getElementById('passField');
+    
+    // ดึงส่วนประกอบของหุ่นยนต์
+    const eye = document.getElementById('mascotEye');
+    const core = document.getElementById('mascotCore');
+    const base = document.getElementById('mascotBase');
+    const line = document.getElementById('mascotLine');
+
+    if (role === 'supervisor') {
+        isSupervisor = true;
+        overlay.classList.add('is-head-mode');
+        if(brandAccent) brandAccent.style.color = '#f59e0b';
+        if(tabSuper) tabSuper.classList.add('active');
+        if(tabStaff) tabStaff.classList.remove('active');
+        if(passField) passField.style.display = 'none';
+
+        // --- เปลี่ยนสีหุ่นยนต์เป็นสีทอง (HEAD) ---
+        if(eye) { 
+            eye.style.fill = '#f59e0b'; 
+            eye.style.color = '#f59e0b'; // สำหรับกรณีใช้ currentColor ใน CSS
+        }
+        if(core) core.style.stroke = '#f59e0b';
+        if(base) base.style.fill = 'rgba(245, 158, 11, 0.4)';
+        if(line) line.style.stroke = '#f59e0b';
+
+    } else {
+        isSupervisor = false;
+        overlay.classList.remove('is-head-mode');
+        if(brandAccent) brandAccent.style.color = '#2563eb';
+        if(tabStaff) tabStaff.classList.add('active');
+        if(tabSuper) tabSuper.classList.remove('active');
+        if(passField) passField.style.display = 'block';
+
+        // --- เปลี่ยนสีหุ่นยนต์เป็นสีฟ้า (STAFF) ---
+        if(eye) { 
+            eye.style.fill = '#3b82f6'; 
+            eye.style.color = '#3b82f6'; 
+        }
+        if(core) core.style.stroke = '#3b82f6';
+        if(base) base.style.fill = 'rgba(59, 130, 246, 0.2)';
+        if(line) line.style.stroke = '#3b82f6';
+    }
+
+    // แอนิเมชันตัวการ์ด
+    if (typeof gsap !== 'undefined') {
+        gsap.from(".lo-card", { scale: 0.98, duration: 0.4, ease: "back.out" });
+    }
+}
+
+async function loadStaffList() {
+    const sb = getSupabase();
+    if (!sb) return;
+
+    try {
+        // ✅ วิธีใหม่: ดึงเฉพาะอีเมลของ Staff จากตาราง users
+        // สมมติว่าตาราง users มีคอลัมน์ 'role'
+        const { data, error } = await sb
+            .from('users')
+            .select('email')
+            .eq('role', 'staff'); // ดึงเฉพาะที่เป็น staff
+
+        if (error) throw error;
+
+        if (data) {
+            allStaffList = data.map(u => u.email).sort(); // เรียงลำดับอีเมล
+            const selector = $id('staffSelector');
+            if (selector) {
+                selector.innerHTML = allStaffList.map(email => {
+                    // ตัด @carrier.com ออกเพื่อแสดงชื่อสั้นๆ
+                    const displayName = email.split('@')[0];
+                    return `<option value="${email}">${displayName}</option>`;
+                }).join('');
+            }
+        }
+    } catch (e) {
+        console.error("Load Staff List Error:", e);
+        toast('❌ โหลดรายชื่อพนักงานไม่สำเร็จ');
+    }
+}
+
+// ฟังก์ชันสลับการดูข้อมูล
+async function switchView(targetEmail) {
+    showInitOverlay('สลับมุมมอง...', `กำลังโหลดข้อมูลของ ${targetEmail}`);
+    viewingUser = targetEmail;
+    
+    const sb = getSupabase();
+    // ดึงข้อมูลใหม่ของคนนั้นๆ
+    const { data } = await sb.from('records').select('*').eq('inspector', targetEmail).order('date', { ascending: false });
+    
+    if (data) {
+        records = data.map(r => ({ ...r, _isSaved: true }));
+        refreshAll(); // อัปเดตตารางและ KPI
+    }
+    
+    hideInitOverlay();
+    toast(`👀 ตอนนี้คุณกำลังดูข้อมูลของ ${targetEmail}`);
+}
+
+// ═════════════════════════════════════════════════
+// FIX: กดปุ่ม ESC เพื่อออกจาก Fullscreen
+// ═════════════════════════════════════════════════
+window.addEventListener('keydown', function(e) {
+    // ตรวจสอบว่าปุ่มที่กดคือ Escape หรือไม่
+    if (e.key === 'Escape' || e.keyCode === 27) {
+        // เช็คก่อนว่ากำลังอยู่ในโหมดเต็มจอจริงไหม
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            // ถ้าอยู่ ให้เรียกฟังก์ชันออกจากจอเต็ม
+            toggleFullscreen();
+            console.log('Exit Fullscreen triggered by ESC key');
+        }
+    }
+});
 </script>
 </body>
 </html>
