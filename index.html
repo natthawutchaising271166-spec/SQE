@@ -7531,7 +7531,7 @@ async function deleteFromSupabase(id) {
 async function initApp(inspector) {
   _isInitializing = true;
   
-  // 1. กำหนดค่าเริ่มต้น (ทำเป็นตัวพิมพ์เล็กเพื่อป้องกันความผิดพลาด)
+  // 1. กำหนดค่าเริ่มต้น
   currentUser = inspector.toLowerCase();
   isSupervisor = sessionStorage.getItem('isSupervisor') === 'true';
 
@@ -7541,20 +7541,19 @@ async function initApp(inspector) {
 
     if (isSupervisor) {
       // ═══════════════════════════════════════════════════
-      // ✅ [โหมดหัวหน้างาน - SUPERVISOR MODE]
+      // [โหมดหัวหน้างาน - SUPERVISOR MODE]
       // ═══════════════════════════════════════════════════
-      showInitOverlay('กำลังเตรียมข้อมูลหัวหน้างาน...', 'กำลังค้นหาข้อมูล Natthawut...');
+      showInitOverlay('เตรียมข้อมูลหัวหน้างาน...', 'กำลังค้นหาพนักงาน Natthawut...');
       
-      // แสดง Console สำหรับหัวหน้า
       if($id('supervisorConsole')) $id('supervisorConsole').style.display = 'flex';
 
-      // โหลดรายชื่อพนักงานเข้า Dropdown (ฟังก์ชันนี้ควรตัดชื่อหน้า @ แล้ว)
+      // โหลดรายชื่อพนักงานเข้า Dropdown
       await loadStaffList(); 
 
       const selector = $id('staffSelector');
       if (selector && selector.options.length > 0) {
         
-        // 🔍 ค้นหา Natthawut ในลิสต์
+        // 🔍 ค้นหา Natthawut ในลิสต์พนักงาน
         let defaultUser = "";
         for (let i = 0; i < selector.options.length; i++) {
             const emailInList = selector.options[i].value.toLowerCase();
@@ -7564,11 +7563,14 @@ async function initApp(inspector) {
             }
         }
 
-        // กำหนดคนที่จะดูข้อมูล: ถ้าเจอ Natthawut ให้เลือกคนนั้น ถ้าไม่เจอให้เอาคนแรก
+        // ⭐ ตั้งค่า Natthawut เป็นคนที่เรากำลังดูข้อมูล (ถ้าไม่เจอให้เอาคนแรก)
         viewingUser = defaultUser || selector.options[0].value;
-        selector.value = viewingUser; // อัปเดตหน้าจอ Dropdown ให้แสดงชื่อที่เลือก
+        selector.value = viewingUser; // อัปเดตหน้าจอ Dropdown
+
+        // ✅ สำคัญ: บันทึกลง Session ทันทีเพื่อให้ปุ่ม Job ใช้งานได้เลย
+        sessionStorage.setItem('viewingUser', viewingUser);
         
-        // ดึงข้อมูลพนักงานคนนั้นจาก Cloud มาแสดง
+        // ดึงข้อมูลของ Natthawut จาก Cloud มาแสดง
         if (isOnline) {
           const cloudData = await fetchFromSupabase(viewingUser);
           records = cloudData || [];
@@ -7579,49 +7581,40 @@ async function initApp(inspector) {
       }
     } else {
       // ═══════════════════════════════════════════════════
-      // ✅ [โหมดผู้ทำงานปกติ - STAFF MODE]
+      // [โหมดผู้ทำงานปกติ - STAFF MODE]
       // ═══════════════════════════════════════════════════
       viewingUser = currentUser;
-      
-      // ซ่อน Console หัวหน้างาน
-      if ($id('supervisorConsole')) $id('supervisorConsole').style.display = 'none';
+      sessionStorage.setItem('viewingUser', currentUser); // พนักงานปกติให้จำชื่อตัวเอง
 
+      if ($id('supervisorConsole')) $id('supervisorConsole').style.display = 'none';
       showInitOverlay('กำลังโหลดข้อมูล...', 'กำลังดึงข้อมูลล่าสุดจากระบบ Cloud');
 
       if (isOnline) {
-        // 1. ดึงข้อมูลของตัวเองจาก Cloud ทันที (แก้ปัญหา Login แล้วข้อมูลว่าง)
         const cloudData = await fetchFromSupabase(currentUser);
-        
         if (cloudData && cloudData.length > 0) {
           records = cloudData;
-          // 2. อัปเดตข้อมูลลง Local DB ในเครื่องด้วย เพื่อให้ใช้งานออฟไลน์ได้ภายหลัง
           await dbClear();
           await dbPutBulk(records);
         } else {
-          // ถ้าบน Cloud ไม่มี ให้ลองดึงจาก Local DB เผื่อมีค้างไว้
           let allLocalData = await dbGetAll();
           records = allLocalData.filter(r => r.inspector.toLowerCase() === currentUser);
         }
       } else {
-        // กรณีออฟไลน์: ดึงจาก Local DB เท่านั้น
         let allLocalData = await dbGetAll();
         records = allLocalData.filter(r => r.inspector.toLowerCase() === currentUser);
-        toast('📶 คุณอยู่ในโหมดออฟไลน์: ใช้ข้อมูลจากแคช');
+        toast('📶 คุณอยู่ในโหมดออฟไลน์');
       }
     }
 
-    // 3. อัปเดต UI (KPI Cards, ตาราง, Datalists)
+    // อัปเดต UI ทั้งหมด
     refreshAll(); 
 
   } catch (err) {
     console.error("Critical Error in initApp:", err);
-    toast('❌ เกิดข้อผิดพลาดร้ายแรงในการโหลดระบบ');
+    toast('❌ เกิดข้อผิดพลาดในการโหลดระบบ');
   } finally {
-    // ปิดหน้าจอโหลด และเปิดให้ใช้งานฟอร์มได้
-    refreshAll();
     hideInitOverlay();
     _isInitializing = false;
-    console.log(`[System] Initialized for: ${viewingUser}`);
   }
 }
 
@@ -7873,14 +7866,16 @@ function logout() {
 }
 
 function openJobProject() {
-    // ตรวจสอบว่ามี ViewingUser (พนักงานที่หัวหน้าเลือก) หรือไม่
-    // ถ้าไม่มี (เช่น พนักงานกดเอง) ให้ใช้ currentUser (ตัวเอง)
+    // 1. ตรวจสอบก่อนว่า "ชื่อที่เราเลือกดูอยู่" คือใคร โดยดึงจากหน่วยความจำ Session
+    // (ซึ่งจะอัปเดตอัตโนมัติจาก initApp และ switchView)
     const target = sessionStorage.getItem('viewingUser') || currentUser;
     
-    // บันทึกซ้ำอีกครั้งเพื่อความชัวร์
+    // 2. บันทึกยืนยันอีกครั้งเพื่อให้หน้าถัดไป (job_project.html) ใช้งานได้แม่นยำ
     sessionStorage.setItem('viewingUser', target);
     
-    // เปิดหน้า Job Project
+    console.log("[System] Redirecting to Job Project for user:", target);
+    
+    // 3. เปิดหน้าต่างใหม่
     window.open('job_project.html', '_blank');
 }
 
@@ -10348,22 +10343,37 @@ async function loadStaffList() {
 
 // 1. แก้ไขฟังก์ชันสลับชื่อพนักงาน (ให้บันทึกค่าลง Session ตลอดเวลา)
 async function switchView(targetEmail) {
-    showInitOverlay('สลับมุมมอง...', `กำลังโหลดข้อมูลของ ${targetEmail}`);
+    // 1. แสดง Overlay โหลดข้อมูลใหม่
+    showInitOverlay('สลับมุมมอง...', `กำลังโหลดข้อมูลของ ${targetEmail.split('@')[0]}`);
+    
+    // 2. อัปเดตสถานะคนที่เรากำลังดู
     viewingUser = targetEmail;
     
-    // ✅ บันทึกอีเมลพนักงานที่เลือกไว้ลงใน sessionStorage 
-    // เพื่อให้หน้า Job_project.html ทราบว่าต้องดึงข้อมูลของใคร
+    // ✅ บันทึกลง Session ทันที เพื่อให้ปุ่ม Job อัปเดตตามชื่อนี้
     sessionStorage.setItem('viewingUser', targetEmail); 
     
     const sb = getSupabase();
-    const { data } = await sb.from('records')
-        .select('*')
-        .eq('inspector', targetEmail)
-        .order('date', { ascending: false });
-    
-    if (data) {
-        records = data.map(r => ({ ...r, _isSaved: true }));
-        refreshAll();
+    if (sb) {
+        try {
+            // 3. ดึงข้อมูลพนักงานคนใหม่จาก Cloud ทันที
+            const { data, error } = await sb.from('records')
+                .select('*')
+                .eq('inspector', targetEmail)
+                .order('date', { ascending: false });
+            
+            if (error) throw error;
+
+            if (data) {
+                // 4. ล้างข้อมูลเก่าและแทนที่ด้วยข้อมูลของพนักงานที่เลือก
+                records = data.map(r => ({ ...r, _isSaved: true }));
+                
+                // 5. สั่งรีเฟรช KPI และตารางใหม่ทั้งหมด
+                refreshAll();
+            }
+        } catch (e) {
+            console.error("Switch View Error:", e);
+            toast('❌ ไม่สามารถดึงข้อมูลพนักงานคนนี้ได้');
+        }
     }
     
     hideInitOverlay();
