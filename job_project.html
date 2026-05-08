@@ -4567,27 +4567,40 @@ async function syncToSupabase() {
 /* ──────────────────────────────────
    2. DOWNLOAD FROM SUPABASE (ประกอบข้อมูลกลับมาให้แอพ)
 ────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────
+   ฟังก์ชันโหลดข้อมูลทั้งหมดจาก Cloud (ฉบับรวมสมบูรณ์)
+   ใช้สำหรับดึงข้อมูลพนักงาน (Staff) หรือหัวหน้า (Supervisor) ส่องดูข้อมูล
+   ────────────────────────────────────────────────────────────── */
 async function loadFromSupabaseComplete() {
     try {
-        // เปิด Loading ของปุ่ม Load
+        // 1. ตรวจสอบ "เป้าหมาย" ของข้อมูล (พนักงานที่ต้องการดึงข้อมูล)
+        // ดึงจาก sessionStorage ที่เราเซฟไว้ตอน switchView หรือ Login
+        const authUser = (sessionStorage.getItem('currentUser') || 'Master Operator').trim();
+        const targetUser = (sessionStorage.getItem('viewingUser') || authUser).trim();
+        
+        // กำหนด currentUser ของฟังก์ชันนี้ให้เป็นพนักงานเป้าหมาย
+        const targetID = targetUser;
+
+        // 2. เริ่มต้นสถานะ Loading บน UI
         setBtnLoading(true, '📥 Loading...', 'loadBtn');
-        setLoading('☁️ ดึงข้อมูลจาก Cloud...', 'กำลังดึงทีละตาราง', 20);
+        setLoading('☁️ ดึงข้อมูลจาก Cloud...', `กำลังโหลดข้อมูลของ: ${targetID.split('@')[0]}`, 10);
 
-        const loadedDB = emptyDB(); // เตรียม DB ก้อนใหม่
+        const loadedDB = emptyDB(); // เตรียม DB ก้อนใหม่ตามโครงสร้างว่าง
 
-        // ดึงข้อมูลพร้อมกันทุกตาราง (Promise.all เพื่อความเร็ว)
-        const[supRes, dailyRes, s5Res, specRes, skillRes, badgeRes] = await Promise.all([
-            sb.from('support_records').select('*').eq('user_id', currentUser),
-            sb.from('daily_reports').select('*').eq('user_id', currentUser),
-            sb.from('s5_records').select('*').eq('user_id', currentUser),
-            sb.from('special_jobs').select('*').eq('user_id', currentUser),
-            sb.from('skill_matrix').select('*').eq('user_id', currentUser),
-            sb.from('achievements').select('*').eq('user_id', currentUser)
+        // 3. ดึงข้อมูลพร้อมกันทุกตาราง (Parallel Fetch) โดยกรองตาม targetID
+        setLoadingPct(20);
+        const [supRes, dailyRes, s5Res, specRes, skillRes, badgeRes] = await Promise.all([
+            sb.from('support_records').select('*').eq('user_id', targetID),
+            sb.from('daily_reports').select('*').eq('user_id', targetID),
+            sb.from('s5_records').select('*').eq('user_id', targetID),
+            sb.from('special_jobs').select('*').eq('user_id', targetID),
+            sb.from('skill_matrix').select('*').eq('user_id', targetID),
+            sb.from('achievements').select('*').eq('user_id', targetID)
         ]);
 
         setLoadingPct(50);
 
-        // แมปข้อมูลกลับเข้า Structure ของ JavaScript
+        // 4. แมปข้อมูลกลับเข้าสู่โครงสร้างระบบ (Data Mapping)
         if (supRes.data) {
             loadedDB.support = supRes.data.map(d => ({
                 id: d.id, problem: d.problem, action: d.action, part: d.part, lot: d.lot,
@@ -4629,15 +4642,17 @@ async function loadFromSupabaseComplete() {
             });
         }
 
-        // นำข้อมูลที่ประกอบเสร็จแล้วแทนที่ในระบบ
+        // 5. บันทึกข้อมูลข้อความลง LocalStorage (Offline First)
         db = loadedDB;
+        db._owner = targetID;
         saveLocal();
 
         setLoadingPct(70);
         setLoading('🖼️ กำลังโหลดรูปภาพ...', 'ดาวน์โหลดภาพลงแคชเครื่อง', 70);
 
-        // โหลดรูปภาพจาก URL ลงแคช (IndexedDB)
+        // 6. โหลดรูปภาพจาก URL ลงแคช (IndexedDB)
         if (db.support && idb) {
+            // สำคัญ: ล้างรูปเก่าของพนักงานคนก่อนหน้าที่ค้างใน IndexedDB ออกก่อน
             const txClear = idb.transaction(['images'], 'readwrite');
             await new Promise(r => { txClear.objectStore('images').clear().onsuccess = r; });
 
@@ -4647,35 +4662,37 @@ async function loadFromSupabaseComplete() {
                     try {
                         setLoadingPct(70 + Math.floor((i / db.support.length) * 30));
                         const response = await fetch(s.imageUrl);
-                        const blob = await response.blob();
-                        await saveImageToDB(s.id, blob, true);
+                        if (response.ok) {
+                            const blob = await response.blob();
+                            // บันทึกลง IndexedDB (ใส่ true เพื่อไม่ให้หน่วง UI)
+                            await saveImageToDB(s.id, blob, true);
+                        }
                     } catch (e) {
-                        console.warn(`Load image failed for ${s.id}:`, e);
+                        console.warn(`Load image failed for ID: ${s.id}`, e);
                     }
                 }
             }
         }
 
+        // 7. สั่งให้ UI แสดงผลข้อมูลและรูปภาพชุดใหม่
         await loadAllImagesFromDB();
         refreshAllPages();
         refreshSupportImagesOnly();
         
         hideLoading();
-        
-        // ✅ แก้ไขตรงนี้: ปิดสถานะ Loading ของปุ่ม Load
         setBtnLoading(false, '📥 Load', 'loadBtn'); 
-        toast(`✅ ดึงข้อมูลสำเร็จ!`);
-        showSyncStatus('✅ โหลดข้อมูลครบทุกตาราง', '#22c55e');
+        
+        // แจ้งเตือนความสำเร็จ
+        toast(`✅ โหลดข้อมูลของ ${targetID.split('@')[0]} สำเร็จ!`);
+        showSyncStatus('✅ ข้อมูลครบถ้วนจาก Cloud', '#22c55e');
         
         return true;
 
     } catch (err) {
         console.error('Load Error:', err);
         hideLoading();
-        
-        // ✅ แก้ไขตรงนี้ด้วย: ปิดสถานะ Loading ของปุ่ม Load ตอนเกิด Error
         setBtnLoading(false, '📥 Load', 'loadBtn'); 
-        toast(`❌ โหลด Cloud ล้มเหลว`);
+        toast(`❌ โหลด Cloud ล้มเหลว: ${err.message}`);
         return false;
     }
 }
@@ -4747,9 +4764,34 @@ async function initSupabaseSync() {
     }
 }
 
-// เรียกใช้ตอน App พร้อม
-// สามารถเพิ่มในส่วน window load event
-const currentUser=(sessionStorage.getItem('currentUser')||'Master Operator').trim();
+/* ══════════════════════════════════
+   แก้ไขระบบ LOGIN CONTEXT สำหรับหัวหน้างาน
+══════════════════════════════════ */
+
+// 1. ตรวจสอบว่าใครคือ "เจ้าของข้อมูล" ที่เราต้องดึง
+// หากหัวหน้าเลือกพนักงานมาจากหน้าหลัก viewingUser จะมีค่า
+const authUser = (sessionStorage.getItem('currentUser') || 'Guest').trim();
+const viewingUser = (sessionStorage.getItem('viewingUser') || authUser).trim();
+
+// ✅ กำหนดให้ currentUser ของหน้านี้ "กลายเป็นพนักงานคนนั้น"
+// เพื่อให้ SQL Query และ LocalStorage Key ใช้ของพนักงานคนนั้นโดยตรง
+const currentUser = viewingUser; 
+
+// 2. แก้ไขส่วนแสดงชื่อที่มุมซ้ายบน (เพื่อให้หัวหน้าทราบว่าดูของใครอยู่)
+document.addEventListener('DOMContentLoaded', () => {
+    const displayEl = document.getElementById('displayUserName');
+    if(displayEl) {
+        if(authUser.toLowerCase() !== viewingUser.toLowerCase()) {
+            // กรณีเป็นหัวหน้าส่องอยู่ ให้แสดงชื่อพนักงานและไอคอนดวงตา
+            displayEl.innerHTML = `<span style="color:var(--or)">👁️ Viewing: ${viewingUser.split('@')[0]}</span>`;
+            // ซ่อนปุ่ม Sync/Load ของหัวหน้าเพื่อป้องกันการเผลอเขียนทับข้อมูลพนักงาน (Optional)
+            // if($id('syncBtn')) $id('syncBtn').style.opacity = '0.5';
+        } else {
+            displayEl.innerHTML = currentUser + ' <span class="online-dot"></span>';
+        }
+    }
+});
+
 document.getElementById('displayUserName').innerHTML=currentUser+' <span class="online-dot"></span>';
 
 /* --- LOCAL STORAGE FOR TEXT DATA --- */
@@ -6431,6 +6473,13 @@ window.addEventListener('load', async () => {
       showSyncStatus('🔄 ข้อมูลอัปเดตจากหน้าต่างอื่น', '#60a5fa');
     }
   });
+});
+
+window.addEventListener('storage', (e) => {
+    if (e.key === 'viewingUser') {
+        // ถ้ามีการเปลี่ยนชื่อพนักงานที่กำลังดู ให้โหลดข้อมูลใหม่ทันที
+        location.reload(); 
+    }
 });
 
 </script>
