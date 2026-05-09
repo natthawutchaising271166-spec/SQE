@@ -9563,42 +9563,55 @@ function guessQtyColumn(rawData, headerRowIdx) {
 function parseExcelDate(excelValue) {
   if (!excelValue) return null;
   
-  // 1. กรณีเป็นตัวเลข (Excel Serial Number)
-  if (typeof excelValue === 'number') {
-    // ใช้สูตรคำนวณแบบไม่พึ่งพา Time Zone ของเครื่อง
-    const date = XLSX.SSF.parse_date_code(excelValue);
-    const y = date.y;
-    const m = String(date.m).padStart(2, '0');
-    const d = String(date.d).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+  // 1. กรณีเป็น Excel Serial Number (เลขทศนิยม)
+  if (!isNaN(excelValue)) {
+    const excelEpoch = new Date(1899, 11, 30);
+    const dateObj = new Date(excelEpoch.getTime() + excelValue * 86400000);
+    // ✅ FIX: ตัดเวลาทิ้ง เพื่อป้องกันปัญหา Timezone shift
+    return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
   }
   
-  // 2. กรณีเป็นข้อความ (String)
   const str = String(excelValue).trim();
-  const parts = str.split(/[\/\-]/);
+  
+  // 2. กรณีเป็น Text Format
+  if (str.match(/^\d{4}-\d{2}-\d{2}$/)) return str; // YYYY-MM-DD
+  
+  const parts = str.split(/[\/\-]/); // รองรับทั้ง / และ -
   
   if (parts.length === 3) {
-    let d, m, y;
-    // รูปแบบ YYYY-MM-DD
-    if (parts[0].length === 4) {
-      y = parts[0]; m = parts[1]; d = parts[2];
-    } 
-    // รูปแบบ DD/MM/YYYY
-    else if (parts[2].length === 4) {
-      d = parts[0]; m = parts[1]; y = parts[2];
-    } else {
-      return null;
-    }
-
-    // จัดการปี พ.ศ.
-    let yearNum = parseInt(y);
-    if (yearNum > 2400) yearNum -= 543;
+    const p1 = parseInt(parts[0]);
+    const p2 = parseInt(parts[1]);
+    const p3 = parseInt(parts[2]);
     
-    // คืนค่าเป็น String ตรงๆ ไม่ผ่าน new Date()
-    return `${yearNum}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    // ✅ FIX: ตรวจสอบว่าตัวไหนคือปี (ค่า >= 1000 หรือค่ามี 4 หลัก)
+    // เพื่อรองรับทั้ง DD/MM/YYYY และ MM/DD/YYYY อัตโนมัติ
+    if (parts[2].length === 4) {
+      // Format แบบเอาปีไว้ท้าย: DD/MM/YYYY หรือ MM/DD/YYYY
+      // สมมติให้เป็น DD/MM/YYYY (มาตรฐานไทย/ยุโรป) เป็นหลัก
+      // ถ้า p1 > 12 แปลว่า p1 คือวันที่ (เช่น 13/01/2024)
+      // ถ้า p1 <= 12 และ p2 > 12 แปลว่า p1 คือเดือน (เช่น 01/13/2024)
+      
+      let d = p1, m = p2, y = p3;
+      
+      if (p1 > 12) { 
+        // p1 แน่นอนเป็นวันที่
+      } else if (p2 > 12) {
+        // p2 แน่นอนเป็นวันที่ -> สลับกัน
+        d = p2; m = p1;
+      }
+      // ถ้า p1 <= 12 และ p2 <= 12 ยากจะทาย แต่ให้ถือว่า p1=วัน, p2=เดือน
+      
+      return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    } 
+    
+    if (parts[0].length === 4) {
+      // Format แบบเอาปีไว้หน้า: YYYY/MM/DD
+      return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+    }
   }
   return null;
 }
+
 
 function formatDateDisplay(dateStr) {
   if (!dateStr || dateStr === '-') return '-';
