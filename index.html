@@ -4,13 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SQE Support V4 · Intelligence Platform</title>
+
+<!-- External Libraries (แก้ไขลบ GSAP ที่ซ้ำซ้อนออก) -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@300;400;500&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -6789,6 +6792,73 @@ html.dark-mode .nav-item:hover:not(.active) { background: rgba(255, 255, 255, 0.
     from { opacity: 0; transform: translateX(20px); }
     to { opacity: 1; transform: translateX(0); }
 }
+/* ═══════════════════════════════════════════════════
+   SUPERVISOR PREMIUM LOG BUTTON
+═══════════════════════════════════════════════════ */
+.supervisor-log-btn {
+    position: relative;
+    background: rgba(245, 158, 11, 0.08); /* พื้นหลังทองจางๆ */
+    color: #b45309; /* ตัวอักษรสีน้ำตาลทอง */
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    padding: 6px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-head);
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(180, 83, 9, 0.05);
+}
+
+/* เอฟเฟกต์เส้นไฟวิ่งผ่าน (Scan Line) */
+.btn-scan-line {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.2), transparent);
+    transition: none;
+}
+
+.supervisor-log-btn:hover {
+    background: #f59e0b; /* เปลี่ยนเป็นสีทองทึบ */
+    color: #fff;
+    border-color: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+}
+
+/* เมื่อ Hover ให้เส้นไฟวิ่งผ่าน */
+.supervisor-log-btn:hover .btn-scan-line {
+    left: 100%;
+    transition: all 0.6s ease;
+}
+
+.supervisor-log-btn svg {
+    filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.3));
+}
+
+.supervisor-log-btn:active {
+    transform: scale(0.95);
+}
+
+/* Dark Mode Adaptation */
+html.dark-mode .supervisor-log-btn {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+html.dark-mode .supervisor-log-btn:hover {
+    background: #f59e0b;
+    color: #000; /* ในโหมดมืด พื้นหลังสีทอง ตัวหนังสือดำจะดูแพงมาก */
+}
 </style>
 </head>
 <body>
@@ -7241,13 +7311,25 @@ html.dark-mode .nav-item:hover:not(.active) { background: rgba(255, 255, 255, 0.
         </div>
 
         <!-- Reference -->
+<!-- ส่วนที่มักพบ Error: Reference Info -->
         <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
-          <div class="sidebar-section-title">Reference Info</div>
-          <input type="text" id="refNo" list="refList" placeholder="REF001/2024 หรือ V001/2024 *" required class="neon-in" required class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
-            <input type="text" id="supplier" list="supList" placeholder="Supplier *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-            <input type="number" id="qty" placeholder="QTY *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-          </div>
+            <div class="sidebar-section-title">Reference Info</div>
+            
+            <!-- ✅ แก้ไขจุดนี้: ลบ required และ class ที่ซ้ำซ้อนออกเหลือเพียงชุดเดียว -->
+            <input type="text" id="refNo" list="refList" 
+                   placeholder="REF001/2024 หรือ V001/2024 *" 
+                   required class="neon-in" 
+                   style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
+                <input type="text" id="supplier" list="supList" 
+                       placeholder="Supplier *" required class="neon-in" 
+                       style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+                
+                <input type="number" id="qty" 
+                       placeholder="QTY *" required class="neon-in" 
+                       style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+            </div>
         </div>
 
         <!-- Part -->
@@ -8365,6 +8447,7 @@ async function initApp(inspector) {
     hideInitOverlay();
     _isInitializing = false;
   }
+  applyRoleRestrictions(); // เพิ่มบรรทัดนี้
 }
 
 async function syncToCloud(isInitial = false) {
@@ -9216,6 +9299,8 @@ function renderVisibleRows() {
   const empty = $id('emptyState');
   
   if (!tbody) return;
+  
+  // 1. ตรวจสอบกรณีไม่มีข้อมูล
   if (allRows.length === 0) {
     if(empty) empty.style.display = 'flex';
     tbody.innerHTML = '';
@@ -9223,12 +9308,14 @@ function renderVisibleRows() {
   }
   if(empty) empty.style.display = 'none';
 
+  // 2. คำนวณแถวที่จะแสดงผล (Slicing)
   const rowsToRender = allRows.slice(visibleStart, visibleEnd);
   
-  // ✅ ปรับ: ใช้ ROW_HEIGHT ตัวแปรแทนตัวเลข
+  // คำนวณความสูงของพื้นที่ว่าง (Spacer) เพื่อรักษาตำแหน่ง Scroll
   const topSpacerHeight = visibleStart * ROW_HEIGHT;
   const bottomSpacerHeight = (allRows.length - visibleEnd) * ROW_HEIGHT;
 
+  // 3. ตั้งค่าสีตาม Judgment
   const SM = {
     'SF': { dot: '#f97316', s: 'color:#c2410c;background:#fff7ed;border:1px solid #fed7aa' },
     'VENDOR FAULT': { dot: '#ef4444', s: 'color:#dc2626;background:#fef2f2;border:1px solid #fecaca' },
@@ -9237,17 +9324,66 @@ function renderVisibleRows() {
   };
 
   let html = '';
-  // ใช้ ROW_HEIGHT ในการคำนวณ spacer
-  if (topSpacerHeight > 0) html += `<tr style="height:${topSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
 
+  // ใส่ Spacer ด้านบน
+  if (topSpacerHeight > 0) {
+    html += `<tr style="height:${topSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
+  }
+
+  // 4. วนลูปสร้างแถวข้อมูล
   rowsToRender.forEach(r => {
     const s = SM[r.judgment] || SM['SF'];
     const safeId = String(r.id).replace(/"/g, '&quot;');
     const disp = (v) => (!v || v === '-') ? '<span style="color:#cbd5e1">-</span>' : escapeHtml(v);
 
-    // ✅ ส่วนที่ปรับปรุง: เช็คสถานะการซิงค์
+    // เช็คสถานะการซิงค์
     let syncClass = r._isSaved ? 'sync-success' : 'sync-pending';
     let syncTitle = r._isSaved ? 'บันทึกบนคลาวด์แล้ว (Synced)' : 'บันทึกในเครื่องแล้ว รอการซิงค์ (Pending Sync)';
+
+    // --- ส่วนที่แก้ไข: จัดการปุ่ม Action ตาม Role ---
+    let actionButtons = '';
+    
+if (isSupervisor) {
+      // ✅ อัปเกรดปุ่ม LOG ให้ดูหรูหราแบบหัวหน้างาน (Premium Gold Glass)
+      actionButtons = `
+        <button onclick="openAuditLogModal('${safeId}')" title="ตรวจสอบประวัติการแก้ไข" 
+          class="supervisor-log-btn">
+          <div class="btn-scan-line"></div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>AUDIT LOG</span>
+        </button>
+      `;
+    } else {
+      // ✅ สำหรับพนักงาน: แสดงปุ่มจัดการครบถ้วน (Copy, Edit, Delete, History)
+      actionButtons = `
+        <button onclick="copyRecord('${safeId}')" class="btn" title="คัดลอกข้อมูล" style="background:#10b981;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+        <button onclick="editRecord('${safeId}')" class="btn" title="แก้ไข" style="background:#3b82f6;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+        </button>
+        <button onclick="showSingleDeleteModal('${safeId}')" class="btn" title="ลบ" style="background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <button onclick="openAuditLogModal('${safeId}')" title="ดูประวัติ" style="background:#334155;color:#cbd5e1;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </button>
+      `;
+    }
 
     html += `<tr class="group vis" data-rid="${safeId}">
       <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">
@@ -9255,37 +9391,44 @@ function renderVisibleRows() {
           <span class="saved-indicator ${syncClass}" title="${syncTitle}"></span> ${formatDateDisplay(r.date)}
         </div>
       </td>
-      <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${disp(r.shift)}</div><div style="font-size:.65rem;color:var(--text-400)">L: ${disp(r.line)}</div></td>
+      <td>
+        <div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${disp(r.shift)}</div>
+        <div style="font-size:.65rem;color:var(--text-400)">L: ${disp(r.line)}</div>
+      </td>
       <td><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">${disp(r.ref)}</span></td>
       <td>
         <div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${disp(r.supplier)}</div>
-        <div style="font-size:.65rem;color:var(--text-400)">${disp(r.partNo)} <span style="opacity:0.5; margin:0 3px;">|</span> <span style="color:var(--blue-600); font-weight:600;">${disp(r.partName)}</span></div>
+        <div style="font-size:.65rem;color:var(--text-400)">
+          ${disp(r.partNo)} <span style="opacity:0.5; margin:0 3px;">|</span> 
+          <span style="color:var(--blue-600); font-weight:600;">${disp(r.partName)}</span>
+        </div>
       </td>
-      <td style="text-align:center"><span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900)">${r.qty.toLocaleString()}</span></td>
-      <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${disp(r.defect)}</td>
-      <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${disp(r.remark)}</td>
       <td style="text-align:center">
-        <span class="status-badge" style="${s.s}"><span style="width:5px;height:5px;border-radius:50%;background:${s.dot};display:inline-block"></span>${r.judgment}</span>
+        <span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900)">
+          ${r.qty.toLocaleString()}
+        </span>
       </td>
-      <td style="text-align:right; display:flex; gap:5px; justify-content:flex-end;">
-        <button onclick="copyRecord('${safeId}')" class="btn" title="คัดลอกข้อมูล" style="background:#10b981;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-        </button>
-        <button onclick="editRecord('${safeId}')" class="btn" style="background:#3b82f6;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-        <button onclick="showSingleDeleteModal('${safeId}')" class="btn" style="background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-        <button onclick="openAuditLogModal('${safeId}')" title="ดูประวัติ" style="background:#334155;color:#cbd5e1;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-    </svg>
-</button>
+      <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${disp(r.defect)}</td>
+      <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        ${disp(r.remark)}
+      </td>
+      <td style="text-align:center">
+        <span class="status-badge" style="${s.s}">
+          <span style="width:5px;height:5px;border-radius:50%;background:${s.dot};display:inline-block"></span>
+          ${r.judgment}
+        </span>
+      </td>
+      <td style="text-align:right; display:flex; gap:5px; justify-content:flex-end; vertical-align:middle;">
+        ${actionButtons}
       </td>
     </tr>`;
   });
 
-  if (bottomSpacerHeight > 0) html += `<tr style="height:${bottomSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
+  // ใส่ Spacer ด้านล่าง
+  if (bottomSpacerHeight > 0) {
+    html += `<tr style="height:${bottomSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
+  }
+
   tbody.innerHTML = html;
 }
 
@@ -9318,12 +9461,13 @@ function renderTable() {
 }
 
 function refreshAll() {
-  // ดึงข้อมูลที่กรองแล้ว (ตามViewingUser)
+  // 1. ดึงข้อมูลที่กรองแล้ว (ตามViewingUser)
   const d = getMyRecords(); 
   
   let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
   let sfL = 0, venL = 0, ctcL = 0, okL = 0;
 
+  // คำนวณตัวเลขทางสถิติ
   d.forEach(r => {
     tQ += (parseInt(r.qty) || 0);
     if (r.judgment === 'SF') { sf += r.qty; sfL++; }
@@ -9334,26 +9478,66 @@ function refreshAll() {
 
   const pct = (v, t) => t > 0 ? Math.round((v / t) * 100) + '%' : '0%';
 
-  // อัปเดตตัวเลขบนการ์ด
+  // --- [ส่วนที่เพิ่มใหม่] การปรับ Layout Header ให้น่าเชื่อถือขึ้นตาม Role ---
+  const pulseText = $id('syncPulseText');
+  const pulseDot = document.querySelector('#syncPulse .sdot');
+  const masterCard = document.querySelector('.kpi-total');
+  const masterLabel = masterCard ? masterCard.querySelector('.kpi-label') : null;
+
+  if (isSupervisor) {
+    // 🛡️ สำหรับหัวหน้างาน (Audit/Verification Mode)
+    if (pulseText) {
+      pulseText.textContent = "VERIFIED ACCESS"; // เปลี่ยนข้อความให้ดูเป็นทางการ
+      pulseText.style.color = "#f59e0b"; // สีทอง/ส้ม บ่งบอกถึงโหมดตรวจสอบ
+    }
+    if (pulseDot) {
+      pulseDot.style.background = "#f59e0b";
+      pulseDot.style.boxShadow = "0 0 8px rgba(245, 158, 11, 0.6)";
+    }
+    if (masterLabel) {
+      masterLabel.textContent = "INSPECTION SUMMARY"; // เปลี่ยนจาก My Total เป็นสรุปผลการตรวจสอบ
+    }
+    // เพิ่มเอฟเฟกต์สีขอบการ์ดหลักให้ดูพรีเมียมขึ้น
+    if (masterCard) masterCard.style.borderTop = "3px solid #f59e0b";
+    
+  } else {
+    // 🛰️ สำหรับพนักงาน (Live Entry Mode)
+    if (pulseText) {
+      pulseText.textContent = "LIVE SYSTEM";
+      pulseText.style.color = "#10b981"; // สีเขียว บ่งบอกว่าระบบทำงานปกติ
+    }
+    if (pulseDot) {
+      pulseDot.style.background = "#10b981";
+      pulseDot.style.boxShadow = "0 0 8px rgba(16, 185, 129, 0.6)";
+    }
+    if (masterLabel) {
+      masterLabel.textContent = "MY PERFORMANCE"; // เปลี่ยนให้ดูมีพลัง (Performance)
+    }
+    if (masterCard) masterCard.style.borderTop = "3px solid #3b82f6";
+  }
+  // -------------------------------------------------------------
+
+  // 2. อัปเดตตัวเลขบน KPI Cards (ใช้ Animation เดิม)
   animNum('masterQty', tQ); 
-  if($id('masterLot')) $id('masterLot').textContent = d.length;
+  if($id('masterLot')) $id('masterLot').textContent = d.length.toLocaleString();
   
   animNum('qtySF', sf); 
-  if($id('lotSF')) $id('lotSF').textContent = sfL; 
+  if($id('lotSF')) $id('lotSF').textContent = sfL.toLocaleString(); 
   if($id('pctSF')) $id('pctSF').textContent = pct(sf, tQ);
   
   animNum('qtyVendor', ven); 
-  if($id('lotVendor')) $id('lotVendor').textContent = venL; 
+  if($id('lotVendor')) $id('lotVendor').textContent = venL.toLocaleString(); 
   if($id('pctVendor')) $id('pctVendor').textContent = pct(ven, tQ);
   
   animNum('qtyCTC', ctc); 
-  if($id('lotCTC')) $id('lotCTC').textContent = ctcL; 
+  if($id('lotCTC')) $id('lotCTC').textContent = ctcL.toLocaleString(); 
   if($id('pctCTC')) $id('pctCTC').textContent = pct(ctc, tQ);
   
   animNum('qtyCanUse', ok); 
-  if($id('lotCanUse')) $id('lotCanUse').textContent = okL; 
+  if($id('lotCanUse')) $id('lotCanUse').textContent = okL.toLocaleString(); 
   if($id('pctCanUse')) $id('pctCanUse').textContent = pct(ok, tQ);
 
+  // 3. อัปเดตข้อมูลส่วนเสริมอื่นๆ
   updateDatalists(); 
   renderTable();
 }
@@ -10201,7 +10385,12 @@ async function importExcel(input) {
       } else { toast('⚠️ ไม่พบข้อมูลใหม่ที่นำเข้าได้'); }
 
     } catch (err) { toast('❌ เกิดข้อผิดพลาด: ' + err.message); } 
-    finally { hideInitOverlay(); input.value = ''; }
+    finally { 
+      hideInitOverlay(); 
+      input.value = ''; 
+      // ✅ เพิ่มบรรทัดนี้เพื่อให้หน้าจอกลับมาเต็มจอทันทีหลัง Import เสร็จ
+      enterFullscreen(); 
+    }
   };
   
   reader.readAsArrayBuffer(file);
@@ -10352,27 +10541,41 @@ window.addEventListener('offline', () => {
   toast('🔴 ออฟไลน์ ข้อมูลจะถูกบันทึกไว้ในเครื่อง');
 });
 
-// Table Virtual Scroll Listener
+function updateVirtualScrollState() {
+  const container = $id('tableContainer');
+  if (!container) return;
+
+  const scrollTop = container.scrollTop;
+  const viewportHeight = container.clientHeight; // ดึงความสูงจริงของพื้นที่แสดงผล ณ ขณะนั้น
+
+  // คำนวณ Index แถวเริ่มต้น
+  const startRow = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT));
+  
+  // คำนวณจำนวนแถวที่ควรจะมองเห็น + Buffer 15 แถวเพื่อความลื่นไหล
+  const visibleCount = Math.ceil(viewportHeight / ROW_HEIGHT) + 15;
+  
+  virtualTableState.visibleStart = startRow;
+  virtualTableState.visibleEnd = Math.min(virtualTableState.allRows.length, startRow + visibleCount);
+  
+  // สั่งวาดแถวใหม่
+  window.requestAnimationFrame(() => renderVisibleRows());
+}
+
+// 1. เพิ่ม Resize Listener (พร้อมระบบหน่วงเวลา 150ms เพื่อประสิทธิภาพ)
+let tableResizeDebounce;
+window.addEventListener('resize', () => {
+  clearTimeout(tableResizeDebounce);
+  tableResizeDebounce = setTimeout(() => {
+    console.log("[System] Window resized, recalculating table viewport...");
+    updateVirtualScrollState();
+  }, 150);
+});
+
+// 2. ปรับปรุง Scroll Listener เดิมให้เรียกใช้ฟังก์ชันกลาง
 const tableContainer = document.getElementById('tableContainer');
 if (tableContainer) {
   tableContainer.addEventListener('scroll', () => {
-    // ✅ ปรับ: ใช้ ROW_HEIGHT ตัวแปรแทน
-    const rowHeight = ROW_HEIGHT; 
-    
-    const scrollTop = tableContainer.scrollTop;
-    const viewportHeight = tableContainer.clientHeight;
-    
-    // คำนวณ index เริ่มต้น
-    let startRow = Math.max(0, Math.floor(scrollTop / rowHeight));
-    
-    // คำนวณจำนวนแถวที่แสดง + Buffer
-    const visibleCount = Math.ceil(viewportHeight / rowHeight) + 20;
-    
-    virtualTableState.visibleStart = startRow;
-    virtualTableState.visibleEnd = Math.min(virtualTableState.allRows.length, startRow + visibleCount);
-    
-    // วาดใหม่เมื่อ Scroll
-    window.requestAnimationFrame(() => renderVisibleRows());
+    updateVirtualScrollState();
   });
 }
 
@@ -11474,6 +11677,38 @@ function switchGuide(index) {
             ${gridHtml}
         </div>
     `;
+}
+
+function applyRoleRestrictions() {
+    const sidebar = $id('sidebar');
+    const importBtn = document.querySelector('button[onclick*="xlsIn"]');
+    const clearBtn = document.querySelector('button[onclick*="showDeleteModal"]');
+    const syncBtn = $id('syncBtnMain'); // ดึง Element ปุ่ม Sync
+    const mainPanel = $id('mainPanel');
+
+    if (isSupervisor) {
+        // 1. ซ่อน Sidebar (ฟอร์มกรอกข้อมูล)
+        if (sidebar) sidebar.style.display = 'none';
+        
+        // 2. ซ่อนปุ่ม Import, ปุ่ม Clear และปุ่ม Sync (ตามที่คุณต้องการ)
+        if (importBtn) importBtn.style.display = 'none';
+        if (clearBtn) clearBtn.style.display = 'none';
+        if (syncBtn) syncBtn.style.display = 'none'; // เพิ่มบรรทัดนี้เพื่อซ่อนปุ่ม Sync
+        
+        // 3. ปรับ Main Panel ให้กว้างเต็มจอ
+        if (mainPanel) {
+            mainPanel.style.width = '100%';
+            mainPanel.style.flexGrow = '1';
+        }
+        
+        console.log("[System] Supervisor Mode: Read-only & Sync hidden.");
+    } else {
+        // ถ้าเป็น Staff ให้กลับมาแสดงผลปกติทั้งหมด
+        if (sidebar) sidebar.style.display = 'flex';
+        if (importBtn) importBtn.style.display = 'flex';
+        if (clearBtn) clearBtn.style.display = 'flex';
+        if (syncBtn) syncBtn.style.display = 'flex'; // แสดงปุ่ม Sync ในโหมดพนักงาน
+    }
 }
 </script>
 </body>
