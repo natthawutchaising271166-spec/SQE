@@ -4,16 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SQE Support V4 · Intelligence Platform</title>
-
-<!-- External Libraries (แก้ไขลบ GSAP ที่ซ้ำซ้อนออก) -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@300;400;500&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -6422,443 +6418,6 @@ html.dark-mode .cp-input {
 }
 html.dark-mode .cp-icon-box { background: rgba(59, 130, 246, 0.12) !important; }
 
-/* ═══════════════════════════════════════════════════
-   USER GUIDE DESIGN SYSTEM
-═══════════════════════════════════════════════════ */
-.guide-fab {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 10000;
-    width: 56px;
-    height: 56px;
-    background: rgba(37, 99, 235, 0.9);
-    color: white;
-    border-radius: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    backdrop-filter: blur(10px);
-}
-
-.guide-fab:hover {
-    transform: scale(1.1) rotate(5deg);
-    background: #2563eb;
-    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.6);
-}
-
-.guide-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 11000;
-    background: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(15px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.guide-card {
-    background: #ffffff;
-    width: 1000px;
-    height: 650px;
-    max-width: 95vw;
-    max-height: 90vh;
-    border-radius: 32px;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    transform: translateY(30px) scale(0.95);
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.guide-overlay.show { opacity: 1; }
-.guide-overlay.show .guide-card { transform: translateY(0) scale(1); }
-
-.guide-close {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    background: none;
-    border: none;
-    font-size: 32px;
-    color: #94a3b8;
-    cursor: pointer;
-    z-index: 10;
-}
-
-.guide-layout { display: flex; width: 100%; height: 100%; }
-
-/* Navigation Sidebar */
-.guide-nav {
-    width: 280px;
-    background: #f8faff;
-    border-right: 1px solid #e2e8f0;
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-}
-
-.brand-dot { width: 10px; height: 10px; background: #3b82f6; border-radius: 50%; }
-.nav-header { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 11px; letter-spacing: 2px; color: #64748b; margin-bottom: 40px; }
-
-.nav-items { display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.nav-item {
-    text-align: left;
-    padding: 14px 20px;
-    border-radius: 14px;
-    font-weight: 700;
-    font-size: 14px;
-    color: #64748b;
-    transition: all 0.3s;
-}
-
-.nav-item.active { background: #3b82f6; color: white; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2); }
-.nav-item:hover:not(.active) { background: #eff6ff; color: #3b82f6; }
-
-/* Content Main */
-.guide-main { flex: 1; padding: 50px; overflow-y: auto; background: #fff; }
-
-.guide-step-title { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 5px; }
-.guide-step-desc { color: #64748b; font-size: 14px; margin-bottom: 20px; line-height: 1.4; }
-
-.guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.guide-info-card {
-    background: #f8fafc;
-    border-radius: 20px;
-    padding: 24px;
-    border: 1px solid #f1f5f9;
-}
-
-.info-icon { font-size: 24px; margin-bottom: 12px; }
-.info-title { font-weight: 800; color: #1e293b; margin-bottom: 6px; font-size: 15px; }
-.info-text { font-size: 13px; color: #64748b; line-height: 1.5; }
-
-/* Dark Mode สำหรับคู่มือ */
-html.dark-mode .guide-card { background: #1e293b; }
-html.dark-mode .guide-nav { background: #0f172a; border-right-color: #334155; }
-html.dark-mode .guide-main { background: #1e293b; }
-html.dark-mode .guide-step-title { color: #f8fafc; }
-html.dark-mode .guide-info-card { background: #0f172a; border-color: #334155; }
-html.dark-mode .info-title { color: #e2e8f0; }
-
-/* ═══════════════════════════════════════════════════
-   UPGRADED USER GUIDE STYLE
-═══════════════════════════════════════════════════ */
-.guide-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    box-shadow: 0 30px 100px rgba(0, 0, 0, 0.2);
-}
-
-/* หัวข้อ Slide */
-.guide-step-title {
-    background: linear-gradient(90deg, #1e3a8a, #3b82f6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-size: 32px;
-    letter-spacing: -1px;
-}
-
-/* Card ย่อยข้างใน */
-.guide-info-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f1f6ff 100%);
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.guide-info-card:hover {
-    transform: translateY(-5px);
-    border-color: #3b82f6;
-    box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15);
-}
-
-.guide-info-card::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; width: 4px; height: 100%;
-    background: #3b82f6;
-    opacity: 0;
-    transition: 0.3s;
-}
-
-.guide-info-card:hover::before { opacity: 1; }
-
-.info-icon {
-    font-size: 32px;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
-}
-
-.info-title {
-    color: #1e3a8a;
-    font-size: 16px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Sidebar Navigation */
-.nav-item {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    border-left: 3px solid transparent;
-}
-
-.nav-item.active {
-    background: linear-gradient(90deg, #3b82f6, #2563eb);
-    border-left: 3px solid #1e3a8a;
-}
-
-/* Dark Mode Support */
-html.dark-mode .guide-info-card {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border-color: #334155;
-}
-
-html.dark-mode .info-title { color: #60a5fa; }
-html.dark-mode .guide-step-title { background: linear-gradient(90deg, #60a5fa, #a5f3fc); -webkit-background-clip: text; }
-
-/* ═══════════════════════════════════════════════════
-   ULTRA-PREMIUM GUIDE THEME (CYBER-PUNK)
-═══════════════════════════════════════════════════ */
-:root {
-    --guide-accent: #3b82f6; /* สีเริ่มต้น */
-    --guide-bg-glass: rgba(255, 255, 255, 0.9);
-}
-
-.guide-overlay {
-    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.5) 0%, rgba(2, 6, 23, 0.8) 100%);
-}
-
-/* ขอบไฟวิ่ง (Animated Border) */
-.guide-card {
-    position: relative;
-    background: var(--guide-bg-glass);
-    padding: 2px; /* พื้นที่สำหรับขอบ */
-    transition: all 0.5s ease;
-}
-
-.guide-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 32px;
-    padding: 2px; 
-    background: linear-gradient(45deg, var(--guide-accent), transparent, var(--guide-accent));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: borderRotate 4s linear infinite;
-}
-
-@keyframes borderRotate {
-    0% { filter: hue-rotate(0deg) brightness(1); }
-    50% { brightness(1.5); }
-    100% { filter: hue-rotate(360deg) brightness(1); }
-}
-
-/* Sidebar Navigation */
-.guide-nav {
-    background: rgba(var(--guide-accent-rgb), 0.03);
-    backdrop-filter: blur(10px);
-}
-
-.nav-item {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid transparent;
-}
-
-.nav-item.active {
-    background: var(--guide-accent) !important;
-    color: white !important;
-    box-shadow: 0 0 20px rgba(var(--guide-accent-rgb), 0.4);
-    transform: translateX(10px);
-}
-
-/* Info Cards (Glassmorphism) */
-.guide-info-card {
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(5px);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.guide-info-card:hover {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: var(--guide-accent);
-    transform: scale(1.05) translateY(-5px);
-}
-
-/* Neon Icon */
-.info-icon {
-    display: inline-block;
-    padding: 10px;
-    border-radius: 12px;
-    background: rgba(var(--guide-accent-rgb), 0.1);
-    color: var(--guide-accent);
-    margin-bottom: 15px;
-    font-size: 28px;
-    box-shadow: inset 0 0 10px rgba(var(--guide-accent-rgb), 0.2);
-}
-
-/* Step Title with Shadow Glow */
-.guide-step-title {
-    font-size: 34px;
-    letter-spacing: -1px;
-    text-shadow: 0 0 30px rgba(var(--guide-accent-rgb), 0.3);
-}
-
-/* Progress Indicator inside cards */
-.power-bar {
-    height: 4px;
-    background: #e2e8f0;
-    border-radius: 2px;
-    margin-top: 15px;
-    overflow: hidden;
-}
-
-.power-level {
-    height: 100%;
-    background: var(--guide-accent);
-    box-shadow: 0 0 10px var(--guide-accent);
-    width: 0;
-    transition: width 1s ease-in-out;
-}
-
-/* Dark Mode Fixes */
-html.dark-mode .guide-card { background: rgba(15, 23, 42, 0.95); }
-html.dark-mode .guide-info-card { background: rgba(30, 41, 59, 0.5); }
-html.dark-mode .nav-item:hover:not(.active) { background: rgba(255, 255, 255, 0.05); }
-
-/* หัวข้อย่อยภายในชุดเนื้อหา */
-.guide-sub-header {
-    font-family: 'Sora', sans-serif;
-    font-size: 11px;
-    font-weight: 800;
-    color: var(--guide-accent);
-    letter-spacing: 2px;
-    margin: 25px 0 15px 5px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    opacity: 0.8;
-}
-
-.guide-sub-header::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, var(--guide-accent), transparent);
-}
-
-/* ปรับระยะห่าง Grid */
-.guide-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-bottom: 30px;
-}
-
-/* Card รายละเอียด */
-.guide-info-card {
-    padding: 20px;
-    border-radius: 18px;
-    background: rgba(var(--guide-accent-rgb), 0.03);
-    border: 1px solid rgba(var(--guide-accent-rgb), 0.1);
-    transition: all 0.3s ease;
-}
-
-.guide-info-card:hover {
-    background: rgba(var(--guide-accent-rgb), 0.08);
-    border-color: var(--guide-accent);
-}
-
-/* เพิ่มแอนิเมชันตอนเปลี่ยนหัวข้อ */
-#guideContent {
-    animation: contentSlide 0.4s ease-out;
-}
-
-@keyframes contentSlide {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-/* ═══════════════════════════════════════════════════
-   SUPERVISOR PREMIUM LOG BUTTON
-═══════════════════════════════════════════════════ */
-.supervisor-log-btn {
-    position: relative;
-    background: rgba(245, 158, 11, 0.08); /* พื้นหลังทองจางๆ */
-    color: #b45309; /* ตัวอักษรสีน้ำตาลทอง */
-    border: 1px solid rgba(245, 158, 11, 0.4);
-    padding: 6px 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-head);
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px rgba(180, 83, 9, 0.05);
-}
-
-/* เอฟเฟกต์เส้นไฟวิ่งผ่าน (Scan Line) */
-.btn-scan-line {
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.2), transparent);
-    transition: none;
-}
-
-.supervisor-log-btn:hover {
-    background: #f59e0b; /* เปลี่ยนเป็นสีทองทึบ */
-    color: #fff;
-    border-color: #d97706;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
-}
-
-/* เมื่อ Hover ให้เส้นไฟวิ่งผ่าน */
-.supervisor-log-btn:hover .btn-scan-line {
-    left: 100%;
-    transition: all 0.6s ease;
-}
-
-.supervisor-log-btn svg {
-    filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.3));
-}
-
-.supervisor-log-btn:active {
-    transform: scale(0.95);
-}
-
-/* Dark Mode Adaptation */
-html.dark-mode .supervisor-log-btn {
-    background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
-    border-color: rgba(245, 158, 11, 0.3);
-}
-
-html.dark-mode .supervisor-log-btn:hover {
-    background: #f59e0b;
-    color: #000; /* ในโหมดมืด พื้นหลังสีทอง ตัวหนังสือดำจะดูแพงมาก */
-}
 </style>
 </head>
 <body>
@@ -7133,75 +6692,6 @@ html.dark-mode .supervisor-log-btn:hover {
     border-color: rgba(59, 130, 246, 0.6);
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
 }
-/* ═══════════════════════════════════════════════════
-   UPGRADED USER GUIDE SYSTEM (NO-SCROLL VERSION)
-═══════════════════════════════════════════════════ */
-.guide-card {
-    background: #ffffff;
-    width: 1050px; /* ขยายความกว้างเล็กน้อย */
-    height: 680px; /* ปรับความสูงให้พอดีกับเนื้อหาละเอียด */
-    max-width: 98vw;
-    max-height: 95vh;
-    border-radius: 24px;
-    display: flex;
-    overflow: hidden;
-}
-
-.guide-main { 
-    flex: 1; 
-    padding: 30px 40px; /* ลด Padding เพื่อเพิ่มพื้นที่ */
-    display: flex; 
-    flex-direction: column;
-    background: #fff;
-    overflow: hidden; /* ห้าม Scroll */
-}
-
-.guide-step-title { 
-    font-size: 26px; 
-    margin-bottom: 5px; 
-    background: linear-gradient(90deg, var(--guide-accent), #1e293b);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.guide-step-desc { 
-    font-size: 14px; 
-    margin-bottom: 20px; 
-    color: #64748b; 
-}
-
-.guide-grid { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    grid-template-rows: 1fr 1fr; 
-    gap: 15px; 
-    flex: 1; /* ให้ Grid ขยายเต็มพื้นที่ที่เหลือ */
-}
-
-.guide-info-card {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 15px 20px;
-    border: 1px solid #e2e8f0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-}
-
-.info-icon { font-size: 24px; margin-bottom: 8px; }
-.info-title { font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
-
-.info-text { 
-    font-size: 12.5px; 
-    color: #475569; 
-    line-height: 1.5; 
-    margin: 0;
-}
-
-.info-text ul { padding-left: 18px; margin: 5px 0; }
-.info-text li { margin-bottom: 3px; }
-
-.power-bar { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: auto; }
 </style>
            <!-- Dark Mode Button (อยู่ด้านขวาสุด) -->
       <button onclick="toggleDarkMode()" id="darkModeBtn" title="Toggle Theme"
@@ -7311,25 +6801,13 @@ html.dark-mode .supervisor-log-btn:hover {
         </div>
 
         <!-- Reference -->
-<!-- ส่วนที่มักพบ Error: Reference Info -->
         <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
-            <div class="sidebar-section-title">Reference Info</div>
-            
-            <!-- ✅ แก้ไขจุดนี้: ลบ required และ class ที่ซ้ำซ้อนออกเหลือเพียงชุดเดียว -->
-            <input type="text" id="refNo" list="refList" 
-                   placeholder="REF001/2024 หรือ V001/2024 *" 
-                   required class="neon-in" 
-                   style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
-            
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
-                <input type="text" id="supplier" list="supList" 
-                       placeholder="Supplier *" required class="neon-in" 
-                       style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-                
-                <input type="number" id="qty" 
-                       placeholder="QTY *" required class="neon-in" 
-                       style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-            </div>
+          <div class="sidebar-section-title">Reference Info</div>
+          <input type="text" id="refNo" list="refList" placeholder="REF001/2024 หรือ V001/2024 *" required class="neon-in" required class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
+            <input type="text" id="supplier" list="supList" placeholder="Supplier *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+            <input type="number" id="qty" placeholder="QTY *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+          </div>
         </div>
 
         <!-- Part -->
@@ -8049,52 +7527,6 @@ html.dark-mode .supervisor-log-btn:hover {
 
   </div>
 </div>
-
-<!-- ═══════════════════════════════════════════════════
-     USER GUIDE TRIGGER BUTTON (ปุ่มไอคอนหน้าลอกอิน)
-═══════════════════════════════════════════════════ -->
-<button onclick="openUserGuide()" id="guideTrigger" title="วิธีการใช้งาน" 
-    class="guide-fab mascot-float">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-    </svg>
-</button>
-
-<!-- ═══════════════════════════════════════════════════
-     USER GUIDE MODAL (ป๊อปอัพคู่มือการใช้งาน)
-═══════════════════════════════════════════════════ -->
-<div id="userGuideModal" class="guide-overlay" style="display:none;">
-    <div class="guide-card shadow-2xl">
-        <!-- Close Button -->
-        <button onclick="closeUserGuide()" class="guide-close">&times;</button>
-        
-        <div class="guide-layout">
-            <!-- Sidebar Navigation -->
-            <div class="guide-nav">
-                <div class="nav-header">
-                    <div class="brand-dot"></div>
-                    <span>OPERATION MANUAL</span>
-                </div>
-                <div class="nav-items">
-                    <button onclick="switchGuide(0)" class="nav-item active">01 เข้าสู่ระบบ</button>
-                    <button onclick="switchGuide(1)" class="nav-item">02 หน้าหลัก & KPI</button>
-                    <button onclick="switchGuide(2)" class="nav-item">03 การกรอกข้อมูล</button>
-                    <button onclick="switchGuide(3)" class="nav-item">04 จัดการไฟล์ & Sync</button>
-                    <button onclick="switchGuide(4)" class="nav-item">05 แดชบอร์ด Cockpit</button>
-                    <button onclick="switchGuide(5)" class="nav-item">06 โหมดหัวหน้างาน</button>
-                </div>
-                <div class="nav-footer">SQE SUPPORT V4.5</div>
-            </div>
-
-            <!-- Content Area -->
-            <div id="guideContent" class="guide-main">
-                <!-- เนื้อหาจะเปลี่ยนไปตามปุ่มที่กด โดยใช้ JavaScript -->
-            </div>
-        </div>
-    </div>
-</div>
 <style>
 @keyframes modalPop {
   from { opacity:0; transform:scale(0.9); }
@@ -8447,7 +7879,6 @@ async function initApp(inspector) {
     hideInitOverlay();
     _isInitializing = false;
   }
-  applyRoleRestrictions(); // เพิ่มบรรทัดนี้
 }
 
 async function syncToCloud(isInitial = false) {
@@ -9299,8 +8730,6 @@ function renderVisibleRows() {
   const empty = $id('emptyState');
   
   if (!tbody) return;
-  
-  // 1. ตรวจสอบกรณีไม่มีข้อมูล
   if (allRows.length === 0) {
     if(empty) empty.style.display = 'flex';
     tbody.innerHTML = '';
@@ -9308,14 +8737,12 @@ function renderVisibleRows() {
   }
   if(empty) empty.style.display = 'none';
 
-  // 2. คำนวณแถวที่จะแสดงผล (Slicing)
   const rowsToRender = allRows.slice(visibleStart, visibleEnd);
   
-  // คำนวณความสูงของพื้นที่ว่าง (Spacer) เพื่อรักษาตำแหน่ง Scroll
+  // ✅ ปรับ: ใช้ ROW_HEIGHT ตัวแปรแทนตัวเลข
   const topSpacerHeight = visibleStart * ROW_HEIGHT;
   const bottomSpacerHeight = (allRows.length - visibleEnd) * ROW_HEIGHT;
 
-  // 3. ตั้งค่าสีตาม Judgment
   const SM = {
     'SF': { dot: '#f97316', s: 'color:#c2410c;background:#fff7ed;border:1px solid #fed7aa' },
     'VENDOR FAULT': { dot: '#ef4444', s: 'color:#dc2626;background:#fef2f2;border:1px solid #fecaca' },
@@ -9324,66 +8751,17 @@ function renderVisibleRows() {
   };
 
   let html = '';
+  // ใช้ ROW_HEIGHT ในการคำนวณ spacer
+  if (topSpacerHeight > 0) html += `<tr style="height:${topSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
 
-  // ใส่ Spacer ด้านบน
-  if (topSpacerHeight > 0) {
-    html += `<tr style="height:${topSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
-  }
-
-  // 4. วนลูปสร้างแถวข้อมูล
   rowsToRender.forEach(r => {
     const s = SM[r.judgment] || SM['SF'];
     const safeId = String(r.id).replace(/"/g, '&quot;');
     const disp = (v) => (!v || v === '-') ? '<span style="color:#cbd5e1">-</span>' : escapeHtml(v);
 
-    // เช็คสถานะการซิงค์
+    // ✅ ส่วนที่ปรับปรุง: เช็คสถานะการซิงค์
     let syncClass = r._isSaved ? 'sync-success' : 'sync-pending';
     let syncTitle = r._isSaved ? 'บันทึกบนคลาวด์แล้ว (Synced)' : 'บันทึกในเครื่องแล้ว รอการซิงค์ (Pending Sync)';
-
-    // --- ส่วนที่แก้ไข: จัดการปุ่ม Action ตาม Role ---
-    let actionButtons = '';
-    
-if (isSupervisor) {
-      // ✅ อัปเกรดปุ่ม LOG ให้ดูหรูหราแบบหัวหน้างาน (Premium Gold Glass)
-      actionButtons = `
-        <button onclick="openAuditLogModal('${safeId}')" title="ตรวจสอบประวัติการแก้ไข" 
-          class="supervisor-log-btn">
-          <div class="btn-scan-line"></div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-          <span>AUDIT LOG</span>
-        </button>
-      `;
-    } else {
-      // ✅ สำหรับพนักงาน: แสดงปุ่มจัดการครบถ้วน (Copy, Edit, Delete, History)
-      actionButtons = `
-        <button onclick="copyRecord('${safeId}')" class="btn" title="คัดลอกข้อมูล" style="background:#10b981;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-        </button>
-        <button onclick="editRecord('${safeId}')" class="btn" title="แก้ไข" style="background:#3b82f6;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-        </button>
-        <button onclick="showSingleDeleteModal('${safeId}')" class="btn" title="ลบ" style="background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-        <button onclick="openAuditLogModal('${safeId}')" title="ดูประวัติ" style="background:#334155;color:#cbd5e1;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </button>
-      `;
-    }
 
     html += `<tr class="group vis" data-rid="${safeId}">
       <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">
@@ -9391,44 +8769,37 @@ if (isSupervisor) {
           <span class="saved-indicator ${syncClass}" title="${syncTitle}"></span> ${formatDateDisplay(r.date)}
         </div>
       </td>
-      <td>
-        <div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${disp(r.shift)}</div>
-        <div style="font-size:.65rem;color:var(--text-400)">L: ${disp(r.line)}</div>
-      </td>
+      <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${disp(r.shift)}</div><div style="font-size:.65rem;color:var(--text-400)">L: ${disp(r.line)}</div></td>
       <td><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">${disp(r.ref)}</span></td>
       <td>
         <div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${disp(r.supplier)}</div>
-        <div style="font-size:.65rem;color:var(--text-400)">
-          ${disp(r.partNo)} <span style="opacity:0.5; margin:0 3px;">|</span> 
-          <span style="color:var(--blue-600); font-weight:600;">${disp(r.partName)}</span>
-        </div>
+        <div style="font-size:.65rem;color:var(--text-400)">${disp(r.partNo)} <span style="opacity:0.5; margin:0 3px;">|</span> <span style="color:var(--blue-600); font-weight:600;">${disp(r.partName)}</span></div>
       </td>
-      <td style="text-align:center">
-        <span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900)">
-          ${r.qty.toLocaleString()}
-        </span>
-      </td>
+      <td style="text-align:center"><span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900)">${r.qty.toLocaleString()}</span></td>
       <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${disp(r.defect)}</td>
-      <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-        ${disp(r.remark)}
-      </td>
+      <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${disp(r.remark)}</td>
       <td style="text-align:center">
-        <span class="status-badge" style="${s.s}">
-          <span style="width:5px;height:5px;border-radius:50%;background:${s.dot};display:inline-block"></span>
-          ${r.judgment}
-        </span>
+        <span class="status-badge" style="${s.s}"><span style="width:5px;height:5px;border-radius:50%;background:${s.dot};display:inline-block"></span>${r.judgment}</span>
       </td>
-      <td style="text-align:right; display:flex; gap:5px; justify-content:flex-end; vertical-align:middle;">
-        ${actionButtons}
+      <td style="text-align:right; display:flex; gap:5px; justify-content:flex-end;">
+        <button onclick="copyRecord('${safeId}')" class="btn" title="คัดลอกข้อมูล" style="background:#10b981;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+        <button onclick="editRecord('${safeId}')" class="btn" style="background:#3b82f6;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+        <button onclick="showSingleDeleteModal('${safeId}')" class="btn" style="background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        <button onclick="openAuditLogModal('${safeId}')" title="ดูประวัติ" style="background:#334155;color:#cbd5e1;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+</button>
       </td>
     </tr>`;
   });
 
-  // ใส่ Spacer ด้านล่าง
-  if (bottomSpacerHeight > 0) {
-    html += `<tr style="height:${bottomSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
-  }
-
+  if (bottomSpacerHeight > 0) html += `<tr style="height:${bottomSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
   tbody.innerHTML = html;
 }
 
@@ -9461,13 +8832,12 @@ function renderTable() {
 }
 
 function refreshAll() {
-  // 1. ดึงข้อมูลที่กรองแล้ว (ตามViewingUser)
+  // ดึงข้อมูลที่กรองแล้ว (ตามViewingUser)
   const d = getMyRecords(); 
   
   let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
   let sfL = 0, venL = 0, ctcL = 0, okL = 0;
 
-  // คำนวณตัวเลขทางสถิติ
   d.forEach(r => {
     tQ += (parseInt(r.qty) || 0);
     if (r.judgment === 'SF') { sf += r.qty; sfL++; }
@@ -9478,66 +8848,26 @@ function refreshAll() {
 
   const pct = (v, t) => t > 0 ? Math.round((v / t) * 100) + '%' : '0%';
 
-  // --- [ส่วนที่เพิ่มใหม่] การปรับ Layout Header ให้น่าเชื่อถือขึ้นตาม Role ---
-  const pulseText = $id('syncPulseText');
-  const pulseDot = document.querySelector('#syncPulse .sdot');
-  const masterCard = document.querySelector('.kpi-total');
-  const masterLabel = masterCard ? masterCard.querySelector('.kpi-label') : null;
-
-  if (isSupervisor) {
-    // 🛡️ สำหรับหัวหน้างาน (Audit/Verification Mode)
-    if (pulseText) {
-      pulseText.textContent = "VERIFIED ACCESS"; // เปลี่ยนข้อความให้ดูเป็นทางการ
-      pulseText.style.color = "#f59e0b"; // สีทอง/ส้ม บ่งบอกถึงโหมดตรวจสอบ
-    }
-    if (pulseDot) {
-      pulseDot.style.background = "#f59e0b";
-      pulseDot.style.boxShadow = "0 0 8px rgba(245, 158, 11, 0.6)";
-    }
-    if (masterLabel) {
-      masterLabel.textContent = "INSPECTION SUMMARY"; // เปลี่ยนจาก My Total เป็นสรุปผลการตรวจสอบ
-    }
-    // เพิ่มเอฟเฟกต์สีขอบการ์ดหลักให้ดูพรีเมียมขึ้น
-    if (masterCard) masterCard.style.borderTop = "3px solid #f59e0b";
-    
-  } else {
-    // 🛰️ สำหรับพนักงาน (Live Entry Mode)
-    if (pulseText) {
-      pulseText.textContent = "LIVE SYSTEM";
-      pulseText.style.color = "#10b981"; // สีเขียว บ่งบอกว่าระบบทำงานปกติ
-    }
-    if (pulseDot) {
-      pulseDot.style.background = "#10b981";
-      pulseDot.style.boxShadow = "0 0 8px rgba(16, 185, 129, 0.6)";
-    }
-    if (masterLabel) {
-      masterLabel.textContent = "MY PERFORMANCE"; // เปลี่ยนให้ดูมีพลัง (Performance)
-    }
-    if (masterCard) masterCard.style.borderTop = "3px solid #3b82f6";
-  }
-  // -------------------------------------------------------------
-
-  // 2. อัปเดตตัวเลขบน KPI Cards (ใช้ Animation เดิม)
+  // อัปเดตตัวเลขบนการ์ด
   animNum('masterQty', tQ); 
-  if($id('masterLot')) $id('masterLot').textContent = d.length.toLocaleString();
+  if($id('masterLot')) $id('masterLot').textContent = d.length;
   
   animNum('qtySF', sf); 
-  if($id('lotSF')) $id('lotSF').textContent = sfL.toLocaleString(); 
+  if($id('lotSF')) $id('lotSF').textContent = sfL; 
   if($id('pctSF')) $id('pctSF').textContent = pct(sf, tQ);
   
   animNum('qtyVendor', ven); 
-  if($id('lotVendor')) $id('lotVendor').textContent = venL.toLocaleString(); 
+  if($id('lotVendor')) $id('lotVendor').textContent = venL; 
   if($id('pctVendor')) $id('pctVendor').textContent = pct(ven, tQ);
   
   animNum('qtyCTC', ctc); 
-  if($id('lotCTC')) $id('lotCTC').textContent = ctcL.toLocaleString(); 
+  if($id('lotCTC')) $id('lotCTC').textContent = ctcL; 
   if($id('pctCTC')) $id('pctCTC').textContent = pct(ctc, tQ);
   
   animNum('qtyCanUse', ok); 
-  if($id('lotCanUse')) $id('lotCanUse').textContent = okL.toLocaleString(); 
+  if($id('lotCanUse')) $id('lotCanUse').textContent = okL; 
   if($id('pctCanUse')) $id('pctCanUse').textContent = pct(ok, tQ);
 
-  // 3. อัปเดตข้อมูลส่วนเสริมอื่นๆ
   updateDatalists(); 
   renderTable();
 }
@@ -9561,7 +8891,6 @@ function forceRefresh() {
 function openDashboard() {
   const modal = $id('dashboardModal');
   if (modal) modal.style.display = 'flex';
-  
   
   // อัปเดตชื่อและเวลา
   document.querySelectorAll('#dashUser').forEach(el => el.textContent = currentUser);
@@ -9596,11 +8925,7 @@ function openDashboard() {
           refreshDash(); // ฟังก์ชันนี้จะไปคำนวณและขยับเข็ม
       });
   });
-    if (window.gsap) {
-        gsap.to('#guideTrigger', { opacity: 0, scale: 0, duration: 0.3, pointerEvents: 'none' });
-    } else {
-        document.getElementById('guideTrigger').style.display = 'none';
-    }
+
   // Animation เสริม (เดิม)
   if (typeof gsap !== 'undefined') {
       gsap.fromTo('.dash-topbar-cockpit', { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 });
@@ -9616,7 +8941,7 @@ function closeDashboard() {
             duration: 0.3, 
             onComplete: () => { 
                 if($id('dashboardModal')) $id('dashboardModal').style.display = 'none'; 
-                gsap.to('#guideTrigger', { opacity: 1, scale: 1, duration: 0.4, delay: 0.2, pointerEvents: 'auto' });
+                
                 // --- ส่วนที่เพิ่มใหม่: รีเฟรชฟิลเตอร์ทั้งหมดเมื่อปิดเสร็จ ---
                 finalizeResetOnExit();
             } 
@@ -10385,12 +9710,7 @@ async function importExcel(input) {
       } else { toast('⚠️ ไม่พบข้อมูลใหม่ที่นำเข้าได้'); }
 
     } catch (err) { toast('❌ เกิดข้อผิดพลาด: ' + err.message); } 
-    finally { 
-      hideInitOverlay(); 
-      input.value = ''; 
-      // ✅ เพิ่มบรรทัดนี้เพื่อให้หน้าจอกลับมาเต็มจอทันทีหลัง Import เสร็จ
-      enterFullscreen(); 
-    }
+    finally { hideInitOverlay(); input.value = ''; }
   };
   
   reader.readAsArrayBuffer(file);
@@ -10541,41 +9861,27 @@ window.addEventListener('offline', () => {
   toast('🔴 ออฟไลน์ ข้อมูลจะถูกบันทึกไว้ในเครื่อง');
 });
 
-function updateVirtualScrollState() {
-  const container = $id('tableContainer');
-  if (!container) return;
-
-  const scrollTop = container.scrollTop;
-  const viewportHeight = container.clientHeight; // ดึงความสูงจริงของพื้นที่แสดงผล ณ ขณะนั้น
-
-  // คำนวณ Index แถวเริ่มต้น
-  const startRow = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT));
-  
-  // คำนวณจำนวนแถวที่ควรจะมองเห็น + Buffer 15 แถวเพื่อความลื่นไหล
-  const visibleCount = Math.ceil(viewportHeight / ROW_HEIGHT) + 15;
-  
-  virtualTableState.visibleStart = startRow;
-  virtualTableState.visibleEnd = Math.min(virtualTableState.allRows.length, startRow + visibleCount);
-  
-  // สั่งวาดแถวใหม่
-  window.requestAnimationFrame(() => renderVisibleRows());
-}
-
-// 1. เพิ่ม Resize Listener (พร้อมระบบหน่วงเวลา 150ms เพื่อประสิทธิภาพ)
-let tableResizeDebounce;
-window.addEventListener('resize', () => {
-  clearTimeout(tableResizeDebounce);
-  tableResizeDebounce = setTimeout(() => {
-    console.log("[System] Window resized, recalculating table viewport...");
-    updateVirtualScrollState();
-  }, 150);
-});
-
-// 2. ปรับปรุง Scroll Listener เดิมให้เรียกใช้ฟังก์ชันกลาง
+// Table Virtual Scroll Listener
 const tableContainer = document.getElementById('tableContainer');
 if (tableContainer) {
   tableContainer.addEventListener('scroll', () => {
-    updateVirtualScrollState();
+    // ✅ ปรับ: ใช้ ROW_HEIGHT ตัวแปรแทน
+    const rowHeight = ROW_HEIGHT; 
+    
+    const scrollTop = tableContainer.scrollTop;
+    const viewportHeight = tableContainer.clientHeight;
+    
+    // คำนวณ index เริ่มต้น
+    let startRow = Math.max(0, Math.floor(scrollTop / rowHeight));
+    
+    // คำนวณจำนวนแถวที่แสดง + Buffer
+    const visibleCount = Math.ceil(viewportHeight / rowHeight) + 20;
+    
+    virtualTableState.visibleStart = startRow;
+    virtualTableState.visibleEnd = Math.min(virtualTableState.allRows.length, startRow + visibleCount);
+    
+    // วาดใหม่เมื่อ Scroll
+    window.requestAnimationFrame(() => renderVisibleRows());
   });
 }
 
@@ -11515,201 +10821,6 @@ window.addEventListener('keydown', function(e) {
         }
     }
 });
-
-/* ═══════════════════════════════════════════════════
-   USER GUIDE SYSTEM - FIXED & UPGRADED VERSION
-═══════════════════════════════════════════════════ */
-const guideData = [
-    {
-        title: "01 ระบบควบคุมการเข้าถึง (Access Control)",
-        desc: "ความปลอดภัยระดับองค์กรและการแยกสิทธิ์ตามบทบาทหน้าที่",
-        color: "#8b5cf6", 
-        rgb: "139, 92, 246",
-        grid: [
-            { icon: "🛡️", title: "การยืนยันตัวตน (Auth)", text: "เข้าสู่ระบบด้วย E-mail บริษัทเท่านั้น ระบบจะใช้ระบบ Neural ในการจำจำชื่อผู้ใช้ล่าสุดเพื่อลดเวลาป้อนข้อมูล รหัสผ่านเริ่มต้นคือ '1234' สำหรับการเข้าใช้งานครั้งแรก", lv: "100%" },
-            { icon: "🎭", title: "โหมดพนักงาน (Staff)", text: "เน้นการทำงานหน้างาน (Shop Floor) ออกแบบ UI มาเพื่อการป้อนข้อมูลที่รวดเร็ว พร้อมระบบ AI คอยเดาชื่อ Part และ Supplier เพื่อความแม่นยำสูงสุด", lv: "100%" },
-            { icon: "🔐", title: "ความปลอดภัย (Security)", text: "ผู้ใช้สามารถเปลี่ยนรหัสผ่านส่วนตัวได้ที่เมนู 'รูปกุญแจ' เพื่อความปลอดภัยสูงสุด แนะนำให้ตั้งรหัสผ่านที่มีทั้งตัวเลขและตัวอักษรยาว 6 ตัวขึ้นไป", lv: "90%" },
-            { icon: "📡", title: "สถานะระบบ (Status)", text: "จุดเขียว 'SYSTEM ONLINE' บ่งบอกว่าเชื่อมต่อกับคลาวด์ หากจุดเป็นสีแดง ระบบจะบันทึกข้อมูลลงเครื่องอัตโนมัติและรอการ Sync เมื่อเน็ตกลับมา", lv: "100%" }
-        ]
-    },
-    {
-        title: "02 การติดตามดัชนีชี้วัด (Dynamic KPI)",
-        desc: "วิเคราะห์ประสิทธิภาพการตรวจรับงานแบบเรียลไทม์",
-        color: "#0ea5e9", 
-        rgb: "14, 165, 233",
-        grid: [
-            { icon: "📊", title: "ยอดรวมสะสม (Totals)", text: "แสดงจำนวน PCS และจำนวน Lot ที่คุณตรวจได้ในวันนี้ ช่วยให้ติดตามเป้าหมายรายวันได้ทันที โดยเลขจะอัปเดตแบบ Real-time ทุกครั้งที่กด Commit", lv: "100%" },
-            { icon: "🎨", title: "รหัสสีความเสี่ยง (Color Code)", text: "<b>สีส้ม:</b> ปัญหาจาก Shop Floor | <b>สีแดง:</b> ปัญหาจาก Supplier | <b>สีน้ำเงิน:</b> ปัญหาจากหน้างาน CTC | <b>สีเขียว:</b> งานปกติที่ผ่านการตรวจสอบ", lv: "100%" },
-            { icon: "📈", title: "สัดส่วนเปอร์เซ็นต์ (Distribution)", text: "ระบบคำนวณ % การพบ NG เทียบกับงานทั้งหมดให้อัตโนมัติ หากประเภทใดมีสัดส่วนสูงผิดปกติ ตัวเลขจะขยายใหญ่ขึ้นเพื่อแจ้งเตือน (Visual Alert)", lv: "95%" },
-            { icon: "🌓", title: "การปรับโหมดสี (Theme)", text: "ปรับเป็น Dark Mode เมื่อทำงานในสภาวะแสงน้อยเพื่อลดอาการล้าของสายตา โดยกราฟในหน้า Dashboard จะปรับสีเส้นตามอัตโนมัติเพื่อให้เห็น Contrast ชัดเจน", lv: "100%" }
-        ]
-    },
-    {
-        title: "03 ขั้นตอนการบันทึกข้อมูล (Pro-Recording)",
-        desc: "บันทึกข้อมูลงานเสียอย่างมีประสิทธิภาพ ลดข้อผิดพลาดเป็นศูนย์",
-        color: "#22d3ee", 
-        rgb: "34, 211, 238",
-        grid: [
-            { icon: "🤖", title: "ระบบเดาคำ (AI Smart Fill)", text: "เมื่อพิมพ์ชื่อ Part หรือ Part No. เพียงบางส่วน ระบบจะดึงชื่อ Supplier และ Line ที่เคยใช้ล่าสุดมาเติมให้อัตโนมัติ ช่วยลดเวลาการพิมพ์ได้กว่า 60%", lv: "100%" },
-            { icon: "👯", title: "การคัดลอก (Cloning)", text: "ปุ่ม 'สีเขียว' ในตารางใช้เพื่อ Copy ข้อมูลทั้งหมดของรายการนั้นมาใส่ฟอร์มใหม่ เหมาะสำหรับงานที่มี NG หลายอาการแต่เป็น Part และ Ref เดียวกัน", lv: "100%" },
-            { icon: "✅", title: "ความถูกต้อง (Validation)", text: "เลข Reference ต้องเป็นรูปแบบ 000/2024 เท่านั้น หากกรอกผิดรูปแบบระบบจะขึ้นขอบสีแดงและไม่อนุญาตให้ Commit เพื่อป้องกันข้อมูลขยะเข้าสู่ระบบ", lv: "100%" },
-            { icon: "📝", title: "การแก้ไข (Global Edit)", text: "สามารถกดแก้ไขได้ตลอดเวลาผ่านปุ่ม 'สีน้ำเงิน' เมื่อแก้ไขเสร็จแล้วกด Update ระบบจะซิงค์การเปลี่ยนแปลงไปยังคลาวด์และแจ้งเตือนพนักงานคนอื่นทันที", lv: "95%" }
-        ]
-    },
-    {
-        title: "04 การจัดการไฟล์และคลาวด์ (Cloud & Files)",
-        desc: "บริหารจัดการข้อมูลด้วยระบบ Offline-First และ Smart Sync",
-        color: "#2563eb", 
-        rgb: "37, 99, 235",
-        grid: [
-            { icon: "💹", title: "การนำเข้า (Excel Import)", text: "รองรับการลากไฟล์ Excel มาวางเพื่อนำเข้าข้อมูลปริมาณมาก ระบบจะค้นหาหัวตารางอัตโนมัติ แม้ไฟล์จะไม่ได้จัดรูปแบบมา (Smart Header Detection)", lv: "95%" },
-            { icon: "☁️", title: "การซิงค์ (One-Click Sync)", text: "เมื่อทำงานในที่ไม่มีสัญญาณ ข้อมูลจะถูกเก็บในเครื่อง (Local) เมื่อเน็ตกลับมาเพียงกดปุ่ม 'Sync' ข้อมูลทั้งหมดจะถูกส่งขึ้นคลาวด์อย่างปลอดภัย", lv: "100%" },
-            { icon: "📥", title: "การส่งออก (Excel Export)", text: "ส่งออกรายงานสรุปผลเป็นไฟล์ .xlsx ที่จัดรูปแบบมาเรียบร้อยแล้ว พร้อมนำไปใช้รายงานผลในที่ประชุมหรือส่งอีเมลต่อได้ทันทีโดยไม่ต้องแก้ไขเพิ่ม", lv: "100%" },
-            { icon: "🧹", title: "การล้างข้อมูล (Data Hygiene)", text: "ใช้ปุ่ม 'Clear' เมื่อต้องการเริ่มรอบการทำงานใหม่ ระบบจะถามยืนยัน 2 ชั้นเพื่อป้องกันการเผลอลบ ข้อมูลที่ลบแล้วจะไม่สามารถกู้คืนได้จากเครื่อง", lv: "80%" }
-        ]
-    },
-    {
-        title: "05 วิเคราะห์ภาพรวม (Strategic Cockpit)",
-        desc: "ศูนย์บัญชาการข้อมูลวิเคราะห์ขั้นสูงเพื่อการตัดสินใจ",
-        color: "#10b981", 
-        rgb: "16, 185, 129",
-        grid: [
-            { icon: "🏎️", title: "หน้าปัดความเร็ว (Gauges)", text: "Pass-Rate Gauge แสดงอัตราส่วนงานปกติเทียบกับงานเสีย <b>(สีเขียว > 90% = ดีเยี่ยม | สีส้ม 75-89% = ควรระวัง | สีแดง < 50% = วิกฤต)</b>", lv: "100%" },
-            { icon: "📊", title: "แนวโน้มรายเดือน (Trends)", text: "กราฟเส้น Production Trend ช่วยเปรียบเทียบยอดเสียในแต่ละเดือน เพื่อวิเคราะห์ว่า Supplier มีการปรับปรุงคุณภาพ (Quality Improvement) หรือไม่", lv: "95%" },
-            { icon: "🏆", title: "อันดับสูงสุด (Top Rankings)", text: "ระบบสรุป 5 อันดับแรกของ Supplier, อาการ NG และ Part ที่เสียบ่อยที่สุด (Pareto Analysis) เพื่อให้คุณเลือกโฟกัสปัญหาที่สำคัญที่สุดก่อน", lv: "90%" },
-            { icon: "📺", title: "รายการสด (Live Feed)", text: "แถบวิ่ง Ticker และ Incident Feed ด้านล่างจะแสดงข้อมูลล่าสุดที่เพื่อนร่วมงานบันทึกเข้ามา ทำให้คุณรู้ความเคลื่อนไหวหน้างานตลอดเวลา", lv: "100%" }
-        ]
-    },
-    {
-        title: "06 การตรวจสอบย้อนกลับ (Transparency)",
-        desc: "ระบบจัดเก็บประวัติและสิทธิ์การเข้าถึงของหัวหน้างาน",
-        color: "#f59e0b", 
-        rgb: "245, 158, 11",
-        grid: [
-            { icon: "🕒", title: "ประวัติการแก้ไข (Audit)", text: "กดปุ่ม 'รูปนาฬิกา' ในตารางเพื่อดูว่าใครแก้ไขข้อมูลอะไร เมื่อไหร่ ระบบจะแสดงค่าก่อนแก้ (สีแดง) และหลังแก้ (สีเขียว) เพื่อความโปร่งใส", lv: "100%" },
-            { icon: "🕵️", title: "สลับมุมมอง (Impersonate)", text: "หัวหน้างานสามารถสลับรายชื่อเพื่อดูหน้าจอและ KPI ของพนักงานแต่ละคนได้ เพื่อตรวจสอบความถูกต้องของข้อมูลก่อนสรุปผลรายงานประจำสัปดาห์", lv: "100%" },
-            { icon: "📂", title: "โปรเจกต์งาน (Job Project)", text: "เชื่อมโยงไปยังหน้า Job Project เพื่อดูไฟล์แนบหรือรูปภาพประกอบ NG รายการนั้นๆ ทำให้การสื่อสารระหว่าง Inspector และ Engineer ชัดเจนขึ้น", lv: "90%" },
-            { icon: "💎", title: "ความสมบูรณ์ (Data Integrity)", text: "ข้อมูลทุกรายการจะมี ID เฉพาะตัวและมีสถานะ Sync Badge กำกับ หากข้อมูลถูกบันทึกสำเร็จบนคลาวด์แล้ว จะมีจุดสีเขียวกำกับอยู่ที่หน้าแถวเสมอ", lv: "100%" }
-        ]
-    }
-];
-// 2. ฟังก์ชันเปิดคู่มือ
-function openUserGuide() {
-    const modal = document.getElementById('userGuideModal');
-    if(!modal) return;
-    
-    modal.style.display = 'flex';
-    // ใช้ GSAP เพื่อความนุ่มนวล
-    if (window.gsap) {
-        gsap.to(modal, { opacity: 1, duration: 0.4 });
-        gsap.fromTo(modal.querySelector('.guide-card'), 
-            { y: 50, scale: 0.9, opacity: 0 }, 
-            { y: 0, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.7)" }
-        );
-    } else {
-        modal.style.opacity = '1';
-    }
-    
-    switchGuide(0); // เริ่มที่หน้าแรกเสมอ
-}
-
-// 3. ฟังก์ชันปิดคู่มือ
-function closeUserGuide() {
-    const modal = document.getElementById('userGuideModal');
-    if(!modal) return;
-    
-    if (window.gsap) {
-        gsap.to(modal, { 
-            opacity: 0, 
-            duration: 0.3, 
-            onComplete: () => { modal.style.display = 'none'; } 
-        });
-    } else {
-        modal.style.display = 'none';
-    }
-}
-
-// 4. ฟังก์ชันสลับหน้า (หัวใจสำคัญที่ต้องแก้)
-function switchGuide(index) {
-    const section = guideData[index];
-    if(!section) return;
-
-    const root = document.documentElement;
-    const contentArea = document.getElementById('guideContent');
-    if(!contentArea) return;
-
-    // อัปเดตสี CSS Variables
-    root.style.setProperty('--guide-accent', section.color);
-    root.style.setProperty('--guide-accent-rgb', section.rgb);
-
-    // เปลี่ยนสถานะปุ่มเมนู
-    document.querySelectorAll('.nav-item').forEach((btn, i) => {
-        if (i === index) btn.classList.add('active');
-        else btn.classList.remove('active');
-    });
-
-    // อนิเมชั่นเปลี่ยนเนื้อหา
-    if (window.gsap) {
-        gsap.fromTo(contentArea, 
-            { opacity: 0, x: 20 }, 
-            { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }
-        );
-    }
-
-    let gridHtml = '';
-    section.grid.forEach((item, i) => {
-        gridHtml += `
-            <div class="guide-info-card" style="animation-delay: ${i * 0.1}s">
-                <div class="info-icon">${item.icon}</div>
-                <div class="info-title">${item.title}</div>
-                <div class="info-text">${item.text}</div>
-                <div class="power-bar">
-                    <div class="power-level" style="width: ${item.lv}"></div>
-                </div>
-            </div>
-        `;
-    });
-
-    contentArea.innerHTML = `
-        <div class="guide-step-title" style="color: ${section.color}">${section.title}</div>
-        <div class="guide-step-desc">${section.desc}</div>
-        <div class="guide-grid">
-            ${gridHtml}
-        </div>
-    `;
-}
-
-function applyRoleRestrictions() {
-    const sidebar = $id('sidebar');
-    const importBtn = document.querySelector('button[onclick*="xlsIn"]');
-    const clearBtn = document.querySelector('button[onclick*="showDeleteModal"]');
-    const syncBtn = $id('syncBtnMain'); // ดึง Element ปุ่ม Sync
-    const mainPanel = $id('mainPanel');
-
-    if (isSupervisor) {
-        // 1. ซ่อน Sidebar (ฟอร์มกรอกข้อมูล)
-        if (sidebar) sidebar.style.display = 'none';
-        
-        // 2. ซ่อนปุ่ม Import, ปุ่ม Clear และปุ่ม Sync (ตามที่คุณต้องการ)
-        if (importBtn) importBtn.style.display = 'none';
-        if (clearBtn) clearBtn.style.display = 'none';
-        if (syncBtn) syncBtn.style.display = 'none'; // เพิ่มบรรทัดนี้เพื่อซ่อนปุ่ม Sync
-        
-        // 3. ปรับ Main Panel ให้กว้างเต็มจอ
-        if (mainPanel) {
-            mainPanel.style.width = '100%';
-            mainPanel.style.flexGrow = '1';
-        }
-        
-        console.log("[System] Supervisor Mode: Read-only & Sync hidden.");
-    } else {
-        // ถ้าเป็น Staff ให้กลับมาแสดงผลปกติทั้งหมด
-        if (sidebar) sidebar.style.display = 'flex';
-        if (importBtn) importBtn.style.display = 'flex';
-        if (clearBtn) clearBtn.style.display = 'flex';
-        if (syncBtn) syncBtn.style.display = 'flex'; // แสดงปุ่ม Sync ในโหมดพนักงาน
-    }
-}
 </script>
 </body>
 </html>
