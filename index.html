@@ -7990,9 +7990,37 @@ if (editingId) {
 writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
 }
 
+// ---------------------------------------------------------
+// ฟังก์ชันช่วย (Helper): สั่งให้กาง Sidebar หากมันถูกพับอยู่
+// ---------------------------------------------------------
+function ensureSidebarOpen() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    // ถ้ามีคลาส collapsed อยู่ (แสดงว่าพับอยู่) ให้เอาออก
+    if (sidebar && sidebar.classList.contains('collapsed')) {
+        sidebar.classList.remove('collapsed');
+        
+        // อัปเดตไอคอนที่ปุ่มให้เป็น "ลูกศรชี้ซ้าย" (สื่อว่ากางออกมาแล้ว/เตรียมพับเข้า)
+        if (toggleIcon) {
+            toggleIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>`;
+        }
+        
+        // บังคับให้ตารางคำนวณพื้นที่ใหม่หลังจาก Sidebar กางออก
+        setTimeout(() => {
+            if (typeof renderTable === 'function') renderTable();
+        }, 400);
+    }
+}
+// ---------------------------------------------------------
+// ฟังก์ชันแก้ไขข้อมูล (Edit Record)
+// ---------------------------------------------------------
 window.editRecord = function(id) {
   const r = records.find(x => x.id === id);
   if (!r) return;
+
+  // ✅ สั่งกาง Sidebar ทันทีที่กดแก้ไข
+  ensureSidebarOpen();
 
   // ❗ 1. ลบไฮไลท์แถวเดิมทิ้งก่อน (ถ้ามี)
   document.querySelectorAll('tr.is-editing').forEach(el => el.classList.remove('is-editing'));
@@ -8031,42 +8059,41 @@ window.editRecord = function(id) {
     btn.parentNode.appendChild(cancelBtn);
   }
 
-  // ✅ 6. แก้ไขตรงนี้: เลื่อนตารางไปหาแถวที่เลือก + Highlight
+  // ✅ 6. เลื่อนตารางไปหาแถวที่เลือก + Highlight
   const tableContainer = $id('tableContainer');
-  
-  // ปัญหาเดิม: ใช้ records.findIndex (index จากข้อมูลทั้งหมด) ทำให้ Scroll ตำแหน่งผิดหากมี Filter หรือ Search
-  // วิธีแก้: ต้องหา index จากข้อมูลที่กำลังแสดงผลอยู่จริง (virtualTableState.allRows)
   const displayData = virtualTableState.allRows;
   const rowIndex = displayData.findIndex(r => r.id === id);
   
   if(rowIndex >= 0 && tableContainer) {
-    const rowHeight = 70; // ความสูงแถวตามที่กำหนด
-    
-    // Scroll ลงไปหาแถวนั้น (ลบออก 50px เพื่อให้แถวไม่ติดขอบบน)
+    const rowHeight = 70; 
     tableContainer.scrollTo({ 
       top: (rowIndex * rowHeight) - 50, 
       behavior: 'smooth' 
     });
 
-    // ใช้ setTimeout สักครู่เพื่อรอให้ Table Render เสร็จ (Virtual Scroll)
     setTimeout(() => {
       const targetRow = document.querySelector(`tr[data-rid="${id}"]`);
       if(targetRow) {
         targetRow.classList.add('is-editing');
       }
-    }, 300); // รอ 0.3 วินาที
+    }, 300);
   }
 };
 
-// ฟังก์ชันสำหรับคัดลอกข้อมูล (Clone)
+// ---------------------------------------------------------
+// ฟังก์ชันคัดลอกข้อมูล (Copy Record)
+// ---------------------------------------------------------
 window.copyRecord = function(id) {
   const r = records.find(x => x.id === id);
   if (!r) return;
 
+  // ✅ สั่งกาง Sidebar ทันทีที่กดคัดลอก
+  ensureSidebarOpen();
+
   // ❗ ล้างปุ่ม Cancel อื่นๆ ก่อน
   if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
 
-  // ✅ 1. รีเซ็ต Filter เป็น ALL
+  // ✅ 1. รีเซ็ต Filter เป็น ALL เพื่อให้เห็นข้อมูลใหม่ที่จะปรากฏ
   setFilter('ALL');
 
   // 2. เติมข้อมูลลงฟอร์ม
@@ -8093,20 +8120,20 @@ window.copyRecord = function(id) {
 
   const btn = $id('submitBtn');
   
-  // ✅ 3. กลับเป็นปุ่ม "Commit Data" ปกติ (สีเขียว)
+  // ✅ 3. กลับเป็นปุ่ม "Commit Data" ปกติ
   if(btn) {
-    btn.innerHTML = '✦ Commit Data'; // ข้อความตัวเดิม
-    btn.style.background = '';       // สีตัวเดิม (จาก CSS หรือค่าเริ่มต้น)
+    btn.innerHTML = '✦ Commit Data';
+    btn.style.background = '';
   }
 
-  // ✅ 4. ยังคงสร้างปุ่ม "ยกเลิกการคัดลอก" ไว้เพื่อล้างข้อมูลหากไม่ต้องการบันทึก
-if(!$id('cancelCopyBtn')) {
-  const cancelBtn = spawnCancelButton('ยกเลิกการคัดลอก', cancelCopy);
-  cancelBtn.id = 'cancelCopyBtn';
-  btn.parentNode.appendChild(cancelBtn);
-}
+  // ✅ 4. สร้างปุ่ม "ยกเลิกการคัดลอก"
+  if(!$id('cancelCopyBtn')) {
+    const cancelBtn = spawnCancelButton('ยกเลิกการคัดลอก', cancelCopy);
+    cancelBtn.id = 'cancelCopyBtn';
+    btn.parentNode.appendChild(cancelBtn);
+  }
 
-  toast('📋 คัดลอกข้อมูลแล้ว พร้อมบันทึกใหม่');
+  toast('📋 คัดลอกข้อมูลและกางหน้าต่างป้อนข้อมูลแล้ว');
 };
 
 function cancelCopy() {
@@ -10421,25 +10448,6 @@ function toggleSidebar() {
         if (typeof renderTable === 'function') renderTable();
     }, 400);
 }
-
-// แก้ไข Hook สำหรับฟังก์ชัน Edit/Copy เพื่อให้ Sidebar กางออกอัตโนมัติ
-window.editRecord = function(id) {
-    // ถ้า Sidebar พับอยู่ ให้กางออกก่อน
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar.classList.contains('collapsed')) {
-        toggleSidebar(); 
-    }
-    if (typeof originalEditRecord === 'function') originalEditRecord(id);
-};
-
-window.copyRecord = function(id) {
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar.classList.contains('collapsed')) {
-        toggleSidebar();
-    }
-    if (typeof originalCopyRecord === 'function') originalCopyRecord(id);
-};
-
 // ฟังก์ชันตรวจจับความแข็งแรงของรหัสผ่าน (UI Feedback)
 function checkPassStrength(pass) {
     const bar = document.getElementById('strengthBar');
