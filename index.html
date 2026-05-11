@@ -82,7 +82,119 @@
   --r-xl:   28px;
   --r-2xl:  36px;
 }
+/* ═══════════════════════════════════════════════════
+   ULTRA-PREMIUM GUIDE THEME (CYBER-PUNK)
+═══════════════════════════════════════════════════ */
+:root {
+    --guide-accent: #3b82f6; /* สีเริ่มต้น */
+    --guide-bg-glass: rgba(255, 255, 255, 0.9);
+}
 
+.guide-overlay {
+    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.5) 0%, rgba(2, 6, 23, 0.8) 100%);
+}
+
+/* ขอบไฟวิ่ง (Animated Border) */
+.guide-card {
+    position: relative;
+    background: var(--guide-bg-glass);
+    padding: 2px; /* พื้นที่สำหรับขอบ */
+    transition: all 0.5s ease;
+}
+
+.guide-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 32px;
+    padding: 2px; 
+    background: linear-gradient(45deg, var(--guide-accent), transparent, var(--guide-accent));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: borderRotate 4s linear infinite;
+}
+
+@keyframes borderRotate {
+    0% { filter: hue-rotate(0deg) brightness(1); }
+    50% { brightness(1.5); }
+    100% { filter: hue-rotate(360deg) brightness(1); }
+}
+
+/* Sidebar Navigation */
+.guide-nav {
+    background: rgba(var(--guide-accent-rgb), 0.03);
+    backdrop-filter: blur(10px);
+}
+
+.nav-item {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+}
+
+.nav-item.active {
+    background: var(--guide-accent) !important;
+    color: white !important;
+    box-shadow: 0 0 20px rgba(var(--guide-accent-rgb), 0.4);
+    transform: translateX(10px);
+}
+
+/* Info Cards (Glassmorphism) */
+.guide-info-card {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.guide-info-card:hover {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: var(--guide-accent);
+    transform: scale(1.05) translateY(-5px);
+}
+
+/* Neon Icon */
+.info-icon {
+    display: inline-block;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(var(--guide-accent-rgb), 0.1);
+    color: var(--guide-accent);
+    margin-bottom: 15px;
+    font-size: 28px;
+    box-shadow: inset 0 0 10px rgba(var(--guide-accent-rgb), 0.2);
+}
+
+/* Step Title with Shadow Glow */
+.guide-step-title {
+    font-size: 34px;
+    letter-spacing: -1px;
+    text-shadow: 0 0 30px rgba(var(--guide-accent-rgb), 0.3);
+}
+
+/* Progress Indicator inside cards */
+.power-bar {
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.power-level {
+    height: 100%;
+    background: var(--guide-accent);
+    box-shadow: 0 0 10px var(--guide-accent);
+    width: 0;
+    transition: width 1s ease-in-out;
+}
+
+/* Dark Mode Fixes */
+html.dark-mode .guide-card { background: rgba(15, 23, 42, 0.95); }
+html.dark-mode .guide-info-card { background: rgba(30, 41, 59, 0.5); }
+html.dark-mode .nav-item:hover:not(.active) { background: rgba(255, 255, 255, 0.05); }
 /* ═══════════════════════════════════════════════════
    2. BASE RESET & GLOBAL STYLES
 ═══════════════════════════════════════════════════ */
@@ -5715,6 +5827,278 @@ datalist { display: none; }
 #auditLogList::-webkit-scrollbar-track { background: #0f172a; }
 #auditLogList::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 #auditLogList::-webkit-scrollbar-thumb:hover { background: #475569; }
+/* ═══════════════════════════════════════════════════
+   USER GUIDE DESIGN SYSTEM
+═══════════════════════════════════════════════════ */
+.guide-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 10000;
+    width: 56px;
+    height: 56px;
+    background: rgba(37, 99, 235, 0.9);
+    color: white;
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(10px);
+}
+
+.guide-fab:hover {
+    transform: scale(1.1) rotate(5deg);
+    background: #2563eb;
+    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.6);
+}
+
+.guide-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 11000;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.guide-card {
+    background: #ffffff;
+    width: 1000px;
+    height: 650px;
+    max-width: 95vw;
+    max-height: 90vh;
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    transform: translateY(30px) scale(0.95);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.guide-overlay.show { opacity: 1; }
+.guide-overlay.show .guide-card { transform: translateY(0) scale(1); }
+
+.guide-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: #94a3b8;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.guide-layout { display: flex; width: 100%; height: 100%; }
+
+/* Navigation Sidebar */
+.guide-nav {
+    width: 280px;
+    background: #f8faff;
+    border-right: 1px solid #e2e8f0;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-dot { width: 10px; height: 10px; background: #3b82f6; border-radius: 50%; }
+.nav-header { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 11px; letter-spacing: 2px; color: #64748b; margin-bottom: 40px; }
+
+.nav-items { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.nav-item {
+    text-align: left;
+    padding: 14px 20px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #64748b;
+    transition: all 0.3s;
+}
+
+.nav-item.active { background: #3b82f6; color: white; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2); }
+.nav-item:hover:not(.active) { background: #eff6ff; color: #3b82f6; }
+
+/* Content Main */
+.guide-main { flex: 1; padding: 50px; overflow-y: auto; background: #fff; }
+
+.guide-step-title { font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 10px; }
+.guide-step-desc { color: #64748b; font-size: 16px; margin-bottom: 30px; line-height: 1.6; }
+
+.guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.guide-info-card {
+    background: #f8fafc;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid #f1f5f9;
+}
+
+.info-icon { font-size: 24px; margin-bottom: 12px; }
+.info-title { font-weight: 800; color: #1e293b; margin-bottom: 6px; font-size: 15px; }
+.info-text { font-size: 13px; color: #64748b; line-height: 1.5; }
+
+/* Dark Mode สำหรับคู่มือ */
+html.dark-mode .guide-card { background: #1e293b; }
+html.dark-mode .guide-nav { background: #0f172a; border-right-color: #334155; }
+html.dark-mode .guide-main { background: #1e293b; }
+html.dark-mode .guide-step-title { color: #f8fafc; }
+html.dark-mode .guide-info-card { background: #0f172a; border-color: #334155; }
+html.dark-mode .info-title { color: #e2e8f0; }
+
+/* ═══════════════════════════════════════════════════
+   UPGRADED USER GUIDE STYLE
+═══════════════════════════════════════════════════ */
+.guide-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 30px 100px rgba(0, 0, 0, 0.2);
+}
+
+/* หัวข้อ Slide */
+.guide-step-title {
+    background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 32px;
+    letter-spacing: -1px;
+}
+
+/* Card ย่อยข้างใน */
+.guide-info-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f1f6ff 100%);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.guide-info-card:hover {
+    transform: translateY(-5px);
+    border-color: #3b82f6;
+    box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15);
+}
+
+.guide-info-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: #3b82f6;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.guide-info-card:hover::before { opacity: 1; }
+
+.info-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+.info-title {
+    color: #1e3a8a;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Sidebar Navigation */
+.nav-item {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    border-left: 3px solid transparent;
+}
+
+.nav-item.active {
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    border-left: 3px solid #1e3a8a;
+}
+
+/* Dark Mode Support */
+html.dark-mode .guide-info-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-color: #334155;
+}
+
+html.dark-mode .info-title { color: #60a5fa; }
+html.dark-mode .guide-step-title { background: linear-gradient(90deg, #60a5fa, #a5f3fc); -webkit-background-clip: text; }
+/* ═══════════════════════════════════════════════════
+   UPGRADED USER GUIDE SYSTEM (NO-SCROLL VERSION)
+═══════════════════════════════════════════════════ */
+.guide-card {
+    background: #ffffff;
+    width: 1050px; /* ขยายความกว้างเล็กน้อย */
+    height: 680px; /* ปรับความสูงให้พอดีกับเนื้อหาละเอียด */
+    max-width: 98vw;
+    max-height: 95vh;
+    border-radius: 24px;
+    display: flex;
+    overflow: hidden;
+}
+
+.guide-main { 
+    flex: 1; 
+    padding: 30px 40px; /* ลด Padding เพื่อเพิ่มพื้นที่ */
+    display: flex; 
+    flex-direction: column;
+    background: #fff;
+    overflow: hidden; /* ห้าม Scroll */
+}
+
+.guide-step-title { 
+    font-size: 26px; 
+    margin-bottom: 5px; 
+    background: linear-gradient(90deg, var(--guide-accent), #1e293b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.guide-step-desc { 
+    font-size: 14px; 
+    margin-bottom: 20px; 
+    color: #64748b; 
+}
+
+.guide-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    grid-template-rows: 1fr 1fr; 
+    gap: 15px; 
+    flex: 1; /* ให้ Grid ขยายเต็มพื้นที่ที่เหลือ */
+}
+
+.guide-info-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 15px 20px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.info-icon { font-size: 24px; margin-bottom: 8px; }
+.info-title { font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+
+.info-text { 
+    font-size: 12.5px; 
+    color: #475569; 
+    line-height: 1.5; 
+    margin: 0;
+}
+
+.info-text ul { padding-left: 18px; margin: 5px 0; }
+.info-text li { margin-bottom: 3px; }
+
+.power-bar { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: auto; }
 </style>
 </head>
 <body>
@@ -6769,6 +7153,51 @@ datalist { display: none; }
 
   </div>
 </div>
+<!-- ═══════════════════════════════════════════════════
+     USER GUIDE TRIGGER BUTTON (ปุ่มไอคอนหน้าลอกอิน)
+═══════════════════════════════════════════════════ -->
+<button onclick="openUserGuide()" id="guideTrigger" title="วิธีการใช้งาน" 
+    class="guide-fab mascot-float">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+</button>
+
+<!-- ═══════════════════════════════════════════════════
+     USER GUIDE MODAL (ป๊อปอัพคู่มือการใช้งาน)
+═══════════════════════════════════════════════════ -->
+<div id="userGuideModal" class="guide-overlay" style="display:none;">
+    <div class="guide-card shadow-2xl">
+        <!-- Close Button -->
+        <button onclick="closeUserGuide()" class="guide-close">&times;</button>
+        
+        <div class="guide-layout">
+            <!-- Sidebar Navigation -->
+            <div class="guide-nav">
+                <div class="nav-header">
+                    <div class="brand-dot"></div>
+                    <span>OPERATION MANUAL</span>
+                </div>
+                <div class="nav-items">
+                    <button onclick="switchGuide(0)" class="nav-item active">01 เข้าสู่ระบบ</button>
+                    <button onclick="switchGuide(1)" class="nav-item">02 หน้าหลัก & KPI</button>
+                    <button onclick="switchGuide(2)" class="nav-item">03 การกรอกข้อมูล</button>
+                    <button onclick="switchGuide(3)" class="nav-item">04 จัดการไฟล์ & Sync</button>
+                    <button onclick="switchGuide(4)" class="nav-item">05 แดชบอร์ด Cockpit</button>
+                    <button onclick="switchGuide(5)" class="nav-item">06 โหมดหัวหน้างาน</button>
+                </div>
+                <div class="nav-footer">SQE SUPPORT V4.5</div>
+            </div>
+
+            <!-- Content Area -->
+            <div id="guideContent" class="guide-main">
+                <!-- เนื้อหาจะเปลี่ยนไปตามปุ่มที่กด โดยใช้ JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
 <style>
 @keyframes modalPop {
   from { opacity:0; transform:scale(0.9); }
@@ -7247,6 +7676,9 @@ async function login() {
       }}, '-=0.1');
             // ✅ เพิ่มบรรทัดนี้: สั่งให้เข้า Full Screen เมื่อ Animation จบ
       tl.call(() => {
+        // เพิ่มบรรทัดเหล่านี้ก่อนบรรทัด enterFullscreen(); ในฟังก์ชัน login()
+if($id('loginName')) $id('loginName').value = '';
+if($id('loginPass')) $id('loginPass').value = '';
           enterFullscreen(); 
       });
     } else {
@@ -7281,9 +7713,43 @@ async function login() {
   }
 }
 
+/**
+ * ฟังก์ชันออกจากระบบ (Logout)
+ * ทำหน้าที่ล้าง Session, ตัวแปรในเครื่อง และรีโหลดหน้าเว็บเพื่อเริ่มใหม่
+ */
 function logout() {
-  sessionStorage.removeItem('currentUser');
-  location.reload();
+    // 1. แสดง Toast แจ้งเตือน (ถ้ามีฟังก์ชัน toast)
+    if (typeof toast === 'function') {
+        toast('🚪 กำลังออกจากระบบอย่างปลอดภัย...');
+    }
+
+    // 2. ล้างข้อมูลชื่อผู้ใช้ที่เก็บไว้ใน SessionStorage
+    sessionStorage.removeItem('currentUser');
+    sessionStorage.clear(); // ล้างค่าอื่นๆ ทั้งหมดที่อาจค้างอยู่ใน Session
+
+    // 3. ล้างตัวแปร Global ใน JavaScript
+    currentUser = '';
+    records = [];
+    editingId = null;
+
+    // 4. ล้างค่าในฟอร์ม Login (เผื่อกรณี Browser พยายามจดจำค่าไว้)
+    if (document.getElementById('loginName')) document.getElementById('loginName').value = '';
+    if (document.getElementById('loginPass')) document.getElementById('loginPass').value = '';
+
+    // 5. ปิดโหมด Fullscreen (ถ้าเปิดอยู่)
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+
+    // 6. หน่วงเวลาเล็กน้อยเพื่อให้ User เห็นการแจ้งเตือน แล้วทำการ Hard Reload
+    // การใช้ location.reload() จะช่วยล้าง Memory และตัวแปร JS ทั้งหมดให้เป็นค่าว่าง (Zero State)
+    setTimeout(() => {
+        window.location.reload();
+    }, 600);
 }
 
 function openJobProject() {
@@ -7966,67 +8432,72 @@ function forceRefresh() {
 }
 
 function openDashboard() {
+  // 1. ซ่อนปุ่ม guideTrigger ทันทีเมื่อเปิด Dashboard
+  if (typeof gsap !== 'undefined') {
+    // ใช้ GSAP เพื่อให้ปุ่มค่อยๆ ย่อหายไปอย่างนุ่มนวล
+    gsap.to('#guideTrigger', { opacity: 0, scale: 0, duration: 0.3, pointerEvents: 'none' });
+  } else {
+    // Fallback กรณีไม่ได้โหลด GSAP
+    const gt = $id('guideTrigger');
+    if (gt) gt.style.display = 'none';
+  }
+
   const modal = $id('dashboardModal');
   if (modal) modal.style.display = 'flex';
   
-  // อัปเดตชื่อและเวลา
+  // 2. อัปเดตชื่อผู้ใช้และเวลาปัจจุบันบน Dashboard
   document.querySelectorAll('#dashUser').forEach(el => el.textContent = currentUser);
   document.querySelectorAll('#dashTime').forEach(el => el.textContent = new Date().toLocaleTimeString('en-GB'));
 
-  // ✅ เพิ่มใหม่: Reset Filters เมื่อเปิด Modal (ล้างค่าวันที่และปุ่ม 3 ปุ่ม)
-  // 1. ล้างค่า Input วันที่
+  // 3. Reset Filters ทั้งหมดให้เป็นค่าเริ่มต้น
   if($id('dashStart')) $id('dashStart').value = '';
   if($id('dashEnd')) $id('dashEnd').value = '';
-  
-  // 2. เลือก Vendor เป็น ALL
   if($id('dashVendor')) $id('dashVendor').value = 'ALL';
 
-  // 3. ลบการไฮไลท์ (class active-qb) ออกจากปุ่ม วันนี้ / 7 วัน / เดือนนี้
+  // 4. ลบการไฮไลท์สีฟ้าออกจากปุ่ม Quick Filter (วันนี้, 7 วัน, เดือนนี้)
   document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active-qb'));
 
-  // ✅ ส่วนสำคัญ: สั่งวาดเส้นขีดบอกค่า (Ticks) ทันทีที่ Modal เปิด
-  drawGaugeTicks('gaugeTicks', 85, true);      // Main Gauge
-  drawGaugeTicks('sfGaugeTicks', 75);         // SF Gauge
-  drawGaugeTicks('vendorGaugeTicks', 75);    // Vendor Gauge
-  drawGaugeTicks('ctcGaugeTicks', 75);       // CTC Gauge
+  // 5. สั่งวาดเส้นขีดบอกค่า (Ticks) ของหน้าปัดทุกตัว
+  drawGaugeTicks('gaugeTicks', 85, true);      // หน้าปัดหลัก (Pass Rate)
+  drawGaugeTicks('sfGaugeTicks', 75);         // หน้าปัด SF Fault
+  drawGaugeTicks('vendorGaugeTicks', 75);    // หน้าปัด Vendor
+  drawGaugeTicks('ctcGaugeTicks', 75);       // หน้าปัด CTC
 
-  // Animation เสริม (เดิม)
+  // 6. รันแอนิเมชันทางเข้าด้วย GSAP (ถ้ามี)
   if (typeof gsap !== 'undefined') {
     gsap.to('#dashboardModal', { opacity: 1, duration: 0.3 });
-    gsap.fromTo('.dash-topbar', { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 });
+    // อนิเมชันแถบบนสุด
+    gsap.fromTo('.dash-topbar-cockpit', { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 });
+    // อนิเมชันส่วนเนื้อหา Dashboard ค่อยๆ ขยายขึ้นมา
+    gsap.fromTo('.cockpit-body', { opacity: 0, scale: 0.98 }, { opacity: 1, scale: 1, duration: 0.5, delay: 0.2 });
   }
 
-  // ✅ ส่วนสำคัญ: ใช้ RequestAnimationFrame 2 ชั้นเพื่อบังคับให้ Render เสร็จก่อนคำนวณ
+  // 7. ใช้ RequestAnimationFrame เพื่อให้ Browser Render UI เสร็จก่อน แล้วจึงคำนวณข้อมูล
+  // วิธีนี้ช่วยป้องกันเข็มหน้าปัดไม่ขยับ หรือกราฟแบน
   requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-          refreshDash(); // ฟังก์ชันนี้จะไปคำนวณและขยับเข็ม
+          refreshDash(); // คำนวณยอดรวม และขยับเข็มหน้าปัดตามข้อมูลจริง
       });
   });
-
-  // Animation เสริม (เดิม)
-  if (typeof gsap !== 'undefined') {
-      gsap.fromTo('.dash-topbar-cockpit', { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 });
-      gsap.fromTo('.cockpit-body', { opacity: 0, scale: 0.98 }, { opacity: 1, scale: 1, duration: 0.5, delay: 0.2 });
-  }
 }
 
 function closeDashboard() {
-    // 1. ทำแอนิเมชันปิด (ถ้ามี GSAP) หรือซ่อน Modal ทันที
     if (typeof gsap !== 'undefined') {
         gsap.to('#dashboardModal', { 
             opacity: 0, 
             duration: 0.3, 
             onComplete: () => { 
-                if($id('dashboardModal')) $id('dashboardModal').style.display = 'none'; 
+                if(document.getElementById('dashboardModal')) document.getElementById('dashboardModal').style.display = 'none'; 
                 
-                // --- ส่วนที่เพิ่มใหม่: รีเฟรชฟิลเตอร์ทั้งหมดเมื่อปิดเสร็จ ---
+                // --- ส่วนที่เพิ่มใหม่: สั่งให้ปุ่ม Guide เด้งกลับมาโชว์ ---
+                gsap.to('#guideTrigger', { opacity: 1, scale: 1, duration: 0.4, delay: 0.2, pointerEvents: 'auto' });
+                
                 finalizeResetOnExit();
             } 
         });
     } else {
-        if($id('dashboardModal')) $id('dashboardModal').style.display = 'none';
-        
-        // --- กรณีไม่มี GSAP ให้รีเฟรชทันที ---
+        if(document.getElementById('dashboardModal')) document.getElementById('dashboardModal').style.display = 'none';
+        document.getElementById('guideTrigger').style.display = 'flex'; // สำหรับกรณีไม่มี GSAP
         finalizeResetOnExit();
     }
 }
@@ -8833,18 +9304,23 @@ function updateChartsTheme() {
 ═══════════════════════════════════════════════════ */
 window.addEventListener('load', () => {
   initTheme();
-  
-  // ✅ เพิ่มบรรทัดนี้เพื่อเปิดใช้งานระบบ AI Smart Fill
   initAISmartFill();
 
   if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
+
+  // บังคับล้างค่าเก่าใน Session ทันทีที่โหลดหน้าเว็บใหม่
+  sessionStorage.removeItem('currentUser'); 
   
-  const saved = sessionStorage.getItem('currentUser');
-  if (saved) {
-    if($id('loginOverlay')) $id('loginOverlay').style.display = 'none';
-    if($id('appShell')) $id('appShell').classList.add('visible');
-    initApp(saved);
+  // แสดงหน้า Login เสมอ
+  if($id('loginOverlay')) $id('loginOverlay').style.display = 'flex';
+  if($id('appShell')) {
+      $id('appShell').style.visibility = 'hidden';
+      $id('appShell').classList.remove('visible');
   }
+
+  // ล้างค่าในช่องกรอก Login ให้ว่างเปล่า
+  if($id('loginName')) $id('loginName').value = '';
+  if($id('loginPass')) $id('loginPass').value = '';
 });
 
 // นาฬิกา Realtime
@@ -9641,6 +10117,170 @@ function renderAuditTimeline(data) {
   });
 
   listEl.innerHTML = html;
+}
+/* ═══════════════════════════════════════════════════
+   USER GUIDE SYSTEM - FIXED & UPGRADED VERSION
+═══════════════════════════════════════════════════ */
+
+const guideData = [
+    {
+        title: "01 ระบบควบคุมการเข้าถึง (Access Control)",
+        desc: "ความปลอดภัยระดับองค์กรและการแยกสิทธิ์ตามบทบาทหน้าที่",
+        color: "#8b5cf6", 
+        rgb: "139, 92, 246",
+        grid: [
+            { icon: "🛡️", title: "การยืนยันตัวตน (Auth)", text: "เข้าสู่ระบบด้วย E-mail บริษัทเท่านั้น ระบบจะใช้ระบบ Neural ในการจำจำชื่อผู้ใช้ล่าสุดเพื่อลดเวลาป้อนข้อมูล รหัสผ่านเริ่มต้นคือ '1234' สำหรับการเข้าใช้งานครั้งแรก", lv: "100%" },
+            { icon: "🎭", title: "โหมดพนักงาน (Staff)", text: "เน้นการทำงานหน้างาน (Shop Floor) ออกแบบ UI มาเพื่อการป้อนข้อมูลที่รวดเร็ว พร้อมระบบ AI คอยเดาชื่อ Part และ Supplier เพื่อความแม่นยำสูงสุด", lv: "100%" },
+            { icon: "🔐", title: "ความปลอดภัย (Security)", text: "ผู้ใช้สามารถเปลี่ยนรหัสผ่านส่วนตัวได้ที่เมนู 'รูปกุญแจ' เพื่อความปลอดภัยสูงสุด แนะนำให้ตั้งรหัสผ่านที่มีทั้งตัวเลขและตัวอักษรยาว 6 ตัวขึ้นไป", lv: "90%" },
+            { icon: "📡", title: "สถานะระบบ (Status)", text: "จุดเขียว 'SYSTEM ONLINE' บ่งบอกว่าเชื่อมต่อกับคลาวด์ หากจุดเป็นสีแดง ระบบจะบันทึกข้อมูลลงเครื่องอัตโนมัติและรอการ Sync เมื่อเน็ตกลับมา", lv: "100%" }
+        ]
+    },
+    {
+        title: "02 การติดตามดัชนีชี้วัด (Dynamic KPI)",
+        desc: "วิเคราะห์ประสิทธิภาพการตรวจรับงานแบบเรียลไทม์",
+        color: "#0ea5e9", 
+        rgb: "14, 165, 233",
+        grid: [
+            { icon: "📊", title: "ยอดรวมสะสม (Totals)", text: "แสดงจำนวน PCS และจำนวน Lot ที่คุณตรวจได้ในวันนี้ ช่วยให้ติดตามเป้าหมายรายวันได้ทันที โดยเลขจะอัปเดตแบบ Real-time ทุกครั้งที่กด Commit", lv: "100%" },
+            { icon: "🎨", title: "รหัสสีความเสี่ยง (Color Code)", text: "<b>สีส้ม:</b> ปัญหาจาก Shop Floor | <b>สีแดง:</b> ปัญหาจาก Supplier | <b>สีน้ำเงิน:</b> ปัญหาจากหน้างาน CTC | <b>สีเขียว:</b> งานปกติที่ผ่านการตรวจสอบ", lv: "100%" },
+            { icon: "📈", title: "สัดส่วนเปอร์เซ็นต์ (Distribution)", text: "ระบบคำนวณ % การพบ NG เทียบกับงานทั้งหมดให้อัตโนมัติ หากประเภทใดมีสัดส่วนสูงผิดปกติ ตัวเลขจะขยายใหญ่ขึ้นเพื่อแจ้งเตือน (Visual Alert)", lv: "95%" },
+            { icon: "🌓", title: "การปรับโหมดสี (Theme)", text: "ปรับเป็น Dark Mode เมื่อทำงานในสภาวะแสงน้อยเพื่อลดอาการล้าของสายตา โดยกราฟในหน้า Dashboard จะปรับสีเส้นตามอัตโนมัติเพื่อให้เห็น Contrast ชัดเจน", lv: "100%" }
+        ]
+    },
+    {
+        title: "03 ขั้นตอนการบันทึกข้อมูล (Pro-Recording)",
+        desc: "บันทึกข้อมูลงานเสียอย่างมีประสิทธิภาพ ลดข้อผิดพลาดเป็นศูนย์",
+        color: "#22d3ee", 
+        rgb: "34, 211, 238",
+        grid: [
+            { icon: "🤖", title: "ระบบอัจฉริยะ(AI Smart Fill)", text: "เมื่อพิมพ์ชื่อ Part หรือ Part No. เพียงบางส่วน ระบบจะดึงชื่อ Supplier และ Line ที่เคยใช้ล่าสุดมาเติมให้อัตโนมัติ ช่วยลดเวลาการพิมพ์ได้กว่า 60%", lv: "100%" },
+            { icon: "👯", title: "การคัดลอก (Cloning)", text: "ปุ่ม 'สีเขียว' ในตารางใช้เพื่อ Copy ข้อมูลทั้งหมดของรายการนั้นมาใส่ฟอร์มใหม่ เหมาะสำหรับงานที่มี NG หลายอาการแต่เป็น Part และ Ref เดียวกัน", lv: "100%" },
+            { icon: "✅", title: "ความถูกต้อง (Validation)", text: "เลข Reference ต้องเป็นรูปแบบ 000/2024 เท่านั้น หากกรอกผิดรูปแบบระบบจะขึ้นขอบสีแดงและไม่อนุญาตให้ Commit เพื่อป้องกันข้อมูลขยะเข้าสู่ระบบ", lv: "100%" },
+            { icon: "📝", title: "การแก้ไข (Global Edit)", text: "สามารถกดแก้ไขได้ตลอดเวลาผ่านปุ่ม 'สีน้ำเงิน' เมื่อแก้ไขเสร็จแล้วกด Update ระบบจะซิงค์การเปลี่ยนแปลงไปยังคลาวด์และแจ้งเตือนพนักงานคนอื่นทันที", lv: "95%" }
+        ]
+    },
+    {
+        title: "04 การจัดการไฟล์และคลาวด์ (Cloud & Files)",
+        desc: "บริหารจัดการข้อมูลด้วยระบบ Offline-First และ Smart Sync",
+        color: "#2563eb", 
+        rgb: "37, 99, 235",
+        grid: [
+            { icon: "💹", title: "การนำเข้า (Excel Import)", text: "รองรับการลากไฟล์ Excel มาวางเพื่อนำเข้าข้อมูลปริมาณมาก ระบบจะค้นหาหัวตารางอัตโนมัติ แม้ไฟล์จะไม่ได้จัดรูปแบบมา (Smart Header Detection)", lv: "95%" },
+            { icon: "☁️", title: "การซิงค์ (One-Click Sync)", text: "เมื่อทำงานในที่ไม่มีสัญญาณ ข้อมูลจะถูกเก็บในเครื่อง (Local) เมื่อเน็ตกลับมาเพียงกดปุ่ม 'Sync' ข้อมูลทั้งหมดจะถูกส่งขึ้นคลาวด์อย่างปลอดภัย", lv: "100%" },
+            { icon: "📥", title: "การส่งออก (Excel Export)", text: "ส่งออกรายงานสรุปผลเป็นไฟล์ .xlsx ที่จัดรูปแบบมาเรียบร้อยแล้ว พร้อมนำไปใช้รายงานผลในที่ประชุมหรือส่งอีเมลต่อได้ทันทีโดยไม่ต้องแก้ไขเพิ่ม", lv: "100%" },
+            { icon: "🧹", title: "การล้างข้อมูล (Data Hygiene)", text: "ใช้ปุ่ม 'Clear' เมื่อต้องการเริ่มรอบการทำงานใหม่ ระบบจะถามยืนยัน 2 ชั้นเพื่อป้องกันการเผลอลบ ข้อมูลที่ลบแล้วจะไม่สามารถกู้คืนได้จากเครื่อง", lv: "80%" }
+        ]
+    },
+    {
+        title: "05 วิเคราะห์ภาพรวม (Strategic Cockpit)",
+        desc: "ศูนย์บัญชาการข้อมูลวิเคราะห์ขั้นสูงเพื่อการตัดสินใจ",
+        color: "#10b981", 
+        rgb: "16, 185, 129",
+        grid: [
+            { icon: "🏎️", title: "หน้าปัดความเร็ว (Gauges)", text: "Pass-Rate Gauge แสดงอัตราส่วนงานปกติเทียบกับงานเสีย <b>(สีเขียว > 90% = ดีเยี่ยม | สีส้ม 75-89% = ควรระวัง | สีแดง < 50% = วิกฤต)</b>", lv: "100%" },
+            { icon: "📊", title: "แนวโน้มรายเดือน (Trends)", text: "กราฟเส้น Production Trend ช่วยเปรียบเทียบยอดเสียในแต่ละเดือน เพื่อวิเคราะห์ว่า Supplier มีการปรับปรุงคุณภาพ (Quality Improvement) หรือไม่", lv: "95%" },
+            { icon: "🏆", title: "อันดับสูงสุด (Top Rankings)", text: "ระบบสรุป 5 อันดับแรกของ Supplier, อาการ NG และ Part ที่เสียบ่อยที่สุด (Pareto Analysis) เพื่อให้คุณเลือกโฟกัสปัญหาที่สำคัญที่สุดก่อน", lv: "90%" },
+            { icon: "📺", title: "รายการสด (Live Feed)", text: "แถบวิ่ง Ticker และ Incident Feed ด้านล่างจะแสดงข้อมูลล่าสุดที่เพื่อนร่วมงานบันทึกเข้ามา ทำให้คุณรู้ความเคลื่อนไหวหน้างานตลอดเวลา", lv: "100%" }
+        ]
+    },
+    {
+        title: "06 การตรวจสอบย้อนกลับ (Transparency)",
+        desc: "ระบบจัดเก็บประวัติและสิทธิ์การเข้าถึงของหัวหน้างาน",
+        color: "#f59e0b", 
+        rgb: "245, 158, 11",
+        grid: [
+            { icon: "🕒", title: "ประวัติการแก้ไข (Audit)", text: "กดปุ่ม 'รูปนาฬิกา' ในตารางเพื่อดูว่าใครแก้ไขข้อมูลอะไร เมื่อไหร่ ระบบจะแสดงค่าก่อนแก้ (สีแดง) และหลังแก้ (สีเขียว) เพื่อความโปร่งใส", lv: "100%" },
+            { icon: "🕵️", title: "สลับมุมมอง (Impersonate)", text: "หัวหน้างานสามารถสลับรายชื่อเพื่อดูหน้าจอและ KPI ของพนักงานแต่ละคนได้ เพื่อตรวจสอบความถูกต้องของข้อมูลก่อนสรุปผลรายงานประจำสัปดาห์", lv: "100%" },
+            { icon: "📂", title: "โปรเจกต์งาน (Job Project)", text: "เชื่อมโยงไปยังหน้า Job Project เพื่อดูไฟล์แนบหรือรูปภาพประกอบ NG รายการนั้นๆ ทำให้การสื่อสารระหว่าง Inspector และ Engineer ชัดเจนขึ้น", lv: "90%" },
+            { icon: "💎", title: "ความสมบูรณ์ (Data Integrity)", text: "ข้อมูลทุกรายการจะมี ID เฉพาะตัวและมีสถานะ Sync Badge กำกับ หากข้อมูลถูกบันทึกสำเร็จบนคลาวด์แล้ว จะมีจุดสีเขียวกำกับอยู่ที่หน้าแถวเสมอ", lv: "100%" }
+        ]
+    }
+];
+
+// 2. ฟังก์ชันเปิดคู่มือ
+function openUserGuide() {
+    const modal = document.getElementById('userGuideModal');
+    if(!modal) return;
+    
+    modal.style.display = 'flex';
+    // ใช้ GSAP เพื่อความนุ่มนวล
+    if (window.gsap) {
+        gsap.to(modal, { opacity: 1, duration: 0.4 });
+        gsap.fromTo(modal.querySelector('.guide-card'), 
+            { y: 50, scale: 0.9, opacity: 0 }, 
+            { y: 0, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.7)" }
+        );
+    } else {
+        modal.style.opacity = '1';
+    }
+    
+    switchGuide(0); // เริ่มที่หน้าแรกเสมอ
+}
+
+// 3. ฟังก์ชันปิดคู่มือ
+function closeUserGuide() {
+    const modal = document.getElementById('userGuideModal');
+    if(!modal) return;
+    
+    if (window.gsap) {
+        gsap.to(modal, { 
+            opacity: 0, 
+            duration: 0.3, 
+            onComplete: () => { modal.style.display = 'none'; } 
+        });
+    } else {
+        modal.style.display = 'none';
+    }
+}
+
+// 4. ฟังก์ชันสลับหน้า (หัวใจสำคัญที่ต้องแก้)
+function switchGuide(index) {
+    const section = guideData[index];
+    if(!section) return;
+
+    const root = document.documentElement;
+    const contentArea = document.getElementById('guideContent');
+    if(!contentArea) return;
+
+    // อัปเดตสี CSS Variables
+    root.style.setProperty('--guide-accent', section.color);
+    root.style.setProperty('--guide-accent-rgb', section.rgb);
+
+    // เปลี่ยนสถานะปุ่มเมนู
+    document.querySelectorAll('.nav-item').forEach((btn, i) => {
+        if (i === index) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+
+    // อนิเมชั่นเปลี่ยนเนื้อหา
+    if (window.gsap) {
+        gsap.fromTo(contentArea, 
+            { opacity: 0, x: 20 }, 
+            { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }
+        );
+    }
+
+    let gridHtml = '';
+    section.grid.forEach((item, i) => {
+        gridHtml += `
+            <div class="guide-info-card" style="animation-delay: ${i * 0.1}s">
+                <div class="info-icon">${item.icon}</div>
+                <div class="info-title">${item.title}</div>
+                <div class="info-text">${item.text}</div>
+                <div class="power-bar">
+                    <div class="power-level" style="width: ${item.lv}"></div>
+                </div>
+            </div>
+        `;
+    });
+
+    contentArea.innerHTML = `
+        <div class="guide-step-title" style="color: ${section.color}">${section.title}</div>
+        <div class="guide-step-desc">${section.desc}</div>
+        <div class="guide-grid">
+            ${gridHtml}
+        </div>
+    `;
 }
 </script>
 </body>
