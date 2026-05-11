@@ -6134,6 +6134,624 @@ html.dark-mode .guide-step-title { background: linear-gradient(90deg, #60a5fa, #
 html.dark-mode #changePassModal {
     background: rgba(2, 6, 23, 0.8);
 }
+/* ═══════════════════════════════════════════════════
+   NEW: ULTRA-PREMIUM LOGIN SYSTEM 
+═══════════════════════════════════════════════════ */
+
+/* 1. ปรับพื้นหลังให้ดูมีมิติ (Perspective Grid) */
+#loginOverlay {
+    background: radial-gradient(circle at 50% 50%, #f8faff 0%, #e0e8ff 100%);
+    perspective: 1000px;
+    overflow: hidden;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lo-grid {
+    position: absolute;
+    inset: -100% 0 0 0;
+    background-image: 
+        linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    transform: rotateX(60deg) translateY(0);
+    animation: gridScroll 20s linear infinite;
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
+}
+
+@keyframes gridScroll {
+    from { background-position: 0 0; }
+    to { background-position: 0 50px; }
+}
+
+/* 2. Login Card: High-End Glassmorphism */
+.lo-card {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(40px) saturate(160%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 40px !important;
+    padding: 3.5rem !important;
+    width: 580px !important;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.4) inset !important;
+    position: relative;
+    z-index: 10;
+}
+
+/* 3. Role Selector: Liquid Slider */
+.role-toggle {
+    display: flex;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.4rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.role-tab {
+    flex: 1;
+    padding: 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-align: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: #64748b;
+    font-family: var(--font-head);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.role-tab.active { color: #fff; }
+
+.role-slider {
+    position: absolute;
+    top: 0.4rem; bottom: 0.4rem; left: 0.4rem;
+    width: calc(50% - 0.4rem);
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    border-radius: 16px;
+    transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+/* 4. Head Mode Switch (Golden Dark Mode) */
+#loginOverlay.is-head-mode {
+    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%) !important;
+}
+
+#loginOverlay.is-head-mode .lo-grid {
+    background-image: 
+        linear-gradient(rgba(245, 158, 11, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245, 158, 11, 0.08) 1px, transparent 1px);
+}
+
+#loginOverlay.is-head-mode .lo-card {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border-color: rgba(245, 158, 11, 0.2) !important;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 158, 11, 0.05) inset !important;
+}
+
+#loginOverlay.is-head-mode .role-slider {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    transform: translateX(100%);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
+#loginOverlay.is-head-mode .role-tab.active { color: #000; }
+#loginOverlay.is-head-mode .lo-brand-title { color: #fff !important; }
+#loginOverlay.is-head-mode .lo-label { color: #94a3b8; }
+
+/* 5. Input & Button Overhaul */
+.lo-in {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1.5px solid #e2e8f0;
+    transition: all 0.3s;
+}
+
+.lo-in:focus {
+    background: #fff;
+    border-color: var(--blue-500);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+}
+
+.lo-btn {
+    height: 56px;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.lo-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
+}
+
+/* 6. Floating Orbs */
+.lo-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 1;
+    animation: orbFloat 20s infinite alternate ease-in-out;
+}
+@keyframes orbFloat {
+    0% { transform: translate(0,0) scale(1); }
+    100% { transform: translate(50px, 30px) scale(1.2); }
+}
+/* ═══════════════════════════════════════════════════
+   SUPERVISOR CONSOLE UPGRADE (PREMIUM INLINE)
+═══════════════════════════════════════════════════ */
+.sc-premium-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(15, 23, 42, 0.4); /* พื้นหลังเข้มโปร่งแสง */
+    padding: 3px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.sc-select-box {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding-left: 10px;
+    position: relative;
+}
+
+.sc-user-icon {
+    color: #60a5fa; /* สีฟ้าสว่าง */
+    margin-right: 8px;
+    filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.4));
+}
+
+.sc-minimal-select {
+    width: 100%;
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-family: var(--font-head);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    padding: 6px 0;
+    appearance: none; /* ซ่อนลูกศรเดิม */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 25px;
+}
+
+.sc-minimal-select option {
+    background: #1e293b;
+    color: white;
+}
+
+.sc-action-btn {
+    background: linear-gradient(135deg, #10b981, #059669); /* ไล่เฉดเขียว */
+    color: white;
+    border: none;
+    border-radius: 9px;
+    padding: 7px 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+}
+
+.sc-action-btn span {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+}
+
+.sc-action-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+}
+
+.sc-action-btn:active {
+    transform: scale(0.96);
+}
+/* ═══════════════════════════════════════════════════
+   MODERN CHANGE PASSWORD - VAULT THEME
+═══════════════════════════════════════════════════ */
+.vault-modal {
+    background: rgba(15, 23, 42, 0.8) !important;
+    backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    padding: 2.5rem;
+    width: 420px;
+    box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5), 
+                inset 0 0 20px rgba(59, 130, 246, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* กิมมิก: เส้นแสง Scan วิ่งผ่านด้านหลัง */
+.vault-modal::after {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(59, 130, 246, 0.1), transparent 30%);
+    animation: rotateScan 10s linear infinite;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes rotateScan {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.vault-content { position: relative; z-index: 1; }
+
+.cp-input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.cp-input-vault {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    padding: 1rem 1rem 1rem 3rem !important;
+    color: #fff !important;
+    font-family: var(--font-mono);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cp-input-vault:focus {
+    border-color: #3b82f6 !important;
+    background: rgba(59, 130, 246, 0.05) !important;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    transform: translateY(-2px);
+}
+
+.cp-icon-left {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    transition: color 0.3s;
+}
+
+.cp-input-vault:focus + .cp-icon-left { color: #3b82f6; }
+
+/* Strength Meter Gimmick */
+.strength-meter {
+    height: 4px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+    border-radius: 2px;
+    overflow: hidden;
+    display: flex;
+    gap: 3px;
+}
+
+.strength-bar {
+    height: 100%;
+    flex: 1;
+    transition: all 0.5s ease;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.strength-bar.active[data-lv="1"] { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+.strength-bar.active[data-lv="2"] { background: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
+.strength-bar.active[data-lv="3"] { background: #10b981; box-shadow: 0 0 10px #10b981; }
+
+.save-btn-premium {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 16px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.save-btn-premium:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(37, 99, 235, 0.5);
+    filter: brightness(1.1);
+}
+/* ═══════════════════════════════════════════════════
+   MODERN AUDIT LOG BUTTON - COMPACT & STANDOUT
+═══════════════════════════════════════════════════ */
+.audit-btn-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(30, 41, 59, 0.7); /* Slate 800 โปร่งแสง */
+    border: 1px solid rgba(59, 130, 246, 0.3); /* ขอบสีฟ้าจางๆ */
+    border-radius: 8px;
+    color: #94a3b8; /* สีเทาอมฟ้า */
+    font-family: 'Sora', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+}
+
+/* เอฟเฟกต์เมื่อ Hover */
+.audit-btn-modern:hover {
+    color: #ffffff;
+    background: rgba(37, 99, 235, 0.2);
+    border-color: #3b82f6;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
+}
+
+/* กิมมิก: เส้นแสง Scan วิ่งผ่านปุ่มเบาๆ */
+.audit-btn-modern::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transition: 0.5s;
+}
+
+.audit-btn-modern:hover::before {
+    left: 150%;
+    transition: 0.7s;
+}
+
+/* ปรับแต่งไอคอนนาฬิกา */
+.audit-btn-modern svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.4s ease;
+}
+
+.audit-btn-modern:hover svg {
+    transform: rotate(20deg);
+    color: #3b82f6;
+}
+
+/* สำหรับโหมดหัวหน้างาน (ให้ดูพรีเมียมขึ้น) */
+.audit-btn-premium {
+    background: rgba(245, 158, 11, 0.05);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #f59e0b; /* สีทอง */
+}
+
+.audit-btn-premium:hover {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: #f59e0b;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+}
+/* ═══════════════════════════════════════════════════
+   NANO-TECH AUDIT LOG BUTTON (Ultra Compact)
+═══════════════════════════════════════════════════ */
+.audit-btn-nano {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px; /* ลดระยะห่าง */
+    padding: 3px 8px; /* เล็กมากแต่ยังกดง่าย */
+    background: rgba(30, 41, 59, 0.5); /* พื้นหลังจางลง */
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 4px; /* ทรงเหลี่ยมมุมโค้งดูเป็นงานวิศวกรรมมากกว่า */
+    color: #94a3b8;
+    font-family: 'DM Mono', monospace; /* ใช้ฟอนต์ Mono จะดูเป็น Log มากขึ้น */
+    font-size: 9px; /* ขนาดตัวอักษรจิ๋ว */
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.audit-btn-nano:hover {
+    background: rgba(37, 99, 235, 0.15);
+    border-color: #3b82f6;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+/* ปรับไอคอนให้จิ๋วตามตัวหนังสือ */
+.audit-btn-nano svg {
+    width: 10px;
+    height: 10px;
+    stroke-width: 3; /* เพิ่มความหนาเส้นไอคอนให้ชัดแม้ขนาดเล็ก */
+}
+
+/* กิมมิก: เมื่อ Hover ให้เข็มนาฬิกาหมุน */
+.audit-btn-nano:hover svg {
+    filter: drop-shadow(0 0 2px #3b82f6);
+}
+/* ปุ่ม LOG แบบอัปเกรด (ขนาดจิ๋วแต่เด่น) */
+.audit-btn-v2 {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px; /* ขนาดจิ๋วเท่าเดิม */
+    background: linear-gradient(135deg, #2563eb, #1e40af); /* ไล่เฉดน้ำเงินเข้ม */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #ffffff !important; /* ตัวหนังสือขาวชัดเจน */
+    font-family: 'Sora', sans-serif;
+    font-size: 10px; /* ขนาดตัวอักษรเล็กแต่หนา */
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4); /* เพิ่มมิติด้วยเงา */
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.audit-btn-v2:hover {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.6);
+}
+
+.audit-btn-v2 svg {
+    width: 11px;
+    height: 11px;
+    stroke-width: 3; /* เส้นไอคอนหนาขึ้นให้มองเห็นง่าย */
+}
+/* ═══════════════════════════════════════════════════
+   ULTRA-PREMIUM LOGIN: ANIMATED GRID & DUAL THEME
+═══════════════════════════════════════════════════ */
+
+/* 1. พื้นหลังหลักและการสลับธีม */
+#loginOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: radial-gradient(circle at center, #f8faff 0%, #dbeafe 100%);
+    overflow: hidden;
+    perspective: 1200px; /* สร้างมิติความลึก */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ธีมหัวหน้างาน (Black & Gold) */
+#loginOverlay.is-head-mode {
+    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%) !important;
+}
+
+/* 2. อนิเมชั่นตารางคลื่นพื้นหลัง */
+.lo-grid {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background-image: 
+        linear-gradient(rgba(37, 99, 235, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37, 99, 235, 0.1) 1px, transparent 1px);
+    background-size: 60px 60px;
+    transform: rotateX(55deg) translateY(0);
+    animation: gridFlow 15s linear infinite;
+    z-index: 1;
+    mask-image: radial-gradient(circle at center, black 30%, transparent 70%);
+}
+
+#loginOverlay.is-head-mode .lo-grid {
+    background-image: 
+        linear-gradient(rgba(245, 158, 11, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245, 158, 11, 0.12) 1px, transparent 1px);
+    animation: gridFlow 10s linear infinite;
+}
+
+@keyframes gridFlow {
+    from { transform: rotateX(55deg) translateY(0); }
+    to { transform: rotateX(55deg) translateY(60px); }
+}
+
+/* 3. แสง Orbs พื้นหลัง */
+.lo-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 2;
+    transition: all 1s ease;
+}
+
+/* 4. Login Card (Glassmorphism) */
+.lo-card {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    gap: 3rem;
+    padding: 3.5rem;
+    width: 900px;
+    max-width: 95vw;
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(30px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 40px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#loginOverlay.is-head-mode .lo-card {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border-color: rgba(245, 158, 11, 0.2) !important;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
+}
+
+/* 5. ปรับปรุงช่องกรอกข้อมูล (Inputs) */
+.lo-in {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    color: #1e3a8a !important;
+    border-radius: 14px !important;
+    padding: 1rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease;
+}
+
+#loginOverlay.is-head-mode .lo-in {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 2px solid #92400e !important; /* เหลืองเข้ม Amber 800 */
+    color: #fbbf24 !important; /* ตัวหนังสือเหลืองสว่าง */
+}
+
+#loginOverlay.is-head-mode .lo-in:focus {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3) !important;
+}
+
+#loginOverlay.is-head-mode .lo-in::placeholder {
+    color: #78350f !important;
+}
+
+/* 6. ปรับปรุงปุ่ม (Buttons) */
+.lo-btn {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+    color: white !important;
+    border-radius: 16px !important;
+    height: 56px;
+    font-weight: 800 !important;
+    letter-spacing: 1px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+#loginOverlay.is-head-mode .lo-btn {
+    background: linear-gradient(135deg, #b45309 0%, #d97706 100%) !important;
+}
+
+#loginOverlay.is-head-mode .lo-label {
+    color: #f59e0b !important;
+    font-weight: 800;
+}
 </style>
 </head>
 <body>
@@ -6217,6 +6835,202 @@ html.dark-mode #changePassModal {
   from { opacity:0; transform:scale(0.95) translateY(10px); }
   to { opacity:1; transform:none; }
 }
+</style>
+
+<div id="loginOverlay">
+    <!-- พื้นหลังล้ำยุค -->
+    <div class="lo-grid"></div>
+    <div class="lo-orb" id="orb1" style="width: 400px; height: 400px; background: rgba(59, 130, 246, 0.15); top: -100px; left: -100px;"></div>
+    <div class="lo-orb" id="orb2" style="width: 300px; height: 300px; background: rgba(139, 92, 246, 0.1); bottom: -50px; right: -50px;"></div>
+
+    <div class="lo-card" id="loCard">
+        <!-- ฝั่งซ้าย: Mascot -->
+        <div class="lo-mascot-col">
+            <div class="mascot-container">
+                <svg class="mascot-float" width="120" height="140" viewBox="0 0 100 120">
+                    <!-- Head with Visor -->
+                    <path d="M25 40C25 26 36 15 50 15C64 15 75 26 75 40V45H25V40Z" fill="url(#headGrad)" />
+                    <rect id="mascotEye" x="30" y="32" width="40" height="6" rx="3" class="cyber-eye" fill="#3b82f6" />
+                    
+                    <!-- Body & Core -->
+                    <rect x="30" y="50" width="40" height="35" rx="8" fill="url(#bodyGrad)" stroke="rgba(255,255,255,0.2)" />
+                    <circle cx="50" cy="67" r="10" fill="rgba(0,0,0,0.2)" />
+                    <circle id="mascotCore" cx="50" cy="67" r="6" class="core-spin" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="8 4" />
+                    
+                    <!-- Floating Hands -->
+                    <rect x="15" y="55" width="8" height="20" rx="4" fill="url(#headGrad)" opacity="0.8" class="hover-glow" />
+                    <rect x="77" y="55" width="8" height="20" rx="4" fill="url(#headGrad)" opacity="0.8" class="hover-glow" style="animation-delay:-1s" />
+
+                    <!-- Hologram Base -->
+                    <ellipse id="mascotBase" cx="50" cy="105" rx="30" ry="8" fill="rgba(59, 130, 246, 0.2)" class="hover-glow" />
+                    
+                    <defs>
+                        <linearGradient id="headGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f8fafc" /><stop offset="100%" style="stop-color:#cbd5e1" />
+                        </linearGradient>
+                        <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f1f5f9" /><stop offset="100%" style="stop-color:#94a3b8" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <div class="lo-badge-online"><span class="sdot"></span>SYSTEM ONLINE</div>
+                <div style="font-family: var(--font-mono); font-size: 0.6rem; color: #94a3b8; margin-top: 0.5rem; letter-spacing: 2px;">V4.5 NEURAL</div>
+            </div>
+        </div>
+
+        <!-- ฝั่งขวา: Form -->
+        <div class="lo-form-col">
+            <div class="lo-brand">
+                <div class="lo-brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 50 50"><circle stroke="#fff" stroke-width="4" cx="25" cy="25" r="18" /><line stroke="#fff" stroke-width="4" x1="35" y1="35" x2="44" y2="44" /></svg>
+                </div>
+                <div>
+                    <h2 class="sora lo-brand-title">SQE <span id="brandAccent">Support</span></h2>
+                    <p class="lo-brand-subtitle">INTELLIGENCE PLATFORM</p>
+                </div>
+            </div>
+
+            <!-- Role Selector (New Design) -->
+            <div class="role-toggle">
+                <div class="role-slider" id="roleSlider"></div>
+                <div class="role-tab active" id="tabStaff" onclick="setLoginRole('staff')">SQE support</div>
+                <div class="role-tab" id="tabSuper" onclick="setLoginRole('supervisor')">SQE EN</div>
+            </div>
+
+            <div id="loginForm">
+                <div class="lo-field">
+                    <label class="lo-label">ACCESS ID (EMAIL)</label>
+                    <input type="email" id="loginName" placeholder="user@carrier.com" class="lo-in">
+                </div>
+                <div id="passField" style="margin-top: 1rem;">
+                    <label class="lo-label">SECURITY KEY</label>
+
+<input type="password" id="loginPass" placeholder="••••••••" class="lo-in" autocomplete="new-password">
+                </div>
+                <button id="loginBtn" onclick="handleLoginClick()" class="lo-btn" style="margin-top: 2rem;">
+                    INITIALIZE SESSION →
+                </button>
+            </div>
+
+            <!-- Advanced 3-Step Loading -->
+            <div id="loProgress">
+                <div class="lo-bar-t"><div class="lo-bar" id="loBar"></div></div>
+                <div class="lo-step" id="ls1"><div class="lo-dot">01</div><span>ENCRYPTING LINK...</span></div>
+                <div class="lo-step" id="ls2"><div class="lo-dot">02</div><span>AUTHENTICATING...</span></div>
+                <div class="lo-step" id="ls3"><div class="lo-dot">03</div><span>SYNCING NEURAL DATA...</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>@keyframes qDraw{to{stroke-dashoffset:0}}</style>
+
+<!-- ════════════════════════════════
+     APP SHELL
+════════════════════════════════ -->
+<div id="appShell">
+  <!-- HEADER -->
+  <header id="appHeader" style="display:grid;grid-template-columns:2.8fr 9.2fr;gap:.9rem;flex-shrink:0">
+
+    <!-- Brand card -->
+    <div id="brandCard">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3)">
+        <svg width="22" height="22" viewBox="0 0 50 50" fill="none">
+          <circle stroke="#fff" stroke-width="4.5" cx="25" cy="25" r="18" stroke-dasharray="100" stroke-dashoffset="100" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
+          <line stroke="#fff" stroke-width="4.5" stroke-linecap="round" x1="35" y1="35" x2="44" y2="44" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
+        </svg>
+      </div>
+
+<!-- ภายใน #brandCard: จัด layout แบบกระจายหัว-ท้าย -->
+<div style="z-index:1; position:relative; display: flex; flex-direction: column; justify-content: space-between; height: 100%; width: 100%;">
+    
+    <!-- ส่วนบน: ชื่อแอป และ นาฬิกา/Sync -->
+    <div>
+        <h1 style="font-family:var(--font-head); font-size:1.1rem; font-weight:800; color:#fff; letter-spacing:-.02em; line-height: 1.1;">
+            SQE <span style="opacity:.85">support</span>
+        </h1>
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+            <p id="liveClock" style="font-family:var(--font-mono); font-size:.55rem; color:rgba(255,255,255,0.5);"></p>
+            <div id="syncPulse" style="display: flex; align-items: center; gap: 4px;">
+                <span class="sdot" style="width: 5px; height: 5px;"></span>
+                <span id="syncPulseText" style="font-size: 0.55rem; font-weight: 700; color: #10b981;">LIVE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ส่วนล่าง: SUPERVISOR CONSOLE (อัปเกรดใหม่: สวยงามและเรียงแถวเดียว) -->
+<div id="supervisorConsole" style="display:none; flex-direction: column; gap: 4px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 5px;">
+    <label style="font-family: var(--font-head); font-size: 0.5rem; font-weight: 800; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; text-transform: uppercase; margin-left: 4px;">
+        Viewing Data As
+    </label>
+    
+    <div class="sc-premium-container">
+        <div class="sc-select-box">
+            <svg class="sc-user-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <select id="staffSelector" onchange="switchView(this.value)" class="sc-minimal-select">
+                <!-- รายชื่อจะถูกใส่โดย JS -->
+            </select>
+        </div>
+
+        <button onclick="openJobProject()" class="sc-action-btn" title="Open staff job project">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>OPEN JOB</span>
+        </button>
+    </div>
+</div>
+</div>
+<style>
+* กิมมิกไอคอน: ให้มีการเรืองแสงอ่อนๆ และกระพริบเบาๆ เหมือนระบบ Security */
+.sc-gimmick-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6; /* สีฟ้าสดใส */
+    filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6));
+    animation: scPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes scPulse {
+    0%, 100% { opacity: 0.6; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* ปรับแต่ง Select ให้เนียนและชื่อชัดเจน */
+.sc-premium-select:hover {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+}
+
+.sc-premium-select option {
+    background: #0f172a; /* พื้นหลังสีเข้มทึบเพื่อให้ชื่อชัดที่สุดเมื่อเปิดเมนู */
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 10px;
+}
+
+/* เมื่อชื่อถูกเลือก ให้ชื่อเด่นออกมาด้วย Ambient Light */
+.sc-premium-select:focus {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+@keyframes modalIn {
+  from { opacity:0; transform:scale(0.95) translateY(10px); }
+  to { opacity:1; transform:none; }
+}
 
 /* การตั้งค่า Sidebar เมื่อพับ */
 #sidebar {
@@ -6254,151 +7068,6 @@ html.dark-mode #changePassModal {
     animation: fadeIn 0.3s ease;
 }
 </style>
-
-<!-- ═══════════════════════════════════════════════════
-     LOGIN OVERLAY - Enterprise Portal
-═══════════════════════════════════════════════════ -->
-<div id="loginOverlay">
-  <div class="lo-lines"></div>
-  <div class="lo-geo"></div>
-  <div class="lo-shape s1"></div>
-  <div class="lo-shape s2"></div>
-  <div class="lo-shape s3"></div>
-
-  <div class="lo-card" id="loCard">
-    <!-- Mascot: Robot holding key -->
-    <div class="lo-mascot-col">
-      <svg class="mascot-float" width="90" height="120" viewBox="0 0 90 120" fill="none">
-        <!-- Head -->
-        <rect x="12" y="12" width="66" height="50" rx="14" fill="#fff" stroke="#bfdbfe" stroke-width="2"/>
-        <!-- Head inner glow -->
-        <rect x="16" y="16" width="58" height="42" rx="10" fill="#f0f6ff"/>
-        <!-- Antenna -->
-        <line x1="45" y1="12" x2="45" y2="3" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="45" cy="2" r="3" fill="#3b82f6"/>
-        <circle cx="45" cy="2" r="1.5" fill="#fff"/>
-        <!-- Eyes -->
-        <rect x="20" y="24" width="20" height="14" rx="5" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
-        <rect x="50" y="24" width="20" height="14" rx="5" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
-        <!-- Eye displays -->
-        <rect x="24" y="27" width="12" height="8" rx="3" fill="#2563eb"/>
-        <rect x="54" y="27" width="12" height="8" rx="3" fill="#2563eb"/>
-        <!-- Eye shine -->
-        <rect x="25.5" y="28.5" width="4" height="3" rx="1" fill="rgba(255,255,255,.5)"/>
-        <rect x="55.5" y="28.5" width="4" height="3" rx="1" fill="rgba(255,255,255,.5)"/>
-        <!-- Smile -->
-        <path d="M28 48 Q45 56 62 48" stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <!-- Body -->
-        <rect x="8" y="66" width="74" height="46" rx="14" fill="#fff" stroke="#bfdbfe" stroke-width="2"/>
-        <!-- Chest panel -->
-        <rect x="18" y="76" width="54" height="26" rx="8" fill="#f0f6ff" stroke="#dbeafe" stroke-width="1"/>
-        <!-- Status lights -->
-        <circle cx="30" cy="87" r="4.5" fill="#10b981" opacity=".8"/>
-        <circle cx="45" cy="87" r="4.5" fill="#3b82f6" opacity=".8"/>
-        <circle cx="60" cy="87" r="4.5" fill="#f59e0b" opacity=".8"/>
-        <!-- Battery bar -->
-        <rect x="24" y="96" width="42" height="3" rx="1.5" fill="#dbeafe"/>
-        <rect x="24" y="96" width="30" height="3" rx="1.5" fill="#3b82f6"/>
-        <!-- Arms -->
-        <rect x="0" y="70" width="10" height="36" rx="5" fill="#fff" stroke="#bfdbfe" stroke-width="1.5"/>
-        <rect x="80" y="70" width="10" height="36" rx="5" fill="#fff" stroke="#bfdbfe" stroke-width="1.5"/>
-        <!-- Key in right hand -->
-        <circle cx="86" cy="112" r="5.5" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-        <line x1="90" y1="112" x2="100" y2="112" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="96" y1="112" x2="96" y2="117" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
-        <line x1="100" y1="112" x2="100" y2="117" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
-        <!-- Legs -->
-        <rect x="18" y="114" width="22" height="16" rx="7" fill="#fff" stroke="#bfdbfe" stroke-width="1.5"/>
-        <rect x="50" y="114" width="22" height="16" rx="7" fill="#fff" stroke="#bfdbfe" stroke-width="1.5"/>
-      </svg>
-      <!-- Online badge -->
-      <div>
-        <div class="lo-badge-online"><span class="sdot"></span>ONLINE</div>
-        <div style="font-family:var(--font-mono);font-size:.55rem;color:var(--text-300);text-align:center;margin-top:.3rem">v4.0</div>
-      </div>
-    </div>
-
-    <!-- Form -->
-    <div class="lo-form-col">
-      <div class="lo-brand" style="margin-bottom:1.5rem">
-        <div class="lo-brand-icon">
-          <svg width="22" height="22" viewBox="0 0 50 50" fill="none">
-            <circle stroke="#fff" stroke-width="4.5" cx="25" cy="25" r="18" stroke-dasharray="100" stroke-dashoffset="100" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
-            <line stroke="#fff" stroke-width="4.5" stroke-linecap="round" x1="35" y1="35" x2="44" y2="44" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
-          </svg>
-        </div>
-        <div>
-          <h2 style="font-family:var(--font-head);font-weight:800;font-size:1.5rem;color:var(--text-900);letter-spacing:-.02em;line-height:1">
-            SQE <span style="color:var(--blue-600)">support</span>
-          </h2>
-          <p style="font-size:.6rem;color:var(--text-400);font-weight:600;letter-spacing:.04em;font-family:var(--font-head)">Intelligence Platform · v4.0</p>
-        </div>
-      </div>
-
-      <div id="loginForm" style="display:flex;flex-direction:column;gap:1rem">
-<!-- ...โค้ดด้านบน... -->
-<div>
-  <!-- เปลี่ยน Label และ Placeholder -->
-  <label class="lo-label">Work Email</label>
-  
-  <!-- เปลี่ยน type="text" เป็น type="email" และเพิ่ม autocomplete="email" -->
-  <!-- ลบ list="inspectorList" ออก (เพื่อความปลอดภัย ไม่ให้เดาได้ง่าย) -->
-  <input type="email" id="loginName" placeholder="Monkan.kancun@carrier.com" class="lo-in" autofocus autocomplete="email" style="text-transform: lowercase;">
-</div>
-<!-- ...โค้ดด้านล่าง... -->
-        <div>
-          <label class="lo-label">Access Key</label>
-          <input type="password" id="loginPass" placeholder="••••••" class="lo-in">
-        </div>
-<!-- ✅ เพิ่ม id เพื่อให้ JS เรียกใช้งานได้ง่ายขึ้น -->
-<button id="loginBtn" onclick="handleLoginClick()" class="lo-btn">
-  Sign In to Dashboard →
-</button>
-      </div>
-
-      <div id="loProgress">
-        <div class="lo-bar-t"><div class="lo-bar" id="loBar"></div></div>
-        <div class="lo-step" id="ls1"><div class="lo-dot">1</div><span>Verifying credentials…</span></div>
-        <div class="lo-step" id="ls2"><div class="lo-dot">2</div><span>Loading workspace…</span></div>
-        <div class="lo-step" id="ls3"><div class="lo-dot">3</div><span>Fetching cloud data…</span></div>
-      </div>
-
-      <p style="margin-top:1.4rem;font-size:.6rem;color:var(--text-200);font-family:var(--font-mono);text-align:center">
-        Authorized Personnel Only · Encrypted · Secure
-      </p>
-    </div>
-  </div>
-</div>
-
-
-<style>@keyframes qDraw{to{stroke-dashoffset:0}}</style>
-
-<!-- ════════════════════════════════
-     APP SHELL
-════════════════════════════════ -->
-<div id="appShell">
-  <!-- HEADER -->
-  <header id="appHeader" style="display:grid;grid-template-columns:2.8fr 9.2fr;gap:.9rem;flex-shrink:0">
-
-    <!-- Brand card -->
-    <div id="brandCard">
-      <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3)">
-        <svg width="22" height="22" viewBox="0 0 50 50" fill="none">
-          <circle stroke="#fff" stroke-width="4.5" cx="25" cy="25" r="18" stroke-dasharray="100" stroke-dashoffset="100" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
-          <line stroke="#fff" stroke-width="4.5" stroke-linecap="round" x1="35" y1="35" x2="44" y2="44" style="animation:qDraw 2.5s infinite alternate cubic-bezier(.45,0,.55,1)"/>
-        </svg>
-      </div>
-
-      <div style="z-index:1;position:relative">
-        <h1 style="font-family:var(--font-head);font-size:1.15rem;font-weight:800;color:#fff;letter-spacing:-.02em">
-          SQE <span style="opacity:.85">support</span>
-        </h1>
-
-        <p id="liveClock" style="font-family:var(--font-mono);font-size:.6rem;color:rgba(255,255,255,.6);margin-top:.15rem"></p>
-        <div id="syncPulse" style="margin-top:.4rem">
-          <span class="sdot"></span><span id="syncPulseText">LIVE SYNC</span>
-        </div>
-      </div>
            <!-- Dark Mode Button (อยู่ด้านขวาสุด) -->
       <button onclick="toggleDarkMode()" id="darkModeBtn" title="Toggle Theme"
         style="position:absolute;top:.75rem;right:.75rem;z-index:2;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 8px;cursor:pointer;transition:all .2s;font-size:.7rem;display:flex;align-items:center;gap:3px;font-family:var(--font-head);font-weight:600"
@@ -6408,17 +7077,7 @@ html.dark-mode #changePassModal {
         <!-- Sun Icon (แสดงตอน Dark Mode) -->
         <svg id="iconSun" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
       </button>
-  <button onclick="toggleSidebar()" id="sidebarToggleBtn" title="พับ/เปิด แถบป้อนข้อมูล"
-    style="position:absolute; top:.75rem; right:111px; z-index:2; 
-           background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); color:rgba(255,255,255,.8); 
-           border-radius:8px; padding:5px 8px; cursor:pointer; transition:all .2s; font-size:.7rem; display:flex; align-items:center; gap:3px; 
-           font-family:var(--font-head); font-weight:600;"
-    onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
-    <!-- ไอคอนลูกศร (เริ่มต้นชี้ไปทางซ้ายเพื่อพับ) -->
-    <svg id="toggleIcon" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-    </svg>
-  </button>
+
       <!-- ปุ่มเปลี่ยนรหัสผ่าน (Settings) -->
 <button onclick="openChangePassModal()" title="Change Password"
   style="position:absolute; top:.75rem; right:78px; z-index:2; /* ปรับ right: ให้ห่างจากปุ่มอื่น */
@@ -6430,7 +7089,16 @@ html.dark-mode #changePassModal {
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
   </svg>
 </button>
-
+<!-- ปุ่ม เปิด-ปิด Sidebar (ขนาดเท่าปุ่มกุญแจ) -->
+<button onclick="toggleSidebar()" id="btnToggleSidebar" title="Toggle Sidebar"
+  style="position:absolute; top:.75rem; right:111px; z-index:2; 
+         width:30px; height:25px; display:flex; align-items:center; justify-content:center;
+         background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); color:rgba(255,255,255,.8); 
+         border-radius:8px; cursor:pointer; transition:all .2s;">
+  <svg id="toggleIcon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+  </svg>
+</button>
       <!-- Logout Button (เลื่อนมาทางซ้าย 1 ก้าว) -->
       <button onclick="logout()" title="Logout"
         style="position:absolute;top:.75rem;right:45px;z-index:2;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 8px;cursor:pointer;transition:all .2s;font-size:.7rem;display:flex;align-items:center;gap:3px;font-family:var(--font-head);font-weight:600"
@@ -6497,16 +7165,9 @@ html.dark-mode #changePassModal {
       <!-- Header -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:.85rem;border-bottom:1.5px solid var(--blue-100)">
         <div>
-          <div style="display:flex; align-items:center; gap:8px;">
-             <!-- ปุ่มพับเข้า -->
-            <button type="button" onclick="toggleSidebar(true)" class="btn" style="background:transparent; color:var(--text-400); padding:2px;">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
-            </button>
-            <div style="font-family:var(--font-head);font-size:.7rem;font-weight:800;color:var(--text-900)">Entry Terminal</div>
+          <div style="font-family:var(--font-head);font-size:.7rem;font-weight:800;color:var(--text-900)">Entry Terminal</div>
+          <div style="font-size:.6rem;color:var(--text-400);margin-top:1px">ป้อนข้อมูลให้ถูกต้องครบถ้วน ขอให้สนุกกับงานทีทำ⭐</div>
         </div>
-        <div style="font-size:.6rem;color:var(--text-400);margin-top:1px">ป้อนข้อมูล</div>
-    </div>
-        <span id="currentUserDisp" style="background:var(--blue-600);color:#fff;padding:3px 10px;border-radius:99px;font-size:.6rem;font-weight:700;font-family:var(--font-head)">GUEST</span>
       </div>
 
       <form id="claimForm" class="scroll" style="display:flex;flex-direction:column;gap:.6rem;overflow-y:auto;flex-grow:1;padding-right:.1rem">
@@ -6524,13 +7185,25 @@ html.dark-mode #changePassModal {
         </div>
 
         <!-- Reference -->
+<!-- ส่วนที่มักพบ Error: Reference Info -->
         <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
-          <div class="sidebar-section-title">Reference Info</div>
-          <input type="text" id="refNo" list="refList" placeholder="Reference No *" required class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
-            <input type="text" id="supplier" list="supList" placeholder="Supplier *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-            <input type="number" id="qty" placeholder="QTY *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-          </div>
+            <div class="sidebar-section-title">Reference Info</div>
+            
+            <!-- ✅ แก้ไขจุดนี้: ลบ required และ class ที่ซ้ำซ้อนออกเหลือเพียงชุดเดียว -->
+            <input type="text" id="refNo" list="refList" 
+                   placeholder="REF001/2024 หรือ V001/2024 *" 
+                   required class="neon-in" 
+                   style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
+                <input type="text" id="supplier" list="supList" 
+                       placeholder="Supplier *" required class="neon-in" 
+                       style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+                
+                <input type="number" id="qty" 
+                       placeholder="QTY *" required class="neon-in" 
+                       style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+            </div>
         </div>
 
         <!-- Part -->
@@ -6570,64 +7243,52 @@ html.dark-mode #changePassModal {
       <!-- Toolbar -->
       <div class="toolbar">
         <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
-          
-          <!-- ✅ ปุ่มกางแถบกรอกข้อมูล (จะแสดงผลเมื่อ Sidebar ถูกพับ) -->
-          <button id="expandFormBtn" onclick="toggleSidebar(false)" class="btn" title="เปิดแถบกรอกข้อมูล"
-            style="display:none; background:var(--blue-600); color:white; border:none; border-radius:8px; padding:5px 10px; cursor:pointer; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(37,99,235,0.3);">
-              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
-          </button>
-
           <button onclick="setFilter('ALL')" id="btn-ALL" class="btn filter-btn active-filter">All</button>
           <button onclick="setFilter('SF')" id="btn-SF" class="btn filter-btn">SF Fault</button>
           <button onclick="setFilter('VENDOR FAULT')" id="btn-VENDOR" class="btn filter-btn">Vendor</button>
           <button onclick="setFilter('CTC')" id="btn-CTC" class="btn filter-btn">CTC</button>
           <button onclick="setFilter('CAN USE')" id="btn-CANUSE" class="btn filter-btn">Can Use</button>
         </div>
-
         <div id="toolbarBtns" style="display:flex;gap:.45rem;align-items:center;flex-wrap:wrap">
           <!-- Search -->
           <div style="position:relative;display:flex;align-items:center">
             <svg style="position:absolute;left:.65rem;pointer-events:none;color:var(--text-300)" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
             <input type="text" id="searchInput" placeholder="Search…">
           </div>
-
           <button id="syncBtnMain" onclick="syncToCloud()" class="btn"
             style="background:var(--accent-grn);color:#fff;padding:.45rem 1rem;border-radius:99px;font-family:var(--font-head);font-size:.65rem;font-weight:700;letter-spacing:.03em;display:flex;align-items:center;gap:.4rem;box-shadow:0 3px 10px rgba(16,185,129,.3)">
             <svg id="syncIcon" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Sync
           </button>
-
           <button id="dashBtn" onclick="openDashboard()" class="btn"
             style="background:linear-gradient(135deg,var(--blue-700),var(--blue-500));color:#fff;padding:.45rem 1rem;border-radius:99px;font-family:var(--font-head);font-size:.65rem;font-weight:700;letter-spacing:.03em;box-shadow:0 3px 10px rgba(37,99,235,.3)">
             Dashboard
           </button>
-
           <button id="jobBtn" onclick="openJobProject()" class="btn"
             style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);color:#fff;padding:.45rem 1rem;border-radius:99px;font-family:var(--font-head);font-size:.65rem;font-weight:700;letter-spacing:.03em;box-shadow:0 3px 10px rgba(124,58,237,.25)">
             Job
           </button>
-
           <button onclick="document.getElementById('xlsIn').click()" class="btn"
             style="background:#f8faff;border:1.5px solid var(--border);color:var(--blue-700);padding:.45rem .9rem;border-radius:99px;font-family:var(--font-head);font-size:.65rem;font-weight:700">
             Import
           </button>
-
           <button onclick="exportToExcel()" class="btn"
             style="background:#f8faff;border:1.5px solid var(--border);color:var(--text-600);padding:.45rem .9rem;border-radius:99px;font-family:var(--font-head);font-size:.65rem;font-weight:700">
             Export
           </button>
-
           <input type="file" id="xlsIn" hidden accept=".xlsx,.xls" onchange="importExcel(this)">
-
-          <button onclick="showDeleteModal()" class="btn" title="Clear all"
-            style="background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.2);color:var(--accent-red);padding:.45rem .6rem;border-radius:99px; display:flex; align-items:center; gap:4px;">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            <span style="font-weight:600; font-size:0.7rem;">Clear</span>
-          </button>
+<!-- แก้ตรง onclick ให้เป็น showDeleteModal -->
+<button onclick="showDeleteModal()" class="btn" title="Clear all"
+  style="background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.2);color:var(--accent-red);padding:.45rem .6rem;border-radius:99px; display:flex; align-items:center; gap:4px;">
+  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+  <!-- เพิ่มข้อความ Clear ตรงนี้ -->
+  <span style="font-weight:600; font-size:0.7rem;">Clear</span>
+</button>
         </div>
       </div>
 
-      <!-- Table Container -->
+      <!-- Table -->
+      
       <div id="tableContainer" style="flex-grow:1;overflow:auto" class="scroll">
         <table>
           <thead>
@@ -6644,8 +7305,8 @@ html.dark-mode #changePassModal {
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
+          
         </table>
-
         <!-- Empty state -->
         <div id="emptyState" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:3rem;text-align:center;gap:1rem">
           <svg class="mascot-float" width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -7185,58 +7846,55 @@ html.dark-mode #changePassModal {
 </div>
 
 <!-- ═════════════════════════════════════════════════
-     UPGRADED CHANGE PASSWORD MODAL (GLASSMORPHISM)
+     MODAL: ULTRA-PREMIUM CHANGE PASSWORD
 ══════════════════════════════════════════════════ -->
-<div id="changePassModal" style="display:none; position:fixed; inset:0; z-index: 30000; align-items:center; justify-content:center; background:rgba(15,23,42,0.6); backdrop-filter:blur(15px); transition: all 0.3s ease;">
+<div id="changePassModal" style="display:none; position:fixed; inset:0; z-index: 40000; align-items:center; justify-content:center; background:rgba(2, 6, 23, 0.7); backdrop-filter:blur(15px);">
   
-  <div class="glass-card" style="position:relative; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:32px; padding:3rem; width:450px; max-width:95vw; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow:hidden;">
-    
-    <!-- พื้นหลังแสงเรือง (Decorative Glows) -->
-    <div style="position:absolute; top:-50px; right:-50px; width:150px; height:150px; background:rgba(59,130,246,0.2); filter:blur(40px); border-radius:50%;"></div>
-    <div style="position:absolute; bottom:-50px; left:-50px; width:150px; height:150px; background:rgba(139,92,246,0.2); filter:blur(40px); border-radius:50%;"></div>
-
-    <!-- Header Section -->
-    <div style="text-align:center; margin-bottom:2rem; position:relative;">
-        <div style="display:inline-flex; width:70px; height:70px; background:linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius:22px; align-items:center; justify-content:center; margin-bottom:1rem; box-shadow: 0 10px 20px rgba(59,130,246,0.3);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+  <div class="vault-modal">
+    <div class="vault-content">
+        <!-- Header -->
+        <div style="text-align:center; margin-bottom: 2rem;">
+            <div style="width:70px; height:70px; background:rgba(59, 130, 246, 0.1); border-radius:24px; margin:0 auto 1rem; display:flex; align-items:center; justify-content:center; border: 1px solid rgba(59, 130, 246, 0.2);">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    <circle cx="12" cy="16" r="1"></circle>
+                </svg>
+            </div>
+            <h3 style="font-family:'Sora',sans-serif; font-weight:800; color:#fff; font-size:1.5rem; letter-spacing:-0.5px;">Update Security Key</h3>
+            <p style="color:#94a3b8; font-size:0.85rem; margin-top:0.5rem;">กรุณากำหนดรหัสผ่านใหม่เพื่อป้องกันข้อมูลของคุณ</p>
         </div>
-        <h3 style="font-family:var(--font-head); font-size:1.5rem; font-weight:800; color:#fff; margin-bottom:0.5rem; letter-spacing:-0.5px;">Update Security</h3>
-        <p style="color:rgba(255,255,255,0.5); font-size:0.85rem;">เปลี่ยนรหัสผ่านเพื่อความปลอดภัยของบัญชี</p>
-    </div>
 
-    <!-- Form Inputs -->
-    <div style="display:flex; flex-direction:column; gap:1.25rem; position:relative;">
-      
-      <!-- Old Password -->
-      <div class="input-group">
-        <label style="color:rgba(255,255,255,0.7); font-size:0.7rem; font-weight:700; text-transform:uppercase; margin-bottom:0.4rem; display:block; letter-spacing:1px;">Current Password</label>
-        <input type="password" id="cpOldPass" class="glass-in" placeholder="••••••••">
-      </div>
-
-      <!-- New Password -->
-      <div class="input-group">
-        <label style="color:rgba(255,255,255,0.7); font-size:0.7rem; font-weight:700; text-transform:uppercase; margin-bottom:0.4rem; display:block; letter-spacing:1px;">New Password</label>
-        <input type="password" id="cpNewPass" class="glass-in" placeholder="••••••••" oninput="checkPassStrength(this.value)">
-        <!-- Strength Meter -->
-        <div style="height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin-top:8px; overflow:hidden;">
-            <div id="strengthBar" style="height:100%; width:0%; background:#ef4444; transition:all 0.4s ease;"></div>
+        <!-- Form -->
+        <div class="cp-input-group">
+            <input type="password" id="cpOldPass" class="cp-input-vault" placeholder="Current Password">
+            <svg class="cp-icon-left" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
         </div>
-      </div>
 
-      <!-- Confirm New Password -->
-      <div class="input-group">
-        <label style="color:rgba(255,255,255,0.7); font-size:0.7rem; font-weight:700; text-transform:uppercase; margin-bottom:0.4rem; display:block; letter-spacing:1px;">Confirm New Password</label>
-        <input type="password" id="cpConfirmPass" class="glass-in" placeholder="••••••••">
-      </div>
+        <div style="height: 1px; background: rgba(255,255,255,0.05); margin: 1.5rem 0;"></div>
 
-    </div>
+        <div class="cp-input-group">
+            <input type="password" id="cpNewPass" class="cp-input-vault" placeholder="New Password" oninput="checkStrength(this.value)">
+            <svg class="cp-icon-left" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        </div>
 
-    <!-- Buttons -->
-    <div style="display:flex; gap:1rem; margin-top:2.5rem; position:relative;">
-      <button onclick="closeChangePassModal()" style="flex:1; padding:1rem; border-radius:16px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#fff; font-weight:700; cursor:pointer; transition:all 0.2s;">Cancel</button>
-      <button onclick="handleChangePassword()" class="save-btn" style="flex:2; padding:1rem; border-radius:16px; border:none; background:linear-gradient(135deg, #3b82f6, #2563eb); color:#fff; font-weight:800; cursor:pointer; box-shadow: 0 10px 25px rgba(37,99,235,0.4);">
-        Update Password
-      </button>
+        <!-- Strength Meter Gimmick -->
+        <div class="strength-meter">
+            <div class="strength-bar" id="bar1" data-lv="1"></div>
+            <div class="strength-bar" id="bar2" data-lv="2"></div>
+            <div class="strength-bar" id="bar3" data-lv="3"></div>
+        </div>
+
+        <div class="cp-input-group">
+            <input type="password" id="cpConfirmPass" class="cp-input-vault" placeholder="Confirm New Password">
+            <svg class="cp-icon-left" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex; gap:1rem; margin-top:2rem;">
+            <button onclick="closeChangePassModal()" style="flex:1; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#94a3b8; padding:1rem; border-radius:16px; cursor:pointer; font-weight:600; transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">CANCEL</button>
+            <button onclick="handleChangePassword()" id="cpSubmitBtn" class="save-btn-premium" style="flex:2;">SAVE NEW KEY</button>
+        </div>
     </div>
   </div>
 </div>
@@ -7267,6 +7925,7 @@ html.dark-mode #changePassModal {
 
   </div>
 </div>
+
 <!-- ═══════════════════════════════════════════════════
      USER GUIDE TRIGGER BUTTON (ปุ่มไอคอนหน้าลอกอิน)
 ═══════════════════════════════════════════════════ -->
@@ -7320,14 +7979,18 @@ html.dark-mode #changePassModal {
 </style>
 <script>
 document.addEventListener('contextmenu', e => e.preventDefault());
-// กำหนดค่าความสูงแถวเป็น Constant (ใส่ไว้ด้านบนส่วนของ Table Logic หรือ Global ได้)
-const ROW_HEIGHT = 70; 
+
+let isSupervisor = false; // สถานะหัวหน้างาน
+let viewingUser = '';    // อีเมลที่หัวหน้ากำลังแอบส่องอยู่ (Impersonating)
+let allStaffList = [];   // รายชื่อพนักงานทั้งหมดที่มีในระบบ
 /* ══════════════════════════════════════════════════════════════
    0. CONFIGURATION & GLOBAL VARIABLES
    ตั้งค่าเริ่มต้น, ตัวแปร Global, และ State ของระบบ
 ═════════════════════════════════════════════════════════════════ */
 const SUPABASE_URL = 'https://xgkjxvljdhpniakgzatf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhna2p4dmxqZGhwbmlha2d6YXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NDkxMjYsImV4cCI6MjA5MzAyNTEyNn0.os0bmAoR7CCefdsuQzGC9eLPnEJ64Ny8rxx0lFMXXAU';
+// กำหนดค่าความสูงแถวเป็น Constant (ใส่ไว้ด้านบนส่วนของ Table Logic หรือ Global ได้)
+const ROW_HEIGHT = 70; 
 let _sbClient = null;
 
 const IDB_NAME = 'Part_Line_Claim';
@@ -7488,14 +8151,21 @@ async function fetchFromSupabase(inspector) {
   if (!sb) return null;
   
   try {
-    let allData =[];
+    let allData = [];
     let fetchMore = true;
     let from = 0;
-    const step = 1000; 
+    const step = 1000; // ดึงทีละ 1000 รายการ
 
     while (fetchMore) {
-      const { data, error } = await sb.from('records').select('*').eq('inspector', inspector).order('date', { ascending: false }).range(from, from + step - 1);
+      const { data, error } = await sb
+        .from('records')
+        .select('*')
+        .eq('inspector', inspector) // ✅ ใช้ eq แทน ilike เพื่อความชัวเจน
+        .order('date', { ascending: false })
+        .range(from, from + step - 1);
+        
       if (error) throw error;
+      
       if (data && data.length > 0) {
         allData = allData.concat(data);
         from += step;
@@ -7555,34 +8225,105 @@ async function deleteFromSupabase(id) {
    โหลดแอพและประสานข้อมูลระหว่าง Local กับ Cloud
 ═════════════════════════════════════════════════════════════════ */
 async function initApp(inspector) {
+  // 🛡️ ป้องกันกรณีไม่มีชื่อผู้ใช้ส่งมา ให้ออกจากระบบทันที
+  if (!inspector || inspector === '') {
+      logout();
+      return;
+  }
+
+  // ❗ Reset Global State เพื่อไม่ให้ข้อมูล User เก่าค้างอยู่ในตัวแปร RAM
+  records = []; 
+  
   _isInitializing = true;
-  currentUser = inspector;
-  if($id('currentUserDisp')) $id('currentUserDisp').textContent = inspector;
+  
+  // กำหนดค่าเริ่มต้น Global และ Session
+  currentUser = inspector.toLowerCase();
+  isSupervisor = sessionStorage.getItem('isSupervisor') === 'true';
 
   try {
+    // เริ่มต้นฐานข้อมูลในเครื่อง (IndexedDB)
     await initDB();
-    records = await dbGetAll();
-    
-    // ✅ เพิ่มบรรทัดนี้: เก็บไว้เฉพาะข้อมูลของ User ที่ Login อยู่เท่านั้น (ล้างข้อมูลคนอื่นทิ้ง)
-    records = records.filter(r => r.inspector === currentUser);
 
+    if (isSupervisor) {
+      // ═════════════════════════════════════════════════
+      // [โหมดหัวหน้างาน - SUPERVISOR MODE]
+      // ═════════════════════════════════════════════════
+      showInitOverlay('เตรียมข้อมูลหัวหน้างาน...', 'กำลังค้นหาพนักงาน...');
+      
+      if($id('supervisorConsole')) $id('supervisorConsole').style.display = 'flex';
+
+      // โหลดรายชื่อพนักงานเข้า Dropdown
+      await loadStaffList(); 
+
+      const selector = $id('staffSelector');
+      if (selector && selector.options.length > 0) {
+        let defaultUser = "";
+        // ลองหา User ชื่อ "Natthawut" (ตามโค้ดเดิม) หรือถ้าไม่เจอก็ใช้คนแรกในลิสต์
+        for (let i = 0; i < selector.options.length; i++) {
+            const emailInList = selector.options[i].value.toLowerCase();
+            if (emailInList.includes("natthawut")) {
+                defaultUser = selector.options[i].value;
+                break;
+            }
+        }
+        
+        // ตั้งค่า User ที่จะดู (Viewing User)
+        viewingUser = defaultUser || selector.options[0].value;
+        selector.value = viewingUser;
+        sessionStorage.setItem('viewingUser', viewingUser);
+        
+        // โหลดข้อมูลของ User ที่เลือกจาก Cloud เท่านั้น
+        if (isOnline) {
+          const cloudData = await fetchFromSupabase(viewingUser);
+          records = cloudData || [];
+        } else {
+          toast('⚠️ ออฟไลน์: ไม่สามารถดึงข้อมูลพนักงานคนอื่นได้');
+          records = [];
+        }
+      }
+    } else {
+      // ═════════════════════════════════════════════════
+      // [โหมดพนักงานปกติ - STAFF MODE]
+      // ═════════════════════════════════════════════════
+      viewingUser = currentUser;
+      sessionStorage.setItem('viewingUser', currentUser);
+
+      if ($id('supervisorConsole')) $id('supervisorConsole').style.display = 'none';
+      showInitOverlay('กำลังโหลดข้อมูล...', 'กำลังดึงข้อมูลล่าสุดจากระบบ Cloud');
+
+      if (isOnline) {
+        // 1. พยายามดึงข้อมูลจาก Cloud
+        const cloudData = await fetchFromSupabase(currentUser);
+        if (cloudData && cloudData.length > 0) {
+          // ถ้ามีข้อมูลบน Cloud ให้ใช้ข้อมูลจาก Cloud
+          records = cloudData;
+          // ล้าง Local เก่าและอัปเดตด้วยข้อมูลใหม่จาก Cloud
+          await dbClear();
+          await dbPutBulk(records);
+        } else {
+          // ถ้า Cloud ว่าง ย้อนกลับไปใช้ข้อมูล Local ที่มีอยู่
+          let allLocalData = await dbGetAll();
+          records = allLocalData.filter(r => r.inspector.toLowerCase() === currentUser);
+        }
+      } else {
+        // 2. โหมดออฟไลน์: ดึงเฉพาะข้อมูลของ User นี้จาก Local
+        let allLocalData = await dbGetAll();
+        records = allLocalData.filter(r => r.inspector.toLowerCase() === currentUser);
+        toast('📶 คุณอยู่ในโหมดออฟไลน์');
+      }
+    }
+
+    // อัปเดต UI ทั้งหมด (Table, KPI, Datalists)
     refreshAll(); 
 
-    showInitOverlay('กำลังเชื่อมต่อ Database...', 'Syncing...');
-
-    if (isOnline) {
-      await syncToCloud(true); 
-    } else {
-      toast('⚠️ ออฟไลน์ ใช้ข้อมูลจากเครื่อง (Local Cache)');
-    }
   } catch (err) {
-    console.error("Init App Error:", err);
+    console.error("Critical Error in initApp:", err);
     toast('❌ เกิดข้อผิดพลาดในการโหลดระบบ');
   } finally {
     hideInitOverlay();
-    refreshAll();
     _isInitializing = false;
   }
+  applyRoleRestrictions(); // เพิ่มบรรทัดนี้
 }
 
 async function syncToCloud(isInitial = false) {
@@ -7678,196 +8419,203 @@ async function syncToCloud(isInitial = false) {
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 async function login() {
-  const nameInput = $id('loginName');
-  const passInput = $id('loginPass');
-  
-  // 1. รับค่าและทำให้เป็นตัวพิมพ์เล็กทั้งหมด
-  const email = (nameInput.value || '').trim().toLowerCase(); 
-  const pass = passInput.value;
-
-  // 2. ตรวจสอบรูปแบบอีเมล (Regex)
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email) { shake(nameInput); toast('❌ กรุณาระบุอีเมล'); return; }
-  if (!emailRegex.test(email)) { shake(nameInput); toast('❌ รูปแบบอีเมลไม่ถูกต้อง'); return; }
-
-  // ปิดปุ่มกันกดซ้ำ
-  $id('loginBtn').disabled = true;
-  $id('loginForm').style.display = 'none';
-  $id('loProgress').style.display = 'flex';
-  
-  const bar = $id('loBar');
-  const step1 = $id('ls1');
-  const step2 = $id('ls2');
-  const step3 = $id('ls3');
-
-  try {
-    // ═══════════ AUTOMATION STEP 1: Checking Database ══════════
-    if (step1) step1.classList.add('active');
-    if (bar) bar.style.width = '35%';
-
-    // ดึง Client Supabase
-    const sb = getSupabase();
+    const nameInput = $id('loginName');
+    const passInput = $id('loginPass');
+    const loginBtn = $id('loginBtn');
+    const loginForm = $id('loginForm');
+    const loProgress = $id('loProgress');
     
-    if (!sb) {
-        throw new Error("ไม่สามารถเชื่อมต่อ Supabase ได้");
-    }
+    const email = (nameInput.value || '').trim().toLowerCase(); 
+    const pass = passInput.value;
 
-    // ✅ ✅ ✅ ตรวจสอบจาก Supabase (ตรงนี้คือหัวใจ) ✅ ✅ ✅
-    // ค้นหาผู้ใช้จากตาราง 'users' โดยเทียบ email
-    const { data: userData, error } = await sb
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single(); // .single() ใช้เพื่อดึงเพียง 1 แถว หรือรู้ว่าไม่พบ
-
-    if (error) {
-        // ถ้ารหัส error เป็น PGRST116 แปลว่า "ไม่พบข้อมูล" (User ไม่มีในระบบ)
-        if (error.code === 'PGRST116') {
-             throw new Error("USER_NOT_FOUND");
-        }
-        throw error; // เกิด error อื่นๆ เช่น Database down
-    }
-
-    await delay(500); // จำลองการทำงานให้ดูสวยงาม
-    if (step1) { step1.classList.remove('active'); step1.classList.add('done'); }
-
-    // ══════════ AUTOMATION STEP 2: Verifying Password ══════════
-    if (step2) step2.classList.add('active');
-    if (bar) bar.style.width = '70%';
-
-    // ✅ เปรียบเทียบรหัสผ่าน
-    if (userData.password !== pass) {
-        throw new Error("WRONG_PASSWORD");
-    }
-
-    await delay(500);
-    if (step2) { step2.classList.remove('active'); step2.classList.add('done'); }
-
-    // ══════════ AUTOMATION STEP 3: Loading Workspace ══════════
-    if (step3) step3.classList.add('active');
-    if (bar) bar.style.width = '90%';
-
-    // ✅ ✅ ✅ LOGIN สำเร็จ ✅ ✅ ✅
+    // --- [1] การตรวจสอบความถูกต้องเบื้องต้น (Pre-Validation) ---
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) { shake(nameInput); toast('❌ กรุณาระบุอีเมล'); return; }
+    if (!emailRegex.test(email)) { shake(nameInput); toast('❌ รูปแบบอีเมลไม่ถูกต้อง'); return; }
     
-    // บันทึก Email เป็น Key หลัก (สำคัญมาก: จะใช้อีเมลเป็นตัวแบ่งข้อมูล)
-    currentUser = email; 
-    sessionStorage.setItem('currentUser', email);
-    
-    // ตั้งค่าชื่อผู้ใช้ที่จะแสดงผลบนหน้าจอ (ถ้ามีในฐานข้อมูล ถ้าไม่มีใช้อีเมลแทน)
-    const displayName = userData.display_name || email;
-    
-    // อัปเดต UI ชื่อผู้ใช้
-    if($id('currentUserDisp')) $id('currentUserDisp').textContent = displayName;
-
-    // เตรียมฐานข้อมูล Local
-    await initDB();
-    // ต้องกรองเฉพาะของ User นี้
-    records = await dbGetAll();
-    records = records.filter(r => r.inspector === currentUser);
-
-    // เตรียมซิงค์ข้อมูล
-    if (isOnline) {
-      await syncToCloud(true); // ใช้ true เพื่อไม่ให้แสดง Toast รบกวน
-    }
-
-    if (bar) bar.style.width = '100%';
-    await delay(500);
-    if (step3) { step3.classList.remove('active'); step3.classList.add('done'); }
-
-    // ══════════ FINISH: สลับหน้าจอ ══════════
-    await delay(300);
-
-    if (typeof gsap !== 'undefined') {
-      const tl = gsap.timeline();
-      tl.to('#loCard', { scale: 0.9, opacity: 0, y: -20, duration: 0.35, ease: 'power3.in' });
-      tl.to('#loginOverlay', { opacity: 0, duration: 0.4, ease: 'power2.in', onComplete: () => {
-          $id('loginOverlay').style.display = 'none';
-      }});
-      tl.to('#appShell', { opacity: 1, duration: 0.6, ease: 'back.out(1.2)', onStart: () => { 
-          $id('appShell').style.visibility = 'visible'; 
-          $id('appShell').classList.add('visible'); 
-          refreshAll(); // อัปเดตหน้าจอหลัก
-      }}, '-=0.1');
-            // ✅ เพิ่มบรรทัดนี้: สั่งให้เข้า Full Screen เมื่อ Animation จบ
-      tl.call(() => {
-        // เพิ่มบรรทัดเหล่านี้ก่อนบรรทัด enterFullscreen(); ในฟังก์ชัน login()
-if($id('loginName')) $id('loginName').value = '';
-if($id('loginPass')) $id('loginPass').value = '';
-          enterFullscreen(); 
-      });
-    } else {
-      $id('loginOverlay').style.display = 'none';
-      $id('appShell').style.visibility = 'visible';
-      $id('appShell').style.opacity = '1';
-      refreshAll();
-            // ✅ กรณีไม่มี GSAP ก็สั่งได้เลย
-      enterFullscreen();
-    }
-
-  } catch (err) {
-    // การจัดการ Error ต่างๆ
-    console.error("Login Error:", err);
-    
-    // คืนค่าปุ่มให้กดได้อีกครั้ง
-    $id('loginBtn').disabled = false;
-    $id('loginForm').style.display = 'flex';
-    $id('loProgress').style.display = 'none';
-
-    if (err.message === 'USER_NOT_FOUND') {
-        shake(nameInput);
-        toast('⛔ ไม่พบอีเมลผู้ใช้งานนี้ในระบบ');
-    } else if (err.message === 'WRONG_PASSWORD') {
-        passInput.style.borderColor = 'var(--accent-red)';
+    // พนักงาน (STAFF) ต้องกรอกรหัสผ่านเสมอ
+    if (!isSupervisor && !pass) { 
         shake(passInput); 
-        toast('⛔ รหัสผ่านไม่ถูกต้อง');
-    } else {
-        shake(nameInput);
-        toast('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + err.message);
+        toast('❌ พนักงานกรุณาระบุรหัสผ่าน'); 
+        return; 
     }
+
+    // --- [2] เตรียม UI เข้าสู่สถานะ Loading ---
+    loginBtn.disabled = true; // ป้องกันการกดซ้ำ
+    loginBtn.innerHTML = 'Connecting...';
+    loginForm.style.display = 'none'; // ซ่อนฟอร์ม
+    loProgress.style.display = 'flex'; // แสดงแถบโหลด
+    
+    const bar = $id('loBar');
+    const step1 = $id('ls1');
+    const step2 = $id('ls2');
+    const step3 = $id('ls3');
+
+    try {
+        // ══════════ STEP 1: Encrypting Link / Search User ══════════
+        if (step1) step1.classList.add('active');
+        if (bar) bar.style.width = '33%';
+
+        const sb = getSupabase();
+        if (!sb) throw new Error("Connection Error: ไม่พบการเชื่อมต่อฐานข้อมูล");
+
+        // ตรวจสอบว่ามีอีเมลนี้ในตาราง users หรือไม่
+        const { data: userData, error } = await sb
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (error || !userData) throw new Error("USER_NOT_FOUND");
+
+        await delay(600); // หน่วงเวลาเพื่อให้เห็นขั้นตอนการโหลด
+        if (step1) { step1.classList.remove('active'); step1.classList.add('done'); }
+
+        // ══════════ STEP 2: Authenticating / Role Check ══════════
+        if (step2) step2.classList.add('active');
+        if (bar) bar.style.width = '66%';
+
+        const requiredRole = isSupervisor ? 'supervisor' : 'staff';
+
+        // 1. ตรวจสอบว่า Role (ปุ่มที่เลือก) ตรงกับใน DB หรือไม่
+        if (userData.role !== requiredRole) {
+            throw new Error("ROLE_MISMATCH");
+        }
+
+        // 2. ถ้าเป็นโหมดพนักงาน (STAFF) ต้องเช็ครหัสผ่าน
+        if (!isSupervisor) {
+            if (userData.password !== pass) {
+                throw new Error("WRONG_PASSWORD");
+            }
+        }
+
+        await delay(600);
+        if (step2) { step2.classList.remove('active'); step2.classList.add('done'); }
+
+        // ══════════ STEP 3: Synchronizing Data ══════════
+        if (step3) step3.classList.add('active');
+        if (bar) bar.style.width = '100%';
+
+        // ตั้งค่าตัวแปร Global และ Session
+        currentUser = email; 
+// ค้นหาในฟังก์ชัน login() ประมาณบรรทัดที่บันทึก sessionStorage
+sessionStorage.setItem('currentUser', email);
+sessionStorage.setItem('isSupervisor', isSupervisor); 
+sessionStorage.setItem('viewingUser', email); // เพิ่มบรรทัดนี้เข้าไปด้วย
+
+        // ดึงข้อมูล Records และ Sync ข้อมูลแอป (ฟังก์ชันนี้ใช้เวลาโหลด)
+        await initApp(email); 
+
+        await delay(600);
+        if (step3) { step3.classList.remove('active'); step3.classList.add('done'); }
+
+        // ══════════ SUCCESS: Launching Application ══════════
+        await delay(400);
+
+        if (typeof gsap !== 'undefined') {
+            const tl = gsap.timeline();
+            tl.to('#loCard', { scale: 0.9, opacity: 0, y: -20, duration: 0.35, ease: 'power3.in' });
+            tl.to('#loginOverlay', { opacity: 0, duration: 0.4, ease: 'power2.in', onComplete: () => {
+                $id('loginOverlay').style.display = 'none';
+            }});
+            tl.to('#appShell', { opacity: 1, duration: 0.6, ease: 'back.out(1.2)', onStart: () => { 
+                $id('appShell').style.visibility = 'visible'; 
+                $id('appShell').classList.add('visible'); 
+                refreshAll(); 
+            }}, '-=0.1');
+        } else {
+            $id('loginOverlay').style.display = 'none';
+            $id('appShell').style.visibility = 'visible';
+            $id('appShell').style.opacity = '1';
+            refreshAll();
+        }
+        
+        enterFullscreen(); // เข้าโหมดเต็มหน้าจอ
+
+    } catch (err) {
+        // ══════════ ERROR RECOVERY: รีเซ็ตหน้าจอกลับมาให้เหมือนเดิม 100% ══════════
+        console.error("Login Failed:", err);
+        
+        // 1. คืนสถานะปุ่มและฟอร์ม
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = 'Initialize Session →';
+        loginForm.style.display = 'flex';
+        loProgress.style.display = 'none';
+
+        // 2. รีเซ็ตแถบโหลดและหัวข้อให้กลับเป็นสีเทา
+        const steps = [step1, step2, step3];
+        steps.forEach(s => { if(s) s.classList.remove('active', 'done'); });
+        if(bar) bar.style.width = '0%';
+
+        // 3. เคลียร์ Style ที่อาจค้างจากแอนิเมชัน GSAP
+        if (typeof gsap !== 'undefined') {
+            gsap.set(['#loCard', '#loginOverlay', '#loginForm'], { clearProps: "all" });
+        }
+
+        // 4. แจ้งเตือนข้อผิดพลาดตามกรณี
+        if (err.message === 'USER_NOT_FOUND') {
+            toast('⛔ ไม่พบอีเมลนี้ในระบบ');
+            shake(nameInput);
+        } else if (err.message === 'WRONG_PASSWORD') {
+            toast('⛔ รหัสผ่านไม่ถูกต้อง');
+            shake(passInput);
+        } else if (err.message === 'ROLE_MISMATCH') {
+            const roleName = isSupervisor ? 'หัวหน้างาน (HEAD)' : 'พนักงาน (STAFF)';
+            toast(`⚠️ คุณไม่มีสิทธิ์เข้าใช้ในโหมด [${roleName}]`);
+        } else {
+            toast('❌ ข้อผิดพลาด: ' + err.message);
+        }
+    }
+}
+
+// --- แก้ไขฟังก์ชัน logout เดิม ---
+function logout() {
+  // 1. ล้างค่า Session ในหน่วยความจำ
+  sessionStorage.clear();
+  
+  // 2. ล้างตัวแปร Global
+  currentUser = '';
+  viewingUser = '';
+  isSupervisor = false;
+  records = [];
+
+  // 3. ล้างค่าในหน้าจอ Login (DOM) ทันที
+  if($id('loginName')) $id('loginName').value = '';
+  if($id('loginPass')) $id('loginPass').value = '';
+  
+  // 4. รีเซ็ต Role กลับไปเป็น Staff เสมอ
+  setLoginRole('staff'); 
+
+  // 5. ล้าง IndexedDB
+  if (db) {
+    const tx = db.transaction([IDB_STORE], 'readwrite');
+    tx.objectStore(IDB_STORE).clear();
+    tx.oncomplete = () => { finalizeLogout(); };
+    tx.onerror = () => { finalizeLogout(); };
+  } else {
+    finalizeLogout();
+  }
+
+  function finalizeLogout() {
+    toast('🔒 ออกจากระบบเรียบร้อยแล้ว');
+    setTimeout(() => {
+      window.location.reload(); // บราวเซอร์จะเคลียร์ JS State ทั้งหมดใหม่
+    }, 600);
   }
 }
 
-/**
- * ฟังก์ชันออกจากระบบ (Logout)
- * ทำหน้าที่ล้าง Session, ตัวแปรในเครื่อง และรีโหลดหน้าเว็บเพื่อเริ่มใหม่
- */
-function logout() {
-    // 1. แสดง Toast แจ้งเตือน (ถ้ามีฟังก์ชัน toast)
-    if (typeof toast === 'function') {
-        toast('🚪 กำลังออกจากระบบอย่างปลอดภัย...');
-    }
-
-    // 2. ล้างข้อมูลชื่อผู้ใช้ที่เก็บไว้ใน SessionStorage
-    sessionStorage.removeItem('currentUser');
-    sessionStorage.clear(); // ล้างค่าอื่นๆ ทั้งหมดที่อาจค้างอยู่ใน Session
-
-    // 3. ล้างตัวแปร Global ใน JavaScript
-    currentUser = '';
-    records = [];
-    editingId = null;
-
-    // 4. ล้างค่าในฟอร์ม Login (เผื่อกรณี Browser พยายามจดจำค่าไว้)
-    if (document.getElementById('loginName')) document.getElementById('loginName').value = '';
-    if (document.getElementById('loginPass')) document.getElementById('loginPass').value = '';
-
-    // 5. ปิดโหมด Fullscreen (ถ้าเปิดอยู่)
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        }
-    }
-
-    // 6. หน่วงเวลาเล็กน้อยเพื่อให้ User เห็นการแจ้งเตือน แล้วทำการ Hard Reload
-    // การใช้ location.reload() จะช่วยล้าง Memory และตัวแปร JS ทั้งหมดให้เป็นค่าว่าง (Zero State)
-    setTimeout(() => {
-        window.location.reload();
-    }, 600);
-}
-
 function openJobProject() {
-  window.open('job_project.html', '_blank');
+    // 1. ตรวจสอบก่อนว่า "ชื่อที่เราเลือกดูอยู่" คือใคร โดยดึงจากหน่วยความจำ Session
+    // (ซึ่งจะอัปเดตอัตโนมัติจาก initApp และ switchView)
+    const target = sessionStorage.getItem('viewingUser') || currentUser;
+    
+    // 2. บันทึกยืนยันอีกครั้งเพื่อให้หน้าถัดไป (job_project.html) ใช้งานได้แม่นยำ
+    sessionStorage.setItem('viewingUser', target);
+    
+    console.log("[System] Redirecting to Job Project for user:", target);
+    
+    // 3. เปิดหน้าต่างใหม่
+    window.open('job_project.html', '_blank');
 }
 
 
@@ -7887,7 +8635,12 @@ function isDuplicate(ref) {
 }
 
 function getMyRecords() {
-  return records.filter(r => r.inspector === currentUser);
+  if (isSupervisor) {
+      // หัวหน้าดูตามคนที่เลือกใน Dropdown
+      return records.filter(r => r.inspector.toLowerCase() === viewingUser.toLowerCase());
+  }
+  // พนักงานดูเฉพาะของตัวเอง
+  return records.filter(r => r.inspector.toLowerCase() === currentUser.toLowerCase());
 }
 
 function handleJudgment(val) {
@@ -7902,25 +8655,39 @@ function handleJudgment(val) {
   }
 }
 
-// บันทึก หรือ อัปเดตข้อมูลผ่านฟอร์ม
+// บันทึก หรือ อัปเดตข้อมูลผ่านฟอร์ม (เวอร์ชันเพิ่ม Validation รูปแบบ Reference No)
 async function handleFormSubmit(e) {
   let oldRecord = null;
   let auditAction = 'INSERT';
   e.preventDefault();
+  
   if (_isInitializing) { toast('⏳ กรุณารอให้ระบบโหลดเสร็จ'); return; }
 
-  const ref = $id('refNo').value.trim();
+  const refInput = $id('refNo');
+  const ref = refInput.value.trim();
   const supp = $id('supplier').value.trim();
   const qty = parseInt($id('qty').value) || 0;
   const jdg = $id('judgmentSelect').value;
-
-  if (!ref) { shake($id('refNo')); toast('❌ กรุณาระบุ Reference No'); return; }
-  if (!supp) { shake($id('supplier')); toast('❌ กรุณาระบุ Supplier'); return; }
-  if (qty <= 0) { shake($id('qty')); toast('❌ QTY ต้องมากกว่า 0'); return; }
-  if (!jdg) { shake($id('judgmentSelect')); toast('❌ กรุณาเลือก Judgment'); return; }
+const dateValue = new Date(document.getElementById('inputDate').value).toISOString();
+  // ตรวจสอบรูปแบบ 000/0000 หรือ V000/0000
+  const refRegex = /^(V?\d{3}\/\d{4})$/i; 
+  
+  if (!ref) { 
+    shake(refInput); 
+    toast('❌ กรุณาระบุ Reference No'); 
+    return; 
+  }
+  
+  if (!refRegex.test(ref)) {
+    shake(refInput);
+    refInput.style.borderColor = '#ef4444'; // ขอบแดงถ้าผิด
+    toast('❌ รูปแบบผิด! ต้องเป็น 000/0000 หรือ V000/0000 เท่านั้น');
+    refInput.focus();
+    return;
+  }
 
   if (!editingId && isDuplicate(ref)) {
-    shake($id('refNo'));
+    shake(refInput);
     toast('⚠️ Duplicate! REF นี้มีในระบบแล้ว');
     return;
   }
@@ -7930,7 +8697,7 @@ async function handleFormSubmit(e) {
     date: $id('inputDate').value,
     shift: $id('shift').value,
     inspector: currentUser,
-    ref: ref,
+    ref: ref.toUpperCase(),
     line: $id('lineNo').value,
     supplier: supp,
     partNo: $id('partNo').value,
@@ -7939,45 +8706,39 @@ async function handleFormSubmit(e) {
     defect: $id('defectName').value,
     remark: $id('remark').value,
     judgment: jdg,
-    _isSaved: false,    // เริ่มต้นเป็น false (เหลือง)
-    _isOffline: false   // เริ่มต้นเป็น false
+    _isSaved: false,
+    _isOffline: false
   };
 
-  // ✅ พยายามส่งขึ้น Cloud
   if (isOnline && getSupabase()) {
     const success = await pushToSupabase([rowData]);
     if (success) {
-      rowData._isSaved = true;  // ส่งสำเร็จ (เขียว)
+      rowData._isSaved = true;
       rowData._isOffline = false;
-      toast(editingId ? '✅ อัปเดตบนระบบ Cloud สำเร็จ' : '✅ บันทึกข้อมูลขึ้น Cloud สำเร็จ');
-    } else {
-      rowData._isSaved = false; // ส่งไม่สำเร็จ (เหลือง)
-      rowData._isOffline = true; 
-      toast('⚠️ บันทึกคลาวด์ล้มเหลว เซฟลงเครื่องแทน');
+      toast(editingId ? '✅ อัปเดตสำเร็จ' : '✅ บันทึกสำเร็จ');
     }
   } else {
-    rowData._isSaved = false;   // ออฟไลน์ (เหลือง)
+    rowData._isSaved = false;
     rowData._isOffline = true;
     toast('💾 บันทึกแบบออฟไลน์เรียบร้อย');
   }
-// ⚡ Audit Logic Hook 1/2
-if (editingId) {
+
+  if (editingId) {
     oldRecord = records.find(r => r.id === editingId);
     auditAction = 'UPDATE';
-}
-  // อัปเดต Local Data
-  if (editingId) {
     const index = records.findIndex(r => r.id === editingId);
     if (index > -1) records[index] = rowData;
   } else {
     records.unshift(rowData); 
   }
+  
   await dbPutBulk([rowData]);  
 
   const keepDate = $id('inputDate').value;
   const keepShift = $id('shift').value;
   const keepLine = $id('lineNo').value;
   
+  // เรียกฟังก์ชันล้างฟอร์ม (ซึ่งจะล้างสีขอบที่เราเพิ่มไว้ในข้อ 1 ด้วย)
   cancelEdit(); 
   
   if($id('inputDate')) $id('inputDate').value = keepDate;
@@ -7986,41 +8747,13 @@ if (editingId) {
   if($id('refNo')) $id('refNo').focus();
 
   refreshAll();
-  // ⚡ Audit Logic Hook 2/2: Write Log
-writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
+  writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
 }
 
-// ---------------------------------------------------------
-// ฟังก์ชันช่วย (Helper): สั่งให้กาง Sidebar หากมันถูกพับอยู่
-// ---------------------------------------------------------
-function ensureSidebarOpen() {
-    const sidebar = document.getElementById('sidebar');
-    const toggleIcon = document.getElementById('toggleIcon');
-    
-    // ถ้ามีคลาส collapsed อยู่ (แสดงว่าพับอยู่) ให้เอาออก
-    if (sidebar && sidebar.classList.contains('collapsed')) {
-        sidebar.classList.remove('collapsed');
-        
-        // อัปเดตไอคอนที่ปุ่มให้เป็น "ลูกศรชี้ซ้าย" (สื่อว่ากางออกมาแล้ว/เตรียมพับเข้า)
-        if (toggleIcon) {
-            toggleIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>`;
-        }
-        
-        // บังคับให้ตารางคำนวณพื้นที่ใหม่หลังจาก Sidebar กางออก
-        setTimeout(() => {
-            if (typeof renderTable === 'function') renderTable();
-        }, 400);
-    }
-}
-// ---------------------------------------------------------
-// ฟังก์ชันแก้ไขข้อมูล (Edit Record)
-// ---------------------------------------------------------
 window.editRecord = function(id) {
+  toggleSidebar('open'); // <--- เพิ่มบรรทัดนี้
   const r = records.find(x => x.id === id);
   if (!r) return;
-
-  // ✅ สั่งกาง Sidebar ทันทีที่กดแก้ไข
-  ensureSidebarOpen();
 
   // ❗ 1. ลบไฮไลท์แถวเดิมทิ้งก่อน (ถ้ามี)
   document.querySelectorAll('tr.is-editing').forEach(el => el.classList.remove('is-editing'));
@@ -8059,41 +8792,44 @@ window.editRecord = function(id) {
     btn.parentNode.appendChild(cancelBtn);
   }
 
-  // ✅ 6. เลื่อนตารางไปหาแถวที่เลือก + Highlight
+  // ✅ 6. แก้ไขตรงนี้: เลื่อนตารางไปหาแถวที่เลือก + Highlight
   const tableContainer = $id('tableContainer');
+  
+  // ปัญหาเดิม: ใช้ records.findIndex (index จากข้อมูลทั้งหมด) ทำให้ Scroll ตำแหน่งผิดหากมี Filter หรือ Search
+  // วิธีแก้: ต้องหา index จากข้อมูลที่กำลังแสดงผลอยู่จริง (virtualTableState.allRows)
   const displayData = virtualTableState.allRows;
   const rowIndex = displayData.findIndex(r => r.id === id);
   
   if(rowIndex >= 0 && tableContainer) {
-    const rowHeight = 70; 
+    const rowHeight = 70; // ความสูงแถวตามที่กำหนด
+    
+    // Scroll ลงไปหาแถวนั้น (ลบออก 50px เพื่อให้แถวไม่ติดขอบบน)
     tableContainer.scrollTo({ 
       top: (rowIndex * rowHeight) - 50, 
       behavior: 'smooth' 
     });
 
+    // ใช้ setTimeout สักครู่เพื่อรอให้ Table Render เสร็จ (Virtual Scroll)
     setTimeout(() => {
       const targetRow = document.querySelector(`tr[data-rid="${id}"]`);
       if(targetRow) {
         targetRow.classList.add('is-editing');
       }
-    }, 300);
+    }, 300); // รอ 0.3 วินาที
   }
+  toggleSidebar('open');
 };
 
-// ---------------------------------------------------------
-// ฟังก์ชันคัดลอกข้อมูล (Copy Record)
-// ---------------------------------------------------------
+// ฟังก์ชันสำหรับคัดลอกข้อมูล (Clone)
 window.copyRecord = function(id) {
+  toggleSidebar('open'); // <--- เพิ่มบรรทัดนี้
   const r = records.find(x => x.id === id);
   if (!r) return;
-
-  // ✅ สั่งกาง Sidebar ทันทีที่กดคัดลอก
-  ensureSidebarOpen();
 
   // ❗ ล้างปุ่ม Cancel อื่นๆ ก่อน
   if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
 
-  // ✅ 1. รีเซ็ต Filter เป็น ALL เพื่อให้เห็นข้อมูลใหม่ที่จะปรากฏ
+  // ✅ 1. รีเซ็ต Filter เป็น ALL
   setFilter('ALL');
 
   // 2. เติมข้อมูลลงฟอร์ม
@@ -8120,20 +8856,20 @@ window.copyRecord = function(id) {
 
   const btn = $id('submitBtn');
   
-  // ✅ 3. กลับเป็นปุ่ม "Commit Data" ปกติ
+  // ✅ 3. กลับเป็นปุ่ม "Commit Data" ปกติ (สีเขียว)
   if(btn) {
-    btn.innerHTML = '✦ Commit Data';
-    btn.style.background = '';
+    btn.innerHTML = '✦ Commit Data'; // ข้อความตัวเดิม
+    btn.style.background = '';       // สีตัวเดิม (จาก CSS หรือค่าเริ่มต้น)
   }
 
-  // ✅ 4. สร้างปุ่ม "ยกเลิกการคัดลอก"
-  if(!$id('cancelCopyBtn')) {
-    const cancelBtn = spawnCancelButton('ยกเลิกการคัดลอก', cancelCopy);
-    cancelBtn.id = 'cancelCopyBtn';
-    btn.parentNode.appendChild(cancelBtn);
-  }
+  // ✅ 4. ยังคงสร้างปุ่ม "ยกเลิกการคัดลอก" ไว้เพื่อล้างข้อมูลหากไม่ต้องการบันทึก
+if(!$id('cancelCopyBtn')) {
+  const cancelBtn = spawnCancelButton('ยกเลิกการคัดลอก', cancelCopy);
+  cancelBtn.id = 'cancelCopyBtn';
+  btn.parentNode.appendChild(cancelBtn);
+}
 
-  toast('📋 คัดลอกข้อมูลและกางหน้าต่างป้อนข้อมูลแล้ว');
+  toast('📋 คัดลอกข้อมูลแล้ว พร้อมบันทึกใหม่');
 };
 
 function cancelCopy() {
@@ -8141,16 +8877,22 @@ function cancelCopy() {
   if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
   handleJudgment('');
   
+  // ══════════════════════════════════════════════════════════
+  // [เพิ่มบรรทัดนี้] ล้างสีขอบให้กลับมาปกติ
+  // ══════════════════════════════════════════════════════════
+  if($id('refNo')) $id('refNo').style.borderColor = "";
+  // ══════════════════════════════════════════════════════════
+  
   const btn = $id('submitBtn');
   if(btn) {
     btn.innerHTML = '✦ Commit Data';
     btn.style.background = '';
   }
   
-  // ✅ แก้ไขตรงนี้: ให้ลบปุ่ม Cancel ทั้งแบบ Edit และ Copy เผื่อไว้
   if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
   if($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
 }
+
 function cancelEdit() {
   editingId = null;
   
@@ -8158,17 +8900,21 @@ function cancelEdit() {
   if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
   handleJudgment('');
   
+  // ══════════════════════════════════════════════════════════
+  // [เช็คว่ามีบรรทัดนี้หรือยัง] ล้างสีขอบให้กลับมาปกติ
+  // ══════════════════════════════════════════════════════════
+  if($id('refNo')) $id('refNo').style.borderColor = "";
+  // ══════════════════════════════════════════════════════════
+
   const btn = $id('submitBtn');
   if(btn) {
     btn.innerHTML = '✦ Commit Data';
     btn.style.background = '';
   }
   
-  // ❗ ลบปุ่มยกเลิกทั้งหมด
   if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
   if($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
 
-  // ✅ ลบไฮไลท์แถวทิ้ง (สำคัญมาก!)
   document.querySelectorAll('tr.is-editing').forEach(el => el.classList.remove('is-editing'));
 }
 
@@ -8190,6 +8936,7 @@ function hideSingleDeleteModal() {
     modal.classList.remove('show');
   }
 }
+
 // ⚡ Audit Logic Hook: Backup data before delete
 async function confirmDeleteSingleRow() {
   const idToDelete = _pendingDeleteId; // ย้ายขึ้นมาบรรทัดแรก
@@ -8431,6 +9178,8 @@ function renderVisibleRows() {
   const empty = $id('emptyState');
   
   if (!tbody) return;
+  
+  // 1. ตรวจสอบกรณีไม่มีข้อมูล
   if (allRows.length === 0) {
     if(empty) empty.style.display = 'flex';
     tbody.innerHTML = '';
@@ -8438,12 +9187,14 @@ function renderVisibleRows() {
   }
   if(empty) empty.style.display = 'none';
 
+  // 2. คำนวณแถวที่จะแสดงผล (Slicing)
   const rowsToRender = allRows.slice(visibleStart, visibleEnd);
   
-  // ✅ ปรับ: ใช้ ROW_HEIGHT ตัวแปรแทนตัวเลข
+  // คำนวณความสูงของพื้นที่ว่าง (Spacer) เพื่อรักษาตำแหน่ง Scroll
   const topSpacerHeight = visibleStart * ROW_HEIGHT;
   const bottomSpacerHeight = (allRows.length - visibleEnd) * ROW_HEIGHT;
 
+  // 3. ตั้งค่าสีตาม Judgment
   const SM = {
     'SF': { dot: '#f97316', s: 'color:#c2410c;background:#fff7ed;border:1px solid #fed7aa' },
     'VENDOR FAULT': { dot: '#ef4444', s: 'color:#dc2626;background:#fef2f2;border:1px solid #fecaca' },
@@ -8452,59 +9203,116 @@ function renderVisibleRows() {
   };
 
   let html = '';
-  // ใช้ ROW_HEIGHT ในการคำนวณ spacer
-  if (topSpacerHeight > 0) html += `<tr style="height:${topSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
 
+  // ใส่ Spacer ด้านบน
+  if (topSpacerHeight > 0) {
+    html += `<tr style="height:${topSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
+  }
+
+  // 4. วนลูปสร้างแถวข้อมูล
   rowsToRender.forEach(r => {
     const s = SM[r.judgment] || SM['SF'];
     const safeId = String(r.id).replace(/"/g, '&quot;');
     const disp = (v) => (!v || v === '-') ? '<span style="color:#cbd5e1">-</span>' : escapeHtml(v);
 
-    // ✅ ส่วนที่ปรับปรุง: เช็คสถานะการซิงค์
+    // เช็คสถานะการซิงค์
     let syncClass = r._isSaved ? 'sync-success' : 'sync-pending';
     let syncTitle = r._isSaved ? 'บันทึกบนคลาวด์แล้ว (Synced)' : 'บันทึกในเครื่องแล้ว รอการซิงค์ (Pending Sync)';
 
-    html += `<tr class="group vis" data-rid="${safeId}">
-      <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">
-        <div style="display:flex; align-items:center;">
-          <span class="saved-indicator ${syncClass}" title="${syncTitle}"></span> ${disp(r.date)}
-        </div>
-      </td>
-      <td><div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${disp(r.shift)}</div><div style="font-size:.65rem;color:var(--text-400)">L: ${disp(r.line)}</div></td>
-      <td><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">#${disp(r.ref)}</span></td>
-      <td>
-        <div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${disp(r.supplier)}</div>
-        <div style="font-size:.65rem;color:var(--text-400)">${disp(r.partNo)} <span style="opacity:0.5; margin:0 3px;">|</span> <span style="color:var(--blue-600); font-weight:600;">${disp(r.partName)}</span></div>
-      </td>
-      <td style="text-align:center"><span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900)">${r.qty.toLocaleString()}</span></td>
-      <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${disp(r.defect)}</td>
-      <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${disp(r.remark)}</td>
-      <td style="text-align:center">
-        <span class="status-badge" style="${s.s}"><span style="width:5px;height:5px;border-radius:50%;background:${s.dot};display:inline-block"></span>${r.judgment}</span>
-      </td>
-      <td style="text-align:right; display:flex; gap:5px; justify-content:flex-end;">
+    // --- ส่วนที่แก้ไข: จัดการปุ่ม Action ตาม Role ---
+    let actionButtons = '';
+    
+if (isSupervisor) {
+      // ✅ อัปเกรดปุ่ม LOG ให้ดูหรูหราแบบหัวหน้างาน (Premium Gold Glass)
+actionButtons = `
+  <button onclick="openAuditLogModal('${safeId}')" class="audit-btn-v2" title="View History">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <polyline points="12 6 12 12 16 14"></polyline>
+    </svg>
+    <span>LOG</span>
+  </button>
+`;
+    } else {
+      // ✅ สำหรับพนักงาน: แสดงปุ่มจัดการครบถ้วน (Copy, Edit, Delete, History)
+      actionButtons = `
         <button onclick="copyRecord('${safeId}')" class="btn" title="คัดลอกข้อมูล" style="background:#10b981;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
         </button>
-        <button onclick="editRecord('${safeId}')" class="btn" style="background:#3b82f6;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-        <button onclick="showSingleDeleteModal('${safeId}')" class="btn" style="background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        <button onclick="editRecord('${safeId}')" class="btn" title="แก้ไข" style="background:#3b82f6;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+        </button>
+        <button onclick="showSingleDeleteModal('${safeId}')" class="btn" title="ลบ" style="background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
         <button onclick="openAuditLogModal('${safeId}')" title="ดูประวัติ" style="background:#334155;color:#cbd5e1;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-    </svg>
-</button>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </button>
+      `;
+    }
+
+    html += `<tr class="group vis" data-rid="${safeId}">
+      <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">
+        <div style="display:flex; align-items:center;">
+          <span class="saved-indicator ${syncClass}" title="${syncTitle}"></span> ${formatDateDisplay(r.date)}
+        </div>
+      </td>
+      <td>
+        <div style="font-size:.75rem;font-weight:700;color:var(--text-900)">${disp(r.shift)}</div>
+        <div style="font-size:.65rem;color:var(--text-400)">L: ${disp(r.line)}</div>
+      </td>
+      <td><span style="font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-700)">${disp(r.ref)}</span></td>
+      <td>
+        <div style="font-size:.78rem;font-weight:700;color:var(--text-900)">${disp(r.supplier)}</div>
+        <div style="font-size:.65rem;color:var(--text-400)">
+          ${disp(r.partNo)} <span style="opacity:0.5; margin:0 3px;">|</span> 
+          <span style="color:var(--blue-600); font-weight:600;">${disp(r.partName)}</span>
+        </div>
+      </td>
+      <td style="text-align:center">
+        <span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900)">
+          ${r.qty.toLocaleString()}
+        </span>
+      </td>
+      <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${disp(r.defect)}</td>
+      <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        ${disp(r.remark)}
+      </td>
+      <td style="text-align:center">
+        <span class="status-badge" style="${s.s}">
+          <span style="width:5px;height:5px;border-radius:50%;background:${s.dot};display:inline-block"></span>
+          ${r.judgment}
+        </span>
+      </td>
+      <td style="text-align:right; display:flex; gap:5px; justify-content:flex-end; vertical-align:middle;">
+        ${actionButtons}
       </td>
     </tr>`;
   });
 
-  if (bottomSpacerHeight > 0) html += `<tr style="height:${bottomSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
+  // ใส่ Spacer ด้านล่าง
+  if (bottomSpacerHeight > 0) {
+    html += `<tr style="height:${bottomSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
+  }
+
   tbody.innerHTML = html;
 }
 
-
+window.openJobForUser = function(email) {
+    sessionStorage.setItem('viewingUser', email);
+    window.open('job_project.html', '_blank');
+};
 
 function renderTable() {
   // 1. ดึงข้อมูลที่ผ่านการกรอง
@@ -8530,12 +9338,15 @@ function renderTable() {
 }
 
 function refreshAll() {
-  const d = getMyRecords();
+  // 1. ดึงข้อมูลที่กรองแล้ว (ตามViewingUser)
+  const d = getMyRecords(); 
+  
   let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
   let sfL = 0, venL = 0, ctcL = 0, okL = 0;
 
+  // คำนวณตัวเลขทางสถิติ
   d.forEach(r => {
-    tQ += r.qty;
+    tQ += (parseInt(r.qty) || 0);
     if (r.judgment === 'SF') { sf += r.qty; sfL++; }
     else if (r.judgment === 'VENDOR FAULT') { ven += r.qty; venL++; }
     else if (r.judgment === 'CTC') { ctc += r.qty; ctcL++; }
@@ -8544,15 +9355,67 @@ function refreshAll() {
 
   const pct = (v, t) => t > 0 ? Math.round((v / t) * 100) + '%' : '0%';
 
-  animNum('masterQty', tQ); 
-  if($id('masterLot')) $id('masterLot').textContent = d.length;
-  
-  animNum('qtySF', sf); if($id('lotSF')) $id('lotSF').textContent = sfL; if($id('pctSF')) $id('pctSF').textContent = pct(sf, tQ);
-  animNum('qtyVendor', ven); if($id('lotVendor')) $id('lotVendor').textContent = venL; if($id('pctVendor')) $id('pctVendor').textContent = pct(ven, tQ);
-  animNum('qtyCTC', ctc); if($id('lotCTC')) $id('lotCTC').textContent = ctcL; if($id('pctCTC')) $id('pctCTC').textContent = pct(ctc, tQ);
-  animNum('qtyCanUse', ok); if($id('lotCanUse')) $id('lotCanUse').textContent = okL; if($id('pctCanUse')) $id('pctCanUse').textContent = pct(ok, tQ);
+  // --- [ส่วนที่เพิ่มใหม่] การปรับ Layout Header ให้น่าเชื่อถือขึ้นตาม Role ---
+  const pulseText = $id('syncPulseText');
+  const pulseDot = document.querySelector('#syncPulse .sdot');
+  const masterCard = document.querySelector('.kpi-total');
+  const masterLabel = masterCard ? masterCard.querySelector('.kpi-label') : null;
 
-   updateDatalists(); // เพิ่มบรรทัดนี้ลงไปท้ายฟังก์ชัน
+  if (isSupervisor) {
+    // 🛡️ สำหรับหัวหน้างาน (Audit/Verification Mode)
+    if (pulseText) {
+      pulseText.textContent = "VERIFIED ACCESS"; // เปลี่ยนข้อความให้ดูเป็นทางการ
+      pulseText.style.color = "#f59e0b"; // สีทอง/ส้ม บ่งบอกถึงโหมดตรวจสอบ
+    }
+    if (pulseDot) {
+      pulseDot.style.background = "#f59e0b";
+      pulseDot.style.boxShadow = "0 0 8px rgba(245, 158, 11, 0.6)";
+    }
+    if (masterLabel) {
+      masterLabel.textContent = "INSPECTION SUMMARY"; // เปลี่ยนจาก My Total เป็นสรุปผลการตรวจสอบ
+    }
+    // เพิ่มเอฟเฟกต์สีขอบการ์ดหลักให้ดูพรีเมียมขึ้น
+    if (masterCard) masterCard.style.borderTop = "3px solid #f59e0b";
+    
+  } else {
+    // 🛰️ สำหรับพนักงาน (Live Entry Mode)
+    if (pulseText) {
+      pulseText.textContent = "LIVE SYSTEM";
+      pulseText.style.color = "#10b981"; // สีเขียว บ่งบอกว่าระบบทำงานปกติ
+    }
+    if (pulseDot) {
+      pulseDot.style.background = "#10b981";
+      pulseDot.style.boxShadow = "0 0 8px rgba(16, 185, 129, 0.6)";
+    }
+    if (masterLabel) {
+      masterLabel.textContent = "MY PERFORMANCE"; // เปลี่ยนให้ดูมีพลัง (Performance)
+    }
+    if (masterCard) masterCard.style.borderTop = "3px solid #3b82f6";
+  }
+  // -------------------------------------------------------------
+
+  // 2. อัปเดตตัวเลขบน KPI Cards (ใช้ Animation เดิม)
+  animNum('masterQty', tQ); 
+  if($id('masterLot')) $id('masterLot').textContent = d.length.toLocaleString();
+  
+  animNum('qtySF', sf); 
+  if($id('lotSF')) $id('lotSF').textContent = sfL.toLocaleString(); 
+  if($id('pctSF')) $id('pctSF').textContent = pct(sf, tQ);
+  
+  animNum('qtyVendor', ven); 
+  if($id('lotVendor')) $id('lotVendor').textContent = venL.toLocaleString(); 
+  if($id('pctVendor')) $id('pctVendor').textContent = pct(ven, tQ);
+  
+  animNum('qtyCTC', ctc); 
+  if($id('lotCTC')) $id('lotCTC').textContent = ctcL.toLocaleString(); 
+  if($id('pctCTC')) $id('pctCTC').textContent = pct(ctc, tQ);
+  
+  animNum('qtyCanUse', ok); 
+  if($id('lotCanUse')) $id('lotCanUse').textContent = okL.toLocaleString(); 
+  if($id('pctCanUse')) $id('pctCanUse').textContent = pct(ok, tQ);
+
+  // 3. อัปเดตข้อมูลส่วนเสริมอื่นๆ
+  updateDatalists(); 
   renderTable();
 }
 
@@ -8573,72 +9436,72 @@ function forceRefresh() {
 }
 
 function openDashboard() {
-  // 1. ซ่อนปุ่ม guideTrigger ทันทีเมื่อเปิด Dashboard
-  if (typeof gsap !== 'undefined') {
-    // ใช้ GSAP เพื่อให้ปุ่มค่อยๆ ย่อหายไปอย่างนุ่มนวล
-    gsap.to('#guideTrigger', { opacity: 0, scale: 0, duration: 0.3, pointerEvents: 'none' });
-  } else {
-    // Fallback กรณีไม่ได้โหลด GSAP
-    const gt = $id('guideTrigger');
-    if (gt) gt.style.display = 'none';
-  }
-
   const modal = $id('dashboardModal');
   if (modal) modal.style.display = 'flex';
   
-  // 2. อัปเดตชื่อผู้ใช้และเวลาปัจจุบันบน Dashboard
+  
+  // อัปเดตชื่อและเวลา
   document.querySelectorAll('#dashUser').forEach(el => el.textContent = currentUser);
   document.querySelectorAll('#dashTime').forEach(el => el.textContent = new Date().toLocaleTimeString('en-GB'));
 
-  // 3. Reset Filters ทั้งหมดให้เป็นค่าเริ่มต้น
+  // ✅ เพิ่มใหม่: Reset Filters เมื่อเปิด Modal (ล้างค่าวันที่และปุ่ม 3 ปุ่ม)
+  // 1. ล้างค่า Input วันที่
   if($id('dashStart')) $id('dashStart').value = '';
   if($id('dashEnd')) $id('dashEnd').value = '';
+  
+  // 2. เลือก Vendor เป็น ALL
   if($id('dashVendor')) $id('dashVendor').value = 'ALL';
 
-  // 4. ลบการไฮไลท์สีฟ้าออกจากปุ่ม Quick Filter (วันนี้, 7 วัน, เดือนนี้)
+  // 3. ลบการไฮไลท์ (class active-qb) ออกจากปุ่ม วันนี้ / 7 วัน / เดือนนี้
   document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active-qb'));
 
-  // 5. สั่งวาดเส้นขีดบอกค่า (Ticks) ของหน้าปัดทุกตัว
-  drawGaugeTicks('gaugeTicks', 85, true);      // หน้าปัดหลัก (Pass Rate)
-  drawGaugeTicks('sfGaugeTicks', 75);         // หน้าปัด SF Fault
-  drawGaugeTicks('vendorGaugeTicks', 75);    // หน้าปัด Vendor
-  drawGaugeTicks('ctcGaugeTicks', 75);       // หน้าปัด CTC
+  // ✅ ส่วนสำคัญ: สั่งวาดเส้นขีดบอกค่า (Ticks) ทันทีที่ Modal เปิด
+  drawGaugeTicks('gaugeTicks', 85, true);      // Main Gauge
+  drawGaugeTicks('sfGaugeTicks', 75);         // SF Gauge
+  drawGaugeTicks('vendorGaugeTicks', 75);    // Vendor Gauge
+  drawGaugeTicks('ctcGaugeTicks', 75);       // CTC Gauge
 
-  // 6. รันแอนิเมชันทางเข้าด้วย GSAP (ถ้ามี)
+  // Animation เสริม (เดิม)
   if (typeof gsap !== 'undefined') {
     gsap.to('#dashboardModal', { opacity: 1, duration: 0.3 });
-    // อนิเมชันแถบบนสุด
-    gsap.fromTo('.dash-topbar-cockpit', { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 });
-    // อนิเมชันส่วนเนื้อหา Dashboard ค่อยๆ ขยายขึ้นมา
-    gsap.fromTo('.cockpit-body', { opacity: 0, scale: 0.98 }, { opacity: 1, scale: 1, duration: 0.5, delay: 0.2 });
+    gsap.fromTo('.dash-topbar', { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 });
   }
 
-  // 7. ใช้ RequestAnimationFrame เพื่อให้ Browser Render UI เสร็จก่อน แล้วจึงคำนวณข้อมูล
-  // วิธีนี้ช่วยป้องกันเข็มหน้าปัดไม่ขยับ หรือกราฟแบน
+  // ✅ ส่วนสำคัญ: ใช้ RequestAnimationFrame 2 ชั้นเพื่อบังคับให้ Render เสร็จก่อนคำนวณ
   requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-          refreshDash(); // คำนวณยอดรวม และขยับเข็มหน้าปัดตามข้อมูลจริง
+          refreshDash(); // ฟังก์ชันนี้จะไปคำนวณและขยับเข็ม
       });
   });
+    if (window.gsap) {
+        gsap.to('#guideTrigger', { opacity: 0, scale: 0, duration: 0.3, pointerEvents: 'none' });
+    } else {
+        document.getElementById('guideTrigger').style.display = 'none';
+    }
+  // Animation เสริม (เดิม)
+  if (typeof gsap !== 'undefined') {
+      gsap.fromTo('.dash-topbar-cockpit', { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 });
+      gsap.fromTo('.cockpit-body', { opacity: 0, scale: 0.98 }, { opacity: 1, scale: 1, duration: 0.5, delay: 0.2 });
+  }
 }
 
 function closeDashboard() {
+    // 1. ทำแอนิเมชันปิด (ถ้ามี GSAP) หรือซ่อน Modal ทันที
     if (typeof gsap !== 'undefined') {
         gsap.to('#dashboardModal', { 
             opacity: 0, 
             duration: 0.3, 
             onComplete: () => { 
-                if(document.getElementById('dashboardModal')) document.getElementById('dashboardModal').style.display = 'none'; 
-                
-                // --- ส่วนที่เพิ่มใหม่: สั่งให้ปุ่ม Guide เด้งกลับมาโชว์ ---
+                if($id('dashboardModal')) $id('dashboardModal').style.display = 'none'; 
                 gsap.to('#guideTrigger', { opacity: 1, scale: 1, duration: 0.4, delay: 0.2, pointerEvents: 'auto' });
-                
+                // --- ส่วนที่เพิ่มใหม่: รีเฟรชฟิลเตอร์ทั้งหมดเมื่อปิดเสร็จ ---
                 finalizeResetOnExit();
             } 
         });
     } else {
-        if(document.getElementById('dashboardModal')) document.getElementById('dashboardModal').style.display = 'none';
-        document.getElementById('guideTrigger').style.display = 'flex'; // สำหรับกรณีไม่มี GSAP
+        if($id('dashboardModal')) $id('dashboardModal').style.display = 'none';
+        
+        // --- กรณีไม่มี GSAP ให้รีเฟรชทันที ---
         finalizeResetOnExit();
     }
 }
@@ -8793,7 +9656,7 @@ function renderIncidentFeed(data) {
   const items = [...data].filter(r => r.judgment === 'VENDOR FAULT').sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 15);
   const html = items.map(r => `
     <div class="incident-item critical">
-      <div class="inc-row-1"><div class="incident-ref-badge">#${escapeHtml(r.ref)}</div><div class="inc-badge VENDOR">VENDOR FAULT</div></div>
+      <div class="inc-row-1"><div class="incident-ref-badge">${escapeHtml(r.ref)}</div><div class="inc-badge VENDOR">VENDOR FAULT</div></div>
       <div class="inc-row-2"><div class="inc-text-main">${escapeHtml(r.supplier)}</div><div class="inc-qty">${r.qty.toLocaleString()} <span style="font-size:0.6rem;color:#94a3b8">PCS</span></div></div>
       <div class="inc-text-sub"><span class="inc-text-highlight">${escapeHtml(r.partNo)}</span> | ${escapeHtml(r.partName) || 'N/A'}</div>
       <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:0.4rem;margin-top:0.4rem;display:flex;flex-direction:column;gap:5px;">
@@ -9302,6 +10165,21 @@ function parseExcelDate(excelValue) {
 }
 
 
+function formatDateDisplay(dateStr) {
+  if (!dateStr || dateStr === '-') return '-';
+  
+  // แยกส่วนประกอบจาก "YYYY-MM-DD"
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  
+  const y = parts[0];
+  const m = parts[1];
+  const d = parts[2];
+  
+  // แสดงผลเป็น วัน/เดือน/ปี ตรงตามที่เก็บไว้เป๊ะๆ
+  return `${d}/${m}/${y}`;
+}
+
 async function importExcel(input) {
   if (!input.files || input.files.length === 0) return;
   const file = input.files[0];
@@ -9384,8 +10262,14 @@ async function importExcel(input) {
       } else { toast('⚠️ ไม่พบข้อมูลใหม่ที่นำเข้าได้'); }
 
     } catch (err) { toast('❌ เกิดข้อผิดพลาด: ' + err.message); } 
-    finally { hideInitOverlay(); input.value = ''; }
+    finally { 
+      hideInitOverlay(); 
+      input.value = ''; 
+      // ✅ เพิ่มบรรทัดนี้เพื่อให้หน้าจอกลับมาเต็มจอทันทีหลัง Import เสร็จ
+      enterFullscreen(); 
+    }
   };
+  
   reader.readAsArrayBuffer(file);
 }
 
@@ -9438,30 +10322,83 @@ function updateChartsTheme() {
   chart.update('none'); 
 }
 
-
-/* ═════════════════════════════════════════════════
-   10. EVENT LISTENERS
-   จับ Events พื้นฐานทั้งหมดเมื่อหน้าจอโหลด
-═══════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   WINDOW LOAD INITIALIZATION (CLEAN START VERSION)
+═════════════════════════════════════════════════════════════════ */
 window.addEventListener('load', () => {
-  initTheme();
-  initAISmartFill();
+    // 🛡️ [1] SECURITY RESET: ล้างเซสชันเก่าทั้งหมดทันทีที่โหลดหน้าใหม่
+    sessionStorage.clear(); 
 
-  if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
+    // 🎨 [2] THEME & AI INIT: ตั้งค่าธีมสีและเตรียมระบบ AI Smart Fill
+    initTheme();
+    initAISmartFill();
 
-  // บังคับล้างค่าเก่าใน Session ทันทีที่โหลดหน้าเว็บใหม่
-  sessionStorage.removeItem('currentUser'); 
-  
-  // แสดงหน้า Login เสมอ
-  if($id('loginOverlay')) $id('loginOverlay').style.display = 'flex';
-  if($id('appShell')) {
-      $id('appShell').style.visibility = 'hidden';
-      $id('appShell').classList.remove('visible');
-  }
+    // 📅 [3] FORM DATE: ตั้งค่าวันที่ในฟอร์มบันทึกเป็นวันปัจจุบัน
+    if ($id('inputDate')) {
+        $id('inputDate').valueAsDate = new Date();
+    }
 
-  // ล้างค่าในช่องกรอก Login ให้ว่างเปล่า
-  if($id('loginName')) $id('loginName').value = '';
-  if($id('loginPass')) $id('loginPass').value = '';
+    // 🧹 [4] LOGIN HARD RESET: ล้างค่าในช่องกรอก Login ให้ว่างเปล่า 100%
+    // ป้องกัน Browser Autofill ที่อาจค้างมาจากครั้งก่อน
+    if ($id('loginName')) $id('loginName').value = '';
+    if ($id('loginPass')) $id('loginPass').value = '';
+    
+    // บังคับรีเซ็ตฟอร์ม (ถ้ามีการใช้ Tag <form>)
+    const loginForm = $id('loginForm');
+    if (loginForm && loginForm.tagName === 'FORM') {
+        loginForm.reset();
+    }
+
+    // 🔵 [5] ROLE RESET: บังคับให้หน้า Login เริ่มที่โหมด SQE Support (Staff) เสมอ
+    // เพื่อล้าง "โหมดสีทอง" ของหัวหน้างานที่อาจค้างอยู่ในหน้าจอ
+    setLoginRole('staff');
+
+    // 👁️ [6] VISIBILITY CONTROL: แสดงหน้า Login และซ่อนแอปหลักไว้ก่อน
+    if ($id('loginOverlay')) {
+        $id('loginOverlay').style.display = 'flex';
+        $id('loginOverlay').style.opacity = '1';
+        
+        // เพิ่มอนิเมชั่นทางเข้าให้นุ่มนวล (ถ้ามี GSAP)
+        if (typeof gsap !== 'undefined') {
+            gsap.from('#loCard', { 
+                scale: 0.95, 
+                y: 30, 
+                opacity: 0, 
+                duration: 0.8, 
+                ease: 'power3.out' 
+            });
+        }
+    }
+    
+    if ($id('appShell')) {
+        $id('appShell').style.visibility = 'hidden';
+        $id('appShell').style.opacity = '0';
+        $id('appShell').classList.remove('visible');
+    }
+
+    // ✅ [7] REFERENCE VALIDATION: ฟังก์ชันตรวจสอบรูปแบบ Ref No (000/0000)
+    const refIn = $id('refNo');
+    if (refIn) {
+        // ล้างค่าสีขอบที่อาจค้าง
+        refIn.style.borderColor = "";
+        
+        refIn.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+            const val = this.value.trim();
+            // รูปแบบ: 000/0000 หรือ V000/0000
+            const refRegex = /^(V?\d{3}\/\d{4})$/i;
+            
+            if (val === "") {
+                this.style.borderColor = ""; 
+            } else if (refRegex.test(val)) {
+                this.style.borderColor = "#10b981"; // เขียวถ้าถูก
+            } else {
+                this.style.borderColor = "#ef4444"; // แดงถ้าผิด
+            }
+        });
+    }
+
+    console.log("[System] Application Initialized & Login Data Cleared.");
 });
 
 // นาฬิกา Realtime
@@ -9481,27 +10418,41 @@ window.addEventListener('offline', () => {
   toast('🔴 ออฟไลน์ ข้อมูลจะถูกบันทึกไว้ในเครื่อง');
 });
 
-// Table Virtual Scroll Listener
+function updateVirtualScrollState() {
+  const container = $id('tableContainer');
+  if (!container) return;
+
+  const scrollTop = container.scrollTop;
+  const viewportHeight = container.clientHeight; // ดึงความสูงจริงของพื้นที่แสดงผล ณ ขณะนั้น
+
+  // คำนวณ Index แถวเริ่มต้น
+  const startRow = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT));
+  
+  // คำนวณจำนวนแถวที่ควรจะมองเห็น + Buffer 15 แถวเพื่อความลื่นไหล
+  const visibleCount = Math.ceil(viewportHeight / ROW_HEIGHT) + 15;
+  
+  virtualTableState.visibleStart = startRow;
+  virtualTableState.visibleEnd = Math.min(virtualTableState.allRows.length, startRow + visibleCount);
+  
+  // สั่งวาดแถวใหม่
+  window.requestAnimationFrame(() => renderVisibleRows());
+}
+
+// 1. เพิ่ม Resize Listener (พร้อมระบบหน่วงเวลา 150ms เพื่อประสิทธิภาพ)
+let tableResizeDebounce;
+window.addEventListener('resize', () => {
+  clearTimeout(tableResizeDebounce);
+  tableResizeDebounce = setTimeout(() => {
+    console.log("[System] Window resized, recalculating table viewport...");
+    updateVirtualScrollState();
+  }, 150);
+});
+
+// 2. ปรับปรุง Scroll Listener เดิมให้เรียกใช้ฟังก์ชันกลาง
 const tableContainer = document.getElementById('tableContainer');
 if (tableContainer) {
   tableContainer.addEventListener('scroll', () => {
-    // ✅ ปรับ: ใช้ ROW_HEIGHT ตัวแปรแทน
-    const rowHeight = ROW_HEIGHT; 
-    
-    const scrollTop = tableContainer.scrollTop;
-    const viewportHeight = tableContainer.clientHeight;
-    
-    // คำนวณ index เริ่มต้น
-    let startRow = Math.max(0, Math.floor(scrollTop / rowHeight));
-    
-    // คำนวณจำนวนแถวที่แสดง + Buffer
-    const visibleCount = Math.ceil(viewportHeight / rowHeight) + 20;
-    
-    virtualTableState.visibleStart = startRow;
-    virtualTableState.visibleEnd = Math.min(virtualTableState.allRows.length, startRow + visibleCount);
-    
-    // วาดใหม่เมื่อ Scroll
-    window.requestAnimationFrame(() => renderVisibleRows());
+    updateVirtualScrollState();
   });
 }
 
@@ -9609,9 +10560,15 @@ window.exportToExcel = function() {
 /* ════════════════════════════════════════════════════════════
    HELPER: วาดเส้นขีดบอกค่ารอบหน้าปัด (Tick Marks)
 ═════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   HELPER: วาดเส้นขีดบอกค่ารอบหน้าปัด (Tick Marks) [FIXED]
+══════════════════════════════════════════════════════ */
 function drawGaugeTicks(elementId, radius, isMain = false) {
   const container = document.getElementById(elementId);
   if (!container) return;
+  
+  // ✅ FIX ที่สำคัญ: เคลียร์เส้นเก่าและ Element เก่าทิ้งก่อนวาดใหม่ 
+  // เพื่อป้องกัน DOM ซ้อนทับ (Stacking) และ Memory Leak
   container.innerHTML = '';
 
   const cx = 100, cy = 100;
@@ -9623,7 +10580,7 @@ function drawGaugeTicks(elementId, radius, isMain = false) {
     const angle = startAngle + (endAngle - startAngle) * (i / totalTicks);
     const isMajor = i % 2 === 0; // ขีดหลักทุกๆ 10 หน่วย (0, 10, 20...)
     
-    // 1. วาดเส้นขีด (Ticks)
+    //1. วาดเส้นขีด (Ticks)
     const innerR = isMajor ? radius - 10 : radius - 6;
     const outerR = radius;
 
@@ -9639,11 +10596,11 @@ function drawGaugeTicks(elementId, radius, isMain = false) {
     line.setAttribute("stroke-width", isMajor ? "2" : "1");
     container.appendChild(line);
 
-    // 2. วางตัวเลขที่ท้ายขีดหลัก (เฉพาะขีดหลัก 0, 20, 40, 60, 80, 100)
+    //2. วางตัวเลขที่ท้ายขีดหลัก (เฉพาะขีดหลัก 0, 20, 40, 60, 80, 100)
     if (isMajor && (i % 4 === 0 || i === totalTicks)) {
       const value = Math.round((i / totalTicks) * 100);
       
-      // กำหนดระยะห่างจากขีด (ยิ่งลบเยอะ ยิ่งเข้าหาจุดศูนย์กลาง)
+      //กำหนดระยะห่างจากขีด (ยิ่งลบเยอะ ยิ่งเข้าหาจุดศูนย์กลาง)
       const textR = radius - 22; 
       
       const tx = cx + textR * Math.cos(angle);
@@ -9899,87 +10856,129 @@ handleFormSubmit = async function(e) {
 
 initAISmartFill();
 
-// ฟังก์ชันเปิด Modal
+// ฟังก์ชันเปิด Modal พร้อมอนิเมชั่นลื่นไหล
 function openChangePassModal() {
-  const modal = document.getElementById('changePassModal');
-  if (modal) {
+    const modal = document.getElementById('changePassModal');
+    if (!modal) return;
+
     modal.style.display = 'flex';
-    // ล้างค่า Input เก่า
+    
+    // รีเซ็ตค่าในฟอร์ม
     document.getElementById('cpOldPass').value = '';
     document.getElementById('cpNewPass').value = '';
     document.getElementById('cpConfirmPass').value = '';
-  }
+
+    // อนิเมชั่นด้วย GSAP
+    gsap.fromTo(modal, 
+        { opacity: 0 }, 
+        { opacity: 1, duration: 0.3, ease: 'power2.out' }
+    );
+
+    gsap.fromTo('.cp-card', 
+        { scale: 0.8, y: 40, opacity: 0 }, 
+        { scale: 1, y: 0, opacity: 1, duration: 0.5, ease: 'back.out(1.7)', delay: 0.1 }
+    );
+
+    // อนิเมชั่นไอคอนกุญแจให้ขยับเล็กน้อย
+    gsap.from('#cpLockIcon', {
+        rotate: -20,
+        y: 10,
+        duration: 0.8,
+        delay: 0.4,
+        ease: 'elastic.out(1, 0.5)'
+    });
 }
 
-// ฟังก์ชันปิด Modal
+// ฟังก์ชันปิด Modal พร้อมอนิเมชั่น
 function closeChangePassModal() {
-  const modal = document.getElementById('changePassModal');
-  if (modal) modal.style.display = 'none';
+    const modal = document.getElementById('changePassModal');
+    
+    gsap.to('.cp-card', {
+        scale: 0.9,
+        y: 20,
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.in'
+    });
+
+    gsap.to(modal, {
+        opacity: 0,
+        duration: 0.3,
+        delay: 0.1,
+        onComplete: () => {
+            modal.style.display = 'none';
+        }
+    });
 }
 
-// ฟังก์ชันหลัก: เปลี่ยนรหัสผ่าน
+// อัพเกรดฟังก์ชันบันทึกรหัสผ่าน (เพิ่มสถานะ Loading และสั่นเมื่อผิดพลาด)
 async function handleChangePassword() {
-  const oldPassInput = document.getElementById('cpOldPass').value;
-  const newPassInput = document.getElementById('cpNewPass').value;
-  const confirmPassInput = document.getElementById('cpConfirmPass').value;
+    const oldPass = document.getElementById('cpOldPass').value;
+    const newPass = document.getElementById('cpNewPass').value;
+    const confirmPass = document.getElementById('cpConfirmPass').value;
+    const submitBtn = document.getElementById('cpSubmitBtn');
 
-  // 1. ตรวจสอบความถูกต้อง (Client-side)
-  if (!oldPassInput || !newPassInput || !confirmPassInput) {
-    toast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน');
-    return;
-  }
-
-  if (newPassInput !== confirmPassInput) {
-    shake(document.getElementById('cpConfirmPass'));
-    toast('❌ รหัสผ่านใหม่ไม่ตรงกัน');
-    return;
-  }
-
-  if (newPassInput.length < 4) {
-    toast('⚠️ รหัสผ่านใหม่ควรมีอย่างน้อย 4 ตัวอักษร');
-    return;
-  }
-
-  // แสดง Overlay โหลด (เพื่อความสวยงาม หรือใช้ Toast ก็ได้)
-  // toast('⏳ กำลังอัปเดตรหัสผ่าน...');
-
-  try {
-    const sb = getSupabase();
-    if (!sb) throw new Error('ไม่สามารถเชื่อมต่อฐานข้อมูลได้');
-
-    // 2. ดึงข้อมูล User ปัจจุบันจาก Supabase เพื่อเช็ครหัสผ่านเดิม
-    const { data: userData, error: fetchError } = await sb
-      .from('users')
-      .select('*')
-      .eq('email', currentUser) // currentUser คือ Email ที่ Login อยู่
-      .single();
-
-    if (fetchError) throw fetchError;
-    if (!userData) throw new Error('ไม่พบข้อมูลผู้ใช้');
-
-    // 3. ตรวจสอบว่า "รหัสผ่านเดิม" ที่กรอกมา ตรงกับที่มีอยู่ในฐานข้อมูลไหม
-    if (userData.password !== oldPassInput) {
-      shake(document.getElementById('cpOldPass'));
-      toast('⛔ รหัสผ่านเดิมไม่ถูกต้อง');
-      return;
+    // 1. ตรวจสอบข้อมูลเบื้องต้น
+    if (!oldPass || !newPass || !confirmPass) {
+        toast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน');
+        gsap.to('.cp-card', { x: -10, repeat: 3, yoyo: true, duration: 0.05 });
+        return;
     }
 
-    // 4. ทำการอัปเดตรหัสผ่านใหม่ลง Supabase
-    const { error: updateError } = await sb
-      .from('users')
-      .update({ password: newPassInput }) // อัปเดตเฉพาะ Field password
-      .eq('email', currentUser);
+    if (newPass !== confirmPass) {
+        toast('❌ รหัสผ่านใหม่ไม่ตรงกัน');
+        shake(document.getElementById('cpConfirmPass'));
+        return;
+    }
 
-    if (updateError) throw updateError;
+    // 2. เริ่มสถานะ Loading
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="init-ring" style="width:18px; height:18px; border-width:2px; display:inline-block; vertical-align:middle; margin-right:8px;"></span> กำลังบันทึก...';
 
-    // 5. สำเร็จ
-    toast('✅ เปลี่ยนรหัสผ่านสำเร็จ');
-    closeChangePassModal();
+    try {
+        const sb = getSupabase();
+        if (!sb) throw new Error('Database Error');
 
-  } catch (err) {
-    console.error("Change Password Error:", err);
-    toast('❌ ไม่สามารถเปลี่ยนรหัสผ่านได้: ' + err.message);
-  }
+        // ตรวจสอบรหัสเดิม
+        const { data: userData, error: fetchError } = await sb
+            .from('users')
+            .select('*')
+            .eq('email', currentUser)
+            .single();
+
+        if (userData.password !== oldPass) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+            shake(document.getElementById('cpOldPass'));
+            toast('⛔ รหัสผ่านเดิมไม่ถูกต้อง');
+            return;
+        }
+
+        // อัปเดตรหัสใหม่
+        const { error: updateError } = await sb
+            .from('users')
+            .update({ password: newPass })
+            .eq('email', currentUser);
+
+        if (updateError) throw updateError;
+
+        // 3. สำเร็จ - ทำอนิเมชั่นเฉลิมฉลองเล็กน้อยก่อนปิด
+        toast('✅ เปลี่ยนรหัสผ่านสำเร็จ');
+        
+        gsap.to('#cpLockIcon', { scale: 1.2, color: '#10b981', duration: 0.3 });
+        
+        setTimeout(() => {
+            closeChangePassModal();
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }, 1000);
+
+    } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        toast('❌ ผิดพลาด: ' + err.message);
+    }
 }
 /* ═══════════════════════════════════════════════
    QUICK DATE FILTER LOGIC
@@ -10129,7 +11128,7 @@ async function openAuditLogModal(id) {
 
   // ดึงข้อมูล Record จากตัวแปร global 'records' เพื่อแสดง Reference
   const record = records.find(r => r.id === id);
-  if (refEl && record) refEl.textContent = '#' + (record.ref || 'Unknown');
+  if (refEl && record) refEl.textContent = (record.ref || 'Unknown');
 
   // แสดง Loading
   if (listEl) listEl.innerHTML = '<div style="text-align:center; padding:2rem; color:#64748b;">กำลังโหลดประวัติ...</div>';
@@ -10159,40 +11158,44 @@ function closeAuditModal() {
 // จัดหน้าตรง Screenshot
 // ══════════════════════════════════════════════════════════════
 
+/// ════════════════════════════════════════════════════════════
+// AUDIT TRAIL RENDER (FIXED)
+// ══════════════════════════════════════════════════════════════
+
 function renderAuditTimeline(data) {
   const listEl = document.getElementById('auditLogList');
   if (!listEl) return;
 
-  // 1. Styles mapping
+  //1. Styles mapping
   const styles = {
     'INSERT': { border: '#10b981', badgeBg: 'rgba(16, 185, 129, 0.15)', badgeText: '#10b981', badgeLabel: 'CREATED' },
     'UPDATE': { border: '#3b82f6', badgeBg: 'rgba(59, 130, 246, 0.15)', badgeText: '#3b82f6', badgeLabel: 'UPDATED' },
     'DELETE': { border: '#ef4444', badgeBg: 'rgba(239, 68, 68, 0.15)', badgeText: '#ef4444', badgeLabel: 'DELETED' }
   };
 
-  // 2. Container
+  //2. Container
   let html = '';
 
   data.forEach((log, index) => {
     const s = styles[log.action] || styles['UPDATE'];
     
-    // 3. Date Format: 06 พ.ค. 69 16:19 (ใช้ TH ถ้าเอาปี พ.ศ. ให้เปลี่ยน 'th-TH' เป็น 'en-GB')
+    //3. Date Format: 06 พ.ค. 69 16:19
     const dateStr = new Date(log.created_at).toLocaleString('th-TH', { 
       day: '2-digit', month: 'short', year: '2-digit', 
       hour: '2-digit', minute: '2-digit' 
     });
 
-    // 4. Diff Logic
+    //4. Diff Logic (ส่วนที่แก้ไข)
     let diffHtml = '';
     if (log.action === 'UPDATE' && log.old_data && log.new_data) {
       
-      // Clean keys
-      const { id, created_at, updated_at, ...old } = log.old_data;
-      const { id: _, created_at: __, updated_at: ___, ...newData } = log.new_data;
+      // ✅ FIX: เพิ่ม || {} เพื่อป้องกัน Crash หาก log.old_data หรือ log.new_data เป็น null
+      const { id, created_at, updated_at, ...old } = log.old_data || {};
+      const { id: _, created_at: __, updated_at: ___, ...newData } = log.new_data || {};
       
       diffHtml = `
-        <div style="margin-top: 1rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 0 0.75rem 0.75rem 0.75rem;">
-          <div style="font-size: 0.7rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+        <div style="margin-top:1rem; background: rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 0 0.75rem 0.75rem 0.75rem;">
+          <div style="font-size: 0.7rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
             Changes Made
           </div>
       `;
@@ -10200,10 +11203,10 @@ function renderAuditTimeline(data) {
       Object.keys(newData).forEach(key => {
         if (old[key] !== newData[key]) {
           diffHtml += `
-            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; font-family: var(--font-mono);">
+            <div style="display: flex; align-items: center; gap:1rem; margin-bottom: 0.75rem; font-family: var(--font-mono);">
               <div style="width: 60px; font-size: 0.8rem; font-weight: 700; color: #94a3b8;">${key}</div>
               
-              <div style="flex: 1; display: flex; align-items: center; gap: 0.75rem; background: rgba(0,0,0,0.2); padding: 0.5rem 0.75rem; border-radius: 6px;">
+              <div style="flex:1; display: flex; align-items: center; gap: 0.75rem; background: rgba(0,0,0,0.2); padding: 0.5rem 0.75rem; border-radius: 6px;">
                 <!-- Old Value (Red) -->
                 <div style="color: #ef4444; text-decoration: line-through; opacity: 0.8; font-size: 0.9rem; min-width: 40px; text-align: right;">
                   ${old[key] || '-'}
@@ -10226,7 +11229,7 @@ function renderAuditTimeline(data) {
        diffHtml = `<div style="margin-top:1rem; color:#64748b; font-style:italic; font-size:0.8rem; padding-left:0.5rem; border-left:2px solid #334155;">Item removed from database</div>`;
     }
 
-    // 5. Build Item
+    //5. Build Item
     html += `
       <div style="position: relative; margin-bottom: 2rem; animation: slideIn 0.3s ease-out both;" style="animation-delay: ${index * 0.1}s">
         
@@ -10259,10 +11262,145 @@ function renderAuditTimeline(data) {
 
   listEl.innerHTML = html;
 }
+
+function setLoginRole(role) {
+    const overlay = document.getElementById('loginOverlay');
+    const brandAccent = document.getElementById('brandAccent');
+    const tabStaff = document.getElementById('tabStaff');
+    const tabSuper = document.getElementById('tabSuper');
+    const passField = document.getElementById('passField');
+    const roleSlider = document.getElementById('roleSlider');
+    
+    // Mascot elements
+    const eye = document.getElementById('mascotEye');
+    const core = document.getElementById('mascotCore');
+    const base = document.getElementById('mascotBase');
+
+    if (role === 'supervisor') {
+        isSupervisor = true;
+        overlay.classList.add('is-head-mode');
+        brandAccent.style.color = '#f59e0b';
+        tabSuper.classList.add('active');
+        tabStaff.classList.remove('active');
+        passField.style.display = 'none';
+        
+        // ขยับ Slider ไปขวา + เปลี่ยนสีเป็นทอง
+        roleSlider.style.transform = 'translateX(100%)';
+        roleSlider.style.background = 'linear-gradient(135deg, #f59e0b, #b45309)';
+        roleSlider.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
+
+        // หุ่นยนต์สีทอง
+        if(eye) eye.style.fill = '#f59e0b';
+        if(core) core.style.stroke = '#f59e0b';
+        if(base) base.style.fill = 'rgba(245, 158, 11, 0.3)';
+    } else {
+        isSupervisor = false;
+        overlay.classList.remove('is-head-mode');
+        brandAccent.style.color = '#2563eb';
+        tabStaff.classList.add('active');
+        tabSuper.classList.remove('active');
+        passField.style.display = 'block';
+        
+        // ขยับ Slider ไปซ้าย + เปลี่ยนสีเป็นน้ำเงิน
+        roleSlider.style.transform = 'translateX(0)';
+        roleSlider.style.background = '#2563eb';
+        roleSlider.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.2)';
+
+        // หุ่นยนต์สีน้ำเงิน
+        if(eye) eye.style.fill = '#3b82f6';
+        if(core) core.style.stroke = '#3b82f6';
+        if(base) base.style.fill = 'rgba(59, 130, 246, 0.2)';
+    }
+}
+
+async function loadStaffList() {
+    const sb = getSupabase();
+    if (!sb) return;
+
+    try {
+        // ✅ วิธีใหม่: ดึงเฉพาะอีเมลของ Staff จากตาราง users
+        // สมมติว่าตาราง users มีคอลัมน์ 'role'
+        const { data, error } = await sb
+            .from('users')
+            .select('email')
+            .eq('role', 'staff'); // ดึงเฉพาะที่เป็น staff
+
+        if (error) throw error;
+
+        if (data) {
+            allStaffList = data.map(u => u.email).sort(); // เรียงลำดับอีเมล
+            const selector = $id('staffSelector');
+            if (selector) {
+                selector.innerHTML = allStaffList.map(email => {
+                    // ตัด @carrier.com ออกเพื่อแสดงชื่อสั้นๆ
+                    const displayName = email.split('@')[0];
+                    return `<option value="${email}">${displayName}</option>`;
+                }).join('');
+            }
+        }
+    } catch (e) {
+        console.error("Load Staff List Error:", e);
+        toast('❌ โหลดรายชื่อพนักงานไม่สำเร็จ');
+    }
+}
+
+// 1. แก้ไขฟังก์ชันสลับชื่อพนักงาน (ให้บันทึกค่าลง Session ตลอดเวลา)
+async function switchView(targetEmail) {
+    // 1. แสดง Overlay โหลดข้อมูลใหม่
+    showInitOverlay('สลับมุมมอง...', `กำลังโหลดข้อมูลของ ${targetEmail.split('@')[0]}`);
+    
+    // 2. อัปเดตสถานะคนที่เรากำลังดู
+    viewingUser = targetEmail;
+    
+    // ✅ บันทึกลง Session ทันที เพื่อให้ปุ่ม Job อัปเดตตามชื่อนี้
+    sessionStorage.setItem('viewingUser', targetEmail); 
+    
+    const sb = getSupabase();
+    if (sb) {
+        try {
+            // 3. ดึงข้อมูลพนักงานคนใหม่จาก Cloud ทันที
+            const { data, error } = await sb.from('records')
+                .select('*')
+                .eq('inspector', targetEmail)
+                .order('date', { ascending: false });
+            
+            if (error) throw error;
+
+            if (data) {
+                // 4. ล้างข้อมูลเก่าและแทนที่ด้วยข้อมูลของพนักงานที่เลือก
+                records = data.map(r => ({ ...r, _isSaved: true }));
+                
+                // 5. สั่งรีเฟรช KPI และตารางใหม่ทั้งหมด
+                refreshAll();
+            }
+        } catch (e) {
+            console.error("Switch View Error:", e);
+            toast('❌ ไม่สามารถดึงข้อมูลพนักงานคนนี้ได้');
+        }
+    }
+    
+    hideInitOverlay();
+    toast(`👀 กำลังดูข้อมูลของ: ${targetEmail.split('@')[0]}`);
+}
+
+// ═════════════════════════════════════════════════
+// FIX: กดปุ่ม ESC เพื่อออกจาก Fullscreen
+// ═════════════════════════════════════════════════
+window.addEventListener('keydown', function(e) {
+    // ตรวจสอบว่าปุ่มที่กดคือ Escape หรือไม่
+    if (e.key === 'Escape' || e.keyCode === 27) {
+        // เช็คก่อนว่ากำลังอยู่ในโหมดเต็มจอจริงไหม
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            // ถ้าอยู่ ให้เรียกฟังก์ชันออกจากจอเต็ม
+            toggleFullscreen();
+            console.log('Exit Fullscreen triggered by ESC key');
+        }
+    }
+});
+
 /* ═══════════════════════════════════════════════════
    USER GUIDE SYSTEM - FIXED & UPGRADED VERSION
 ═══════════════════════════════════════════════════ */
-
 const guideData = [
     {
         title: "01 ระบบควบคุมการเข้าถึง (Access Control)",
@@ -10294,7 +11432,7 @@ const guideData = [
         color: "#22d3ee", 
         rgb: "34, 211, 238",
         grid: [
-            { icon: "🤖", title: "ระบบอัจฉริยะ(AI Smart Fill)", text: "เมื่อพิมพ์ชื่อ Part หรือ Part No. เพียงบางส่วน ระบบจะดึงชื่อ Supplier และ Line ที่เคยใช้ล่าสุดมาเติมให้อัตโนมัติ ช่วยลดเวลาการพิมพ์ได้กว่า 60%", lv: "100%" },
+            { icon: "🤖", title: "ระบบเดาคำ (AI Smart Fill)", text: "เมื่อพิมพ์ชื่อ Part หรือ Part No. เพียงบางส่วน ระบบจะดึงชื่อ Supplier และ Line ที่เคยใช้ล่าสุดมาเติมให้อัตโนมัติ ช่วยลดเวลาการพิมพ์ได้กว่า 60%", lv: "100%" },
             { icon: "👯", title: "การคัดลอก (Cloning)", text: "ปุ่ม 'สีเขียว' ในตารางใช้เพื่อ Copy ข้อมูลทั้งหมดของรายการนั้นมาใส่ฟอร์มใหม่ เหมาะสำหรับงานที่มี NG หลายอาการแต่เป็น Part และ Ref เดียวกัน", lv: "100%" },
             { icon: "✅", title: "ความถูกต้อง (Validation)", text: "เลข Reference ต้องเป็นรูปแบบ 000/2024 เท่านั้น หากกรอกผิดรูปแบบระบบจะขึ้นขอบสีแดงและไม่อนุญาตให้ Commit เพื่อป้องกันข้อมูลขยะเข้าสู่ระบบ", lv: "100%" },
             { icon: "📝", title: "การแก้ไข (Global Edit)", text: "สามารถกดแก้ไขได้ตลอดเวลาผ่านปุ่ม 'สีน้ำเงิน' เมื่อแก้ไขเสร็จแล้วกด Update ระบบจะซิงค์การเปลี่ยนแปลงไปยังคลาวด์และแจ้งเตือนพนักงานคนอื่นทันที", lv: "95%" }
@@ -10337,7 +11475,6 @@ const guideData = [
         ]
     }
 ];
-
 // 2. ฟังก์ชันเปิดคู่มือ
 function openUserGuide() {
     const modal = document.getElementById('userGuideModal');
@@ -10424,67 +11561,123 @@ function switchGuide(index) {
     `;
 }
 
-/**
- * ฟังก์ชันพับ/กาง แถบป้อนข้อมูล (เวอร์ชันใหม่)
- */
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const toggleIcon = document.getElementById('toggleIcon');
-    
-    // ตรวจสอบสถานะปัจจุบัน
-    const isCollapsed = sidebar.classList.toggle('collapsed');
-    
-    if (isCollapsed) {
-        // เมื่อพับ: เปลี่ยนลูกศรให้ชี้ไปทางขวา (กางออก)
-        toggleIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>`;
-        toast('⬅️ พับแถบป้อนข้อมูลเพื่อขยายตาราง');
-    } else {
-        // เมื่อกาง: เปลี่ยนลูกศรให้ชี้ไปทางซ้าย (พับเข้า)
-        toggleIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>`;
+function applyRoleRestrictions() {
+    const sidebar = $id('sidebar');
+    const btnToggle = $id('btnToggleSidebar'); // ปุ่มที่เราเพิ่งเพิ่ม
+    const importBtn = document.querySelector('button[onclick*="xlsIn"]');
+    const clearBtn = document.querySelector('button[onclick*="showDeleteModal"]');
+    const syncBtn = $id('syncBtnMain'); // ดึง Element ปุ่ม Sync
+    const mainPanel = $id('mainPanel');
+
+ if (isSupervisor) {
+        if (sidebar) sidebar.style.display = 'none';
+        if (btnToggle) btnToggle.style.display = 'none';
+        
+        // 2. ซ่อนปุ่ม Import, ปุ่ม Clear และปุ่ม Sync (ตามที่คุณต้องการ)
+        if (importBtn) importBtn.style.display = 'none';
+        if (clearBtn) clearBtn.style.display = 'none';
+        if (syncBtn) syncBtn.style.display = 'none'; // เพิ่มบรรทัดนี้เพื่อซ่อนปุ่ม Sync
+        
+        // 3. ปรับ Main Panel ให้กว้างเต็มจอ
+        if (mainPanel) {
+            mainPanel.style.width = '100%';
+            mainPanel.style.flexGrow = '1';
+        }
+        
+        console.log("[System] Supervisor Mode: Read-only & Sync hidden.");
+} else {
+        if (sidebar) sidebar.style.display = 'flex';
+        if (btnToggle) btnToggle.style.display = 'flex';
+        if (importBtn) importBtn.style.display = 'flex';
+        if (clearBtn) clearBtn.style.display = 'flex';
+        if (syncBtn) syncBtn.style.display = 'flex'; // แสดงปุ่ม Sync ในโหมดพนักงาน
     }
-    
-    // บังคับให้ตารางคำนวณพื้นที่ใหม่หลังการพับ/กาง
-    setTimeout(() => {
-        if (typeof renderTable === 'function') renderTable();
-    }, 400);
 }
-// ฟังก์ชันตรวจจับความแข็งแรงของรหัสผ่าน (UI Feedback)
-function checkPassStrength(pass) {
-    const bar = document.getElementById('strengthBar');
-    if (!bar) return;
+// ฟังก์ชันตรวจความแรงรหัสผ่าน (The Gimmick)
+function checkStrength(val) {
+    const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')];
+    bars.forEach(b => b.classList.remove('active'));
     
     let strength = 0;
-    if (pass.length >= 4) strength += 25;
-    if (pass.length >= 8) strength += 25;
-    if (/[A-Z]/.test(pass)) strength += 25;
-    if (/[0-9]/.test(pass) && /[^A-Za-z0-9]/.test(pass)) strength += 25;
+    if (val.length > 5) strength++;
+    if (/[A-Z]/.test(val) && /[0-9]/.test(val)) strength++;
+    if (/[^A-Za-z0-9]/.test(val)) strength++;
 
-    bar.style.width = strength + '%';
-    
-    // เปลี่ยนสีตามระดับ
-    if (strength <= 25) bar.style.background = '#ef4444'; // Red
-    else if (strength <= 50) bar.style.background = '#f59e0b'; // Orange
-    else if (strength <= 75) bar.style.background = '#3b82f6'; // Blue
-    else bar.style.background = '#10b981'; // Green
+    for (let i = 0; i < strength; i++) {
+        bars[i].classList.add('active');
+    }
 }
 
-// อัพเกรดฟังก์ชันเปิด Modal ให้มีอนิเมชั่น GSAP (ถ้ามีในระบบ)
+// อัปเกรดฟังก์ชันเปิด Modal ด้วย GSAP
 function openChangePassModal() {
     const modal = document.getElementById('changePassModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        // เคลียร์ค่า
-        document.getElementById('cpOldPass').value = '';
-        document.getElementById('cpNewPass').value = '';
-        document.getElementById('cpConfirmPass').value = '';
-        document.getElementById('strengthBar').style.width = '0%';
+    modal.style.display = 'flex';
+    
+    gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.4 });
+    gsap.fromTo(".vault-modal", 
+        { scale: 0.8, y: 50, rotateX: 15 }, 
+        { scale: 1, y: 0, rotateX: 0, duration: 0.6, ease: "back.out(1.5)" }
+    );
+}
 
-        if (window.gsap) {
-            gsap.fromTo(modal.querySelector('.glass-card'), 
-                { scale: 0.8, opacity: 0, y: 20 }, 
-                { scale: 1, opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.7)" }
-            );
-        }
+// อัปเกรดฟังก์ชันบันทึกรหัสผ่าน (พร้อมเอฟเฟกต์ Loading)
+async function handleChangePassword() {
+    const btn = document.getElementById('cpSubmitBtn');
+    const oldP = document.getElementById('cpOldPass').value;
+    const newP = document.getElementById('cpNewPass').value;
+    const confP = document.getElementById('cpConfirmPass').value;
+
+    if (!oldP || !newP || newP !== confP) {
+        toast('❌ ข้อมูลไม่ถูกต้องหรือรหัสผ่านไม่ตรงกัน');
+        gsap.to(".vault-modal", { x: -10, repeat: 5, yoyo: true, duration: 0.05 });
+        return;
+    }
+
+    // กิมมิก: เปลี่ยนสถานะปุ่มเป็น Scanning
+    btn.disabled = true;
+    btn.innerHTML = '<span class="sdot" style="margin-right:8px"></span> AUTHENTICATING...';
+
+    try {
+        const sb = getSupabase();
+        // จำลองการโหลดและตรวจสอบ (เหมือนระบบแฮ็กเกอร์ในหนัง)
+        await new Promise(res => setTimeout(res, 1200));
+
+        const { error } = await sb.from('users').update({ password: newP }).eq('email', currentUser);
+        if (error) throw error;
+
+        // สำเร็จ
+        btn.style.background = '#10b981';
+        btn.innerHTML = '✅ ACCESS GRANTED';
+        toast('🔓 รหัสผ่านถูกอัปเกรดเรียบร้อยแล้ว');
+        
+        setTimeout(closeChangePassModal, 1000);
+    } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = 'SAVE NEW KEY';
+        toast('⛔ ผิดพลาด: ' + err.message);
+    }
+}
+function toggleSidebar(forceState = null) {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('btnToggleSidebar');
+    const iconPath = document.querySelector('#toggleIcon path');
+
+    // ตรวจสอบสถานะที่จะเปลี่ยน
+    let isCollapsing;
+    if (forceState === 'open') isCollapsing = false;
+    else if (forceState === 'close') isCollapsing = true;
+    else isCollapsing = !sidebar.classList.contains('collapsed');
+
+    if (isCollapsing) {
+        sidebar.classList.add('collapsed');
+        // เปลี่ยนไอคอนเป็นแบบ "กางออก" (Sidebar Icon)
+        iconPath.setAttribute('d', 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2');
+        toggleBtn.style.background = "rgba(255,255,255,.15)"; // สีปกติ
+    } else {
+        sidebar.classList.remove('collapsed');
+        // เปลี่ยนไอคอนเป็นแบบ "แฮมเบอร์เกอร์" (ปิดฟอร์ม)
+        iconPath.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+        toggleBtn.style.background = "rgba(59, 130, 246, 0.4)"; // ไฮไลท์สีฟ้าเมื่อกางออก
     }
 }
 </script>
