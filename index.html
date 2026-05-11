@@ -7202,6 +7202,154 @@ html.dark-mode .supervisor-log-btn:hover {
 .info-text li { margin-bottom: 3px; }
 
 .power-bar { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: auto; }
+
+/* =========================================
+   RESPONSIVE LAYOUT FIX (Mobile & Tablet)
+   ========================================= */
+
+/* สำหรับหน้าจอ Tablet/Notebook แนวตั้ง (ขนาด < 1024px) */
+@media (max-width: 1024px) {
+  .cockpit-body {
+    /* เปลี่ยนจาก Grid เป็น Flexbox แบบเรียงแนวตั้ง */
+    display: flex !important;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto; /* ให้เลื่อนแนวตั้งได้ทั้งหน้า */
+  }
+
+  /* บังคัพทั้งหมดให้กินพื้นที่เต็ม */
+  .cockpit-left, 
+  .cockpit-center, 
+  .cockpit-right {
+    width: 100% !important;
+    min-width: unset !important;
+    overflow: visible;
+  }
+
+  /* ปรับหน้าปัดและ Chart ให้ไม่ใหญ่เกินไป */
+  .cockpit-left {
+    min-height: auto !important;
+    order: 1; /* ให้หน้าปัดอยู่บนสุด */
+  }
+  .cockpit-center {
+    order: 2;
+    min-height: 400px; /* กำหนดความสูงขั้นต่ำสำหรับ Chart */
+  }
+  .cockpit-right {
+    order: 3;
+  }
+}
+
+/* สำหรับหน้าจอมือถือ (< 480px) */
+@media (max-width: 480px) {
+  /* ปรับระยะห่างของ Grid ให้น้อยลง */
+  .cockpit-body, 
+  .dash-charts-section, 
+  .dash-rankings-section {
+    gap: 0.75rem;
+  }
+
+  /* ปรับแถว Stat ให้เป็น 2 คอลัมน์แทน 4 คอลัมน์ */
+  .cockpit-center .stats-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  
+  /* ซ่อน Sparkline ถ้าหน้าจอเล็กมากเพื่อประหยัดพื้นที่ */
+  .mini-gauge-sparkline,
+  .hero-sparkline {
+    display: none !important;
+  }
+}
+/* =========================================
+   COMPONENT RESPONSIVENESS
+   ========================================= */
+
+/* 1. ปรับหน้าปัด (Gauges) ให้ย่อขยายได้ */
+.gauge-svg {
+  width: 100% !important; 
+  height: auto !important; /* สูงปรับตามสัดส่วน */
+}
+
+/* จำกัดความกว้างสูงสุดของวงหน้าปัด */
+.gauge-ring, 
+.mini-gauge-display {
+  width: min(160px, 100%) !important; /* ไม่ให้เกิน 160px หรือ 100% ของพ่อง */
+  max-width: 100%;
+  aspect-ratio: 1 / 1; /* บังคั้ให้เป็นสี่เหลี่ยมจัตุๆ */
+}
+
+/* ปรับตัวเลขในหน้าปัด */
+.gauge-value, 
+.mini-gauge-value {
+  font-size: clamp(1.2rem, 5vw, 1.8rem) !important; /* ขนาดอยู่ระหว่าง 1.2rem ถึง 1.8rem */
+}
+
+/* 2. ปรับ Modal Login ให้รองรับหน้าจอเล็ก */
+@media (max-width: 600px) {
+  .lo-card {
+    width: 90vw !important; /* กินพื้นที่ 90% ของหน้าจอ */
+    max-width: 95vw;
+    padding: 1.5rem !important; /* ลดระยะห่างภายใน */
+  }
+  
+  /* จัดเรียง Mascot และ Form แบบแนวตั้งในมือถือ */
+  .lo-card {
+    flex-direction: column !important;
+  }
+  
+  .lo-mascot-col {
+    width: 100%;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+}
+
+/* 3. ปรับ Chart ให้ยืดหยุ่ */
+.chart-body {
+  min-height: 250px !important; /* บังคั้ความสูงต่ำสุด */
+}
+/* =========================================
+   TABLE SCROLL & OVERFLOW FIX
+   ========================================= */
+
+/* ปรับตัวห่องตารางให้เล็กลงแต่ยังอ่านได้ */
+@media (max-width: 768px) {
+  thead th {
+    padding: 0.6rem 0.5rem !important;
+    font-size: 0.55rem !important; /* ตัวอักษรเล็กลง */
+  }
+
+  tbody td {
+    padding: 0.6rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* ซ่อนคอลัมน์ที่ไม่จำเป็นบนมือถือ (Optional: เพื่อให้หน้าจอสวยงาม) */
+  tbody td:nth-child(7), /* Remark */
+  tbody th:nth-child(7) {
+    display: none; 
+  }
+}
+
+/* บังคับว่าตารางต้องเลื่อนแนวนอนถ้าหน้าจอแคบ */
+#tableContainer {
+  overflow-x: auto !important; /* เปิด Scrollbar แนวนอน */
+  -webkit-overflow-scrolling: touch; /* Scroll ลื่นไหลบน iOS */
+}
+
+/* ปรับ Header ของ Dashboard ให้สามารถ Wrap ได้ */
+.dash-topbar-cockpit {
+  flex-wrap: wrap !important; /* ปุ่มขึ้นบรรทัดใหม่ได้ */
+  height: auto !important;
+  padding: 0.75rem 1rem;
+}
+
+/* ปรับ Control Panel ด้านบน Dashboard */
+.topbar-controls {
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  width: 100%;
+}
 </style>
            <!-- Dark Mode Button (อยู่ด้านขวาสุด) -->
       <button onclick="toggleDarkMode()" id="darkModeBtn" title="Toggle Theme"
