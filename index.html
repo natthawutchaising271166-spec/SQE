@@ -6782,80 +6782,6 @@ html.dark-mode #changePassModal {
     line-height: 0;
     vertical-align: middle;
 }
-
-@media (max-width: 1024px) {
-    #submitBtn {
-        min-height: 60px !important; /* ใหญ่ขึ้นนิดหน่อยในแท็บเล็ตเพื่อให้กดง่ายและสมมาตร */
-        font-size: 1rem !important;
-    }
-}
-/* บังคับให้ Sidebar และ Form กรอกข้อมูลสูงเท่าหน้าจอพอดีและห้ามมี Scroll */
-@media (max-width: 1280px), (max-height: 850px) {
-    #sidebar {
-        width: 260px !important; /* ลดความกว้างลงเล็กน้อย */
-        padding: 0.5rem !important; /* ลดพื้นที่ขอบ */
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* ส่วนหัวของข้อความในกล่อง */
-    .sidebar-section-title {
-        font-size: 0.55rem !important;
-        margin-bottom: 0.2rem !important;
-    }
-
-    /* ปรับขนาดกล่อง Input ทุกช่องให้เล็กลง */
-    .neon-in, #judgmentSelect, .form-date, .form-textarea {
-        padding: 0.4rem 0.6rem !important; /* หดความหนาของช่องกรอก */
-        font-size: 0.68rem !important; /* ลดขนาดตัวอักษร */
-        margin-bottom: 0.2rem !important;
-    }
-
-    /* ปรับระยะห่างระหว่างกลุ่มข้อมูล */
-    #claimForm {
-        gap: 0.3rem !important; /* ลดช่องว่างระหว่างกล่อง */
-        padding-bottom: 0 !important;
-        overflow: hidden !important; /* ปิด scroll ถ้าไม่จำเป็น */
-    }
-
-    /* ปรับกล่องหุ้ม (Container) ของแต่ละส่วน */
-    #claimForm > div {
-        padding: 0.4rem !important;
-        border-radius: 8px !important;
-    }
-
-    /* ปรับปุ่ม Commit ให้เล็กลงแต่ยังเด่น */
-    #submitBtn {
-        min-height: 45px !important;
-        font-size: 0.8rem !important;
-        margin-top: 0.2rem !important;
-        padding: 0 !important;
-    }
-    
-    /* ปรับความสูงของ Remark (Textarea) ให้สั้นลง */
-    textarea#remark {
-        rows: 1 !important; 
-        height: 40px !important;
-    }
-}
-
-/* กรณีหน้าจอเตี้ยมาก (เช่น แท็บเล็ตแนวนอน) */
-@media (max-height: 650px) {
-    .sidebar-section-title { display: none; } /* ซ่อนหัวข้อเล็กๆ เพื่อประหยัดพื้นที่ */
-    #claimForm > div { margin-bottom: 0 !important; }
-}
-@media (max-width: 1024px) {
-    #appHeader {
-        grid-template-columns: 1fr !important; /* ปรับ Layout หัวข้อ */
-        gap: 0.5rem !important;
-    }
-    .kpi-card {
-        padding: 0.5rem !important; /* หด KPI ให้เล็กลง */
-    }
-    .kpi-value {
-        font-size: 1.5rem !important; /* ลดขนาดตัวเลข KPI */
-    }
-}
 /* บังคับให้ช่องกรอกข้อมูลทุกประเภทมี Padding ที่เท่ากัน */
 .neon-in, textarea.neon-in {
     padding: 0.65rem 0.85rem !important;
@@ -6875,21 +6801,6 @@ textarea#remark {
         padding: 0.5rem 0.7rem !important;
         font-size: 0.7rem !important;
     }
-}
-/* ปรับแต่งปุ่มยกเลิกในโหมดหน้าจอเล็ก */
-@media (max-height: 850px) {
-    #cancelEditBtn, #cancelCopyBtn {
-        min-height: 40px !important; /* หดความสูงลงเมื่อจอเตี้ย */
-        font-size: 0.75rem !important;
-        margin-top: 0.3rem !important;
-    }
-}
-
-/* ล็อคตำแหน่งไอคอน ✖ ไม่ให้ลอยเกินไป */
-#cancelEditBtn span:first-child, 
-#cancelCopyBtn span:first-child {
-    font-size: 0.9rem;
-    margin-bottom: 1px; /* ชดเชยสายตาให้กลางเป๊ะ */
 }
 </style>
 </head>
