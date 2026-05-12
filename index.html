@@ -6752,6 +6752,145 @@ html.dark-mode #changePassModal {
     color: #f59e0b !important;
     font-weight: 800;
 }
+/* ปรับแต่งปุ่ม Commit ให้เด่นเป็นพิเศษ */
+#submitBtn {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+/* เมื่อเปิดในแท็บเล็ตหรือจอเล็ก (ความกว้างน้อยกว่า 1024px) */
+@media (max-width: 1024px) {
+    #submitBtn {
+        font-size: 1rem !important; /* ใหญ่ขึ้นอีกนิดในแท็บเล็ต */
+        padding: 1.25rem !important; /* ขยายขนาดปุ่มให้กดด้วยนิ้วง่ายขึ้น */
+        box-shadow: 0 0 25px rgba(37, 99, 235, 0.5) !important; /* เพิ่มแสงเรืองรอบปุ่ม */
+    }
+}
+#submitBtn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    overflow: hidden;
+}
+
+/* ป้องกันไอคอนดาว ✦ ลอยสูงกว่าตัวหนังสือ */
+#submitBtn span, #submitBtn i {
+    display: inline-block;
+    line-height: 0;
+    vertical-align: middle;
+}
+
+@media (max-width: 1024px) {
+    #submitBtn {
+        min-height: 60px !important; /* ใหญ่ขึ้นนิดหน่อยในแท็บเล็ตเพื่อให้กดง่ายและสมมาตร */
+        font-size: 1rem !important;
+    }
+}
+/* บังคับให้ Sidebar และ Form กรอกข้อมูลสูงเท่าหน้าจอพอดีและห้ามมี Scroll */
+@media (max-width: 1280px), (max-height: 850px) {
+    #sidebar {
+        width: 260px !important; /* ลดความกว้างลงเล็กน้อย */
+        padding: 0.5rem !important; /* ลดพื้นที่ขอบ */
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ส่วนหัวของข้อความในกล่อง */
+    .sidebar-section-title {
+        font-size: 0.55rem !important;
+        margin-bottom: 0.2rem !important;
+    }
+
+    /* ปรับขนาดกล่อง Input ทุกช่องให้เล็กลง */
+    .neon-in, #judgmentSelect, .form-date, .form-textarea {
+        padding: 0.4rem 0.6rem !important; /* หดความหนาของช่องกรอก */
+        font-size: 0.68rem !important; /* ลดขนาดตัวอักษร */
+        margin-bottom: 0.2rem !important;
+    }
+
+    /* ปรับระยะห่างระหว่างกลุ่มข้อมูล */
+    #claimForm {
+        gap: 0.3rem !important; /* ลดช่องว่างระหว่างกล่อง */
+        padding-bottom: 0 !important;
+        overflow: hidden !important; /* ปิด scroll ถ้าไม่จำเป็น */
+    }
+
+    /* ปรับกล่องหุ้ม (Container) ของแต่ละส่วน */
+    #claimForm > div {
+        padding: 0.4rem !important;
+        border-radius: 8px !important;
+    }
+
+    /* ปรับปุ่ม Commit ให้เล็กลงแต่ยังเด่น */
+    #submitBtn {
+        min-height: 45px !important;
+        font-size: 0.8rem !important;
+        margin-top: 0.2rem !important;
+        padding: 0 !important;
+    }
+    
+    /* ปรับความสูงของ Remark (Textarea) ให้สั้นลง */
+    textarea#remark {
+        rows: 1 !important; 
+        height: 40px !important;
+    }
+}
+
+/* กรณีหน้าจอเตี้ยมาก (เช่น แท็บเล็ตแนวนอน) */
+@media (max-height: 650px) {
+    .sidebar-section-title { display: none; } /* ซ่อนหัวข้อเล็กๆ เพื่อประหยัดพื้นที่ */
+    #claimForm > div { margin-bottom: 0 !important; }
+}
+@media (max-width: 1024px) {
+    #appHeader {
+        grid-template-columns: 1fr !important; /* ปรับ Layout หัวข้อ */
+        gap: 0.5rem !important;
+    }
+    .kpi-card {
+        padding: 0.5rem !important; /* หด KPI ให้เล็กลง */
+    }
+    .kpi-value {
+        font-size: 1.5rem !important; /* ลดขนาดตัวเลข KPI */
+    }
+}
+/* บังคับให้ช่องกรอกข้อมูลทุกประเภทมี Padding ที่เท่ากัน */
+.neon-in, textarea.neon-in {
+    padding: 0.65rem 0.85rem !important;
+    box-sizing: border-box; /* สำคัญมาก: เพื่อให้ padding ไม่ไปเพิ่มความกว้างกล่อง */
+    display: block;
+}
+
+/* ปรับแต่งพิเศษสำหรับ Textarea */
+textarea#remark {
+    font-family: var(--font-body);
+    vertical-align: top;
+}
+
+/* เมื่อหน้าจอเล็กลง (Tablet/Mobile) ให้ลด Padding ลงเล็กน้อยแต่ยังต้องไม่ชิดขอบ */
+@media (max-height: 850px) {
+    .neon-in, textarea.neon-in {
+        padding: 0.5rem 0.7rem !important;
+        font-size: 0.7rem !important;
+    }
+}
+/* ปรับแต่งปุ่มยกเลิกในโหมดหน้าจอเล็ก */
+@media (max-height: 850px) {
+    #cancelEditBtn, #cancelCopyBtn {
+        min-height: 40px !important; /* หดความสูงลงเมื่อจอเตี้ย */
+        font-size: 0.75rem !important;
+        margin-top: 0.3rem !important;
+    }
+}
+
+/* ล็อคตำแหน่งไอคอน ✖ ไม่ให้ลอยเกินไป */
+#cancelEditBtn span:first-child, 
+#cancelCopyBtn span:first-child {
+    font-size: 0.9rem;
+    margin-bottom: 1px; /* ชดเชยสายตาให้กลางเป๊ะ */
+}
 </style>
 </head>
 <body>
@@ -7170,7 +7309,7 @@ html.dark-mode #changePassModal {
         </div>
       </div>
 
-      <form id="claimForm" class="scroll" style="display:flex;flex-direction:column;gap:.6rem;overflow-y:auto;flex-grow:1;padding-right:.1rem">
+      <form id="claimForm" class="scroll" style="display:flex;flex-direction:column;gap:.6rem;overflow-y:auto;flex-grow:1;padding-right:.1rem; padding-bottom: 5rem;">
 
         <!-- Date & Shift -->
         <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
@@ -7184,38 +7323,36 @@ html.dark-mode #changePassModal {
           </div>
         </div>
 
-        <!-- Reference -->
-<!-- ส่วนที่มักพบ Error: Reference Info -->
-        <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
-            <div class="sidebar-section-title">Reference Info</div>
-            
-            <!-- ✅ แก้ไขจุดนี้: ลบ required และ class ที่ซ้ำซ้อนออกเหลือเพียงชุดเดียว -->
-            <input type="text" id="refNo" list="refList" 
-                   placeholder="REF001/2024 หรือ V001/2024 *" 
-                   required class="neon-in" 
-                   style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
-            
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
-                <input type="text" id="supplier" list="supList" 
-                       placeholder="Supplier *" required class="neon-in" 
-                       style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-                
-                <input type="number" id="qty" 
-                       placeholder="QTY *" required class="neon-in" 
-                       style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-            </div>
-        </div>
+<!-- Part Details (ย้ายขึ้นมาลำดับแรกหลัง Date) -->
+<div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.6rem;border:1px solid var(--border)">
+  <div class="sidebar-section-title">Part Details</div>
+  <!-- ปรับจาก grid 1fr 1fr เป็น column เพื่อให้ Part No และ Part Name อยู่คนละบรรทัด -->
+  <div style="display:flex; flex-direction:column; gap:.45rem; margin-bottom:.5rem">
+    <input type="text" id="partNo" list="ptList" placeholder="Part No *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+    <input type="text" id="partOn" list="lotList" placeholder="Part Name *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+  </div>
+  <input type="text" id="defectName" list="defectList" placeholder="Defect Type *" required class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
+  <textarea id="remark" placeholder="Remarks…" class="neon-in" style="height: 3vh; min-height: 40px;"></textarea>
+</div>
 
-        <!-- Part -->
-        <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
-          <div class="sidebar-section-title">Part Details</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem">
-            <input type="text" id="partNo" list="ptList" placeholder="Part No *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-            <input type="text" id="partOn" list="lotList" placeholder="Part Name *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-          </div>
-          <input type="text" id="defectName" list="defectList" placeholder="Defect Type *" required class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
-          <textarea id="remark" placeholder="Remarks…" rows="2" class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;resize:none"></textarea>
-        </div>
+<!-- Reference Info -->
+<div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.6rem;border:1px solid var(--border)">
+    <div class="sidebar-section-title">Reference Info</div>
+    <input type="text" id="refNo" list="refList" 
+           placeholder="REF001/2024 หรือ V001/2024 *" 
+           required class="neon-in" 
+           style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
+        <input type="text" id="supplier" list="supList" 
+               placeholder="Supplier *" required class="neon-in" 
+               style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+        
+        <input type="number" id="qty" 
+               placeholder="QTY *" required class="neon-in" 
+               style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+    </div>
+</div>
 
         <!-- Judgment -->
         <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
@@ -7232,8 +7369,8 @@ html.dark-mode #changePassModal {
 
 <!-- ปุ่ม Submit เดียว เพื่อให้ JS ควบคุมการแสดงผลปุ่ม Cancel -->
 <button type="submit" id="submitBtn" class="btn"
-  style="padding:1rem;font-weight:700;font-size:.75rem;letter-spacing:.04em;border-radius:var(--r-sm)">
-  ✦ Commit Data
+  style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 55px; padding: 0; font-weight: 800; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); transition: all 0.3s ease; margin-top: 0.5rem; line-height: 1;">
+  ✦ COMMIT DATA
 </button>
       </form>
     </aside>
@@ -10685,15 +10822,48 @@ function resetDashboardState() {
         mainTrendChartInstance = null;
     }
 }
-// ✅ Helper: สร้างปุ่มยกเลิก (Cancel Button) แบบรวมศูนย์
+// ✅ Helper: สร้างปุ่มยกเลิก (Cancel Button) แบบสวยงาม สมมาตร 100%
 function spawnCancelButton(text, onClickCallback) {
   const btn = document.createElement('button');
-  btn.className = 'btn'; // ใช้คลาสเดิม
-  btn.innerHTML = `✖ ${text}`;
-  btn.style.cssText = 'padding:1rem; font-weight:700; font-size:.75rem; border-radius:var(--r-sm); background:#fee2e2; border:1.5px solid #ef4444; color:#ef4444; margin-top:0.5rem; width:100%; cursor:pointer; transition:all .2s;';
+  btn.className = 'btn'; 
   
-  btn.onmouseover = function() { this.style.background = '#fecaca'; };
-  btn.onmouseout = function() { this.style.background = '#fee2e2'; };
+  // ใช้ Flexbox เพื่อให้ตัวหนังสือและไอคอนอยู่กึ่งกลางเสมอ
+  btn.style.display = 'flex';
+  btn.style.alignItems = 'center';
+  btn.style.justifyContent = 'center';
+  btn.style.gap = '8px';
+  btn.style.width = '100%';
+  btn.style.minHeight = '50px'; // กำหนดความสูงที่แน่นอนเพื่อความสมมาตร
+  btn.style.marginTop = '0.5rem';
+  btn.style.padding = '0'; // ล้าง padding เดิมที่อาจทำให้เบี้ยว
+  
+  btn.style.fontWeight = '800';
+  btn.style.fontSize = '0.85rem';
+  btn.style.letterSpacing = '0.03em';
+  btn.style.textTransform = 'uppercase';
+  btn.style.borderRadius = '12px';
+  
+  // โทนสีแดงอ่อน (Soft Danger)
+  btn.style.background = '#fef2f2';
+  btn.style.border = '1.5px solid #fecaca';
+  btn.style.color = '#ef4444';
+  btn.style.cursor = 'pointer';
+  btn.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+  btn.style.lineHeight = '1';
+
+  // ใส่ไอคอนกากบาทข้างหน้าข้อความ
+  btn.innerHTML = `<span>✖</span> <span>${text}</span>`;
+  
+  btn.onmouseover = function() { 
+    this.style.background = '#fee2e2'; 
+    this.style.borderColor = '#ef4444';
+    this.style.transform = 'translateY(-1px)';
+  };
+  btn.onmouseout = function() { 
+    this.style.background = '#fef2f2'; 
+    this.style.borderColor = '#fecaca';
+    this.style.transform = 'translateY(0)';
+  };
   
   btn.onclick = onClickCallback;
   return btn;
