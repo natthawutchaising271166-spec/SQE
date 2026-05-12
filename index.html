@@ -6802,6 +6802,11 @@ textarea#remark {
         font-size: 0.7rem !important;
     }
 }
+    /* ซ่อน scrollbar ของ datalist ที่อาจจะค้างอยู่ในระบบของบางเบราว์เซอร์ */
+    datalist {
+        display: none !important;
+        visibility: hidden !important;
+    }
 </style>
 </head>
 <body>
@@ -11653,6 +11658,13 @@ function toggleSidebar(forceState = null) {
         toggleBtn.style.background = "rgba(59, 130, 246, 0.4)"; // ไฮไลท์สีฟ้าเมื่อกางออก
     }
 }
+  window.addEventListener('DOMContentLoaded', (event) => {
+    // สั่งให้ทุกช่อง input ในหน้าเว็บปิด autocomplete
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.setAttribute('autocomplete', 'off');
+    });
+  });
 </script>
 </body>
 </html>
