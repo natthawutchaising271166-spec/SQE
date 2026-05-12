@@ -8887,7 +8887,7 @@ window.copyRecord = function(id) {
   
   if($id('refNo')) {
     $id('refNo').value = ''; 
-    $id('refNo').focus();
+    //$id('refNo').focus();
   }
 
   if($id('supplier')) $id('supplier').value = r.supplier;
@@ -10937,39 +10937,6 @@ handleFormSubmit = async function(e) {
 
 initAISmartFill();
 
-// ฟังก์ชันเปิด Modal พร้อมอนิเมชั่นลื่นไหล
-function openChangePassModal() {
-    const modal = document.getElementById('changePassModal');
-    if (!modal) return;
-
-    modal.style.display = 'flex';
-    
-    // รีเซ็ตค่าในฟอร์ม
-    document.getElementById('cpOldPass').value = '';
-    document.getElementById('cpNewPass').value = '';
-    document.getElementById('cpConfirmPass').value = '';
-
-    // อนิเมชั่นด้วย GSAP
-    gsap.fromTo(modal, 
-        { opacity: 0 }, 
-        { opacity: 1, duration: 0.3, ease: 'power2.out' }
-    );
-
-    gsap.fromTo('.cp-card', 
-        { scale: 0.8, y: 40, opacity: 0 }, 
-        { scale: 1, y: 0, opacity: 1, duration: 0.5, ease: 'back.out(1.7)', delay: 0.1 }
-    );
-
-    // อนิเมชั่นไอคอนกุญแจให้ขยับเล็กน้อย
-    gsap.from('#cpLockIcon', {
-        rotate: -20,
-        y: 10,
-        duration: 0.8,
-        delay: 0.4,
-        ease: 'elastic.out(1, 0.5)'
-    });
-}
-
 // ฟังก์ชันปิด Modal พร้อมอนิเมชั่น
 function closeChangePassModal() {
     const modal = document.getElementById('changePassModal');
@@ -10990,76 +10957,6 @@ function closeChangePassModal() {
             modal.style.display = 'none';
         }
     });
-}
-
-// อัพเกรดฟังก์ชันบันทึกรหัสผ่าน (เพิ่มสถานะ Loading และสั่นเมื่อผิดพลาด)
-async function handleChangePassword() {
-    const oldPass = document.getElementById('cpOldPass').value;
-    const newPass = document.getElementById('cpNewPass').value;
-    const confirmPass = document.getElementById('cpConfirmPass').value;
-    const submitBtn = document.getElementById('cpSubmitBtn');
-
-    // 1. ตรวจสอบข้อมูลเบื้องต้น
-    if (!oldPass || !newPass || !confirmPass) {
-        toast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน');
-        gsap.to('.cp-card', { x: -10, repeat: 3, yoyo: true, duration: 0.05 });
-        return;
-    }
-
-    if (newPass !== confirmPass) {
-        toast('❌ รหัสผ่านใหม่ไม่ตรงกัน');
-        shake(document.getElementById('cpConfirmPass'));
-        return;
-    }
-
-    // 2. เริ่มสถานะ Loading
-    const originalText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="init-ring" style="width:18px; height:18px; border-width:2px; display:inline-block; vertical-align:middle; margin-right:8px;"></span> กำลังบันทึก...';
-
-    try {
-        const sb = getSupabase();
-        if (!sb) throw new Error('Database Error');
-
-        // ตรวจสอบรหัสเดิม
-        const { data: userData, error: fetchError } = await sb
-            .from('users')
-            .select('*')
-            .eq('email', currentUser)
-            .single();
-
-        if (userData.password !== oldPass) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-            shake(document.getElementById('cpOldPass'));
-            toast('⛔ รหัสผ่านเดิมไม่ถูกต้อง');
-            return;
-        }
-
-        // อัปเดตรหัสใหม่
-        const { error: updateError } = await sb
-            .from('users')
-            .update({ password: newPass })
-            .eq('email', currentUser);
-
-        if (updateError) throw updateError;
-
-        // 3. สำเร็จ - ทำอนิเมชั่นเฉลิมฉลองเล็กน้อยก่อนปิด
-        toast('✅ เปลี่ยนรหัสผ่านสำเร็จ');
-        
-        gsap.to('#cpLockIcon', { scale: 1.2, color: '#10b981', duration: 0.3 });
-        
-        setTimeout(() => {
-            closeChangePassModal();
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        }, 1000);
-
-    } catch (err) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-        toast('❌ ผิดพลาด: ' + err.message);
-    }
 }
 /* ═══════════════════════════════════════════════
    QUICK DATE FILTER LOGIC
@@ -11238,11 +11135,6 @@ function closeAuditModal() {
 // AUDIT TRAIL RENDER (UPDATED)
 // จัดหน้าตรง Screenshot
 // ══════════════════════════════════════════════════════════════
-
-/// ════════════════════════════════════════════════════════════
-// AUDIT TRAIL RENDER (FIXED)
-// ══════════════════════════════════════════════════════════════
-
 function renderAuditTimeline(data) {
   const listEl = document.getElementById('auditLogList');
   if (!listEl) return;
