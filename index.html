@@ -6752,6 +6752,56 @@ html.dark-mode #changePassModal {
     color: #f59e0b !important;
     font-weight: 800;
 }
+/* ปรับแต่งปุ่ม Commit ให้เด่นเป็นพิเศษ */
+#submitBtn {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+/* เมื่อเปิดในแท็บเล็ตหรือจอเล็ก (ความกว้างน้อยกว่า 1024px) */
+@media (max-width: 1024px) {
+    #submitBtn {
+        font-size: 1rem !important; /* ใหญ่ขึ้นอีกนิดในแท็บเล็ต */
+        padding: 1.25rem !important; /* ขยายขนาดปุ่มให้กดด้วยนิ้วง่ายขึ้น */
+        box-shadow: 0 0 25px rgba(37, 99, 235, 0.5) !important; /* เพิ่มแสงเรืองรอบปุ่ม */
+    }
+}
+#submitBtn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    overflow: hidden;
+}
+
+/* ป้องกันไอคอนดาว ✦ ลอยสูงกว่าตัวหนังสือ */
+#submitBtn span, #submitBtn i {
+    display: inline-block;
+    line-height: 0;
+    vertical-align: middle;
+}
+/* บังคับให้ช่องกรอกข้อมูลทุกประเภทมี Padding ที่เท่ากัน */
+.neon-in, textarea.neon-in {
+    padding: 0.65rem 0.85rem !important;
+    box-sizing: border-box; /* สำคัญมาก: เพื่อให้ padding ไม่ไปเพิ่มความกว้างกล่อง */
+    display: block;
+}
+
+/* ปรับแต่งพิเศษสำหรับ Textarea */
+textarea#remark {
+    font-family: var(--font-body);
+    vertical-align: top;
+}
+
+/* เมื่อหน้าจอเล็กลง (Tablet/Mobile) ให้ลด Padding ลงเล็กน้อยแต่ยังต้องไม่ชิดขอบ */
+@media (max-height: 850px) {
+    .neon-in, textarea.neon-in {
+        padding: 0.5rem 0.7rem !important;
+        font-size: 0.7rem !important;
+    }
+}
 </style>
 </head>
 <body>
@@ -7170,7 +7220,7 @@ html.dark-mode #changePassModal {
         </div>
       </div>
 
-      <form id="claimForm" class="scroll" style="display:flex;flex-direction:column;gap:.6rem;overflow-y:auto;flex-grow:1;padding-right:.1rem">
+      <form id="claimForm" class="scroll" style="display:flex;flex-direction:column;gap:.6rem;overflow-y:auto;flex-grow:1;padding-right:.1rem; padding-bottom: 5rem;">
 
         <!-- Date & Shift -->
         <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
@@ -7184,38 +7234,36 @@ html.dark-mode #changePassModal {
           </div>
         </div>
 
-        <!-- Reference -->
-<!-- ส่วนที่มักพบ Error: Reference Info -->
-        <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
-            <div class="sidebar-section-title">Reference Info</div>
-            
-            <!-- ✅ แก้ไขจุดนี้: ลบ required และ class ที่ซ้ำซ้อนออกเหลือเพียงชุดเดียว -->
-            <input type="text" id="refNo" list="refList" 
-                   placeholder="REF001/2024 หรือ V001/2024 *" 
-                   required class="neon-in" 
-                   style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
-            
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
-                <input type="text" id="supplier" list="supList" 
-                       placeholder="Supplier *" required class="neon-in" 
-                       style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-                
-                <input type="number" id="qty" 
-                       placeholder="QTY *" required class="neon-in" 
-                       style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-            </div>
-        </div>
+<!-- Part Details (ย้ายขึ้นมาลำดับแรกหลัง Date) -->
+<div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.6rem;border:1px solid var(--border)">
+  <div class="sidebar-section-title">Part Details</div>
+  <!-- ปรับจาก grid 1fr 1fr เป็น column เพื่อให้ Part No และ Part Name อยู่คนละบรรทัด -->
+  <div style="display:flex; flex-direction:column; gap:.45rem; margin-bottom:.5rem">
+    <input type="text" id="partNo" list="ptList" placeholder="Part No *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+    <input type="text" id="partOn" list="lotList" placeholder="Part Name *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+  </div>
+  <input type="text" id="defectName" list="defectList" placeholder="Defect Type *" required class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
+  <textarea id="remark" placeholder="Remarks…" class="neon-in" style="height: 3vh; min-height: 40px;"></textarea>
+</div>
 
-        <!-- Part -->
-        <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
-          <div class="sidebar-section-title">Part Details</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem">
-            <input type="text" id="partNo" list="ptList" placeholder="Part No *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-            <input type="text" id="partOn" list="lotList" placeholder="Part Name *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-          </div>
-          <input type="text" id="defectName" list="defectList" placeholder="Defect Type *" required class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
-          <textarea id="remark" placeholder="Remarks…" rows="2" class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;resize:none"></textarea>
-        </div>
+<!-- Reference Info -->
+<div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.6rem;border:1px solid var(--border)">
+    <div class="sidebar-section-title">Reference Info</div>
+    <input type="text" id="refNo" list="refList" 
+           placeholder="REF001/2024 หรือ V001/2024 *" 
+           required class="neon-in" 
+           style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
+        <input type="text" id="supplier" list="supList" 
+               placeholder="Supplier *" required class="neon-in" 
+               style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+        
+        <input type="number" id="qty" 
+               placeholder="QTY *" required class="neon-in" 
+               style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+    </div>
+</div>
 
         <!-- Judgment -->
         <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
@@ -7232,8 +7280,8 @@ html.dark-mode #changePassModal {
 
 <!-- ปุ่ม Submit เดียว เพื่อให้ JS ควบคุมการแสดงผลปุ่ม Cancel -->
 <button type="submit" id="submitBtn" class="btn"
-  style="padding:1rem;font-weight:700;font-size:.75rem;letter-spacing:.04em;border-radius:var(--r-sm)">
-  ✦ Commit Data
+  style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 55px; padding: 0; font-weight: 800; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); transition: all 0.3s ease; margin-top: 0.5rem; line-height: 1;">
+  ✦ COMMIT DATA
 </button>
       </form>
     </aside>
@@ -8839,7 +8887,7 @@ window.copyRecord = function(id) {
   
   if($id('refNo')) {
     $id('refNo').value = ''; 
-    $id('refNo').focus();
+    //$id('refNo').focus();
   }
 
   if($id('supplier')) $id('supplier').value = r.supplier;
@@ -10685,15 +10733,48 @@ function resetDashboardState() {
         mainTrendChartInstance = null;
     }
 }
-// ✅ Helper: สร้างปุ่มยกเลิก (Cancel Button) แบบรวมศูนย์
+// ✅ Helper: สร้างปุ่มยกเลิก (Cancel Button) แบบสวยงาม สมมาตร 100%
 function spawnCancelButton(text, onClickCallback) {
   const btn = document.createElement('button');
-  btn.className = 'btn'; // ใช้คลาสเดิม
-  btn.innerHTML = `✖ ${text}`;
-  btn.style.cssText = 'padding:1rem; font-weight:700; font-size:.75rem; border-radius:var(--r-sm); background:#fee2e2; border:1.5px solid #ef4444; color:#ef4444; margin-top:0.5rem; width:100%; cursor:pointer; transition:all .2s;';
+  btn.className = 'btn'; 
   
-  btn.onmouseover = function() { this.style.background = '#fecaca'; };
-  btn.onmouseout = function() { this.style.background = '#fee2e2'; };
+  // ใช้ Flexbox เพื่อให้ตัวหนังสือและไอคอนอยู่กึ่งกลางเสมอ
+  btn.style.display = 'flex';
+  btn.style.alignItems = 'center';
+  btn.style.justifyContent = 'center';
+  btn.style.gap = '8px';
+  btn.style.width = '100%';
+  btn.style.minHeight = '50px'; // กำหนดความสูงที่แน่นอนเพื่อความสมมาตร
+  btn.style.marginTop = '0.5rem';
+  btn.style.padding = '0'; // ล้าง padding เดิมที่อาจทำให้เบี้ยว
+  
+  btn.style.fontWeight = '800';
+  btn.style.fontSize = '0.85rem';
+  btn.style.letterSpacing = '0.03em';
+  btn.style.textTransform = 'uppercase';
+  btn.style.borderRadius = '12px';
+  
+  // โทนสีแดงอ่อน (Soft Danger)
+  btn.style.background = '#fef2f2';
+  btn.style.border = '1.5px solid #fecaca';
+  btn.style.color = '#ef4444';
+  btn.style.cursor = 'pointer';
+  btn.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+  btn.style.lineHeight = '1';
+
+  // ใส่ไอคอนกากบาทข้างหน้าข้อความ
+  btn.innerHTML = `<span>✖</span> <span>${text}</span>`;
+  
+  btn.onmouseover = function() { 
+    this.style.background = '#fee2e2'; 
+    this.style.borderColor = '#ef4444';
+    this.style.transform = 'translateY(-1px)';
+  };
+  btn.onmouseout = function() { 
+    this.style.background = '#fef2f2'; 
+    this.style.borderColor = '#fecaca';
+    this.style.transform = 'translateY(0)';
+  };
   
   btn.onclick = onClickCallback;
   return btn;
@@ -10856,39 +10937,6 @@ handleFormSubmit = async function(e) {
 
 initAISmartFill();
 
-// ฟังก์ชันเปิด Modal พร้อมอนิเมชั่นลื่นไหล
-function openChangePassModal() {
-    const modal = document.getElementById('changePassModal');
-    if (!modal) return;
-
-    modal.style.display = 'flex';
-    
-    // รีเซ็ตค่าในฟอร์ม
-    document.getElementById('cpOldPass').value = '';
-    document.getElementById('cpNewPass').value = '';
-    document.getElementById('cpConfirmPass').value = '';
-
-    // อนิเมชั่นด้วย GSAP
-    gsap.fromTo(modal, 
-        { opacity: 0 }, 
-        { opacity: 1, duration: 0.3, ease: 'power2.out' }
-    );
-
-    gsap.fromTo('.cp-card', 
-        { scale: 0.8, y: 40, opacity: 0 }, 
-        { scale: 1, y: 0, opacity: 1, duration: 0.5, ease: 'back.out(1.7)', delay: 0.1 }
-    );
-
-    // อนิเมชั่นไอคอนกุญแจให้ขยับเล็กน้อย
-    gsap.from('#cpLockIcon', {
-        rotate: -20,
-        y: 10,
-        duration: 0.8,
-        delay: 0.4,
-        ease: 'elastic.out(1, 0.5)'
-    });
-}
-
 // ฟังก์ชันปิด Modal พร้อมอนิเมชั่น
 function closeChangePassModal() {
     const modal = document.getElementById('changePassModal');
@@ -10909,76 +10957,6 @@ function closeChangePassModal() {
             modal.style.display = 'none';
         }
     });
-}
-
-// อัพเกรดฟังก์ชันบันทึกรหัสผ่าน (เพิ่มสถานะ Loading และสั่นเมื่อผิดพลาด)
-async function handleChangePassword() {
-    const oldPass = document.getElementById('cpOldPass').value;
-    const newPass = document.getElementById('cpNewPass').value;
-    const confirmPass = document.getElementById('cpConfirmPass').value;
-    const submitBtn = document.getElementById('cpSubmitBtn');
-
-    // 1. ตรวจสอบข้อมูลเบื้องต้น
-    if (!oldPass || !newPass || !confirmPass) {
-        toast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน');
-        gsap.to('.cp-card', { x: -10, repeat: 3, yoyo: true, duration: 0.05 });
-        return;
-    }
-
-    if (newPass !== confirmPass) {
-        toast('❌ รหัสผ่านใหม่ไม่ตรงกัน');
-        shake(document.getElementById('cpConfirmPass'));
-        return;
-    }
-
-    // 2. เริ่มสถานะ Loading
-    const originalText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="init-ring" style="width:18px; height:18px; border-width:2px; display:inline-block; vertical-align:middle; margin-right:8px;"></span> กำลังบันทึก...';
-
-    try {
-        const sb = getSupabase();
-        if (!sb) throw new Error('Database Error');
-
-        // ตรวจสอบรหัสเดิม
-        const { data: userData, error: fetchError } = await sb
-            .from('users')
-            .select('*')
-            .eq('email', currentUser)
-            .single();
-
-        if (userData.password !== oldPass) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-            shake(document.getElementById('cpOldPass'));
-            toast('⛔ รหัสผ่านเดิมไม่ถูกต้อง');
-            return;
-        }
-
-        // อัปเดตรหัสใหม่
-        const { error: updateError } = await sb
-            .from('users')
-            .update({ password: newPass })
-            .eq('email', currentUser);
-
-        if (updateError) throw updateError;
-
-        // 3. สำเร็จ - ทำอนิเมชั่นเฉลิมฉลองเล็กน้อยก่อนปิด
-        toast('✅ เปลี่ยนรหัสผ่านสำเร็จ');
-        
-        gsap.to('#cpLockIcon', { scale: 1.2, color: '#10b981', duration: 0.3 });
-        
-        setTimeout(() => {
-            closeChangePassModal();
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        }, 1000);
-
-    } catch (err) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-        toast('❌ ผิดพลาด: ' + err.message);
-    }
 }
 /* ═══════════════════════════════════════════════
    QUICK DATE FILTER LOGIC
@@ -11157,11 +11135,6 @@ function closeAuditModal() {
 // AUDIT TRAIL RENDER (UPDATED)
 // จัดหน้าตรง Screenshot
 // ══════════════════════════════════════════════════════════════
-
-/// ════════════════════════════════════════════════════════════
-// AUDIT TRAIL RENDER (FIXED)
-// ══════════════════════════════════════════════════════════════
-
 function renderAuditTimeline(data) {
   const listEl = document.getElementById('auditLogList');
   if (!listEl) return;
