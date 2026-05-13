@@ -6802,26 +6802,53 @@ textarea#remark {
         font-size: 0.7rem !important;
     }
 }
+/* กล่อง Dropdown ที่ลอยออกมา */
+.search-results-container {
+    position: absolute;
+    z-index: 9999;
+    background: #ffffff;
+    border: 2px solid #bfdbfe; /* สีฟ้าอ่อนตามรูป */
+    border-top: none; /* เชื่อมกับช่องกรอก */
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-height: 220px;
+    overflow-y: auto;
+    display: none;
+    margin-top: -2px; /* ให้แนบชิดขอบล่างของ input */
+}
+
+/* รายการแต่ละแถวใน Dropdown */
+.search-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.2s;
+}
+
+.search-item:last-child { border-bottom: none; }
+
+.search-item:hover {
+    background: #eff6ff; /* สีฟ้าเวลาเอาเมาส์ชี้ */
+    color: #2563eb;
+}
+
+/* ปรับปรุง Input เมื่อ Dropdown เปิดอยู่ */
+.input-dropdown-open {
+    border-color: #3b82f6 !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Wrapper สำหรับกำหนดตำแหน่ง */
+.form-section-input { position: relative; width: 100%; }
 </style>
 </head>
 <body>
-<!-- ═══════════════════════════════════════════════════
-     DATALISTS (FIXED - เพิ่ม datalist ที่ขาดหายไป)
-═══════════════════════════════════════════════════ -->
-<!-- Inspector names datalist -->
-<datalist id="inspectorList"></datalist>
-<!-- Line numbers datalist -->
-<datalist id="lineList"></datalist>
-<!-- Reference numbers datalist -->
-<datalist id="refList"></datalist>
-<!-- Supplier names datalist -->
-<datalist id="supList"></datalist>
-<!-- Part numbers datalist -->
-<datalist id="ptList"></datalist>
-<!-- Part names/lot datalist -->
-<datalist id="lotList"></datalist>
-<!-- Defect types datalist -->
-<datalist id="defectList"></datalist>
 <!-- ═══════════════════════════════════════════════════
      LOADING OVERLAY
 ═══════════════════════════════════════════════════ -->
@@ -7239,28 +7266,34 @@ textarea#remark {
   <div class="sidebar-section-title">Part Details</div>
   <!-- ปรับจาก grid 1fr 1fr เป็น column เพื่อให้ Part No และ Part Name อยู่คนละบรรทัด -->
   <div style="display:flex; flex-direction:column; gap:.45rem; margin-bottom:.5rem">
-    <input type="text" id="partNo" list="ptList" placeholder="Part No *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+    <input type="text" id="partNo" autocomplete="off" placeholder="Part No *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
     <input type="text" id="partOn" list="lotList" placeholder="Part Name *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
   </div>
   <input type="text" id="defectName" list="defectList" placeholder="Defect Type *" required class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
   <textarea id="remark" placeholder="Remarks…" class="neon-in" style="height: 3vh; min-height: 40px;"></textarea>
 </div>
 
-<!-- Reference Info -->
+<!-- Reference Info (สลับตำแหน่งเพื่อให้ Supplier เห็นชัดเจนขึ้น) -->
 <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.6rem;border:1px solid var(--border)">
     <div class="sidebar-section-title">Reference Info</div>
-    <input type="text" id="refNo" list="refList" 
-           placeholder="REF001/2024 หรือ V001/2024 *" 
-           required class="neon-in" 
-           style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
+    
+    <!-- Supplier อยู่ด้านบนแบบเต็มความกว้าง -->
+    <div class="form-section-input">
+        <input type="text" id="supplier" placeholder="Supplier *" required class="neon-in" 
+               style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
+        <div id="results-supplier" class="search-results-container scroll"></div>
+    </div>
     
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
-        <input type="text" id="supplier" list="supList" 
-               placeholder="Supplier *" required class="neon-in" 
-               style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+        <!-- Ref No ย้ายลงมาตรงนี้ -->
+        <div class="form-section-input">
+            <input type="text" id="refNo" placeholder="REF No. *" required class="neon-in" 
+                   style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+            <div id="results-refNo" class="search-results-container scroll"></div>
+        </div>
         
-        <input type="number" id="qty" 
-               placeholder="QTY *" required class="neon-in" 
+        <!-- QTY -->
+        <input type="number" id="qty" placeholder="QTY *" required class="neon-in" 
                style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
     </div>
 </div>
@@ -8786,16 +8819,35 @@ const dateValue = new Date(document.getElementById('inputDate').value).toISOStri
   const keepShift = $id('shift').value;
   const keepLine = $id('lineNo').value;
   
-  // เรียกฟังก์ชันล้างฟอร์ม (ซึ่งจะล้างสีขอบที่เราเพิ่มไว้ในข้อ 1 ด้วย)
+  // 1. ล้างข้อมูลในฟอร์ม
   cancelEdit(); 
+  
+  // 2. สั่งให้ปุ่ม Reset Form หายไปทันที
+  removeAiResetButton(); 
   
   if($id('inputDate')) $id('inputDate').value = keepDate;
   if($id('shift')) $id('shift').value = keepShift;
   if($id('lineNo')) $id('lineNo').value = keepLine;
   if($id('refNo')) $id('refNo').focus();
-
+if (document.activeElement) document.activeElement.blur();
   refreshAll();
   writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
+  // --- เพิ่มโค้ดส่วนนี้เข้าไปในฟังก์ชัน handleFormSubmit ---
+
+// 1. สั่งซ่อนกล่องรายการเลือก (Dropdown) ทุกช่อง
+document.querySelectorAll('.search-results-container').forEach(box => {
+    box.style.display = 'none';
+});
+
+// 2. ลบคลาสที่ทำให้ขอบ Input ตัดตรงออก (คืนค่าขอบโค้งมน)
+document.querySelectorAll('.neon-in').forEach(input => {
+    input.classList.remove('input-dropdown-open');
+});
+
+// 3. เอาเคอร์เซอร์ออกจากช่องกรอก (ตามที่ตั้งค่าไว้ก่อนหน้า)
+if (document.activeElement) document.activeElement.blur();
+
+// -------------------------------------------------------
 }
 
 window.editRecord = function(id) {
@@ -8920,39 +8972,13 @@ if(!$id('cancelCopyBtn')) {
   toast('📋 คัดลอกข้อมูลแล้ว พร้อมบันทึกใหม่');
 };
 
-function cancelCopy() {
-  if($id('claimForm')) $id('claimForm').reset();
-  if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
-  handleJudgment('');
-  
-  // ══════════════════════════════════════════════════════════
-  // [เพิ่มบรรทัดนี้] ล้างสีขอบให้กลับมาปกติ
-  // ══════════════════════════════════════════════════════════
-  if($id('refNo')) $id('refNo').style.borderColor = "";
-  // ══════════════════════════════════════════════════════════
-  
-  const btn = $id('submitBtn');
-  if(btn) {
-    btn.innerHTML = '✦ Commit Data';
-    btn.style.background = '';
-  }
-  
-  if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
-  if($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
-}
-
 function cancelEdit() {
   editingId = null;
-  
   if($id('claimForm')) $id('claimForm').reset();
   if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
   handleJudgment('');
   
-  // ══════════════════════════════════════════════════════════
-  // [เช็คว่ามีบรรทัดนี้หรือยัง] ล้างสีขอบให้กลับมาปกติ
-  // ══════════════════════════════════════════════════════════
   if($id('refNo')) $id('refNo').style.borderColor = "";
-  // ══════════════════════════════════════════════════════════
 
   const btn = $id('submitBtn');
   if(btn) {
@@ -8964,6 +8990,29 @@ function cancelEdit() {
   if($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
 
   document.querySelectorAll('tr.is-editing').forEach(el => el.classList.remove('is-editing'));
+
+  // ✅ เพิ่มบรรทัดนี้: เอาเคอร์เซอร์ออก
+  if (document.activeElement) document.activeElement.blur();
+}
+
+function cancelCopy() {
+  if($id('claimForm')) $id('claimForm').reset();
+  if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
+  handleJudgment('');
+  
+  if($id('refNo')) $id('refNo').style.borderColor = "";
+  
+  const btn = $id('submitBtn');
+  if(btn) {
+    btn.innerHTML = '✦ Commit Data';
+    btn.style.background = '';
+  }
+  
+  if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
+  if($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
+
+  // ✅ เพิ่มบรรทัดนี้: เอาเคอร์เซอร์ออก
+  if (document.activeElement) document.activeElement.blur();
 }
 
 // --- ลบข้อมูล (แถวเดียว) ---
@@ -10016,26 +10065,112 @@ window.refreshDash = function() {
     console.log(`[Dashboard] Refreshed: ${displayData.length} records found.`);
 };
 
-function updateDatalists() {
-  const myR = getMyRecords();
-  const fields = {
-    'inspectorList': 'inspector',
-    'lineList': 'line',
-    'refList': 'ref',
-    'supList': 'supplier',
-    'ptList': 'partNo',
-    'lotList': 'partName',
-    'defectList': 'defect'
-  };
+// เก็บข้อมูลตัวเลือกไว้ในตัวแปร Global
+let masterLists = {};
 
-  for (const [id, key] of Object.entries(fields)) {
-    const list = document.getElementById(id);
-    if (!list) continue;
-    // ดึงค่าที่ไม่ซ้ำกัน (Unique Values)
-    const uniqueValues = [...new Set(myR.map(r => r[key]).filter(Boolean))];
-    list.innerHTML = uniqueValues.map(v => `<option value="${escapeHtml(v)}">`).join('');
-  }
+// ฟังก์ชันจัดการ Searchable Dropdown สำหรับทุกช่อง
+function updateDatalists() {
+    const myR = getMyRecords();
+    
+    // กำหนดว่า ID ไหน ใช้ข้อมูลจาก Field ไหนใน Database
+    const fields = {
+        'lineNo': 'line',
+        'refNo': 'ref',
+        'supplier': 'supplier',
+        'partNo': 'partNo',
+        'partOn': 'partName',
+        'defectName': 'defect',
+        'shift': 'shift' // เพิ่ม Shift ด้วย
+    };
+
+    for (const [id, key] of Object.entries(fields)) {
+        const inputEl = $id(id);
+        if (!inputEl) continue;
+
+        // 1. เก็บข้อมูล Unique Values ไว้ค้นหา
+        masterLists[id] = [...new Set(myR.map(r => r[key]).filter(Boolean))].sort();
+        
+        // 2. ปิดระบบ Auto-complete เดิมของ Browser
+        inputEl.setAttribute('autocomplete', 'off');
+        inputEl.removeAttribute('list');
+
+        // 3. สร้าง Wrapper และกล่องผลลัพธ์ถ้ายังไม่มี
+        if (!inputEl.parentNode.classList.contains('form-section-input')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'form-section-input';
+            inputEl.parentNode.insertBefore(wrapper, inputEl);
+            wrapper.appendChild(inputEl);
+            
+            const resultBox = document.createElement('div');
+            resultBox.id = 'results-' + id;
+            resultBox.className = 'search-results-container scroll';
+            wrapper.appendChild(resultBox);
+        }
+
+        // 4. ผูกเหตุการณ์การพิมพ์ (Input)
+        inputEl.oninput = function() {
+            showCustomList(this.id, this.value);
+        };
+        
+        // 5. ผูกเหตุการณ์เมื่อคลิก (Focus) ให้แสดงรายการทันที
+        inputEl.onfocus = function() {
+            showCustomList(this.id, this.value);
+        };
+    }
 }
+
+// ฟังก์ชันแสดงรายการที่กรองตามคำค้นหา
+function showCustomList(inputId, value) {
+    const resultBox = $id('results-' + inputId);
+    const inputEl = $id(inputId);
+    const list = masterLists[inputId] || [];
+    const searchTerm = value.toLowerCase().trim();
+
+    // กรองข้อมูล (ถ้าไม่มีคำค้นหา ให้โชว์ 10 อันดับแรกที่เคยใช้บ่อย)
+    const filtered = list.filter(item => 
+        String(item).toLowerCase().includes(searchTerm)
+    ).slice(0, 15);
+
+    if (filtered.length > 0) {
+        resultBox.innerHTML = filtered.map(item => 
+            `<div class="search-item" onclick="selectCustomItem('${inputId}', '${item.replace(/'/g, "\\'")}')">${item}</div>`
+        ).join('');
+        resultBox.style.display = 'block';
+        inputEl.classList.add('input-dropdown-open');
+    } else {
+        resultBox.style.display = 'none';
+        inputEl.classList.remove('input-dropdown-open');
+    }
+}
+
+// ฟังก์ชันเมื่อกดเลือกรายการ
+window.selectCustomItem = function(inputId, value) {
+    const inputEl = $id(inputId);
+    const resultBox = $id('results-' + inputId);
+    
+    inputEl.value = value;
+    resultBox.style.display = 'none';
+    inputEl.classList.remove('input-dropdown-open');
+    
+    // ถ้าเลือก Part No หรือ Part Name ให้ระบบ AI ช่วยกรอกช่องที่เกี่ยวข้อง
+    if (inputId === 'partNo' || inputId === 'partOn') {
+        aiInstantFill(value, inputId);
+    }
+    
+    
+};
+
+// ปิด Dropdown เมื่อคลิกที่อื่น
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.form-section-input')) {
+        document.querySelectorAll('.search-results-container').forEach(box => {
+            box.style.display = 'none';
+        });
+        document.querySelectorAll('.neon-in').forEach(input => {
+            input.classList.remove('input-dropdown-open');
+        });
+    }
+});
 
 function updateChartStats(dataArray) {
   // ✅ FIX: ตรวจสอบว่ามีข้อมูลไหม ก่อนคำนวณ Min/Max/Avg ป้องกัน NaN
@@ -10889,20 +11024,23 @@ function showAiResetButton() {
     resetBtn.onmouseover = () => { resetBtn.style.background = '#f1f5f9'; resetBtn.style.borderColor = '#cbd5e1'; };
     resetBtn.onmouseout = () => { resetBtn.style.background = '#f8fafc'; resetBtn.style.borderColor = '#e2e8f0'; };
     
-    resetBtn.onclick = () => {
-        // 1. ล้างช่อง Input ทั้งหมด
-        const allFields = ['partNo', 'partOn', 'supplier', 'lineNo', 'qty', 'defectName', 'remark', 'refNo'];
-        allFields.forEach(id => { if($id(id)) $id(id).value = ''; });
-        
-        // 2. รีเซ็ต Judgment
-        const jd = $id('judgmentSelect');
-        if (jd) { jd.value = ''; handleJudgment(''); }
-        
-        // 3. แจ้งเตือนและลบปุ่มตัวเองออก
-        toast("🧹 ล้างข้อมูลฟอร์มทั้งหมดแล้ว");
-        resetBtn.remove();
-        if($id('partNo')) $id('partNo').focus(); // โฟกัสช่องแรกใหม่
-    };
+// --- ค้นหาบรรทัด resetBtn.onclick ภายในฟังก์ชัน showAiResetButton ---
+resetBtn.onclick = () => {
+    // 1. ล้างช่อง Input ทั้งหมด
+    const allFields = ['partNo', 'partOn', 'supplier', 'lineNo', 'qty', 'defectName', 'remark', 'refNo'];
+    allFields.forEach(id => { if($id(id)) $id(id).value = ''; });
+    
+    // 2. รีเซ็ต Judgment
+    const jd = $id('judgmentSelect');
+    if (jd) { jd.value = ''; handleJudgment(''); }
+    
+    // 3. แจ้งเตือนและลบปุ่มตัวเองออก
+    toast("🧹 ล้างข้อมูลฟอร์มทั้งหมดแล้ว");
+    resetBtn.remove();
+
+    // ✅ แก้ไขตรงนี้: จากเดิมที่สั่ง .focus() ให้เปลี่ยนเป็น .blur()
+    if (document.activeElement) document.activeElement.blur();
+};
 
     submitBtn.parentNode.insertBefore(resetBtn, submitBtn);
 }
@@ -10930,7 +11068,12 @@ refreshAll = function() { originalRefreshAll(); updateAIBrain(); };
 // ตรวจจับการกด Submit เพื่อซ่อนปุ่มล้าง
 const originalHandleFormSubmit = handleFormSubmit;
 handleFormSubmit = async function(e) {
+    // ป้องกันการเอาเคอร์เซอร์ลงช่องตั้งแต่เริ่มกดบันทึก
+    if (document.activeElement) document.activeElement.blur();
+    
     const res = await originalHandleFormSubmit(e);
+    
+    // ย้ำอีกครั้งให้ปุ่มหายไป
     removeAiResetButton();
     return res;
 };
