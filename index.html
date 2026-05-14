@@ -6846,6 +6846,115 @@ textarea#remark {
 
 /* Wrapper สำหรับกำหนดตำแหน่ง */
 .form-section-input { position: relative; width: 100%; }
+* กิมมิกไอคอน: ให้มีการเรืองแสงอ่อนๆ และกระพริบเบาๆ เหมือนระบบ Security */
+.sc-gimmick-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6; /* สีฟ้าสดใส */
+    filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6));
+    animation: scPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes scPulse {
+    0%, 100% { opacity: 0.6; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* ปรับแต่ง Select ให้เนียนและชื่อชัดเจน */
+.sc-premium-select:hover {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+}
+
+.sc-premium-select option {
+    background: #0f172a; /* พื้นหลังสีเข้มทึบเพื่อให้ชื่อชัดที่สุดเมื่อเปิดเมนู */
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 10px;
+}
+
+/* เมื่อชื่อถูกเลือก ให้ชื่อเด่นออกมาด้วย Ambient Light */
+.sc-premium-select:focus {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+@keyframes modalIn {
+  from { opacity:0; transform:scale(0.95) translateY(10px); }
+  to { opacity:1; transform:none; }
+}
+
+/* การตั้งค่า Sidebar เมื่อพับ */
+#sidebar {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: left;
+    position: relative;
+}
+
+#sidebar.collapsed {
+    width: 0px !important;
+    min-width: 0px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* ปุ่มสำหรับเปิด Sidebar คืนมา (จะอยู่ในฝั่ง Main Panel) */
+#expandFormBtn {
+    display: none; /* ซ่อนไว้ก่อน */
+    background: var(--blue-600);
+    color: white;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    padding: 10px 8px;
+    cursor: pointer;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+#expandFormBtn.visible {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes modalIn {
+  from { opacity:0; transform:scale(0.95) translateY(10px); }
+  to { opacity:1; transform:none; }
+}
+.row-deleting {
+  animation: rowOut 0.3s forwards cubic-bezier(0.4, 0, 1, 1);
+}
+@keyframes rowOut {
+  to { opacity: 0; transform: translateX(30px); height: 0; padding: 0; margin: 0; }
+}
+/* เอฟเฟกต์สำหรับแถวใหม่ในตาราง */
+@keyframes rowFlash {
+  0% { background-color: rgba(16, 185, 129, 0.4); }
+  100% { background-color: transparent; }
+}
+.row-new-entry {
+  animation: rowFlash 2s ease-out;
+}
+
+/* เอฟเฟกต์โลโก้กระพริบเมื่อบันทึก */
+.logo-success-glow {
+  box-shadow: 0 0 20px #10b981 !important;
+  border-color: #10b981 !important;
+  transition: all 0.3s;
+}
+/* เอฟเฟกต์สำหรับแถวที่บันทึกสำเร็จ */
+@keyframes rowFlashSuccess {
+  0% { background-color: rgba(16, 185, 129, 0.35); } /* สีเขียวมิ้นต์แบบในรูป */
+  100% { background-color: transparent; }
+}
+
+.row-new-entry {
+  animation: rowFlashSuccess 3s ease-out forwards;
+}
 </style>
 </head>
 <body>
@@ -6906,13 +7015,6 @@ textarea#remark {
     </div>
   </div>
 </div>
-
-<style>
-@keyframes modalIn {
-  from { opacity:0; transform:scale(0.95) translateY(10px); }
-  to { opacity:1; transform:none; }
-}
-</style>
 
 <div id="loginOverlay">
     <!-- พื้นหลังล้ำยุค -->
@@ -7069,82 +7171,6 @@ textarea#remark {
     </div>
 </div>
 </div>
-<style>
-* กิมมิกไอคอน: ให้มีการเรืองแสงอ่อนๆ และกระพริบเบาๆ เหมือนระบบ Security */
-.sc-gimmick-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #3b82f6; /* สีฟ้าสดใส */
-    filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6));
-    animation: scPulse 2.5s infinite ease-in-out;
-}
-
-@keyframes scPulse {
-    0%, 100% { opacity: 0.6; transform: scale(0.95); }
-    50% { opacity: 1; transform: scale(1.05); }
-}
-
-/* ปรับแต่ง Select ให้เนียนและชื่อชัดเจน */
-.sc-premium-select:hover {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border-color: rgba(59, 130, 246, 0.4) !important;
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
-}
-
-.sc-premium-select option {
-    background: #0f172a; /* พื้นหลังสีเข้มทึบเพื่อให้ชื่อชัดที่สุดเมื่อเปิดเมนู */
-    color: #fff;
-    font-size: 0.8rem;
-    padding: 10px;
-}
-
-/* เมื่อชื่อถูกเลือก ให้ชื่อเด่นออกมาด้วย Ambient Light */
-.sc-premium-select:focus {
-    border-color: rgba(59, 130, 246, 0.6);
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-}
-@keyframes modalIn {
-  from { opacity:0; transform:scale(0.95) translateY(10px); }
-  to { opacity:1; transform:none; }
-}
-
-/* การตั้งค่า Sidebar เมื่อพับ */
-#sidebar {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: left;
-    position: relative;
-}
-
-#sidebar.collapsed {
-    width: 0px !important;
-    min-width: 0px !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-right: 0 !important;
-    opacity: 0;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-/* ปุ่มสำหรับเปิด Sidebar คืนมา (จะอยู่ในฝั่ง Main Panel) */
-#expandFormBtn {
-    display: none; /* ซ่อนไว้ก่อน */
-    background: var(--blue-600);
-    color: white;
-    border: none;
-    border-radius: 0 10px 10px 0;
-    padding: 10px 8px;
-    cursor: pointer;
-    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-    z-index: 100;
-}
-
-#expandFormBtn.visible {
-    display: flex;
-    animation: fadeIn 0.3s ease;
-}
-</style>
            <!-- Dark Mode Button (อยู่ด้านขวาสุด) -->
       <button onclick="toggleDarkMode()" id="darkModeBtn" title="Toggle Theme"
         style="position:absolute;top:.75rem;right:.75rem;z-index:2;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 8px;cursor:pointer;transition:all .2s;font-size:.7rem;display:flex;align-items:center;gap:3px;font-family:var(--font-head);font-weight:600"
@@ -7385,7 +7411,7 @@ textarea#remark {
           </thead>
           <tbody id="tableBody"></tbody>
         </table>
-        
+
         <!-- Empty state -->
         <div id="emptyState" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:3rem;text-align:center;gap:1rem">
           <svg class="mascot-float" width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -8744,7 +8770,7 @@ function handleJudgment(val) {
   }
 }
 
-// บันทึก หรือ อัปเดตข้อมูลผ่านฟอร์ม (ฉบับแก้ไขปัญหา Update ข้อมูลไม่เปลี่ยน)
+// ฟังก์ชัน handleFormSubmit ฉบับสมบูรณ์ (Loading -> Success -> Reset)
 async function handleFormSubmit(e) {
   let oldRecord = null;
   let auditAction = 'INSERT';
@@ -8758,6 +8784,7 @@ async function handleFormSubmit(e) {
   const supp = $id('supplier').value.trim();
   const qty = parseInt($id('qty').value) || 0;
   const jdg = $id('judgmentSelect').value;
+  const btn = $id('submitBtn');
   
   const refRegex = /^(V?\d{3}\/\d{4})$/i; 
   if (!ref) { shake(refInput); toast('❌ กรุณาระบุ Reference No'); return; }
@@ -8769,12 +8796,24 @@ async function handleFormSubmit(e) {
     return;
   }
 
-  // เช็คข้อมูลซ้ำ (ยกเว้นตัวที่กำลังแก้ไขอยู่)
   if (!editingId && isDuplicate(ref)) {
     shake(refInput);
     toast('⚠️ Duplicate! REF นี้มีในระบบแล้ว');
     return;
   }
+
+  // 🌟 [AUTOMATION 1: START LOADING] 🌟
+  const originalBtnHTML = '<span>✦ COMMIT DATA</span>'; // เก็บค่าเริ่มต้นเพื่อย้อนกลับ
+  btn.disabled = true;
+  btn.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <span>กำลังบันทึกลงคลาวด์...</span>
+    </div>
+  `;
 
   // --- [2] สร้างโครงสร้างข้อมูล ---
   const rowData = {
@@ -8792,73 +8831,97 @@ async function handleFormSubmit(e) {
     remark: $id('remark').value,
     judgment: jdg,
     _isSaved: false,
-    _isOffline: false
+    _isOffline: false,
+    _isNew: true // สำหรับเอฟเฟกต์แสงสีเขียวในตาราง
   };
 
-  // --- [3] บันทึกลง Cloud (Supabase) ---
-  if (isOnline && getSupabase()) {
-    const success = await pushToSupabase([rowData]);
-    if (success) {
-      rowData._isSaved = true;
-      rowData._isOffline = false;
+  try {
+    // --- [3] บันทึกลง Cloud (Supabase) ---
+    if (isOnline && getSupabase()) {
+      const success = await pushToSupabase([rowData]);
+      if (success) {
+        rowData._isSaved = true;
+        rowData._isOffline = false;
+      }
     }
-  }
 
-  // --- [4] อัปเดตข้อมูลในระบบ (แก้จุดที่ข้อมูลในตารางไม่เปลี่ยน) ---
-  if (editingId) {
-    // เก็บข้อมูลเก่าไว้ทำ Audit Log
-    oldRecord = records.find(r => String(r.id) === String(editingId));
+    // --- [4] อัปเดตข้อมูลในระบบ (RAM & Local DB) ---
+    if (editingId) {
+      oldRecord = records.find(r => String(r.id) === String(editingId));
+      const index = records.findIndex(r => String(r.id) === String(editingId));
+      if (index > -1) {
+        records[index] = { ...rowData }; 
+      }
+      auditAction = 'UPDATE';
+      toast('✅ อัปเดตข้อมูลสำเร็จ');
+    } else {
+      records.unshift(rowData); 
+      auditAction = 'INSERT';
+      toast('✅ บันทึกข้อมูลใหม่สำเร็จ');
+    }
     
-    // หาตำแหน่งเดิมใน Array และแทนที่ด้วย rowData ใหม่ทันที
-    const index = records.findIndex(r => String(r.id) === String(editingId));
-    if (index > -1) {
-      records[index] = { ...rowData }; // ใช้ Spread operator เพื่อความชัวร์
-    }
-    auditAction = 'UPDATE';
-    toast('✅ อัปเดตข้อมูลสำเร็จ');
-  } else {
-    // กรณีเพิ่มใหม่
-    records.unshift(rowData); 
-    auditAction = 'INSERT';
-    toast('✅ บันทึกข้อมูลใหม่สำเร็จ');
+    await dbPutBulk([rowData]);  
+
+    // 🌟 [AUTOMATION 2: SUCCESS SEQUENCE] 🌟
+    btn.innerHTML = '<span>✅ บันทึกข้อมูลสำเร็จ</span>';
+    btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    btn.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.4)';
+
+    const brandLogo = document.querySelector('#brandCard div:first-child');
+    if(brandLogo) brandLogo.classList.add('logo-success-glow');
+
+    // หน่วงเวลาเพื่อให้ User เห็นสถานะ Success แวบหนึ่ง
+    setTimeout(() => {
+      
+      // --- [5] UI RESET SEQUENCE ---
+      const keepDate = $id('inputDate').value;
+      const keepShift = $id('shift').value;
+
+      // ล้างสถานะแก้ไขและกลับหน้าตาปุ่มเป็นปกติ
+      cancelEdit(); 
+      extinguishAllGlows();
+
+      // คืนค่าฟอร์มบางส่วน
+      if($id('inputDate')) $id('inputDate').value = keepDate;
+      if($id('shift')) $id('shift').value = keepShift;
+
+      // ปิด UI เสริม
+      document.querySelectorAll('.search-results-container').forEach(box => box.style.display = 'none');
+      document.querySelectorAll('.neon-in').forEach(input => {
+        input.classList.remove('input-dropdown-open');
+        input.style.borderColor = "";
+      });
+      removeAiResetButton(); 
+
+      if (document.activeElement) document.activeElement.blur();
+
+      // ย้อนกลับปุ่มเป็นสถานะเตรียมพร้อม (Commit Data)
+      btn.innerHTML = originalBtnHTML;
+      btn.style.background = ''; // กลับไปใช้สีตาม CSS
+      btn.style.boxShadow = '';
+      btn.disabled = false;
+      
+      if(brandLogo) brandLogo.classList.remove('logo-success-glow');
+
+      // --- [6] RE-RENDER & LOG ---
+      refreshAll(); 
+      writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
+      
+      // ล้างสถานะไฮไลท์สีเขียวหลัง 3 วินาที
+      setTimeout(() => {
+          const idx = records.findIndex(x => x.id === rowData.id);
+          if(idx > -1) records[idx]._isNew = false;
+      }, 3000);
+
+    }, 1000);
+
+  } catch (err) {
+    console.error("Save Error:", err);
+    toast('❌ บันทึกไม่สำเร็จ กรุณาลองใหม่');
+    btn.disabled = false;
+    btn.innerHTML = originalBtnHTML;
+    btn.style.background = '';
   }
-  
-  // บันทึกลง Local DB
-  await dbPutBulk([rowData]);  
-
-  // --- [5] UI RESET SEQUENCE (ล้างฟอร์ม/ดับไฟ/ล้างค่า Line) ---
-  
-  // 5.1 เก็บค่าเฉพาะ วันที่ และ กะ (ล้าง Line/MH ทิ้งตามความต้องการ)
-  const keepDate = $id('inputDate').value;
-  const keepShift = $id('shift').value;
-
-  // 5.2 ล้างสถานะการแก้ไขและ Reset ฟอร์ม
-  cancelEdit(); 
-  
-  // 5.3 ดับแสงนีออนทุกดวง
-  extinguishAllGlows();
-
-  // 5.4 คืนค่าเฉพาะ วันที่ และ กะ (ช่อง Line จะว่างเปล่า)
-  if($id('inputDate')) $id('inputDate').value = keepDate;
-  if($id('shift')) $id('shift').value = keepShift;
-
-  // 5.5 ซ่อน Dropdown และลบสีขอบแดงที่อาจค้างอยู่
-  document.querySelectorAll('.search-results-container').forEach(box => box.style.display = 'none');
-  document.querySelectorAll('.neon-in').forEach(input => {
-    input.classList.remove('input-dropdown-open');
-    input.style.borderColor = "";
-  });
-  removeAiResetButton(); 
-
-  // 5.6 เอาเคอร์เซอร์ออก
-  if (document.activeElement) document.activeElement.blur();
-
-  // --- [6] FORCE RE-RENDER (บังคับวาดตารางใหม่) ---
-  // สำคัญ: refreshAll จะเรียก renderTable ซึ่งจะดึง records ล่าสุดไปใส่ Virtual Scroll
-  refreshAll(); 
-  
-  // บันทึกประวัติ
-  writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
 }
 
 // ฟังก์ชันจัดการแสงนีออนแบบอัจฉริยะ
@@ -9032,10 +9095,11 @@ function cancelEdit() {
   
   if($id('refNo')) $id('refNo').style.borderColor = "";
 
-  const btn = $id('submitBtn');
+   const btn = $id('submitBtn');
   if(btn) {
-    btn.innerHTML = '✦ Commit Data';
-    btn.style.background = '';
+    btn.innerHTML = '✦ COMMIT DATA';
+    btn.style.background = ''; // คืนค่าเป็นสีน้ำเงินตาม CSS หลัก
+    btn.style.boxShadow = '';
   }
   
   if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
@@ -9088,19 +9152,33 @@ function hideSingleDeleteModal() {
 
 // ⚡ Audit Logic Hook: Backup data before delete
 async function confirmDeleteSingleRow() {
-  const idToDelete = _pendingDeleteId; // ย้ายขึ้นมาบรรทัดแรก
+  const idToDelete = _pendingDeleteId;
   if (!idToDelete) { 
     toast("❌ ระบบไม่พบรหัสข้อมูล"); 
     return; 
   }
 
-  // ค้นหาข้อมูลก่อนลบเพื่อเก็บไว้ทำ Audit Log
+  // 1. ค้นหาข้อมูลก่อนลบเพื่อเก็บไว้ทำ Audit Log
   const recordToDelete = records.find(r => String(r.id) === String(idToDelete));
   
+  // 2. เพิ่ม Visual Feedback: ใส่ Class เพื่อทำอนิเมชั่นแถวค่อยๆ จางหาย (Optional)
+  const rowEl = document.querySelector(`tr[data-rid="${idToDelete}"]`);
+  if (rowEl) {
+    rowEl.style.transition = "all 0.3s ease";
+    rowEl.style.opacity = "0";
+    rowEl.style.transform = "translateX(20px)";
+  }
+
   hideSingleDeleteModal();
 
   try {
-    // 1. ลบจาก IndexedDB
+    // 3. ลบจาก Cloud ถ้าออนไลน์ (ทำก่อนเพื่อความชัวร์)
+    if (isOnline && getSupabase()) {
+      const success = await deleteFromSupabase(idToDelete);
+      if (!success) throw new Error("Cloud delete failed");
+    }
+
+    // 4. ลบจาก IndexedDB
     if (db) {
       await new Promise((resolve, reject) => {
         const tx = db.transaction(IDB_STORE, 'readwrite');
@@ -9111,25 +9189,33 @@ async function confirmDeleteSingleRow() {
       });
     }
 
-    // 2. ลบจาก Cloud ถ้าออนไลน์
-    if (isOnline && getSupabase()) {
-      await deleteFromSupabase(idToDelete);
-    }
-
-    // 3. อัปเดต State ในโปรแกรม
+    // 5. อัปเดต Global State ใน RAM
     records = records.filter(r => String(r.id) !== String(idToDelete));
     
-    // 4. เขียน Audit Log (ต้องทำก่อน Refresh หน้าจอ)
+    // 6. เขียน Audit Log (Async - ไม่ต้องรอเสร็จก็ได้)
     if (recordToDelete) {
-      await writeAuditLog('DELETE', idToDelete, recordToDelete, null);
+      writeAuditLog('DELETE', idToDelete, recordToDelete, null);
     }
 
+    // 🌟 7. จุดสำคัญ: สั่ง Re-calculate ทุกอย่างใหม่ทันที
+    // refreshAll() จะไปเรียก renderTable() ซึ่งจะอัปเดต virtualTableState.allRows ให้ถูกต้อง
     refreshAll();
+    
+    // 8. บังคับอัปเดต Virtual Scroll อีกครั้งเพื่อให้จำนวนแถวใน Scroll พื้นที่ว่าง (Spacer) คำนวณใหม่
+    updateVirtualScrollState();
+
     toast("✅ ลบรายการสำเร็จ");
 
   } catch (err) {
     console.error("Single Delete Error:", err);
-    toast("❌ ลบรายการไม่สำเร็จ");
+    // หากลบไม่สำเร็จ ให้คืนค่า UI
+    if (rowEl) {
+      rowEl.style.opacity = "1";
+      rowEl.style.transform = "none";
+    }
+    toast("❌ ลบรายการไม่สำเร็จ: " + err.message);
+  } finally {
+    _pendingDeleteId = null;
   }
 }
 
@@ -9363,7 +9449,7 @@ function renderVisibleRows() {
 
   let html = '';
 
-  // ใส่ Spacer ด้านบน
+  // ใส่ Spacer ด้านบน (รักษาตำแหน่ง Scroll)
   if (topSpacerHeight > 0) {
     html += `<tr style="height:${topSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
   }
@@ -9373,27 +9459,25 @@ function renderVisibleRows() {
     const s = SM[r.judgment] || SM['SF'];
     const safeId = String(r.id).replace(/"/g, '&quot;');
     const disp = (v) => (!v || v === '-') ? '<span style="color:#cbd5e1">-</span>' : escapeHtml(v);
-
+    
     // เช็คสถานะการซิงค์
     let syncClass = r._isSaved ? 'sync-success' : 'sync-pending';
     let syncTitle = r._isSaved ? 'บันทึกบนคลาวด์แล้ว (Synced)' : 'บันทึกในเครื่องแล้ว รอการซิงค์ (Pending Sync)';
 
-    // --- ส่วนที่แก้ไข: จัดการปุ่ม Action ตาม Role ---
+    // --- จัดการปุ่ม Action ตาม Role ---
     let actionButtons = '';
-    
-if (isSupervisor) {
-      // ✅ อัปเกรดปุ่ม LOG ให้ดูหรูหราแบบหัวหน้างาน (Premium Gold Glass)
-actionButtons = `
-  <button onclick="openAuditLogModal('${safeId}')" class="audit-btn-v2" title="View History">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"></circle>
-      <polyline points="12 6 12 12 16 14"></polyline>
-    </svg>
-    <span>LOG</span>
-  </button>
-`;
+    if (isSupervisor) {
+      // ✅ โหมดหัวหน้างาน: แสดงปุ่ม LOG พรีเมียม
+      actionButtons = `
+        <button onclick="openAuditLogModal('${safeId}')" class="audit-btn-v2" title="View History">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>LOG</span>
+        </button>`;
     } else {
-      // ✅ สำหรับพนักงาน: แสดงปุ่มจัดการครบถ้วน (Copy, Edit, Delete, History)
+      // ✅ โหมดพนักงาน: แสดงปุ่มจัดการครบชุด
       actionButtons = `
         <button onclick="copyRecord('${safeId}')" class="btn" title="คัดลอกข้อมูล" style="background:#10b981;color:white;border:none;padding:4px 9px;border-radius:8px;cursor:pointer;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -9417,11 +9501,15 @@ actionButtons = `
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
-        </button>
-      `;
+        </button>`;
     }
 
-    html += `<tr class="group vis" data-rid="${safeId}">
+    // 🌟 เช็คเอฟเฟกต์รายการใหม่
+    const isNewClass = r._isNew ? 'row-new-entry' : '';
+
+    // สร้าง HTML สำหรับแถว
+    html += `
+    <tr class="group vis ${isNewClass}" data-rid="${safeId}">
       <td style="font-family:var(--font-head);font-size:.72rem;font-weight:600;color:var(--text-500)">
         <div style="display:flex; align-items:center;">
           <span class="saved-indicator ${syncClass}" title="${syncTitle}"></span> ${formatDateDisplay(r.date)}
@@ -9460,12 +9548,21 @@ actionButtons = `
     </tr>`;
   });
 
-  // ใส่ Spacer ด้านล่าง
+  // ใส่ Spacer ด้านล่าง (รักษาขนาด Scrollbar)
   if (bottomSpacerHeight > 0) {
     html += `<tr style="height:${bottomSpacerHeight}px;pointer-events:none;"><td colspan="9" style="border:none;padding:0"></td></tr>`;
   }
 
   tbody.innerHTML = html;
+
+  // 🧹 หลังจากวาดเสร็จ ถ้ามีรายการใหม่ ให้ตั้งเวลาล้างสถานะเพื่อหยุดกระพริบ
+  const newItems = rowsToRender.filter(row => row._isNew);
+  if (newItems.length > 0) {
+    setTimeout(() => {
+      newItems.forEach(item => { item._isNew = false; });
+      // ไม่ต้องสั่งเรนเดอร์ใหม่ทั้นทีเพื่อให้ Animation เล่นจนจบอย่างนุ่มนวล
+    }, 3000);
+  }
 }
 
 window.openJobForUser = function(email) {
@@ -10265,13 +10362,13 @@ const cleanText = (str) => String(str).toLowerCase().trim().replace(/[^a-z0-9ก
 function smartMapHeaders(excelHeaders) {
   const fieldRules = {
     date: ['inspectiondate', 'inspection date', 'insp. date', 'insp-date', 'date', 'time', 'claimdate', 'dailydate', 'created', 'วันที่', 'วันเวลา', 'insp date', 'check date'],
-    ref: ['ref', 'refer', 'reference', 'claimno', 'claim no', 'claim-no', 'ref-no', 'ref.no', 'id', 'doc', 'invoice', 'inv', 'itemno', 'item', 'lot', 'no', 'number', 'code', 'refno'],
-    partName: ['partname', 'part name', 'description', 'desc', 'detail', 'name', 'product', 'itemname', 'remark', 'part-name', 'part.name'],
+    ref: ['ref', 'refer', 'Reference', 'claimno', 'claim no', 'claim-no', 'ref-no', 'ref.no', 'id', 'doc', 'invoice', 'inv', 'itemno', 'item', 'lot', 'no', 'number', 'code', 'refno'],
+    partName: ['partname', 'part name', 'Description', 'desc', 'detail', 'name', 'product', 'itemname', 'remark', 'part-name', 'part.name'],
     supplier: ['supplier', 'vendor', 'sup', 'suppliername', 'vendorname', 'company', 'maker', 'factory', 'ผู้ขาย', 'ซัพพลายเออร์'],
-    partNo: ['partno', 'part-no', 'part.no', 'part number', 'partnumber', 'pn', 'part', 'material', 'mat', 'model', 'p/n'],
-    qty: ['qty', 'quantity', 'pcs', 'piece', 'amount', 'count', 'claimqty', 'lotsize', 'number', 'value', 'val', 'total', 'pc', 'ea', 'each'],
+    partNo: ['partno', 'part-no', 'part.no', 'part number', 'partnumber', 'pn', 'part', 'material', 'mat', 'model', 'Material_no'],
+    qty: ['qty', 'Quantity', 'pcs', 'piece', 'amount', 'count', 'claimqty', 'lotsize', 'number', 'value', 'val', 'total', 'pc', 'ea', 'each'],
     defect: ['defect', 'problem', 'trouble', 'troubleclaim', 'trouble claim', 'ng', 'symptom', 'cause', 'reason', 'issue'],
-    judgment: ['judgment', 'judge', 'status', 'result', 'disposition', 'okng', 'ผลการตรวจ'],
+    judgment: ['judgment', 'judge', 'status', 'result', 'disposition', 'okng', 'HeadText'],
     shift: ['shift', 'turn', 'workshift', 'day', 'night', 'ผลัด'],
     line: ['line', 'process', 'machine', 'station', 'location', 'productionline', 'ไลน์'],
     remark: ['remark', 'note', 'comment', 'memo', 'หมายเหตุ', 'บันทึก'],
@@ -11792,43 +11889,84 @@ function openChangePassModal() {
     );
 }
 
-// อัปเกรดฟังก์ชันบันทึกรหัสผ่าน (พร้อมเอฟเฟกต์ Loading)
 async function handleChangePassword() {
     const btn = document.getElementById('cpSubmitBtn');
-    const oldP = document.getElementById('cpOldPass').value;
-    const newP = document.getElementById('cpNewPass').value;
-    const confP = document.getElementById('cpConfirmPass').value;
+    const oldP = (document.getElementById('cpOldPass').value || '').trim();
+    const newP = (document.getElementById('cpNewPass').value || '').trim();
+    const confP = (document.getElementById('cpConfirmPass').value || '').trim();
 
-    if (!oldP || !newP || newP !== confP) {
-        toast('❌ ข้อมูลไม่ถูกต้องหรือรหัสผ่านไม่ตรงกัน');
+    // 1. Validation เบื้องต้น (ฝั่ง Client)
+    if (!oldP || !newP || !confP) {
+        toast('❌ กรุณากรอกข้อมูลให้ครบทุกช่อง');
         gsap.to(".vault-modal", { x: -10, repeat: 5, yoyo: true, duration: 0.05 });
         return;
     }
 
-    // กิมมิก: เปลี่ยนสถานะปุ่มเป็น Scanning
+    if (newP !== confP) {
+        toast('❌ รหัสผ่านใหม่ไม่ตรงกัน');
+        gsap.to(".vault-modal", { x: -10, repeat: 5, yoyo: true, duration: 0.05 });
+        return;
+    }
+
+    if (newP.length < 4) {
+        toast('❌ รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 4 ตัวอักษร');
+        return;
+    }
+
+    // เริ่มกระบวนการตรวจสอบ
     btn.disabled = true;
-    btn.innerHTML = '<span class="sdot" style="margin-right:8px"></span> AUTHENTICATING...';
+    btn.innerHTML = '<span class="sdot" style="margin-right:8px"></span> VERIFYING...';
 
     try {
         const sb = getSupabase();
-        // จำลองการโหลดและตรวจสอบ (เหมือนระบบแฮ็กเกอร์ในหนัง)
-        await new Promise(res => setTimeout(res, 1200));
+        if (!sb) throw new Error("ไม่สามารถเชื่อมต่อฐานข้อมูลได้");
 
-        const { error } = await sb.from('users').update({ password: newP }).eq('email', currentUser);
-        if (error) throw error;
+        // 2. ตรวจสอบรหัสผ่านเก่ากับฐานข้อมูล (Security Check)
+        const { data: userVerify, error: verifyError } = await sb
+            .from('users')
+            .select('id')
+            .eq('email', currentUser)
+            .eq('password', oldP) // ตรวจสอบว่ารหัสเก่าที่กรอกมา ตรงกับใน DB ไหม
+            .single();
+
+        if (verifyError || !userVerify) {
+            btn.disabled = false;
+            btn.innerHTML = 'SAVE NEW KEY';
+            toast('⛔ รหัสผ่านเดิมไม่ถูกต้อง');
+            gsap.to(".vault-modal", { x: -10, repeat: 5, yoyo: true, duration: 0.05 });
+            return;
+        }
+
+        // 3. ถ้าผ่านการตรวจสอบรหัสเก่า ให้ทำการอัปเดตรหัสใหม่
+        btn.innerHTML = '<span class="sdot" style="margin-right:8px"></span> UPDATING...';
+        
+        const { error: updateError } = await sb
+            .from('users')
+            .update({ password: newP })
+            .eq('email', currentUser);
+
+        if (updateError) throw updateError;
 
         // สำเร็จ
         btn.style.background = '#10b981';
         btn.innerHTML = '✅ ACCESS GRANTED';
-        toast('🔓 รหัสผ่านถูกอัปเกรดเรียบร้อยแล้ว');
+        toast('🔓 อัปเกรดรหัสผ่านใหม่เรียบร้อยแล้ว');
         
-        setTimeout(closeChangePassModal, 1000);
+        // ล้างค่าในฟอร์ม
+        document.getElementById('cpOldPass').value = '';
+        document.getElementById('cpNewPass').value = '';
+        document.getElementById('cpConfirmPass').value = '';
+        
+        setTimeout(closeChangePassModal, 1200);
+
     } catch (err) {
         btn.disabled = false;
         btn.innerHTML = 'SAVE NEW KEY';
-        toast('⛔ ผิดพลาด: ' + err.message);
+        toast('❌ เกิดข้อผิดพลาด: ' + err.message);
+        console.error("Change Pass Error:", err);
     }
 }
+
 function toggleSidebar(forceState = null) {
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('btnToggleSidebar');
