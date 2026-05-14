@@ -7234,75 +7234,85 @@ textarea#remark {
     </div>
   </header>
 
-  <!-- BODY -->
+<!-- BODY -->
   <div style="display:flex;gap:.9rem;flex-grow:1;min-height:0">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="scroll form-in" style="width:310px;flex-shrink:0;padding:1.2rem 1rem 1rem;display:flex;flex-direction:column;overflow-y:auto">
-      <!-- Header -->
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:.85rem;border-bottom:1.5px solid var(--blue-100)">
-        <div>
-          <div style="font-family:var(--font-head);font-size:.7rem;font-weight:800;color:var(--text-900)">Entry Terminal</div>
-          <div style="font-size:.6rem;color:var(--text-400);margin-top:1px">ป้อนข้อมูลให้ถูกต้องครบถ้วน ขอให้สนุกกับงานทีทำ⭐</div>
-        </div>
+   <!-- SIDEBAR -->
+   <aside id="sidebar" class="scroll form-in" style="width:310px; flex-shrink:0; padding:1.5rem 1.2rem; display:flex; flex-direction:column; overflow-y:auto; background: var(--bg-sidebar); transition: all 0.3s ease;">
+      
+      <!-- [CSS สำหรับ Filled Effect] -->
+      <style>
+        .neon-in:not(:placeholder-shown):not(.no-auto-glow) {
+          border-color: #10b981 !important;
+          box-shadow: 0 0 8px rgba(16, 185, 129, 0.3) !important;
+          background: rgba(16, 185, 129, 0.02) !important;
+        }
+        html.dark-mode .neon-in:not(:placeholder-shown):not(.no-auto-glow) {
+          border-color: #34d399 !important;
+          box-shadow: 0 0 15px rgba(52, 211, 153, 0.5) !important;
+          background: rgba(52, 211, 153, 0.08) !important;
+        }
+        #judgmentSelect.is-selected {
+          border-color: #10b981 !important;
+          box-shadow: 0 0 12px rgba(16, 185, 129, 0.4) !important;
+        }
+        /* ปรับแต่งให้หัวตารางและ Panel โค้งมน */
+        .main-panel {
+            background: var(--bg-card);
+            border-radius: 24px;
+            overflow: hidden; /* สำคัญ: เพื่อให้หัวตารางโค้งตาม */
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+      </style>
+
+      <div style="margin-bottom:1.2rem;">
+        <div style="font-family:var(--font-head); font-size:0.85rem; font-weight:800; color:var(--text-900); letter-spacing:-0.2px;">Entry Terminal</div>
+        <div style="font-size:0.65rem; color:var(--text-400); margin-top:2px;">กรอกข้อมูลให้ครบถ้วน ขอบจะ <span style="color:#10b981; font-weight:bold;">เรืองแสง</span> เมื่อพร้อม ✅</div>
       </div>
 
-      <form id="claimForm" class="scroll" style="display:flex;flex-direction:column;gap:.6rem;overflow-y:auto;flex-grow:1;padding-right:.1rem; padding-bottom: 5rem;">
+      <form id="claimForm" style="display:flex; flex-direction:column; gap:0.8rem;">
+        <!-- ... (เก็บส่วน Input ต่างๆ ไว้เหมือนเดิม) ... -->
+        <div style="background: var(--bg-card); border-radius:16px; padding:0.8rem; border:1px solid var(--border); box-shadow: var(--shadow-sm);">
+          <div class="sidebar-section-title" style="margin-bottom:0.6rem; color:var(--blue-500); font-size:0.6rem;">DATE & SHIFT</div>
+          <input type="date" id="inputDate" class="neon-in no-auto-glow" style="height:42px; font-weight:600; font-size:0.8rem; border-radius:10px; background: var(--bg-input); color: var(--text-900); border-color: var(--border);">
+        </div>
 
-        <!-- Date & Shift -->
-        <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
-          <div class="sidebar-section-title">Date & Shift</div>
-          <input type="date" id="inputDate" class="neon-in" style="padding:.65rem .85rem;font-size:.75rem;font-weight:600;margin-bottom:.5rem">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
-            <select id="shift" class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-              <option>SHIFT A</option><option>SHIFT B</option><option>SHIFT C</option>
-            </select>
-            <input type="text" id="lineNo" list="lineList" placeholder="Line" class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
+        <div style="background: var(--bg-card); border-radius:16px; padding:0.8rem; border:1px solid var(--border); box-shadow: var(--shadow-sm); display:flex; flex-direction:column; gap:0.5rem;">
+          <div class="sidebar-section-title" style="margin-bottom:0.1rem; color:var(--blue-500); font-size:0.6rem;">PART DETAILS</div>
+          <input type="text" id="partNo" placeholder="Part No *" required class="neon-in" style="height:40px; border-radius:10px;">
+          <input type="text" id="partOn" placeholder="Part Name *" required class="neon-in" style="height:40px; border-radius:10px;">
+          <div class="form-section-input">
+            <input type="text" id="supplier" placeholder="Supplier *" required class="neon-in" style="height:40px; border-radius:10px;">
+            <div id="results-supplier" class="search-results-container scroll"></div>
           </div>
+          <input type="text" id="defectName" placeholder="Defect Type *" required class="neon-in" style="height:40px; border-radius:10px;">
         </div>
 
-<!-- Part Details (ย้ายขึ้นมาลำดับแรกหลัง Date) -->
-<div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.6rem;border:1px solid var(--border)">
-  <div class="sidebar-section-title">Part Details</div>
-  <!-- ปรับจาก grid 1fr 1fr เป็น column เพื่อให้ Part No และ Part Name อยู่คนละบรรทัด -->
-  <div style="display:flex; flex-direction:column; gap:.45rem; margin-bottom:.5rem">
-    <input type="text" id="partNo" autocomplete="off" placeholder="Part No *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-    <input type="text" id="partOn" list="lotList" placeholder="Part Name *" required class="neon-in" style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-  </div>
-  <input type="text" id="defectName" list="defectList" placeholder="Defect Type *" required class="neon-in" style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
-  <textarea id="remark" placeholder="Remarks…" class="neon-in" style="height: 3vh; min-height: 40px;"></textarea>
-</div>
-
-<!-- Reference Info (สลับตำแหน่งเพื่อให้ Supplier เห็นชัดเจนขึ้น) -->
-<div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.6rem;border:1px solid var(--border)">
-    <div class="sidebar-section-title">Reference Info</div>
-    
-    <!-- Supplier อยู่ด้านบนแบบเต็มความกว้าง -->
-    <div class="form-section-input">
-        <input type="text" id="supplier" placeholder="Supplier *" required class="neon-in" 
-               style="padding:.65rem .85rem;font-size:.72rem;font-weight:600;margin-bottom:.5rem">
-        <div id="results-supplier" class="search-results-container scroll"></div>
-    </div>
-    
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
-        <!-- Ref No ย้ายลงมาตรงนี้ -->
-        <div class="form-section-input">
-            <input type="text" id="refNo" placeholder="REF No. *" required class="neon-in" 
-                   style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-            <div id="results-refNo" class="search-results-container scroll"></div>
+        <div style="background: var(--bg-card); border-radius:16px; padding:0.8rem; border:1px solid var(--border); box-shadow: var(--shadow-sm); display:flex; flex-direction:column; gap:0.5rem;">
+          <div class="sidebar-section-title" style="margin-bottom:0.1rem; color:var(--blue-500); font-size:0.6rem;">REFERENCE INFO</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+            <div class="form-section-input">
+                <input type="text" id="refNo" placeholder="REF No. *" required class="neon-in" style="height:40px; border-radius:10px;">
+            </div>
+            <input type="number" id="qty" placeholder="Quantity" required class="neon-in" style="height:40px; border-radius:10px;">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+            <select id="shift" class="neon-in no-auto-glow" style="height:40px; border-radius:10px; font-weight:700;">
+              <option value="SHIFT A">SHIFT A</option>
+              <option value="SHIFT B">SHIFT B</option>
+              <option value="SHIFT C">SHIFT C</option>
+            </select>
+            <input type="text" id="lineNo" placeholder="Line" class="neon-in" style="height:40px; border-radius:10px;">
+          </div>
+          <textarea id="remark" placeholder="Remarks..." class="neon-in" style="height:45px; border-radius:10px; min-height:45px;"></textarea>
         </div>
-        
-        <!-- QTY -->
-        <input type="number" id="qty" placeholder="QTY *" required class="neon-in" 
-               style="padding:.65rem .75rem;font-size:.72rem;font-weight:600">
-    </div>
-</div>
 
-        <!-- Judgment -->
-        <div style="background:var(--bg-input);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border)">
-          <div class="sidebar-section-title">Judgment</div>
-          <select id="judgmentSelect" required onchange="handleJudgment(this.value)"
-            style="padding:.75rem .85rem;font-size:.75rem;font-weight:700;border-width:2px">
+        <div style="background: var(--bg-card); border-radius:16px; padding:0.8rem; border:1px solid var(--border); box-shadow: var(--shadow-sm);">
+          <div class="sidebar-section-title" style="margin-bottom:0.5rem; color:var(--blue-500); font-size:0.6rem;">JUDGMENT</div>
+          <select id="judgmentSelect" required onchange="handleJudgment(this.value)" style="height:42px; border-radius:12px; border:2.2px solid var(--blue-500); font-weight:800; font-size:0.75rem; text-align:center; cursor:pointer; width: 100%;">
             <option value="" disabled selected>── Select Judgment ──</option>
             <option value="SF">SF FAULT</option>
             <option value="VENDOR FAULT">VENDOR FAULT</option>
@@ -7311,65 +7321,53 @@ textarea#remark {
           </select>
         </div>
 
-<!-- ปุ่ม Submit เดียว เพื่อให้ JS ควบคุมการแสดงผลปุ่ม Cancel -->
-<button type="submit" id="submitBtn" class="btn"
-  style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 55px; padding: 0; font-weight: 800; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); transition: all 0.3s ease; margin-top: 0.5rem; line-height: 1;">
-  ✦ COMMIT DATA
-</button>
+        <button type="submit" id="submitBtn" class="btn" style="width:100%; min-height:54px; font-weight:800; border-radius:14px; background:linear-gradient(135deg, var(--blue-600), var(--blue-700)); color:white; border:none; box-shadow: 0 8px 20px rgba(37,99,235,0.25);">
+          ✦ COMMIT DATA
+        </button>
       </form>
     </aside>
 
-    <!-- MAIN PANEL -->
-    <main id="mainPanel" style="flex-grow:1;display:flex;flex-direction:column;min-width:0">
+    <!-- MAIN PANEL (ส่วนที่หายไป) -->
+    <main id="mainPanel" class="main-panel" style="flex-grow:1; min-width:0;">
+      
       <!-- Toolbar -->
       <div class="toolbar">
-        <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
-          <button onclick="setFilter('ALL')" id="btn-ALL" class="btn filter-btn active-filter">All</button>
-          <button onclick="setFilter('SF')" id="btn-SF" class="btn filter-btn">SF Fault</button>
-          <button onclick="setFilter('VENDOR FAULT')" id="btn-VENDOR" class="btn filter-btn">Vendor</button>
-          <button onclick="setFilter('CTC')" id="btn-CTC" class="btn filter-btn">CTC</button>
-          <button onclick="setFilter('CAN USE')" id="btn-CANUSE" class="btn filter-btn">Can Use</button>
+        <div class="toolbar-filters">
+          <button id="btn-ALL" onclick="setFilter('ALL')" class="filter-btn active-filter">All</button>
+          <button id="btn-SF" onclick="setFilter('SF')" class="filter-btn">SF Fault</button>
+          <button id="btn-VENDOR" onclick="setFilter('VENDOR FAULT')" class="filter-btn">Vendor</button>
+          <button id="btn-CTC" onclick="setFilter('CTC')" class="filter-btn">CTC</button>
+          <button id="btn-CANUSE" onclick="setFilter('CAN USE')" class="filter-btn">Can Use</button>
         </div>
-        <div id="toolbarBtns" style="display:flex;gap:.45rem;align-items:center;flex-wrap:wrap">
-          <!-- Search -->
-          <div style="position:relative;display:flex;align-items:center">
-            <svg style="position:absolute;left:.65rem;pointer-events:none;color:var(--text-300)" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
-            <input type="text" id="searchInput" placeholder="Search…">
+
+        <div class="toolbar-btns">
+          <div class="search-wrapper">
+            <svg class="search-icon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="searchInput" placeholder="Search...">
           </div>
-          <button id="syncBtnMain" onclick="syncToCloud()" class="btn"
-            style="background:var(--accent-grn);color:#fff;padding:.45rem 1rem;border-radius:99px;font-family:var(--font-head);font-size:.65rem;font-weight:700;letter-spacing:.03em;display:flex;align-items:center;gap:.4rem;box-shadow:0 3px 10px rgba(16,185,129,.3)">
-            <svg id="syncIcon" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          
+          <button onclick="syncToCloud()" class="toolbar-btn sync-btn" id="syncBtnMain">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Sync
           </button>
-          <button id="dashBtn" onclick="openDashboard()" class="btn"
-            style="background:linear-gradient(135deg,var(--blue-700),var(--blue-500));color:#fff;padding:.45rem 1rem;border-radius:99px;font-family:var(--font-head);font-size:.65rem;font-weight:700;letter-spacing:.03em;box-shadow:0 3px 10px rgba(37,99,235,.3)">
-            Dashboard
+          
+          <button onclick="openDashboard()" class="toolbar-btn dash-btn">Dashboard</button>
+          <button onclick="openJobProject()" class="toolbar-btn job-btn">Job</button>
+          
+          <label class="toolbar-btn import-btn" style="cursor:pointer">
+            Import <input type="file" hidden accept=".xlsx, .xls" onchange="importExcel(this)">
+          </label>
+          
+          <button onclick="exportToExcel()" class="toolbar-btn export-btn">Export</button>
+          
+          <button onclick="showDeleteModal()" class="toolbar-btn clear-btn">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Clear
           </button>
-          <button id="jobBtn" onclick="openJobProject()" class="btn"
-            style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);color:#fff;padding:.45rem 1rem;border-radius:99px;font-family:var(--font-head);font-size:.65rem;font-weight:700;letter-spacing:.03em;box-shadow:0 3px 10px rgba(124,58,237,.25)">
-            Job
-          </button>
-          <button onclick="document.getElementById('xlsIn').click()" class="btn"
-            style="background:#f8faff;border:1.5px solid var(--border);color:var(--blue-700);padding:.45rem .9rem;border-radius:99px;font-family:var(--font-head);font-size:.65rem;font-weight:700">
-            Import
-          </button>
-          <button onclick="exportToExcel()" class="btn"
-            style="background:#f8faff;border:1.5px solid var(--border);color:var(--text-600);padding:.45rem .9rem;border-radius:99px;font-family:var(--font-head);font-size:.65rem;font-weight:700">
-            Export
-          </button>
-          <input type="file" id="xlsIn" hidden accept=".xlsx,.xls" onchange="importExcel(this)">
-<!-- แก้ตรง onclick ให้เป็น showDeleteModal -->
-<button onclick="showDeleteModal()" class="btn" title="Clear all"
-  style="background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.2);color:var(--accent-red);padding:.45rem .6rem;border-radius:99px; display:flex; align-items:center; gap:4px;">
-  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-  <!-- เพิ่มข้อความ Clear ตรงนี้ -->
-  <span style="font-weight:600; font-size:0.7rem;">Clear</span>
-</button>
         </div>
       </div>
 
-      <!-- Table -->
-      
+      <!-- Table Container -->
       <div id="tableContainer" style="flex-grow:1;overflow:auto" class="scroll">
         <table>
           <thead>
@@ -7386,8 +7384,8 @@ textarea#remark {
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
-          
         </table>
+        
         <!-- Empty state -->
         <div id="emptyState" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:3rem;text-align:center;gap:1rem">
           <svg class="mascot-float" width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -8059,15 +8057,15 @@ textarea#remark {
 }
 </style>
 <script>
-document.addEventListener('contextmenu', e => e.preventDefault());
 
-let isSupervisor = false; // สถานะหัวหน้างาน
-let viewingUser = '';    // อีเมลที่หัวหน้ากำลังแอบส่องอยู่ (Impersonating)
-let allStaffList = [];   // รายชื่อพนักงานทั้งหมดที่มีในระบบ
 /* ══════════════════════════════════════════════════════════════
    0. CONFIGURATION & GLOBAL VARIABLES
    ตั้งค่าเริ่มต้น, ตัวแปร Global, และ State ของระบบ
 ═════════════════════════════════════════════════════════════════ */
+document.addEventListener('contextmenu', e => e.preventDefault());
+let isSupervisor = false; // สถานะหัวหน้างาน
+let viewingUser = '';    // อีเมลที่หัวหน้ากำลังแอบส่องอยู่ (Impersonating)
+let allStaffList = [];   // รายชื่อพนักงานทั้งหมดที่มีในระบบ
 const SUPABASE_URL = 'https://xgkjxvljdhpniakgzatf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhna2p4dmxqZGhwbmlha2d6YXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NDkxMjYsImV4cCI6MjA5MzAyNTEyNn0.os0bmAoR7CCefdsuQzGC9eLPnEJ64Ny8rxx0lFMXXAU';
 // กำหนดค่าความสูงแถวเป็น Constant (ใส่ไว้ด้านบนส่วนของ Table Logic หรือ Global ได้)
@@ -8092,7 +8090,6 @@ let _pendingDeleteId = null; // สำหรับลบแถวเดียว
 let virtualTableState = { visibleStart: 0, visibleEnd: 50, scrollTop: 0, allRows:[] };
 let mainTrendChartInstance = null;
 let globalRichChartData =[];
-
 
 /* ══════════════════════════════════════════════════════════════
    1. UTILITIES & HELPERS
@@ -8157,13 +8154,10 @@ function shake(el) {
   gsap.fromTo(el, { x: -7 }, { x: 7, repeat: 5, yoyo: true, duration: .06, ease: 'power1.inOut' });
 }
 
-
 /* ══════════════════════════════════════════════════════════════
    2. DATABASE ENGINES (INDEXED-DB & SUPABASE)
    จัดการฐานข้อมูล Local เครื่อง และ Cloud
 ═════════════════════════════════════════════════════════════════ */
-
-// --- 2.1 IndexedDB (Local) ---
 function initDB() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(IDB_NAME, IDB_VERSION);
@@ -8491,7 +8485,6 @@ async function syncToCloud(isInitial = false) {
   }
 }
 
-
 /* ══════════════════════════════════════════════════════════════
    4. AUTHENTICATION & CORE APP NAVIGATION
    เข้าสู่ระบบ และ ออกจากระบบ
@@ -8699,7 +8692,6 @@ function openJobProject() {
     window.open('job_project.html', '_blank');
 }
 
-
 /* ══════════════════════════════════════════════════════════════
    5. CRUD OPERATIONS (CREATE, UPDATE, DELETE)
    จัดการข้อมูลฟอร์ม และการลบข้อมูล
@@ -8727,16 +8719,32 @@ function getMyRecords() {
 function handleJudgment(val) {
   const sel = $id('judgmentSelect');
   const btn = $id('submitBtn');
-  const c = { 'SF': '#f97316', 'VENDOR FAULT': '#ef4444', 'CTC': '#2563eb', 'CAN USE': '#10b981' };
-  const color = c[val] || '#2563eb';
-  if(sel) { sel.style.borderColor = color; sel.style.color = color; }
-  if (btn) {
-    btn.style.background = `linear-gradient(135deg,${color},${color}dd)`;
-    btn.style.boxShadow = `0 4px 14px ${color}55`;
+  if(!sel) return;
+
+  // ถ้าค่าว่าง (ถูกล้างข้อมูล) ให้ลบแสงออก
+  if (!val || val === "") {
+    sel.classList.remove('is-selected');
+    sel.style.borderColor = "";
+    sel.style.color = "";
+    if (btn) {
+      btn.style.background = ""; // คืนค่าสีปุ่ม
+      btn.style.boxShadow = "";
+    }
+  } else {
+    // ถ้ามีค่า ให้ใส่แสงเขียว
+    sel.classList.add('is-selected');
+    const c = { 'SF': '#f97316', 'VENDOR FAULT': '#ef4444', 'CTC': '#2563eb', 'CAN USE': '#10b981' };
+    const color = c[val] || '#2563eb';
+    sel.style.borderColor = color;
+    // ปรับสีปุ่ม Commit ตาม Judgment
+    if (btn) {
+      btn.style.background = `linear-gradient(135deg,${color},${color}dd)`;
+      btn.style.boxShadow = `0 4px 14px ${color}55`;
+    }
   }
 }
 
-// บันทึก หรือ อัปเดตข้อมูลผ่านฟอร์ม (เวอร์ชันเพิ่ม Validation รูปแบบ Reference No)
+// บันทึก หรือ อัปเดตข้อมูลผ่านฟอร์ม (ฉบับแก้ไขปัญหา Update ข้อมูลไม่เปลี่ยน)
 async function handleFormSubmit(e) {
   let oldRecord = null;
   let auditAction = 'INSERT';
@@ -8744,35 +8752,31 @@ async function handleFormSubmit(e) {
   
   if (_isInitializing) { toast('⏳ กรุณารอให้ระบบโหลดเสร็จ'); return; }
 
+  // --- [1] การเตรียมข้อมูลและ Validation ---
   const refInput = $id('refNo');
   const ref = refInput.value.trim();
   const supp = $id('supplier').value.trim();
   const qty = parseInt($id('qty').value) || 0;
   const jdg = $id('judgmentSelect').value;
-const dateValue = new Date(document.getElementById('inputDate').value).toISOString();
-  // ตรวจสอบรูปแบบ 000/0000 หรือ V000/0000
+  
   const refRegex = /^(V?\d{3}\/\d{4})$/i; 
-  
-  if (!ref) { 
-    shake(refInput); 
-    toast('❌ กรุณาระบุ Reference No'); 
-    return; 
-  }
-  
+  if (!ref) { shake(refInput); toast('❌ กรุณาระบุ Reference No'); return; }
   if (!refRegex.test(ref)) {
     shake(refInput);
-    refInput.style.borderColor = '#ef4444'; // ขอบแดงถ้าผิด
+    refInput.style.borderColor = '#ef4444'; 
     toast('❌ รูปแบบผิด! ต้องเป็น 000/0000 หรือ V000/0000 เท่านั้น');
     refInput.focus();
     return;
   }
 
+  // เช็คข้อมูลซ้ำ (ยกเว้นตัวที่กำลังแก้ไขอยู่)
   if (!editingId && isDuplicate(ref)) {
     shake(refInput);
     toast('⚠️ Duplicate! REF นี้มีในระบบแล้ว');
     return;
   }
 
+  // --- [2] สร้างโครงสร้างข้อมูล ---
   const rowData = {
     id: editingId || generateUUID(),
     date: $id('inputDate').value,
@@ -8791,65 +8795,113 @@ const dateValue = new Date(document.getElementById('inputDate').value).toISOStri
     _isOffline: false
   };
 
+  // --- [3] บันทึกลง Cloud (Supabase) ---
   if (isOnline && getSupabase()) {
     const success = await pushToSupabase([rowData]);
     if (success) {
       rowData._isSaved = true;
       rowData._isOffline = false;
-      toast(editingId ? '✅ อัปเดตสำเร็จ' : '✅ บันทึกสำเร็จ');
     }
-  } else {
-    rowData._isSaved = false;
-    rowData._isOffline = true;
-    toast('💾 บันทึกแบบออฟไลน์เรียบร้อย');
   }
 
+  // --- [4] อัปเดตข้อมูลในระบบ (แก้จุดที่ข้อมูลในตารางไม่เปลี่ยน) ---
   if (editingId) {
-    oldRecord = records.find(r => r.id === editingId);
+    // เก็บข้อมูลเก่าไว้ทำ Audit Log
+    oldRecord = records.find(r => String(r.id) === String(editingId));
+    
+    // หาตำแหน่งเดิมใน Array และแทนที่ด้วย rowData ใหม่ทันที
+    const index = records.findIndex(r => String(r.id) === String(editingId));
+    if (index > -1) {
+      records[index] = { ...rowData }; // ใช้ Spread operator เพื่อความชัวร์
+    }
     auditAction = 'UPDATE';
-    const index = records.findIndex(r => r.id === editingId);
-    if (index > -1) records[index] = rowData;
+    toast('✅ อัปเดตข้อมูลสำเร็จ');
   } else {
+    // กรณีเพิ่มใหม่
     records.unshift(rowData); 
+    auditAction = 'INSERT';
+    toast('✅ บันทึกข้อมูลใหม่สำเร็จ');
   }
   
+  // บันทึกลง Local DB
   await dbPutBulk([rowData]);  
 
+  // --- [5] UI RESET SEQUENCE (ล้างฟอร์ม/ดับไฟ/ล้างค่า Line) ---
+  
+  // 5.1 เก็บค่าเฉพาะ วันที่ และ กะ (ล้าง Line/MH ทิ้งตามความต้องการ)
   const keepDate = $id('inputDate').value;
   const keepShift = $id('shift').value;
-  const keepLine = $id('lineNo').value;
-  
-  // 1. ล้างข้อมูลในฟอร์ม
+
+  // 5.2 ล้างสถานะการแก้ไขและ Reset ฟอร์ม
   cancelEdit(); 
   
-  // 2. สั่งให้ปุ่ม Reset Form หายไปทันที
-  removeAiResetButton(); 
-  
+  // 5.3 ดับแสงนีออนทุกดวง
+  extinguishAllGlows();
+
+  // 5.4 คืนค่าเฉพาะ วันที่ และ กะ (ช่อง Line จะว่างเปล่า)
   if($id('inputDate')) $id('inputDate').value = keepDate;
   if($id('shift')) $id('shift').value = keepShift;
-  if($id('lineNo')) $id('lineNo').value = keepLine;
-  if($id('refNo')) $id('refNo').focus();
-if (document.activeElement) document.activeElement.blur();
-  refreshAll();
-  writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
-  // --- เพิ่มโค้ดส่วนนี้เข้าไปในฟังก์ชัน handleFormSubmit ---
 
-// 1. สั่งซ่อนกล่องรายการเลือก (Dropdown) ทุกช่อง
-document.querySelectorAll('.search-results-container').forEach(box => {
-    box.style.display = 'none';
-});
-
-// 2. ลบคลาสที่ทำให้ขอบ Input ตัดตรงออก (คืนค่าขอบโค้งมน)
-document.querySelectorAll('.neon-in').forEach(input => {
+  // 5.5 ซ่อน Dropdown และลบสีขอบแดงที่อาจค้างอยู่
+  document.querySelectorAll('.search-results-container').forEach(box => box.style.display = 'none');
+  document.querySelectorAll('.neon-in').forEach(input => {
     input.classList.remove('input-dropdown-open');
-});
+    input.style.borderColor = "";
+  });
+  removeAiResetButton(); 
 
-// 3. เอาเคอร์เซอร์ออกจากช่องกรอก (ตามที่ตั้งค่าไว้ก่อนหน้า)
-if (document.activeElement) document.activeElement.blur();
+  // 5.6 เอาเคอร์เซอร์ออก
+  if (document.activeElement) document.activeElement.blur();
 
-// -------------------------------------------------------
+  // --- [6] FORCE RE-RENDER (บังคับวาดตารางใหม่) ---
+  // สำคัญ: refreshAll จะเรียก renderTable ซึ่งจะดึง records ล่าสุดไปใส่ Virtual Scroll
+  refreshAll(); 
+  
+  // บันทึกประวัติ
+  writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
 }
 
+// ฟังก์ชันจัดการแสงนีออนแบบอัจฉริยะ
+function refreshNeonGlow() {
+    const allFields = ['inputDate', 'shift', 'lineNo', 'partNo', 'partOn', 'supplier', 'defectName', 'qty', 'remark', 'refNo', 'judgmentSelect'];
+    
+    // 1. ตรวจสอบกลุ่ม PART DETAILS ว่ามีข้อมูลไหม
+    const partDetailsFields = ['partNo', 'partOn', 'supplier', 'defectName'];
+    const hasPartData = partDetailsFields.some(id => {
+        const el = $id(id);
+        return el && el.value.trim() !== "" && el.value.trim() !== "-";
+    });
+
+    // 2. วนลูปจัดการแสงทีละช่อง
+    allFields.forEach(id => {
+        const el = $id(id);
+        if (!el) return;
+
+        // เงื่อนไขพิเศษ: ถ้าเป็น วันที่ หรือ กะ ให้เช็คจากกลุ่ม Part Details ด้วย
+        if (id === 'inputDate' || id === 'shift') {
+            if (hasPartData || (el.value && el.value !== "")) {
+                el.classList.add('is-filled');
+            } else {
+                el.classList.remove('is-filled');
+            }
+        } 
+        // ช่องอื่นๆ ให้เช็คตามข้อมูลของตัวเองปกติ
+        else {
+            if (el.value && el.value !== "" && el.value !== "-") {
+                el.classList.add('is-filled');
+            } else {
+                el.classList.remove('is-filled');
+            }
+        }
+    });
+}
+// ดักจับการพิมพ์และการเปลี่ยนแปลงข้อมูลทุกช่องในฟอร์ม
+document.querySelectorAll('.neon-in, #judgmentSelect').forEach(input => {
+    input.addEventListener('input', refreshNeonGlow);
+    input.addEventListener('change', refreshNeonGlow);
+    // เพิ่มตอน Focus เผื่อกรณีคลิกเข้าไปเฉยๆ
+    input.addEventListener('focus', refreshNeonGlow); 
+});
 window.editRecord = function(id) {
   toggleSidebar('open'); // <--- เพิ่มบรรทัดนี้
   const r = records.find(x => x.id === id);
@@ -8968,7 +9020,7 @@ if(!$id('cancelCopyBtn')) {
   cancelBtn.id = 'cancelCopyBtn';
   btn.parentNode.appendChild(cancelBtn);
 }
-
+refreshNeonGlow();
   toast('📋 คัดลอกข้อมูลแล้ว พร้อมบันทึกใหม่');
 };
 
@@ -9150,7 +9202,17 @@ async function performClearAll() {
     toast("❌ ลบข้อมูลไม่สำเร็จ: " + error.message);
   }
 }
-
+function extinguishAllGlows() {
+    // ดึงทุก Element ที่อาจจะมีแสงติดอยู่
+    const elements = document.querySelectorAll('.is-filled, .is-selected');
+    elements.forEach(el => {
+        el.classList.remove('is-filled');
+        el.classList.remove('is-selected');
+        // รีเซ็ตขอบและสีที่อาจจะถูกเขียนทับด้วย inline style จาก handleJudgment
+        el.style.borderColor = "";
+        el.style.color = "";
+    });
+}
 
 /* ══════════════════════════════════════════════════════════════
    6. MAIN UI RENDERING (TABLE & FILTERS)
@@ -9516,12 +9578,10 @@ function refreshAll() {
   renderTable();
 }
 
-
 /* ══════════════════════════════════════════════════════════════
    7. DASHBOARD & CHARTS
    แดชบอร์ดสรุปผล กราฟ และจัดอันดับ Top Lists
 ═════════════════════════════════════════════════════════════════ */
-
 function forceRefresh() {
   // ล้างค่า Filter
   if($id('dashStart')) $id('dashStart').value = '';
@@ -9797,7 +9857,7 @@ function renderTickerTape(data) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   GET CHART DATA (Safe & Consistent)
+   8.GET CHART DATA (Safe & Consistent)
    คำนวณข้อมูลรายเดือนและอัปเดตตัวแปร Global สำหรับ Tooltip
 ═════════════════════════════════════════════════════════════════ */
 function getChartData(rawRecords, startVal, endVal) {
@@ -9848,7 +9908,7 @@ function getChartData(rawRecords, startVal, endVal) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   DASHBOARD & CHART LOGIC
+   9.DASHBOARD & CHART LOGIC
 ═════════════════════════════════════════════════════════════════ */
 function initMainChart() {
   const ctx = $id('mainTrendChart');
@@ -9949,7 +10009,7 @@ callbacks: {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   MASTER DASHBOARD REFRESH (Consolidated)
+   10.MASTER DASHBOARD REFRESH (Consolidated)
    รวม Logic การคำนวณและอัปเดตหน้า Dashboard ทั้งหมด
 ═════════════════════════════════════════════════════════════════ */
 window.refreshDash = function() {
@@ -10196,9 +10256,8 @@ function updateChartStats(dataArray) {
   animNum('statAvg', Math.round(cleanData.reduce((a, b) => a + b, 0) / cleanData.length));
 }
 
-
 /* ══════════════════════════════════════════════════════════════
-   8. EXCEL IMPORT & EXPORT
+   11. EXCEL IMPORT & EXPORT
    นำเข้าข้อมูลจากไฟล์ Excel (XLSX) แบบอัจฉริยะ และการส่งออก
 ═════════════════════════════════════════════════════════════════ */
 const cleanText = (str) => String(str).toLowerCase().trim().replace(/[^a-z0-9ก-๙.-]/g, '');
@@ -10457,7 +10516,7 @@ async function importExcel(input) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   9. THEME MANAGEMENT
+   12. THEME MANAGEMENT
    จัดการระบบ Dark Mode / Light Mode
 ═════════════════════════════════════════════════════════════════ */
 function initTheme() {
@@ -10506,7 +10565,7 @@ function updateChartsTheme() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   WINDOW LOAD INITIALIZATION (CLEAN START VERSION)
+   13.WINDOW LOAD INITIALIZATION (CLEAN START VERSION)
 ═════════════════════════════════════════════════════════════════ */
 window.addEventListener('load', () => {
     // 🛡️ [1] SECURITY RESET: ล้างเซสชันเก่าทั้งหมดทันทีที่โหลดหน้าใหม่
@@ -10743,9 +10802,6 @@ window.exportToExcel = function() {
 /* ════════════════════════════════════════════════════════════
    HELPER: วาดเส้นขีดบอกค่ารอบหน้าปัด (Tick Marks)
 ═════════════════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════
-   HELPER: วาดเส้นขีดบอกค่ารอบหน้าปัด (Tick Marks) [FIXED]
-══════════════════════════════════════════════════════ */
 function drawGaugeTicks(elementId, radius, isMain = false) {
   const container = document.getElementById(elementId);
   if (!container) return;
@@ -10915,7 +10971,7 @@ function spawnCancelButton(text, onClickCallback) {
   return btn;
 }
 /* ══════════════════════════════════════════════════════════════
-   INSTANT AI SMART FILL (v4.3 - Full Form Reset)
+   14.INSTANT AI SMART FILL (v4.3 - Full Form Reset)
 ═════════════════════════════════════════════════════════════════ */
 
 let aiBrain = { partNoMap: {}, partNameMap: {} };
@@ -11033,7 +11089,7 @@ resetBtn.onclick = () => {
     // 2. รีเซ็ต Judgment
     const jd = $id('judgmentSelect');
     if (jd) { jd.value = ''; handleJudgment(''); }
-    
+    handleJudgment('');
     // 3. แจ้งเตือนและลบปุ่มตัวเองออก
     toast("🧹 ล้างข้อมูลฟอร์มทั้งหมดแล้ว");
     resetBtn.remove();
@@ -11102,7 +11158,7 @@ function closeChangePassModal() {
     });
 }
 /* ═══════════════════════════════════════════════
-   QUICK DATE FILTER LOGIC
+   15.QUICK DATE FILTER LOGIC
 ════════════════════════════════════════════════ */
 function applyQuickDateFilter(type, btnElement) {
   const now = new Date();
@@ -11155,7 +11211,7 @@ function applyQuickDateFilter(type, btnElement) {
   oast(`📅 กรองข้อมูล: ${startStr} ถึง ${endStr}`);
 }
 /* ══════════════════════════════════════════════════════════════
-   FEATURE: IMMUTABLE AUDIT LOG (NEW FUNCTIONS)
+   16.FEATURE: IMMUTABLE AUDIT LOG (NEW FUNCTIONS)
    โค้ดชุดนี้ไม่ได้แก้ไขฟังก์ชันเดิม แต่เป็นฟังก์ชันใหม่ที่เตรียมไว้เรียกใช้
 ═══════════════════════════════════════════════════════════════ */
 
@@ -11500,7 +11556,7 @@ async function switchView(targetEmail) {
 }
 
 // ═════════════════════════════════════════════════
-// FIX: กดปุ่ม ESC เพื่อออกจาก Fullscreen
+// 17.FIX: กดปุ่ม ESC เพื่อออกจาก Fullscreen
 // ═════════════════════════════════════════════════
 window.addEventListener('keydown', function(e) {
     // ตรวจสอบว่าปุ่มที่กดคือ Escape หรือไม่
@@ -11515,7 +11571,7 @@ window.addEventListener('keydown', function(e) {
 });
 
 /* ═══════════════════════════════════════════════════
-   USER GUIDE SYSTEM - FIXED & UPGRADED VERSION
+   18.USER GUIDE SYSTEM - FIXED & UPGRADED VERSION
 ═══════════════════════════════════════════════════ */
 const guideData = [
     {
