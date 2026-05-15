@@ -8373,6 +8373,61 @@ async function deleteFromSupabase(id) {
   }
 }
 
+// พจนานุกรมคำศัพท์เทคนิคแยกหมวดหมู่ (ละเอียด)
+const defectTranslations = {
+    // --- MOLD & DIE ---
+    "flash": "พบครีบเกินที่ชิ้นงาน (Flash)",
+    "scratch": "พบรอยขีดข่วน (Scratch)",
+    "dent": "พบรอยบุบ/รอยบุ๋ม (Dent)",
+    "burr": "พบครีบคม/เศษโลหะ (Burrs)",
+    "crack": "พบรอยแตกร้าว (Crack)",
+    "sink mark": "พบรอยยุบตัว (Sink Mark)",
+    "short shot": "ฉีดชิ้นงานไม่เต็ม (Short Shot)",
+    "flow mark": "พบรอยสายน้ำ (Flow Mark)",
+    "burn mark": "พบรอยไหม้ (Burn Mark)",
+    "ejector mark": "พบรอยเข็มกระทุ้ง (Ejector Mark)",
+    "deformation": "ชิ้นงานบิดเบี้ยวผิดรูป (Deformation)",
+    "gas mark": "รอยไหม้จากแก๊สสะสม (Gas Mark)",
+    "rust": "พบสนิมบนผิวชิ้นงาน/แม่พิมพ์ (Rust)",
+    "stain": "พบคราบสกปรก/รอยด่าง (Stain)",
+    "weld line": "พบรอยประสาน (Weld Line)",
+    "deformed": "เสียรูป (Deformed)",
+    "out off Standard": "ชิ้นงานไม่ตรงตาม Standard (out off Standard)",
+    "out off spec": "ชิ้นงานไม่ตรงตาม Standard (out off spec)",
+
+    // --- PIPING & MECHANICAL ---
+    "leakage": "พบการรั่วซึม (Leakage)",
+    "leak": "พบจุดรั่ว (Leak)",
+    "corrosion": "ผิววัสดุถูกกัดกร่อน (Corrosion)",
+    "clogging": "พบการอุดตันภายใน (Clogging)",
+    "clog": "อุดตัน (Clog)",
+    "loose": "พบการหลวม/ขันไม่แน่น (Loose)",
+    "pressure drop": "ความดันตกผิดปกติ (Pressure Drop)",
+    "weld defect": "รอยเชื่อมบกพร่อง (Weld Defect)",
+    "bending": "ท่อบิดงอ/เสียรูป (Bending)",
+    "vibration": "การสั่นสะเทือนผิดปกติ (Vibration)",
+    "noise": "มีเสียงดังผิดปกติ (Noise)",
+
+    // --- ELECTRONICS ---
+    "short circuit": "วงจรไฟฟ้าลัดวงจร (Short Circuit)",
+    "short": "ช็อต (Short)",
+    "open circuit": "วงจรขาด (Open Circuit)",
+    "solder bridge": "ตะกั่วเชื่อมติดกัน (Solder Bridge)",
+    "cold solder": "จุดบัดกรีไม่สนิท (Cold Solder)",
+    "burnt": "อุปกรณ์มีรอยไหม้ (Burnt)",
+    "missing part": "อุปกรณ์หาย/ใส่ไม่ครบ (Missing Part)",
+    "wrong polarity": "ใส่ขั้วผิด (Wrong Polarity)",
+    "contamination": "พบสิ่งปนเปื้อน (Contamination)",
+    "unstable": "สัญญาณไม่คงที่ (Unstable)",
+    "broken": "แตกหัก (Broken)",
+
+    // --- GENERAL ---
+    "wrong part": "ผิดรุ่น/ผิดพาร์ท (Wrong Part)",
+    "oversize": "ขนาดใหญ่กว่ามาตรฐาน (Oversize)",
+    "undersize": "ขนาดเล็กกว่ามาตรฐาน (Undersize)",
+    "discoloration": "สีเพี้ยน/สีไม่ตรง (Discoloration)",
+    "damage": "ชำรุดเสียหาย (Damage)"
+};
 /* ══════════════════════════════════════════════════════════════
    3. APP INITIALIZATION & SYNC
    โหลดแอพและประสานข้อมูลระหว่าง Local กับ Cloud
@@ -9116,6 +9171,7 @@ window.editRecord = function(id) {
     }, 300); // รอ 0.3 วินาที
   }
   toggleSidebar('open');
+  autoTranslateDefect(r.defect, false);
 };
 
 // ฟังก์ชันสำหรับคัดลอกข้อมูล (Clone)
@@ -10399,12 +10455,15 @@ window.selectCustomItem = function(inputId, value) {
     resultBox.style.display = 'none';
     inputEl.classList.remove('input-dropdown-open');
     
-    // ถ้าเลือก Part No หรือ Part Name ให้ระบบ AI ช่วยกรอกช่องที่เกี่ยวข้อง
+    // --- เพิ่มโค้ดส่วนนี้เข้าไป ---
+    if (inputId === 'defectName') {
+        translateDefectToRemark(); // เรียกแปลทันทีหลังเลือกจากลิสต์
+    }
+    // ---------------------------
+
     if (inputId === 'partNo' || inputId === 'partOn') {
         aiInstantFill(value, inputId);
     }
-    
-    
 };
 
 // ปิด Dropdown เมื่อคลิกที่อื่น
@@ -10826,7 +10885,11 @@ window.addEventListener('load', () => {
             }
         });
     }
-
+const defectInput = document.getElementById('defectName');
+if (defectInput) {
+    // แปลทันทีที่พิมพ์ (Input)
+    defectInput.addEventListener('input', translateDefectToRemark);
+}
     console.log("[System] Application Initialized & Login Data Cleared.");
 });
 
@@ -11230,13 +11293,17 @@ function aiInstantFill(inputVal, source) {
                 aiHighlightEffect(jd); hasFilled = true;
             }
         }
-
+const defectVal = document.getElementById('defectName').value;
+    if (defectVal) {
+        autoTranslateDefect(defectVal);
+    }
         if (hasFilled) {
             showAiResetButton();
             const t = $id('toast');
             if (t) { t.textContent = "✨ AI Auto-fill Active"; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1000); }
         }
     }
+    setTimeout(translateDefectToRemark, 100); // ดีเลย์เล็กน้อยเพื่อให้ค่าใน input อัปเดตก่อน
 }
 
 // --- ฟังก์ชันล้างข้อมูลทั้งหมด ---
@@ -12182,6 +12249,147 @@ $id('refNo').addEventListener('keypress', function(e) {
         this.value = val + '/';
     }
 });
+
+/* ═══════════════════════════════════════════════════
+   DEFECT TRANSLATION DICTIONARY (Standard Factory Terms)
+═══════════════════════════════════════════════════ */
+const defectDict = {
+    // --- MOLD & DIE (งานฉีดพลาสติกและงานปั๊มโลหะ) ---
+    "flash": "มีครีบเกิน (Flash)",
+    "scratch": "รอยขีดข่วน (Scratch)",
+    "dent": "รอยบุบ/รอยบุ๋ม (Dent)",
+    "burr": "ครีบคะมัด/เศษโลหะเกิน (Burrs)",
+    "crack": "รอยแตกร้าว (Crack)",
+    "sink mark": "รอยยุบตัว (Sink Mark)",
+    "short shot": "ฉีดชิ้นงานไม่เต็ม (Short Shot)",
+    "flow mark": "รอยสายน้ำ (Flow Mark)",
+    "burn mark": "รอยไหม้ (Burn Mark)",
+    "ejector mark": "รอยเข็มกระทุ้ง (Ejector Mark)",
+    "deformation": "ชิ้นงานบิดเบี้ยว (Deformation)",
+    "gas mark": "รอยไหม้จากแก๊ส (Gas Mark)",
+    "rust": "สนิม (Rust)",
+    "stain": "คราบสกปรง/รอยด่าง (Stain)",
+    "mark": "รอยตำหนิ (Mark)",
+
+    // --- PIPING & MECHANICAL (งานท่อและเครื่องกล) ---
+    "leakage": "การรั่วซึม (Leakage)",
+    "leak": "รั่ว (Leak)",
+    "corrosion": "การกัดกร่อน (Corrosion)",
+    "clogging": "การอุดตัน (Clogging)",
+    "clog": "ตัน (Clog)",
+    "loose": "หลวม/ขันไม่แน่น (Loose)",
+    "pressure drop": "ความดันตก (Pressure Drop)",
+    "weld defect": "รอยเชื่อมบกพร่อง (Weld Defect)",
+    "bending": "ท่อบิดงอ (Bending)",
+    "vibration": "การสั่นสะเทือนผิดปกติ (Vibration)",
+    "noise": "เสียงดังผิดปกติ (Noise)",
+
+    // --- ELECTRONICS (งานอิเล็กทรอนิกส์) ---
+    "short circuit": "ไฟฟ้าลัดวงจร (Short Circuit)",
+    "short": "ช็อต (Short)",
+    "open circuit": "วงจรขาด (Open Circuit)",
+    "solder bridge": "ตะกั่วเชื่อมติดกัน (Solder Bridge)",
+    "cold solder": "จุดบัดกรีไม่สนิท (Cold Solder)",
+    "burnt": "อุปกรณ์ไหม้ (Burnt)",
+    "missing part": "อุปกรณ์หาย (Missing Part)",
+    "wrong polarity": "ใส่ขั้วผิด (Wrong Polarity)",
+    "contamination": "สิ่งปนเปื้อน (Contamination)",
+    "unstable": "สัญญาณไม่คงที่ (Unstable)",
+    "no signal": "ไม่มีสัญญาณ (No Signal)",
+    "broken": "แตกหัก (Broken)",
+
+    // --- GENERAL QUALITY (ทั่วไป) ---
+    "wrong part": "ผิดรุ่น/ผิดพาร์ท (Wrong Part)",
+    "oversize": "ขนาดใหญ่เกินไป (Oversize)",
+    "undersize": "ขนาดเล็กเกินไป (Undersize)",
+    "discoloration": "สีเพี้ยน/สีไม่ตรง (Discoloration)",
+    "dust": "ฝุ่นปนเปื้อน (Dust)",
+    "damage": "เสียหาย/ชำรุด (Damage)"
+};
+/**
+ * ฟังก์ชันแปลคำศัพท์ Defect เป็นไทยและใส่ใน Remark
+ * @param {string} val - ข้อความที่กรอกในช่อง Defect
+ * @param {boolean} force - บังคับแปลแม้มีข้อความใน Remark แล้วหรือไม่
+ */
+function autoTranslateDefect(val, force = false) {
+    if (!val) return;
+    
+    const remarkEl = document.getElementById('remark');
+    if (!remarkEl) return;
+
+    // ถ้าในช่อง Remark มีข้อมูลอยู่แล้ว และไม่ได้สั่ง Force (บังคับ) จะไม่ทับข้อมูลเดิมที่ User พิมพ์ไว้
+    if (remarkEl.value.trim() !== "" && !force) return;
+
+    let inputText = val.toLowerCase().trim();
+    let translatedText = "";
+
+    // ค้นหาใน Dictionary (รองรับกรณีพิมพ์หลายคำแยกด้วย Space หรือ Comma)
+    let found = false;
+    for (let key in defectDict) {
+        if (inputText.includes(key)) {
+            translatedText = defectDict[key];
+            found = true;
+            break; 
+        }
+    }
+
+    // ถ้าแปลได้ ให้เอาไปใส่ในช่อง Remark
+    if (found) {
+        remarkEl.value = translatedText;
+        // เอฟเฟกต์เรืองแสงสีฟ้าเพื่อให้รู้ว่าระบบช่วยเติมให้
+        remarkEl.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+        setTimeout(() => { remarkEl.style.backgroundColor = ''; }, 1000);
+        
+        // อัปเดตแสง Neon (ถ้ามีฟังก์ชัน refreshNeonGlow)
+        if (typeof refreshNeonGlow === 'function') refreshNeonGlow();
+    }
+}
+// ดักจับการพิมพ์ในช่อง Defect Name
+const defectInput = document.getElementById('defectName');
+if (defectInput) {
+    defectInput.addEventListener('input', function() {
+        autoTranslateDefect(this.value);
+    });
+    
+    // กรณีเลือกจาก Search Results (Dropdown)
+    defectInput.addEventListener('change', function() {
+        autoTranslateDefect(this.value);
+    });
+}
+function translateDefectToRemark() {
+    const defectIn = document.getElementById('defectName');
+    const remarkIn = document.getElementById('remark');
+    if (!defectIn || !remarkIn) return;
+
+    const val = defectIn.value.toLowerCase().trim();
+    if (val === "") {
+        remarkIn.value = "";
+        return;
+    }
+
+    let foundMatch = false;
+    
+    // ค้นหาแบบ Partial Match (ถ้ามีคำสำคัญปรากฏอยู่ในประโยค)
+    for (const [key, translated] of Object.entries(defectTranslations)) {
+        if (val.includes(key)) {
+            remarkIn.value = translated;
+            foundMatch = true;
+            
+            // เพิ่ม Effect เรืองแสงที่ช่อง Remark เพื่อให้ User รู้ว่ามีการเปลี่ยนแปลง
+            remarkIn.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+            setTimeout(() => { remarkIn.style.backgroundColor = ''; }, 800);
+            break; 
+        }
+    }
+
+    // หากไม่เจอในพจนานุกรม ให้ล้างค่า Remark (หรือปล่อยว่างไว้)
+    if (!foundMatch) {
+        // remarkIn.value = ""; // ปิดไว้หากต้องการให้ User พิมพ์เองได้อิสระ
+    }
+    
+    // อัปเดตสถานะแสงไฟ Neon ของฟอร์ม
+    if (typeof refreshNeonGlow === 'function') refreshNeonGlow();
+}
 </script>
 </body>
 </html>
