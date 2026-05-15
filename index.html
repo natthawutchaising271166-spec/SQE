@@ -8394,6 +8394,10 @@ const defectTranslations = {
     "deformed": "เสียรูป (Deformed)",
     "out off Standard": "ชิ้นงานไม่ตรงตาม Standard (out off Standard)",
     "out off spec": "ชิ้นงานไม่ตรงตาม Standard (out off spec)",
+    "Tear": "ขาด (Tear)",
+    "Max part": "'งานปน' (Max part)",
+    "Tear": "ขาด (Tear)",
+    "TEAR": "ขาด (TEAR)",
 
     // --- PIPING & MECHANICAL ---
     "leakage": "พบการรั่วซึม (Leakage)",
@@ -8427,6 +8431,7 @@ const defectTranslations = {
     "undersize": "ขนาดเล็กกว่ามาตรฐาน (Undersize)",
     "discoloration": "สีเพี้ยน/สีไม่ตรง (Discoloration)",
     "damage": "ชำรุดเสียหาย (Damage)"
+ 
 };
 /* ══════════════════════════════════════════════════════════════
    3. APP INITIALIZATION & SYNC
@@ -10668,12 +10673,31 @@ function formatDateDisplay(dateStr) {
   return `${d}/${m}/${y}`;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   AI HELPER: ฟังก์ชันสำหรับแปลผล Defect เป็น Remark (Internal)
+   ══════════════════════════════════════════════════════════════ */
+function getAiTranslatedRemark(defectVal) {
+  if (!defectVal || defectVal === '-' || defectVal.trim() === '') return '';
+  
+  const lowerDefect = defectVal.toLowerCase();
+  // อ้างอิงจาก defectTranslations ที่มีอยู่ใน Design System ของคุณ
+  for (const [key, translation] of Object.entries(defectTranslations)) {
+    if (lowerDefect.includes(key)) {
+      return translation;
+    }
+  }
+  return ''; // ถ้าไม่เจอคำแปลให้ส่งค่าว่าง
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MAIN FUNCTION: IMPORT EXCEL WITH AI REMARK INTEGRATION
+   ══════════════════════════════════════════════════════════════ */
 async function importExcel(input) {
   if (!input.files || input.files.length === 0) return;
   const file = input.files[0];
   const reader = new FileReader();
 
-  showInitOverlay('กำลังประมวลผลไฟล์...', 'กรุณารอสักครู่ กำลังอ่านข้อมูล Excel');
+  showInitOverlay('กำลังประมวลผลไฟล์...', 'กรุณารอสักครู่ กำลังอ่านข้อมูล Excel และประมวลผลด้วย AI');
 
   reader.onload = async function(e) {
     try {
@@ -10699,7 +10723,8 @@ async function importExcel(input) {
       const defaultShift = $id('shift') ? $id('shift').value : 'SHIFT A';
       const defaultLine = $id('lineNo') ? $id('lineNo').value : '-';
       
-      let successCount = 0; let importedRecords =[];
+      let successCount = 0; 
+      let importedRecords = [];
 
       for (let i = headerRowIndex + 1; i < rawData.length; i++) {
         const row = rawData[i];
@@ -10709,6 +10734,19 @@ async function importExcel(input) {
         const ref = getVal('ref');
         
         if (!ref || isDuplicate(ref)) continue;
+
+        // --- AI REMARK INTEGRATION LOGIC ---
+        const defect = getVal('defect') || '-';
+        let remark = getVal('remark') || '';
+
+        // ถ้า Remark ใน Excel ว่าง หรือเป็นเครื่องหมายลบ ให้ AI ช่วยแปลจาก Defect
+        if (remark === '' || remark === '-') {
+            const translated = getAiTranslatedRemark(defect);
+            if (translated) {
+                remark = translated; // ใส่คำแปลที่ AI หาได้
+            }
+        }
+        // ------------------------------------
 
         let qtyRaw = getVal('qty');
         let qtyVal = (qtyRaw === "" || qtyRaw == null) ? 0 : parseFloat(String(qtyRaw).replace(/,/g, ''));
@@ -10721,16 +10759,25 @@ async function importExcel(input) {
         else if (rawJudgment.includes('CAN') || rawJudgment.includes('OK') || rawJudgment.includes('USE')) finalJudgment = 'CAN USE';
 
         const newRecord = {
-          id: generateUUID(), date: parseExcelDate(getVal('date')) || defaultDate,
+          id: generateUUID(), 
+          date: parseExcelDate(getVal('date')) || defaultDate,
           shift: getVal('shift') || defaultShift, 
-          // ✅ แก้ตรงนี้: บังคับให้เป็นของ User ที่ Login อยู่เท่านั้น ไม่สนใจคอลัมน์ใน Excel
           inspector: currentUser, 
-          ref: ref, line: getVal('line') || defaultLine, supplier: getVal('supplier') || 'Unknown Supplier',
-          partNo: getVal('partNo') || '-', partName: getVal('partName') || '', qty: qtyVal,
-          defect: getVal('defect') || '-', remark: getVal('remark') || '', judgment: finalJudgment, _isOffline: true 
+          ref: ref.toUpperCase(), 
+          line: getVal('line') || defaultLine, 
+          supplier: getVal('supplier') || 'Unknown Supplier',
+          partNo: getVal('partNo') || '-', 
+          partName: getVal('partName') || '', 
+          qty: qtyVal,
+          defect: defect, 
+          remark: remark, // ใช้ Remark ที่ผ่านการประมวลผล AI แล้ว
+          judgment: finalJudgment, 
+          _isOffline: true 
         };
 
-        records.push(newRecord); importedRecords.push(newRecord); successCount++;
+        records.push(newRecord); 
+        importedRecords.push(newRecord); 
+        successCount++;
       }
 
       if (importedRecords.length > 0) {
@@ -10742,18 +10789,25 @@ async function importExcel(input) {
              const success = await pushToSupabase(dataToUpload);
              if (success) {
                  importedRecords.forEach(r => { delete r._isOffline; r._isSaved = true; });
-                 await dbClear(); await dbPutBulk(records);
-                 toast(`☁️ อัปโหลดขึ้น Cloud สำเร็จ ${successCount} รายการ`);
-             } else { toast(`⚠️ นำเข้า Local สำเร็จ แต่เซฟขึ้น Cloud ไม่ผ่าน`); }
-        } else { toast(`✅ นำเข้าแบบออฟไลน์สำเร็จ ${successCount} รายการ`); }
+                 await dbClear(); 
+                 await dbPutBulk(records);
+                 toast(`☁️ อัปโหลดขึ้น Cloud สำเร็จ ${successCount} รายการ (AI ช่วยสรุป Remark เรียบร้อย)`);
+             } else { 
+                 toast(`⚠️ นำเข้า Local สำเร็จ แต่เซฟขึ้น Cloud ไม่ผ่าน`); 
+             }
+        } else { 
+            toast(`✅ นำเข้าแบบออฟไลน์สำเร็จ ${successCount} รายการ`); 
+        }
         refreshAll();
-      } else { toast('⚠️ ไม่พบข้อมูลใหม่ที่นำเข้าได้'); }
+      } else { 
+          toast('⚠️ ไม่พบข้อมูลใหม่ที่นำเข้าได้'); 
+      }
 
-    } catch (err) { toast('❌ เกิดข้อผิดพลาด: ' + err.message); } 
-    finally { 
+    } catch (err) { 
+        toast('❌ เกิดข้อผิดพลาด: ' + err.message); 
+    } finally { 
       hideInitOverlay(); 
       input.value = ''; 
-      // ✅ เพิ่มบรรทัดนี้เพื่อให้หน้าจอกลับมาเต็มจอทันทีหลัง Import เสร็จ
       enterFullscreen(); 
     }
   };
@@ -11224,41 +11278,81 @@ function spawnCancelButton(text, onClickCallback) {
    14.INSTANT AI SMART FILL (v4.3 - Full Form Reset)
 ═════════════════════════════════════════════════════════════════ */
 
-let aiBrain = { partNoMap: {}, partNameMap: {} };
+// เพิ่มตัวแปรเก็บความจำใหม่
+let aiBrain = { partNoMap: {}, partNameMap: {}, defectToRemarkMap: {} };
 
 function updateAIBrain() {
     const myRecords = getMyRecords();
     if (!myRecords || myRecords.length === 0) return;
-    aiBrain.partNoMap = {}; aiBrain.partNameMap = {};
+
+    // ล้างค่าเก่าก่อนอัปเดตใหม่
+    aiBrain.partNoMap = {}; 
+    aiBrain.partNameMap = {};
+    aiBrain.defectToRemarkMap = {}; // เพิ่มการจำ Remark ตามปัญหา
+
     const tempStore = {};
+    const defectTempStore = {}; // สำหรับเก็บประวัติ Remark
+
     myRecords.forEach(r => {
         const pNo = String(r.partNo || "").trim();
         const pName = String(r.partName || "").trim();
+        const def = String(r.defect || "").trim().toLowerCase();
+        const rem = String(r.remark || "").trim();
+
+        // เก็บข้อมูล Part (โค้ดเดิม)
         if (pNo) { if (!tempStore[pNo]) tempStore[pNo] = []; tempStore[pNo].push(r); }
         if (pName) { if (!tempStore[pName]) tempStore[pName] = []; tempStore[pName].push(r); }
+
+        // เก็บข้อมูล Remark ที่เคยใช้คู่กับปัญหานี้
+        if (def && rem && rem !== "-") {
+            if (!defectTempStore[def]) defectTempStore[def] = [];
+            defectTempStore[def].push(rem);
+        }
     });
-    const getMode = (arr, key) => {
+
+    // ฟังก์ชันหาค่าที่ใช้บ่อยที่สุด (Mode)
+    const getMode = (arr) => {
+        if (!arr || arr.length === 0) return null;
         const counts = {}; let max = 0, result = null;
-        arr.forEach(item => {
-            const val = item[key];
-            if (val && val !== '-' && val !== '') {
-                counts[val] = (counts[val] || 0) + 1;
-                if (counts[val] > max) { max = counts[val]; result = val; }
-            }
+        arr.forEach(val => {
+            counts[val] = (counts[val] || 0) + 1;
+            if (counts[val] > max) { max = counts[val]; result = val; }
         });
         return result;
     };
+
+    // 1. ประมวลผลสมองส่วน Part (โค้ดเดิม)
+    // ... (ส่วนการวนลูป tempStore เดิมของคุณ) ...
     for (let key in tempStore) {
         const recordsForKey = tempStore[key];
+        const mode = (k) => {
+            const counts = {}; let m = 0, res = null;
+            recordsForKey.forEach(item => {
+                const v = item[k];
+                if (v && v !== '-' && v !== '') {
+                    counts[v] = (counts[v] || 0) + 1;
+                    if (counts[v] > m) { m = counts[v]; res = v; }
+                }
+            });
+            return res;
+        };
         aiBrain.partNoMap[key.toLowerCase()] = aiBrain.partNameMap[key.toLowerCase()] = {
-            supplier: getMode(recordsForKey, 'supplier'),
-            partNo: getMode(recordsForKey, 'partNo'),
-            partName: getMode(recordsForKey, 'partName'),
-            line: getMode(recordsForKey, 'line'),
-            defect: getMode(recordsForKey, 'defect'),
-            judgment: getMode(recordsForKey, 'judgment')
+            supplier: mode('supplier'),
+            partNo: mode('partNo'),
+            partName: mode('partName'),
+            line: mode('line'),
+            defect: mode('defect'),
+            judgment: mode('judgment')
         };
     }
+
+    // 2. ประมวลผลสมองส่วน Remark (ใหม่!)
+    // ระบบจะดูว่าปัญหานี้ ปกติคุณพิมพ์ Remark ว่าอะไร แล้วจำอันที่ใช้บ่อยที่สุดไว้
+    for (let defKey in defectTempStore) {
+        aiBrain.defectToRemarkMap[defKey] = getMode(defectTempStore[defKey]);
+    }
+    
+    console.log("[AI Brain] Learned " + Object.keys(aiBrain.defectToRemarkMap).length + " custom defect patterns.");
 }
 
 function aiInstantFill(inputVal, source) {
@@ -12364,30 +12458,39 @@ function translateDefectToRemark() {
     const val = defectIn.value.toLowerCase().trim();
     if (val === "") {
         remarkIn.value = "";
+        if (typeof refreshNeonGlow === 'function') refreshNeonGlow();
         return;
     }
 
     let foundMatch = false;
-    
-    // ค้นหาแบบ Partial Match (ถ้ามีคำสำคัญปรากฏอยู่ในประโยค)
-    for (const [key, translated] of Object.entries(defectTranslations)) {
-        if (val.includes(key)) {
-            remarkIn.value = translated;
-            foundMatch = true;
-            
-            // เพิ่ม Effect เรืองแสงที่ช่อง Remark เพื่อให้ User รู้ว่ามีการเปลี่ยนแปลง
-            remarkIn.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
-            setTimeout(() => { remarkIn.style.backgroundColor = ''; }, 800);
-            break; 
+
+    // --- STEP 1: ตรวจสอบจาก Project Memory (AI Learned จากข้อมูลที่เคยบันทึก) ---
+    // ระบบจะดูว่าปัญหานี้ "เป๊ะๆ" คุณเคยพิมพ์ Remark ว่าอะไรไว้บ่อยที่สุดในโปรเจกต์
+    if (window.aiBrain && aiBrain.defectToRemarkMap && aiBrain.defectToRemarkMap[val]) {
+        remarkIn.value = aiBrain.defectToRemarkMap[val];
+        foundMatch = true;
+    }
+
+    // --- STEP 2: ตรวจสอบจาก Dictionary ใน Code (ถาม Code ถ้าในความจำไม่มี) ---
+    if (!foundMatch) {
+        // ค้นหาแบบ Partial Match (ถ้ามีคำสำคัญปรากฏอยู่ในประโยค)
+        for (const [key, translated] of Object.entries(defectTranslations)) {
+            if (val.includes(key)) {
+                remarkIn.value = translated;
+                foundMatch = true;
+                break; 
+            }
         }
     }
 
-    // หากไม่เจอในพจนานุกรม ให้ล้างค่า Remark (หรือปล่อยว่างไว้)
-    if (!foundMatch) {
-        // remarkIn.value = ""; // ปิดไว้หากต้องการให้ User พิมพ์เองได้อิสระ
+    // --- ส่วนแสดงผล Visual Feedback ---
+    if (foundMatch) {
+        // เพิ่ม Effect เรืองแสงเพื่อให้ User รู้ว่าระบบช่วยเติมให้ (ใช้สีเขียวมิ้นต์เพื่อให้ดู Smart)
+        remarkIn.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+        setTimeout(() => { remarkIn.style.backgroundColor = ''; }, 800);
     }
-    
-    // อัปเดตสถานะแสงไฟ Neon ของฟอร์ม
+
+    // อัปเดตสถานะแสงไฟ Neon ของฟอร์ม (เพื่อให้ปุ่ม Commit เช็คความพร้อม)
     if (typeof refreshNeonGlow === 'function') refreshNeonGlow();
 }
 </script>
