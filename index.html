@@ -6966,6 +6966,40 @@ html.dark-mode #judgmentSelect option {
 html.dark-mode #judgmentSelect {
     color-scheme: dark; /* ช่วยบอกเบราว์เซอร์ให้ปรับ UI พื้นฐานเป็นโหมดมืด */
 }
+/* สถานะเมื่อกรอกข้อมูลถูกต้อง */
+.neon-in.is-valid {
+    border-color: #10b981 !important; /* เขียว */
+    background: rgba(16, 185, 129, 0.05) !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* สถานะเมื่อข้อมูลผิดรูปแบบ */
+.neon-in.is-invalid {
+    border-color: #ef4444 !important; /* แดง */
+    background: rgba(239, 68, 68, 0.05) !important;
+    animation: shake 0.4s ease-in-out;
+}
+
+/* ปรับแต่ง Tooltip เล็กๆ ใต้ช่องกรอก */
+.validation-msg {
+    font-size: 0.6rem;
+    font-weight: 600;
+    margin-top: 2px;
+    margin-left: 4px;
+    display: none;
+}
+.is-invalid + .validation-msg {
+    display: block;
+    color: #ef4444;
+}
+
+/* ปิดปุ่มบันทึกถ้าฟอร์มไม่สมบูรณ์ */
+#submitBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+    transform: none !important;
+}
 </style>
 </head>
 <body>
@@ -7332,9 +7366,16 @@ html.dark-mode #judgmentSelect {
           <div class="sidebar-section-title" style="margin-bottom:0.1rem; color:var(--blue-500); font-size:0.6rem;">REFERENCE INFO</div>
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
             <div class="form-section-input">
-                <input type="text" id="refNo" placeholder="REF No. *" required class="neon-in" style="height:40px; border-radius:10px;">
+                <!-- ตัวอย่างช่อง Ref No ที่อัพเกรดแล้ว -->
+<div class="form-section-input">
+    <input type="text" id="refNo" placeholder="REF No*" required class="neon-in">
+    <span class="validation-msg">รูปแบบต้องเป็น 000/0000 หรือ V000/0000</span>
+</div>
             </div>
-            <input type="number" id="qty" placeholder="Quantity" required class="neon-in" style="height:40px; border-radius:10px;">
+            <div class="form-section-input">
+    <input type="number" id="qty" placeholder="Quantity *" min="1" required class="neon-in">
+    <span class="validation-msg">จำนวนต้องมากกว่า 0</span>
+</div>
           </div>
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
             <select id="shift" class="neon-in no-auto-glow" style="height:40px; border-radius:10px; font-weight:700;">
@@ -8781,7 +8822,7 @@ function handleJudgment(val) {
   }
 }
 
-// ฟังก์ชัน handleFormSubmit ฉบับสมบูรณ์ (Loading -> Success -> Reset)
+/// ฟังก์ชัน handleFormSubmit ฉบับอัปเกรด (Security + AI + Visual Feedback)
 async function handleFormSubmit(e) {
   let oldRecord = null;
   let auditAction = 'INSERT';
@@ -8789,47 +8830,78 @@ async function handleFormSubmit(e) {
   
   if (_isInitializing) { toast('⏳ กรุณารอให้ระบบโหลดเสร็จ'); return; }
 
-  // --- [1] การเตรียมข้อมูลและ Validation ---
+  // --- [1] การเตรียมข้อมูลและ Advanced Validation ---
+  const btn = $id('submitBtn');
   const refInput = $id('refNo');
+  const qtyInput = $id('qty');
+  const dateInput = $id('inputDate');
+  const jdgSelect = $id('judgmentSelect');
+
   const ref = refInput.value.trim();
   const supp = $id('supplier').value.trim();
-  const qty = parseInt($id('qty').value) || 0;
-  const jdg = $id('judgmentSelect').value;
-  const btn = $id('submitBtn');
-  
+  const qty = parseInt(qtyInput.value) || 0;
+  const jdg = jdgSelect.value;
+  const selectedDate = new Date(dateInput.value);
+  const today = new Date();
+  today.setHours(23, 59, 59, 999); // ตั้งค่าให้ครอบคลุมถึงสิ้นวัน
+
+  // 🛡️ Rule 1: ตรวจสอบรูปแบบ Reference (000/0000 หรือ V000/0000)
   const refRegex = /^(V?\d{3}\/\d{4})$/i; 
-  if (!ref) { shake(refInput); toast('❌ กรุณาระบุ Reference No'); return; }
   if (!refRegex.test(ref)) {
     shake(refInput);
-    refInput.style.borderColor = '#ef4444'; 
-    toast('❌ รูปแบบผิด! ต้องเป็น 000/0000 หรือ V000/0000 เท่านั้น');
+    refInput.classList.add('is-invalid');
+    toast('❌ รูปแบบ Ref ผิด! ต้องเป็น 000/0000 หรือ V000/0000');
     refInput.focus();
     return;
   }
 
+  // 🛡️ Rule 2: ตรวจสอบจำนวน (ต้องมากกว่า 0)
+  if (qty <= 0) {
+    shake(qtyInput);
+    qtyInput.classList.add('is-invalid');
+    toast('❌ จำนวน (QTY) ต้องมากกว่า 0');
+    return;
+  }
+
+  // 🛡️ Rule 3: ป้องกันการลงข้อมูลในอนาคต
+  if (selectedDate > today) {
+    shake(dateInput);
+    toast('❌ ห้ามบันทึกข้อมูลวันที่ล่วงหน้า (Future Date)');
+    return;
+  }
+
+  // 🛡️ Rule 4: ตรวจสอบข้อมูลซ้ำ (กรณีไม่ใช่การแก้ไข)
   if (!editingId && isDuplicate(ref)) {
     shake(refInput);
     toast('⚠️ Duplicate! REF นี้มีในระบบแล้ว');
     return;
   }
 
+  // 🛡️ Rule 5: ตรวจสอบการเลือก Judgment
+  if (!jdg) {
+    shake(jdgSelect);
+    toast('❌ กรุณาเลือกผลการตัดสิน (Judgment)');
+    return;
+  }
+
   // 🌟 [AUTOMATION 1: START LOADING] 🌟
-  const originalBtnHTML = '<span>✦ COMMIT DATA</span>'; // เก็บค่าเริ่มต้นเพื่อย้อนกลับ
+  const originalBtnHTML = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = `
     <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-      <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
         <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
-      <span>กำลังบันทึกลงคลาวด์...</span>
+      <span>SECURE SAVING...</span>
     </div>
   `;
 
   // --- [2] สร้างโครงสร้างข้อมูล ---
+  const rowId = editingId || generateUUID();
   const rowData = {
-    id: editingId || generateUUID(),
-    date: $id('inputDate').value,
+    id: rowId,
+    date: dateInput.value,
     shift: $id('shift').value,
     inspector: currentUser,
     ref: ref.toUpperCase(),
@@ -8843,7 +8915,7 @@ async function handleFormSubmit(e) {
     judgment: jdg,
     _isSaved: false,
     _isOffline: false,
-    _isNew: true // สำหรับเอฟเฟกต์แสงสีเขียวในตาราง
+    _isNew: true 
   };
 
   try {
@@ -8860,9 +8932,7 @@ async function handleFormSubmit(e) {
     if (editingId) {
       oldRecord = records.find(r => String(r.id) === String(editingId));
       const index = records.findIndex(r => String(r.id) === String(editingId));
-      if (index > -1) {
-        records[index] = { ...rowData }; 
-      }
+      if (index > -1) records[index] = { ...rowData }; 
       auditAction = 'UPDATE';
       toast('✅ อัปเดตข้อมูลสำเร็จ');
     } else {
@@ -8874,9 +8944,9 @@ async function handleFormSubmit(e) {
     await dbPutBulk([rowData]);  
 
     // 🌟 [AUTOMATION 2: SUCCESS SEQUENCE] 🌟
-    btn.innerHTML = '<span>✅ บันทึกข้อมูลสำเร็จ</span>';
+    btn.innerHTML = '<span>✅ DATA SECURED</span>';
     btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-    btn.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.4)';
+    btn.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.5)';
 
     const brandLogo = document.querySelector('#brandCard div:first-child');
     if(brandLogo) brandLogo.classList.add('logo-success-glow');
@@ -8884,51 +8954,53 @@ async function handleFormSubmit(e) {
     // หน่วงเวลาเพื่อให้ User เห็นสถานะ Success แวบหนึ่ง
     setTimeout(() => {
       
-      // --- [5] UI RESET SEQUENCE ---
-      const keepDate = $id('inputDate').value;
+      // --- [5] UI RESET & CLEANUP SEQUENCE ---
+      const keepDate = dateInput.value;
       const keepShift = $id('shift').value;
 
       // ล้างสถานะแก้ไขและกลับหน้าตาปุ่มเป็นปกติ
       cancelEdit(); 
       extinguishAllGlows();
 
-      // คืนค่าฟอร์มบางส่วน
+      // คืนค่าฟอร์มบางส่วน (อำนวยความสะดวกให้ User ไม่ต้องเลือกใหม่)
       if($id('inputDate')) $id('inputDate').value = keepDate;
       if($id('shift')) $id('shift').value = keepShift;
 
-      // ปิด UI เสริม
+      // ล้าง UI ส่วนเกิน (Dropdowns / AI Buttons / Validation Colors)
       document.querySelectorAll('.search-results-container').forEach(box => box.style.display = 'none');
       document.querySelectorAll('.neon-in').forEach(input => {
-        input.classList.remove('input-dropdown-open');
+        input.classList.remove('input-dropdown-open', 'is-valid', 'is-invalid');
         input.style.borderColor = "";
+        input.style.backgroundColor = "";
       });
-      removeAiResetButton(); 
+      
+      removeAiResetButton(); // ล้างปุ่ม Reset ของ AI ออก
 
-      if (document.activeElement) document.activeElement.blur();
+      if (document.activeElement) document.activeElement.blur(); // เอาเคอร์เซอร์ออก
 
-      // ย้อนกลับปุ่มเป็นสถานะเตรียมพร้อม (Commit Data)
+      // ย้อนกลับปุ่มเป็นสถานะเตรียมพร้อม
       btn.innerHTML = originalBtnHTML;
-      btn.style.background = ''; // กลับไปใช้สีตาม CSS
+      btn.style.background = ''; 
       btn.style.boxShadow = '';
       btn.disabled = false;
       
       if(brandLogo) brandLogo.classList.remove('logo-success-glow');
 
-      // --- [6] RE-RENDER & LOG ---
+      // --- [6] RE-RENDER & AUDIT LOG ---
       refreshAll(); 
       writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
       
-      // ล้างสถานะไฮไลท์สีเขียวหลัง 3 วินาที
+      // ล้างสถานะไฮไลท์สีเขียวในตารางหลัง 3 วินาที
       setTimeout(() => {
-          const idx = records.findIndex(x => x.id === rowData.id);
+          const idx = records.findIndex(x => x.id === rowId);
           if(idx > -1) records[idx]._isNew = false;
       }, 3000);
 
-    }, 1000);
+    }, 1200);
 
   } catch (err) {
-    console.error("Save Error:", err);
-    toast('❌ บันทึกไม่สำเร็จ กรุณาลองใหม่');
+    console.error("Critical Save Error:", err);
+    toast('❌ บันทึกไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ');
     btn.disabled = false;
     btn.innerHTML = originalBtnHTML;
     btn.style.background = '';
@@ -9300,15 +9372,22 @@ async function performClearAll() {
   }
 }
 function extinguishAllGlows() {
-    // ดึงทุก Element ที่อาจจะมีแสงติดอยู่
-    const elements = document.querySelectorAll('.is-filled, .is-selected');
+    // 1. ลบ Class ที่ทำให้เกิดแสง
+    const elements = document.querySelectorAll('.is-filled, .is-selected, .is-valid, .is-invalid');
     elements.forEach(el => {
-        el.classList.remove('is-filled');
-        el.classList.remove('is-selected');
-        // รีเซ็ตขอบและสีที่อาจจะถูกเขียนทับด้วย inline style จาก handleJudgment
+        el.classList.remove('is-filled', 'is-selected', 'is-valid', 'is-invalid');
+        // 2. ล้าง Inline Style (สีขอบที่ถูกกำหนดโดย JS เช่น ช่อง REF)
         el.style.borderColor = "";
+        el.style.backgroundColor = "";
         el.style.color = "";
     });
+    
+    // ล้างสีที่ปุ่ม Submit ด้วย
+    const btn = $id('submitBtn');
+    if (btn) {
+        btn.style.background = "";
+        btn.style.boxShadow = "";
+    }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -11189,20 +11268,34 @@ function showAiResetButton() {
     resetBtn.onmouseout = () => { resetBtn.style.background = '#f8fafc'; resetBtn.style.borderColor = '#e2e8f0'; };
     
 // --- ค้นหาบรรทัด resetBtn.onclick ภายในฟังก์ชัน showAiResetButton ---
+// ค้นหาในฟังก์ชัน showAiResetButton()
 resetBtn.onclick = () => {
-    // 1. ล้างช่อง Input ทั้งหมด
-    const allFields = ['partNo', 'partOn', 'supplier', 'lineNo', 'qty', 'defectName', 'remark', 'refNo'];
-    allFields.forEach(id => { if($id(id)) $id(id).value = ''; });
+    // 1. ล้างข้อมูลทุกช่อง (รวมวันที่และกะด้วยถ้าต้องการ)
+    const allInputs = ['partNo', 'partOn', 'supplier', 'lineNo', 'qty', 'defectName', 'remark', 'refNo'];
+    allInputs.forEach(id => { 
+        if($id(id)) {
+            $id(id).value = ''; 
+        }
+    });
     
-    // 2. รีเซ็ต Judgment
+    // 2. รีเซ็ตตัวเลือก Judgment
     const jd = $id('judgmentSelect');
-    if (jd) { jd.value = ''; handleJudgment(''); }
-    handleJudgment('');
-    // 3. แจ้งเตือนและลบปุ่มตัวเองออก
-    toast("🧹 ล้างข้อมูลฟอร์มทั้งหมดแล้ว");
-    resetBtn.remove();
+    if (jd) jd.value = '';
 
-    // ✅ แก้ไขตรงนี้: จากเดิมที่สั่ง .focus() ให้เปลี่ยนเป็น .blur()
+    // 3. รีเซ็ตวันที่เป็นปัจจุบัน และ กะเป็น SHIFT A (ค่าเริ่มต้น)
+    if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
+    if($id('shift')) $id('shift').value = 'SHIFT A';
+
+    // 4. สำคัญที่สุด: ล้างสีและแสงทั้งหมด (เรียกใช้ฟังก์ชันที่แก้ในข้อ 1)
+    extinguishAllGlows();
+    handleJudgment(''); // ล้างสถานะปุ่มบันทึก
+
+    // 5. ปิด Dropdown ที่อาจค้างอยู่
+    document.querySelectorAll('.search-results-container').forEach(box => box.style.display = 'none');
+
+    toast("🧹 ล้างข้อมูลและรีเซ็ตค่าสีทั้งหมดแล้ว");
+    resetBtn.remove(); // ลบปุ่มล้างออก
+
     if (document.activeElement) document.activeElement.blur();
 };
 
@@ -12001,6 +12094,94 @@ function toggleSidebar(forceState = null) {
         toggleBtn.style.background = "rgba(59, 130, 246, 0.4)"; // ไฮไลท์สีฟ้าเมื่อกางออก
     }
 }
+
+/* ═══════════════════════════════════════════════════
+   ULTRA-SAFE FORM VALIDATION SYSTEM
+═══════════════════════════════════════════════════ */
+
+// 1. กำหนดกฎการตรวจสอบ (Validation Rules)
+const validationRules = {
+    refNo: (val) => /^(V?\d{3}\/\d{4})$/i.test(val.trim()),
+    qty: (val) => parseInt(val) > 0,
+    partNo: (val) => val.trim().length >= 3,
+    supplier: (val) => val.trim().length >= 2,
+    inputDate: (val) => {
+        const selectedDate = new Date(val);
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+        return val !== "" && selectedDate <= today; // ห้ามเลือกวันที่ในอนาคต
+    },
+    judgmentSelect: (val) => val !== ""
+};
+
+// 2. ฟังก์ชันตรวจสอบรายช่อง
+function validateField(id) {
+    const el = $id(id);
+    if (!el) return false;
+
+    const val = el.value;
+    const isValid = validationRules[id] ? validationRules[id](val) : val.trim() !== "";
+
+    if (isValid) {
+        el.classList.remove('is-invalid');
+        el.classList.add('is-valid');
+    } else {
+        if (val !== "") { // จะขึ้นสีแดงต่อเมื่อพิมพ์แล้วแต่ผิด
+            el.classList.remove('is-valid');
+            el.classList.add('is-invalid');
+        } else {
+            el.classList.remove('is-valid', 'is-invalid');
+        }
+    }
+    checkFormCompleteness(); // ตรวจสอบภาพรวมฟอร์มเพื่อเปิด/ปิดปุ่มบันทึก
+    return isValid;
+}
+
+// 3. ตรวจสอบภาพรวมเพื่อเปิดปุ่ม Commit
+function checkFormCompleteness() {
+    const requiredIds = ['inputDate', 'partNo', 'supplier', 'refNo', 'qty', 'judgmentSelect'];
+    const allValid = requiredIds.every(id => {
+        const el = $id(id);
+        const val = el ? el.value : "";
+        return validationRules[id] ? validationRules[id](val) : val.trim() !== "";
+    });
+
+    const btn = $id('submitBtn');
+    if (btn) {
+        btn.disabled = !allValid;
+        if (allValid) {
+            btn.style.filter = "none";
+            btn.innerHTML = "✦ COMMIT DATA";
+        } else {
+            btn.innerHTML = "📝 PLEASE FILL REQUIRED FIELDS";
+        }
+    }
+}
+
+// 4. ผูกเหตุการณ์ (Event Listeners)
+const fieldsToWatch = ['inputDate', 'partNo', 'supplier', 'refNo', 'qty', 'judgmentSelect', 'defectName'];
+fieldsToWatch.forEach(id => {
+    const el = $id(id);
+    if (el) {
+        // ตรวจสอบขณะพิมพ์
+        el.addEventListener('input', () => validateField(id));
+        // ตรวจสอบเมื่อเปลี่ยนค่า (สำหรับ Date/Select)
+        el.addEventListener('change', () => validateField(id));
+    }
+});
+
+// 5. ระบบ Input Masking สำหรับ Ref No (ช่วยเติม "/" ให้อัตโนมัติ)
+$id('refNo').addEventListener('keypress', function(e) {
+    const val = this.value;
+    // ถ้าพิมพ์ถึงตัวที่ 3 แล้ว (กรณีเลขล้วน) ให้เติม / อัตโนมัติ
+    if (val.length === 3 && !val.includes('/') && e.key !== 'Backspace') {
+        this.value = val + '/';
+    }
+    // ถ้าพิมพ์ตัวแรกเป็น V แล้วถึงตัวที่ 4 ให้เติม /
+    if (val.length === 4 && val.startsWith('V') && !val.includes('/') && e.key !== 'Backspace') {
+        this.value = val + '/';
+    }
+});
 </script>
 </body>
 </html>
