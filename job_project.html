@@ -3220,6 +3220,137 @@ body.dark-mode .score-big { background: var(--card); border-color: var(--border)
 /* ── 7. Image Hover (รูปภาพในตาราง Support) ── */
 body.dark-mode .sup-img-none { background: var(--bg2); border-color: var(--border); }
 body.dark-mode .sup-img-none:hover { background: rgba(37,99,235,.15); border-color: var(--primary); }
+/* สไตล์ Badge สำหรับ OT แยกตามประเภทวัน */
+.ot-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center; /* จัดกึ่งกลาง */
+    min-width: 120px;       /* ความกว้างคงที่เพื่อให้ตารางดูเป็นระเบียบ */
+    padding: 4px 12px;
+    border-radius: 99px;    /* ทรงแคปซูล */
+    font-size: 0.65rem;
+    font-weight: 800;
+    border: 1.5px solid transparent;
+    text-align: center;
+}
+
+/* สีแต่ละประเภท (อิงตามสีในกราฟวงกลมเพื่อให้เข้าชุดกัน) */
+.ot-normal  { background: rgba(37, 99, 235, 0.1);  color: #2563eb; border-color: rgba(37, 99, 235, 0.2); }
+.ot-sat     { background: rgba(5, 150, 105, 0.1);  color: #059669; border-color: rgba(5, 150, 105, 0.2); }
+.ot-sun     { background: rgba(124, 58, 237, 0.1); color: #7c3aed; border-color: rgba(124, 58, 237, 0.2); }
+.ot-holiday { background: rgba(220, 38, 38, 0.1);  color: #dc2626; border-color: rgba(220, 38, 38, 0.2); }
+
+/* Progress Ring Styles */
+.ot-goal-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.ring-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ring-container svg {
+    transform: rotate(-90deg);
+}
+
+.ring-bg {
+    fill: none;
+    stroke: var(--bg3);
+    stroke-width: 10;
+}
+
+.ring-fill {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 314.159; /* เส้นรอบวง 2 * pi * 50 */
+    stroke-dashoffset: 314.159;
+    transition: stroke-dashoffset 1s ease-in-out, stroke 0.3s;
+}
+
+.ring-text {
+    position: absolute;
+    text-align: center;
+}
+
+.ring-percent {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--txt);
+    display: block;
+    line-height: 1;
+}
+
+.ring-label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: var(--txt4);
+    text-transform: uppercase;
+}
+
+/* 3D Gradient Icon Styles */
+.kpi-icon-3d {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1), inset 0 -3px 0 rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.kpi:hover .kpi-icon-3d {
+    transform: translateY(-3px) scale(1.1);
+}
+
+.ico-blue { background: linear-gradient(135deg, #60a5fa, #2563eb); color: white; }
+.ico-green { background: linear-gradient(135deg, #34d399, #059669); color: white; }
+.ico-amber { background: linear-gradient(135deg, #fbbf24, #d97706); color: white; }
+.ico-red { background: linear-gradient(135deg, #f87171, #dc2626); color: white; }
+
+/* สไตล์ช่องกรอกเป้าหมายแบบคลีน */
+.goal-input-clean {
+    width: 40px;
+    background: transparent; /* พื้นหลังโปร่งใส */
+    border: 1px solid transparent; /* ขอบล่างโปร่งใส */
+    border-radius: 4px;
+    padding: 2px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-align: center;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.3s; /* ให้การแสดงผลนุ่มนวล */
+    outline: none;
+}
+
+/* เมื่อเอาเมาส์ไปชี้ หรือ กดคลิก ให้แสดงกรอบและพื้นหลัง */
+.goal-input-clean:hover, 
+.goal-input-clean:focus {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+}
+
+/* ซ่อนปุ่มลูกศรขึ้น-ลงของช่องตัวเลขเพื่อให้ดูเนียนเหมือนข้อความ */
+.goal-input-clean::-webkit-outer-spin-button,
+.goal-input-clean::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 </style>
 
 </head>
@@ -3423,6 +3554,7 @@ body.dark-mode .sup-img-none:hover { background: rgba(37,99,235,.15); border-col
       <div class="menu-item" onclick="nav('5s',this)"><span class="menu-icon">🧹</span><span class="menu-label">5S System</span></div>
       <div class="menu-item" onclick="nav('multi',this)"><span class="menu-icon">📊</span><span class="menu-label">Skill Matrix</span></div>
       <div class="menu-item" onclick="nav('special',this)"><span class="menu-icon">⭐</span><span class="menu-label">Special Jobs</span></div>
+      <div class="menu-item" onclick="nav('ot-page',this)"><span class="menu-icon">⏰</span><span class="menu-label">OT Logging</span></div>
     </nav>
   </div>
 <div class="sb-footer">
@@ -4322,6 +4454,166 @@ body.dark-mode .sup-img-none:hover { background: rgba(37,99,235,.15); border-col
     </div>
   </div>
 
+<!-- ── OVERTIME LOGGING ── -->
+<div id="ot-page" class="page">
+    <div class="ph">
+        <div>
+            <div class="eyebrow">Compensation & Time Tracking</div>
+            <h1 class="main-title">Overtime <span class="title-grad">Management System</span></h1>
+        </div>
+        <div id="ot-total-badge" class="level-badge level-adv">0.00 Total Hours</div>
+    </div>
+
+    <!-- Date Filter Bar -->
+    <div class="date-filter-bar">
+        <span class="df-label">📅 ช่วงเวลา OT</span>
+        <div class="df-preset">
+            <button class="df-btn" onclick="setDateFilter('ot-page','today',this)">วันนี้</button>
+            <button class="df-btn" onclick="setDateFilter('ot-page','month',this)">เดือนนี้</button>
+            <button class="df-btn active" onclick="setDateFilter('ot-page','year',this)">ทั้งปี</button>
+        </div>
+        <div class="df-divider"></div>
+        <input type="date" id="ot-from" onchange="applyCustomFilter('ot-page')">
+        <span class="df-sep">—</span>
+        <input type="date" id="ot-to" onchange="applyCustomFilter('ot-page')">
+        <span class="df-result" id="ot-filter-result">ทั้งปี 2026</span>
+    </div>
+
+<div class="kpi-strip" style="grid-template-columns: repeat(5, 1fr);"> <!-- เพิ่มเป็น 5 คอลัมน์ -->
+    
+    <!-- 1. Monthly Goal Progress Ring -->
+    <div class="kpi ot-goal-card">
+        <div class="ring-container">
+            <svg width="110" height="110">
+                <circle class="ring-bg" cx="55" cy="55" r="50"></circle>
+                <circle id="ot-goal-ring" class="ring-fill" cx="55" cy="55" r="50"></circle>
+            </svg>
+            <div class="ring-text">
+                <span id="ot-goal-percent" class="ring-percent">0%</span>
+                <span class="ring-label">ของเป้าหมาย</span>
+            </div>
+        </div>
+<div style="font-size: 0.65rem; font-weight: 700; color: var(--txt3); margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 2px;">
+    เป้าหมาย 
+    <input type="number" id="ot-monthly-goal-input" value="40" class="goal-input-clean" oninput="refreshOT()">
+    ชม./เดือน
+</div>
+    </div>
+
+    <!-- 2. ชั่วโมงจริง -->
+    <div class="kpi">
+        <div class="kpi-top" style="background:var(--b600);"></div>
+        <div class="kpi-icon-3d ico-blue">⏱️</div>
+        <div class="kpi-lbl">ชั่วโมงจริง</div>
+        <div class="kpi-val" id="ot-kpi-actual" style="color:var(--b600);">0.00</div>
+        <div class="kpi-hint">ทั้งหมด (Actual)</div>
+    </div>
+
+    <!-- 3. วันปกติ -->
+    <div class="kpi">
+        <div class="kpi-top" style="background:var(--green);"></div>
+        <div class="kpi-icon-3d ico-green">🏢</div>
+        <div class="kpi-lbl">OT วันปกติ</div>
+        <div id="ot-kpi-normal-days" class="kpi-val" style="color:var(--green);">0</div>
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--txt3);"><span id="ot-kpi-normal-hours">0.00</span> ชม.</div>
+    </div>
+
+    <!-- 4. เสาร์-อาทิตย์ -->
+    <div class="kpi">
+        <div class="kpi-top" style="background:var(--amber);"></div>
+        <div class="kpi-icon-3d ico-amber">🏖️</div>
+        <div class="kpi-lbl">OT เสาร์-อาทิตย์</div>
+        <div id="ot-kpi-weekend-days" class="kpi-val" style="color:var(--amber);">0</div>
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--txt3);"><span id="ot-kpi-weekend-hours">0.00</span> ชม.</div>
+    </div>
+
+    <!-- 5. นักขัตฤกษ์ -->
+    <div class="kpi">
+        <div class="kpi-top" style="background:var(--red);"></div>
+        <div class="kpi-icon-3d ico-red">🚩</div>
+        <div class="kpi-lbl">OT นักขัตฤกษ์</div>
+        <div id="ot-kpi-holiday-days" class="kpi-val" style="color:var(--red);">0</div>
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--txt3);"><span id="ot-kpi-holiday-hours">0.00</span> ชม.</div>
+    </div>
+</div>
+
+    <div class="g2r">
+        <!-- 📝 Form บันทึกข้อมูล -->
+        <div class="card">
+            <div class="card-hd">➕ บันทึกข้อมูล OT</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:10px;">
+                <div class="edit-field"><label class="edit-label">วันที่ทำงาน</label><input type="date" id="otDate" class="edit-input" onchange="predictMostFrequentJob()"></div>
+                <div class="edit-field">
+                    <label class="edit-label">ประเภท (Multiplier)</label>
+                    <select id="otType" class="edit-input" onchange="autoFillOT()">
+                        <option value="">-- เลือกประเภท --</option>
+                        <option value="1.5">โอทีวันปกติ</option>
+                        <option value="1.0">โอทีวันเสาร์</option>
+                        <option value="2.0">โอทีวันอาทิตย์</option>
+                        <option value="3.0">โอทีวันหยุดนักขัตฤกษ์</option>
+                    </select>
+                </div>
+                <div class="edit-field"><label class="edit-label">เวลาเริ่ม</label><input type="time" id="otStart" class="edit-input" oninput="calcLiveOT()"></div>
+                <div class="edit-field"><label class="edit-label">เวลาสิ้นสุด</label><input type="time" id="otEnd" class="edit-input" oninput="calcLiveOT()"></div>
+                <div class="edit-field"><label class="edit-label">เวลาพัก (นาที)</label><input type="number" id="otBreak" class="edit-input" value="0" oninput="calcLiveOT()"></div>
+                
+                <div class="edit-field" style="justify-content:center; display:flex; flex-direction:column; align-items:center; background:var(--bg); border-radius:12px; border:1px dashed var(--primary);">
+                    <span style="font-size:0.6rem; font-weight:700; color:var(--txt4); text-transform:uppercase;">ชั่วโมงที่จะบันทึก</span>
+                    <span id="otLivePreview" style="font-size:1.6rem; font-weight:900; color:var(--primary); font-family:'DM Mono';">0.00</span>
+                </div>
+            </div>
+            <div class="edit-field" style="margin-top:12px;">
+                <label class="edit-label">รายละเอียดงาน / JOB NAME</label>
+                <input type="text" id="otJob" class="edit-input" placeholder="เช่น Support กะดึก, เคลียร์ Part NG">
+            </div>
+            <button class="btn-save" onclick="addOT()" style="width:100%; height:45px; margin-top:15px; font-size: 0.9rem;">บันทึก OT</button>
+        </div>
+
+        <!-- 📊 กลุ่มกราฟด้านขวา -->
+        <div style="display: flex; flex-direction: column; gap: 13px;">
+            <!-- กราฟแท่ง (Trend) -->
+            <div class="card" style="display: flex; flex-direction: column; flex: 1;">
+                <div class="card-hd">📈 Monthly OT Trend</div>
+                <div style="flex: 1; min-height: 250px; position: relative;">
+                    <canvas id="otMonthChart"></canvas>
+                </div>
+            </div>
+
+            <!-- กราฟวงกลม (Type Distribution) -->
+            <div class="card" style="display: flex; flex-direction: column; flex: 1;">
+                <div class="card-hd">🥧 OT Type Distribution</div>
+                <div style="height: 180px; position: relative; display: flex; align-items: center; justify-content: center;">
+                    <canvas id="otTypeChart"></canvas>
+                    <div style="position: absolute; text-align: center; pointer-events: none;">
+                        <div style="font-size: 0.55rem; font-weight: 700; color: var(--txt4);">รวม</div>
+                        <div id="otTypeTotal" style="font-size: 1.4rem; font-weight: 900; color: var(--navy); font-family: 'DM Mono';">0</div>
+                    </div>
+                </div>
+                <div id="otTypeLegend" style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📋 Data Table -->
+    <div class="card">
+        <div class="card-hd">📝 ประวัติการบันทึก OT</div>
+        <div class="tbl-wrap">
+            <table style="min-width: 800px;">
+                <thead>
+                    <tr>
+                        <th style="padding-left:15px;">วันที่</th>
+                        <th>รายละเอียดงาน</th>
+                        <th>ช่วงเวลา</th>
+                        <th style="text-align:center;">ชั่วโมงจริง</th>
+                        <th style="text-align:center;">เรท</th>
+                        <th style="text-align:center; width: 80px;">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="otTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
   </main>
 </div>
 
@@ -4420,11 +4712,12 @@ function getLocalYYYYMMDD(d = new Date()) {
 async function syncToSupabase() {
     try {
         setBtnLoading(true, '☁️ Syncing...');
-        setLoading('📤 เตรียมข้อมูล...', 'กำลังจัดการรูปภาพ', 10);
+        setLoading('📤 เตรียมข้อมูล...', 'กำลังจัดการรูปภาพและข้อมูล', 10);
 
         let successCount = 0;
         let errorList = [];
-        const totalTables = 6; 
+        // ปรับจำนวนตารางที่ต้องซิงค์ (เพิ่ม OT)
+        const totalTables = 7; 
 
         // --------------------------------------------------
         // 1. SYNC IMAGES (รูปภาพ)
@@ -4460,8 +4753,6 @@ async function syncToSupabase() {
         console.log(`✅ Images Synced: ${uploadCount}/${totalImagesToUpload}`);
         setLoadingPct(30);
 
-
-
         // --------------------------------------------------
         // 2. SYNC SUPPORT RECORDS
         // --------------------------------------------------
@@ -4484,7 +4775,7 @@ async function syncToSupabase() {
                 date: d.date,
                 type: d.type,
                 note: d.note,
-                full_timestamp: d.fullTimestamp
+                full_timestamp: d.full_timestamp
             }));
             await safeUpsert('daily_reports', dailyData, 'id');
         }
@@ -4495,7 +4786,7 @@ async function syncToSupabase() {
         if (db.s5.length > 0) {
             const s5Data = db.s5.map(s => ({
                 id: s.id, user_id: currentUser, area: s.area, issue_count: s.count || 0, detail: s.detail,
-                owner: s.owner, date: s.date || null, month: s.month, full_timestamp: s.fullTimestamp
+                owner: s.owner, date: s.date || null, month: s.month, full_timestamp: s.full_timestamp
             }));
             await safeUpsert('s5_records', s5Data, 'id');
         }
@@ -4532,12 +4823,37 @@ async function syncToSupabase() {
         }
 
         // --------------------------------------------------
-        // 8. LOG SYNC HISTORY
+        // 🚩 8. SYNC OT RECORDS (ส่วนที่เพิ่มใหม่)
+        // --------------------------------------------------
+        if (db.ot && db.ot.length > 0) {
+            const otData = db.ot.map(o => ({
+                id: o.id,
+                user_id: currentUser,
+                date: o.date,
+                start_time: o.start,
+                end_time: o.end,
+                break_min: o.breakMin,
+                type_rate: o.type,
+                job_name: o.job,
+                actual_hours: o.actualHours,
+                calc_hours: o.calcHours,
+                full_timestamp: o.fullTimestamp
+            }));
+            await safeUpsert('ot_records', otData, 'id');
+        }
+
+        // --------------------------------------------------
+        // 9. LOG SYNC HISTORY
         // --------------------------------------------------
         try {
             await sb.from('sync_log').insert({
-                user_id: currentUser, action: 'sync_to_cloud_relational',
-                details: { images: uploadCount, records: db.support.length, errors: errorList }
+                user_id: currentUser, action: 'sync_to_cloud_complete',
+                details: { 
+                    images: uploadCount, 
+                    records: db.support.length, 
+                    ot_entries: (db.ot ? db.ot.length : 0),
+                    errors: errorList 
+                }
             });
         } catch (logErr) {
             console.warn('Log skipped', logErr);
@@ -4547,7 +4863,7 @@ async function syncToSupabase() {
         setBtnLoading(false, '☁️ Sync Cloud');
 
         if (errorList.length === 0) {
-            toast('✅ ซิงค์ข้อมูลทุกหมวดหมู่สำเร็จ!');
+            toast('✅ ซิงค์ข้อมูลทุกหมวดหมู่รวมถึง OT สำเร็จ!');
             showSyncStatus('✅ Sync ล่าสุดเมื่อ ' + new Date().toLocaleTimeString(), '#22c55e');
         } else {
             console.error("Sync Errors:", errorList);
@@ -4567,40 +4883,28 @@ async function syncToSupabase() {
 /* ──────────────────────────────────
    2. DOWNLOAD FROM SUPABASE (ประกอบข้อมูลกลับมาให้แอพ)
 ────────────────────────────────── */
-/* ──────────────────────────────────────────────────────────────
-   ฟังก์ชันโหลดข้อมูลทั้งหมดจาก Cloud (ฉบับรวมสมบูรณ์)
-   ใช้สำหรับดึงข้อมูลพนักงาน (Staff) หรือหัวหน้า (Supervisor) ส่องดูข้อมูล
-   ────────────────────────────────────────────────────────────── */
 async function loadFromSupabaseComplete() {
     try {
-        // 1. ตรวจสอบ "เป้าหมาย" ของข้อมูล (พนักงานที่ต้องการดึงข้อมูล)
-        // ดึงจาก sessionStorage ที่เราเซฟไว้ตอน switchView หรือ Login
-        const authUser = (sessionStorage.getItem('currentUser') || 'Master Operator').trim();
-        const targetUser = (sessionStorage.getItem('viewingUser') || authUser).trim();
-        
-        // กำหนด currentUser ของฟังก์ชันนี้ให้เป็นพนักงานเป้าหมาย
-        const targetID = targetUser;
-
-        // 2. เริ่มต้นสถานะ Loading บน UI
+        // เปิด Loading ของปุ่ม Load
         setBtnLoading(true, '📥 Loading...', 'loadBtn');
-        setLoading('☁️ ดึงข้อมูลจาก Cloud...', `กำลังโหลดข้อมูลของ: ${targetID.split('@')[0]}`, 10);
+        setLoading('☁️ ดึงข้อมูลจาก Cloud...', 'กำลังดึงทีละตาราง', 20);
 
-        const loadedDB = emptyDB(); // เตรียม DB ก้อนใหม่ตามโครงสร้างว่าง
+        const loadedDB = emptyDB(); // เตรียม DB ก้อนใหม่
 
-        // 3. ดึงข้อมูลพร้อมกันทุกตาราง (Parallel Fetch) โดยกรองตาม targetID
-        setLoadingPct(20);
-        const [supRes, dailyRes, s5Res, specRes, skillRes, badgeRes] = await Promise.all([
-            sb.from('support_records').select('*').eq('user_id', targetID),
-            sb.from('daily_reports').select('*').eq('user_id', targetID),
-            sb.from('s5_records').select('*').eq('user_id', targetID),
-            sb.from('special_jobs').select('*').eq('user_id', targetID),
-            sb.from('skill_matrix').select('*').eq('user_id', targetID),
-            sb.from('achievements').select('*').eq('user_id', targetID)
+// แก้ไขบรรทัด Promise.all ให้มี otRes เพิ่มเข้ามา
+        const[supRes, dailyRes, s5Res, specRes, skillRes, badgeRes, otRes] = await Promise.all([
+            sb.from('support_records').select('*').eq('user_id', currentUser),
+            sb.from('daily_reports').select('*').eq('user_id', currentUser),
+            sb.from('s5_records').select('*').eq('user_id', currentUser),
+            sb.from('special_jobs').select('*').eq('user_id', currentUser),
+            sb.from('skill_matrix').select('*').eq('user_id', currentUser),
+            sb.from('achievements').select('*').eq('user_id', currentUser),
+            sb.from('ot_records').select('*').eq('user_id', currentUser) // ดึงข้อมูล OT
         ]);
 
         setLoadingPct(50);
 
-        // 4. แมปข้อมูลกลับเข้าสู่โครงสร้างระบบ (Data Mapping)
+        // แมปข้อมูลกลับเข้า Structure ของ JavaScript
         if (supRes.data) {
             loadedDB.support = supRes.data.map(d => ({
                 id: d.id, problem: d.problem, action: d.action, part: d.part, lot: d.lot,
@@ -4641,18 +4945,33 @@ async function loadFromSupabaseComplete() {
                 loadedDB.badges[b.badge_id] = { unlocked: true, unlockedAt: b.unlocked_at };
             });
         }
+        
+        // เพิ่มส่วนแมปข้อมูล OT กลับเข้าโครงสร้าง JavaScript
+        if (otRes.data) {
+            loadedDB.ot = otRes.data.map(d => ({
+                id: d.id,
+                date: d.date,
+                start: d.start_time,
+                end: d.end_time,
+                breakMin: d.break_min,
+                type: d.type_rate,
+                job: d.job_name,
+                actualHours: d.actual_hours,
+                calcHours: d.calc_hours,
+                fullTimestamp: d.full_timestamp,
+                _user: d.user_id
+            }));
+        }
 
-        // 5. บันทึกข้อมูลข้อความลง LocalStorage (Offline First)
+        // นำข้อมูลที่ประกอบเสร็จแล้วแทนที่ในระบบ
         db = loadedDB;
-        db._owner = targetID;
         saveLocal();
 
         setLoadingPct(70);
         setLoading('🖼️ กำลังโหลดรูปภาพ...', 'ดาวน์โหลดภาพลงแคชเครื่อง', 70);
 
-        // 6. โหลดรูปภาพจาก URL ลงแคช (IndexedDB)
+        // โหลดรูปภาพจาก URL ลงแคช (IndexedDB)
         if (db.support && idb) {
-            // สำคัญ: ล้างรูปเก่าของพนักงานคนก่อนหน้าที่ค้างใน IndexedDB ออกก่อน
             const txClear = idb.transaction(['images'], 'readwrite');
             await new Promise(r => { txClear.objectStore('images').clear().onsuccess = r; });
 
@@ -4662,37 +4981,35 @@ async function loadFromSupabaseComplete() {
                     try {
                         setLoadingPct(70 + Math.floor((i / db.support.length) * 30));
                         const response = await fetch(s.imageUrl);
-                        if (response.ok) {
-                            const blob = await response.blob();
-                            // บันทึกลง IndexedDB (ใส่ true เพื่อไม่ให้หน่วง UI)
-                            await saveImageToDB(s.id, blob, true);
-                        }
+                        const blob = await response.blob();
+                        await saveImageToDB(s.id, blob, true);
                     } catch (e) {
-                        console.warn(`Load image failed for ID: ${s.id}`, e);
+                        console.warn(`Load image failed for ${s.id}:`, e);
                     }
                 }
             }
         }
 
-        // 7. สั่งให้ UI แสดงผลข้อมูลและรูปภาพชุดใหม่
         await loadAllImagesFromDB();
         refreshAllPages();
         refreshSupportImagesOnly();
         
         hideLoading();
-        setBtnLoading(false, '📥 Load', 'loadBtn'); 
         
-        // แจ้งเตือนความสำเร็จ
-        toast(`✅ โหลดข้อมูลของ ${targetID.split('@')[0]} สำเร็จ!`);
-        showSyncStatus('✅ ข้อมูลครบถ้วนจาก Cloud', '#22c55e');
+        // ✅ แก้ไขตรงนี้: ปิดสถานะ Loading ของปุ่ม Load
+        setBtnLoading(false, '📥 Load', 'loadBtn'); 
+        toast(`✅ ดึงข้อมูลสำเร็จ!`);
+        showSyncStatus('✅ โหลดข้อมูลครบทุกตาราง', '#22c55e');
         
         return true;
 
     } catch (err) {
         console.error('Load Error:', err);
         hideLoading();
+        
+        // ✅ แก้ไขตรงนี้ด้วย: ปิดสถานะ Loading ของปุ่ม Load ตอนเกิด Error
         setBtnLoading(false, '📥 Load', 'loadBtn'); 
-        toast(`❌ โหลด Cloud ล้มเหลว: ${err.message}`);
+        toast(`❌ โหลด Cloud ล้มเหลว`);
         return false;
     }
 }
@@ -4764,30 +5081,25 @@ async function initSupabaseSync() {
     }
 }
 
-/* ══════════════════════════════════
-   แก้ไขระบบ LOGIN CONTEXT สำหรับหัวหน้างาน
-══════════════════════════════════ */
+// เรียกใช้ตอน App พร้อม
+// สามารถเพิ่มในส่วน window load event
+// อีเมลของคนที่ล็อคอินอยู่จริง (หัวหน้าหรือพนักงาน)
+const authUser = (sessionStorage.getItem('currentUser') || 'Master Operator').trim();
 
-// 1. ตรวจสอบว่าใครคือ "เจ้าของข้อมูล" ที่เราต้องดึง
-// หากหัวหน้าเลือกพนักงานมาจากหน้าหลัก viewingUser จะมีค่า
-const authUser = (sessionStorage.getItem('currentUser') || 'Guest').trim();
-const viewingUser = (sessionStorage.getItem('viewingUser') || authUser).trim();
+// อีเมลของพนักงานที่หัวหน้าเลือกส่องดู (ถ้าเป็นพนักงานปกติ ค่านี้จะเท่ากับ authUser)
+const targetUser = (sessionStorage.getItem('viewingUser') || authUser).trim();
 
-// ✅ กำหนดให้ currentUser ของหน้านี้ "กลายเป็นพนักงานคนนั้น"
-// เพื่อให้ SQL Query และ LocalStorage Key ใช้ของพนักงานคนนั้นโดยตรง
-const currentUser = viewingUser; 
+// ใช้ targetUser เป็นตัวแปรหลักในการดึงข้อมูล
+const currentUser = targetUser; 
 
-// 2. แก้ไขส่วนแสดงชื่อที่มุมซ้ายบน (เพื่อให้หัวหน้าทราบว่าดูของใครอยู่)
+// ปรับการแสดงชื่อบนหน้าจอให้หัวหน้าทราบว่ากำลังดูของใคร
 document.addEventListener('DOMContentLoaded', () => {
     const displayEl = document.getElementById('displayUserName');
     if(displayEl) {
-        if(authUser.toLowerCase() !== viewingUser.toLowerCase()) {
-            // กรณีเป็นหัวหน้าส่องอยู่ ให้แสดงชื่อพนักงานและไอคอนดวงตา
-            displayEl.innerHTML = `<span style="color:var(--or)">👁️ Viewing: ${viewingUser.split('@')[0]}</span>`;
-            // ซ่อนปุ่ม Sync/Load ของหัวหน้าเพื่อป้องกันการเผลอเขียนทับข้อมูลพนักงาน (Optional)
-            // if($id('syncBtn')) $id('syncBtn').style.opacity = '0.5';
+        if(authUser !== targetUser) {
+            displayEl.innerHTML = `<span style="color:var(--or)">👁️ Viewing: ${targetUser.split('@')[0]}</span>`;
         } else {
-            displayEl.innerHTML = currentUser + ' <span class="online-dot"></span>';
+            displayEl.innerHTML = targetUser + ' <span class="online-dot"></span>';
         }
     }
 });
@@ -4796,7 +5108,14 @@ document.getElementById('displayUserName').innerHTML=currentUser+' <span class="
 
 /* --- LOCAL STORAGE FOR TEXT DATA --- */
 const STORAGE_KEY=`wap_data_offline_${currentUser}`;
-function emptyDB(){return{daily:[],s5:[],skills:[],special:[],support:[],_owner:currentUser,_lastModified:0, badges:{}};}
+// แก้ไขจุดที่ 3: เปลี่ยน _ot เป็น ot
+function emptyDB(){
+  return {
+    daily:[], s5:[], skills:[], special:[], support:[], 
+    ot:[], // <--- เปลี่ยนจาก _ot เป็น ot
+    _owner:currentUser, _lastModified:0, badges:{}
+  };
+}
 function loadLocalDB(){
   try{
     const raw=localStorage.getItem(STORAGE_KEY);
@@ -5328,14 +5647,21 @@ function importDB(event) {
     event.target.value = ''; // Reset input
 }
 
-
 /* ══════════════════════════════════
    DATE FILTER SYSTEM (คงเดิม)
 ══════════════════════════════════ */
-const pageFilters={'master-dash':{from:null,to:null},'daily':{from:null,to:null},'support':{from:null,to:null},'5s':{from:null,to:null},'multi':{from:null,to:null},'special':{from:null,to:null}};
-const PAGE_FROM_IDS={'master-dash':'md-from','daily':'daily-from','support':'sup-from','5s':'s5-from','multi':'sk-from','special':'sp-from'};
-const PAGE_TO_IDS={'master-dash':'md-to','daily':'daily-to','support':'sup-to','5s':'s5-to','multi':'sk-to','special':'sp-to'};
-const PAGE_RESULT_IDS={'master-dash':'md-filter-result','daily':'daily-filter-result','support':'sup-filter-result','5s':'s5-filter-result','multi':'sk-filter-result','special':'sp-filter-result'};
+const pageFilters={'master-dash':{from:null,to:null},'daily':{from:null,to:null},'support':{from:null,to:null},'5s':{from:null,to:null},'multi':{from:null,to:null},'special':{from:null,to:null},'ot-page':{from:null,to:null}};
+const PAGE_FROM_IDS = {'master-dash':'md-from','daily':'daily-from','support':'sup-from','5s':'s5-from','multi':'sk-from','special':'sp-from','ot-page':'ot-from'};
+const PAGE_TO_IDS = {
+  'master-dash':'md-to','daily':'daily-to','support':'sup-to',
+  '5s':'s5-to','multi':'sk-to','special':'sp-to',
+  'ot-page':'ot-to'
+};
+const PAGE_RESULT_IDS = {
+  'master-dash':'md-filter-result','daily':'daily-filter-result','support':'sup-filter-result',
+  '5s':'s5-filter-result','multi':'sk-filter-result','special':'sp-filter-result',
+  'ot-page':'ot-filter-result'
+};
 
 function getDateRange(preset){
   const now=new Date();const y=now.getFullYear();const m=now.getMonth();const d=now.getDate();
@@ -5355,6 +5681,7 @@ function setDateFilter(page,preset,btn){
   if(fEl)fEl.value=range.from||'';if(tEl)tEl.value=range.to||'';
   setText(PAGE_RESULT_IDS[page],range.label);
   if(page==='master-dash')refreshMasterDashboard();else if(page==='daily')refreshDashboard();else if(page==='support')refreshSupport();else if(page==='5s')refresh5S();else if(page==='multi')refreshSkills();else if(page==='special')refreshSpecial();
+if(page==='ot-page') refreshOT();
 }
 function applyCustomFilter(page){
   const fEl=document.getElementById(PAGE_FROM_IDS[page]);const tEl=document.getElementById(PAGE_TO_IDS[page]);
@@ -5363,6 +5690,7 @@ function applyCustomFilter(page){
   const label=from&&to?`${from.slice(5)} – ${to.slice(5)}`:from?`จาก ${from.slice(5)}`:'กำหนดเอง';
   setText(PAGE_RESULT_IDS[page],label);
   if(page==='master-dash')refreshMasterDashboard();else if(page==='daily')refreshDashboard();else if(page==='support')refreshSupport();else if(page==='5s')refresh5S();else if(page==='special')refreshSpecial();
+ if(page==='ot-page') refreshOT(); 
 }
 function filterByDateRange(arr,dateField,page){
   const f=pageFilters[page];if(!f||(!f.from&&!f.to))return arr;
@@ -5799,10 +6127,32 @@ function exportSupportToExcel() {
 /* ══════════════════════════════════
    PAGES RENDERING FUNCTIONS
 ══════════════════════════════════ */
-const PAGE_TITLES={'master-dash':'Performance Overview','daily':'Executive Dashboard','support':'Support Production','5s':'5S Excellence System','multi':'Skill Matrix','special':'Special Jobs'};
+const PAGE_TITLES = {
+  'master-dash':'Performance Overview','daily':'Executive Dashboard',
+  'support':'Support Production','5s':'5S Excellence System',
+  'multi':'Skill Matrix','special':'Special Jobs',
+  'ot-page':'Overtime Tracking'
+};
 function nav(id,el){document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));el.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');setText('topbar-title',PAGE_TITLES[id]||'');renderPage(id);}
-function renderPage(id){if(id==='master-dash')refreshMasterDashboard();if(id==='daily')refreshDashboard();if(id==='5s')refresh5S();if(id==='multi')refreshSkills();if(id==='special')refreshSpecial();if(id==='support')refreshSupport();}
-function refreshAllPages(){refreshMasterDashboard();refreshDashboard();refresh5S();refreshSkills();refreshSpecial();refreshSupport();runAIAnalytics();}
+function renderPage(id){
+  if(id==='master-dash')refreshMasterDashboard();
+  if(id==='daily')refreshDashboard();
+  if(id==='5s')refresh5S();
+  if(id==='multi')refreshSkills();
+  if(id==='special')refreshSpecial();
+  if(id==='support')refreshSupport();
+  if(id==='ot-page')refreshOT(); 
+}
+function refreshAllPages(){
+  refreshMasterDashboard();
+  refreshDashboard();
+  refresh5S();
+  refreshSkills();
+  refreshSpecial();
+  refreshSupport();
+  refreshOT(); 
+  runAIAnalytics();
+}
 
 // ---------------- DASHBOARD GROUPS ----------------
 function buildGroupData(supportList){
@@ -6475,13 +6825,601 @@ window.addEventListener('load', async () => {
   });
 });
 
-window.addEventListener('storage', (e) => {
-    if (e.key === 'viewingUser') {
-        // ถ้ามีการเปลี่ยนชื่อพนักงานที่กำลังดู ให้โหลดข้อมูลใหม่ทันที
-        location.reload(); 
+/* ══════════════════════════════════
+   OT LOGGING SYSTEM LOGIC
+══════════════════════════════════ */
+
+// 1. ฟังก์ชันบันทึก OT
+// 1. ฟังก์ชันบันทึก OT (ฉบับเพิ่มระบบป้องกันวันที่ซ้ำ)
+function addOT() {
+    const date = document.getElementById('otDate').value;
+    const start = document.getElementById('otStart').value;
+    const end = document.getElementById('otEnd').value;
+    const breakMin = parseInt(document.getElementById('otBreak').value) || 0;
+    const type = parseFloat(document.getElementById('otType').value);
+    const job = document.getElementById('otJob').value;
+
+    // --- ส่วนที่เพิ่มใหม่: ตรวจสอบข้อมูลว่าง ---
+    if (!date || !start || !end || !type) return toast('❌ กรุณากรอกข้อมูลให้ครบถ้วน');
+
+    // --- ส่วนที่เพิ่มใหม่: ตรวจสอบวันที่ซ้ำ ---
+    const isDuplicate = db.ot.some(item => item.date === date);
+    if (isDuplicate) {
+        // แจ้งเตือนผู้ใช้ด้วย Toast หรือ Alert
+        toast(`⚠️ วันที่ ${dateOnly(date)} มีการบันทึกข้อมูลไว้แล้ว`);
+        
+        // สั่นหรือไฮไลท์ช่องวันที่ให้รู้ว่าผิดตรงนี้
+        document.getElementById('otDate').style.borderColor = 'var(--red)';
+        setTimeout(() => { document.getElementById('otDate').style.borderColor = ''; }, 2000);
+        
+        return; // หยุดการทำงาน ไม่บันทึกลงฐานข้อมูล
+    }
+
+    // --- โค้ดคำนวณและบันทึกเดิม ---
+    const startTime = new Date(`${date}T${start}`);
+    let endTime = new Date(`${date}T${end}`);
+    if (endTime < startTime) endTime.setDate(endTime.getDate() + 1);
+    
+    const diffMs = endTime - startTime;
+    const actualHours = Math.max(0, (diffMs / (1000 * 60 * 60)) - (breakMin / 60));
+    const calcHours = actualHours * type;
+
+    const newOT = {
+        id: "OT-" + Date.now(),
+        date, start, end, breakMin, type, job,
+        actualHours: parseFloat(actualHours.toFixed(2)),
+        calcHours: parseFloat(calcHours.toFixed(2)),
+        fullTimestamp: fullTimestamp(),
+        _user: currentUser
+    };
+
+    db.ot.push(newOT);
+    save(); 
+    toast('✅ บันทึก OT สำเร็จ');
+
+    // ล้างค่าฟอร์ม
+    document.getElementById('otType').value = "";
+    document.getElementById('otStart').value = "";
+    document.getElementById('otEnd').value = "";
+    document.getElementById('otBreak').value = "0";
+    document.getElementById('otJob').value = "";
+    document.getElementById('otLivePreview').textContent = "0.00";
+    
+    refreshOT(); 
+}
+
+// 2. ฟังก์ชันลบ OT
+function delOTConfirm(id) {
+    robotConfirm('ต้องการลบข้อมูล OT นี้ใช่หรือไม่?', async () => {
+        // 1. ลบจาก Cloud ทันที
+        try { 
+            const { error } = await sb.from('ot_records').delete().eq('id', id); 
+            if (error) throw error;
+        } catch(e) {
+            console.error('Cloud Delete OT Error:', e);
+        }
+        
+        // 2. ลบในเครื่อง
+        db.ot = db.ot.filter(item => item.id !== id);
+        save(); // เซฟ LocalStorage
+        toast('🗑 ลบข้อมูลออกจากระบบแล้ว');
+        refreshOT();
+    });
+}
+
+// 4. ฟังก์ชันวาดกราฟ OT รายเดือน - ฉบับสวยล้ำ (Modern Gradient)
+// ฟังก์ชันวาดกราฟ OT รายเดือน ฉบับ Upgrade Premium + เส้นประเป้าหมาย
+function buildOTChart(otData) {
+    const canvas = document.getElementById('otMonthChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (window.otChartObj) window.otChartObj.destroy();
+
+    const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const dataActual = Array(12).fill(0);
+    
+    // รวมข้อมูลชั่วโมงจริงแยกตามเดือน
+    otData.forEach(item => {
+        const m = new Date(item.date).getMonth();
+        if (m >= 0 && m < 12) dataActual[m] += parseFloat(item.actualHours || 0);
+    });
+
+    // --- 🚩 ดึงค่าเป้าหมายจาก Input ปัจจุบัน ---
+    const goalVal = parseFloat(document.getElementById('ot-monthly-goal-input').value) || 40;
+
+    // สร้าง Gradient สำหรับแท่งกราฟ (ไล่เฉดสี)
+    const barGradient = ctx.createLinearGradient(0, 0, 0, 300);
+    barGradient.addColorStop(0, 'rgba(37, 99, 235, 0.85)'); // สีน้ำเงินเข้ม
+    barGradient.addColorStop(1, 'rgba(96, 165, 250, 0.2)');  // สีฟ้าจางๆ
+
+    window.otChartObj = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'ชม.จริง',
+                data: dataActual,
+                backgroundColor: barGradient,
+                borderColor: '#2563eb',
+                borderWidth: 2,
+                borderRadius: 6, // ทำมุมมนให้แท่งกราฟ
+                borderSkipped: false,
+                barPercentage: 0.6 // ปรับขนาดแท่งให้ดูพอดี
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 13 },
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: (ctx) => ` ทำไปได้: ${ctx.raw.toFixed(2)} ชม.`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Prompt', size: 11 }, color: '#94a3b8' }
+                },
+                y: {
+                    beginAtZero: true,
+                    // ขยาย Max ของแกน Y ให้สูงกว่าเป้าหมายนิดนึงเสมอ เพื่อไม่ให้เส้นประติดขอบบน
+                    suggestedMax: goalVal + 10,
+                    grid: { color: 'rgba(203, 213, 225, 0.4)', drawBorder: false },
+                    ticks: { font: { family: 'DM Mono', size: 11 }, color: '#94a3b8' }
+                }
+            }
+        },
+        // --- 🚩 ส่วนที่เพิ่มใหม่: Plugin สำหรับวาดเส้นประเป้าหมาย ---
+        plugins: [{
+            id: 'goalLine',
+            afterDraw: (chart) => {
+                const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
+                const yScale = y.getPixelForValue(goalVal);
+                
+                // ถ้ายอดเป้าหมายอยู่ในช่วงที่แสดงผลได้
+                if (yScale >= top && yScale <= bottom) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.setLineDash([6, 6]); // กำหนดเป็นเส้นประ [ความยาวเส้น, ความยาวช่องว่าง]
+                    ctx.moveTo(left, yScale);
+                    ctx.lineTo(right, yScale);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#ef4444'; // เส้นประสีแดง
+                    ctx.stroke();
+                    
+                    // เขียนข้อความกำกับบนเส้น
+                    ctx.fillStyle = '#ef4444';
+                    ctx.font = 'bold 10px Prompt';
+                    ctx.textAlign = 'right';
+                    ctx.fillText('เป้าหมาย: ' + goalVal + ' ชม.', right, yScale - 5);
+                    ctx.restore();
+                }
+            }
+        }]
+    });
+}
+
+// 🚩 ฟังก์ชัน 1: เติมค่าอัตโนมัติตามประเภทที่เลือก
+function autoFillOT() {
+    const type = document.getElementById('otType').value;
+    const startInput = document.getElementById('otStart');
+    const endInput = document.getElementById('otEnd');
+    const breakInput = document.getElementById('otBreak');
+
+    if (type === "1.5") { 
+        // ถ้าเป็นวันปกติ: เริ่ม 17:30, จบ 20:00, พัก 0
+        startInput.value = "17:30";
+        endInput.value = "20:00";
+        breakInput.value = "0";
+    } else if (type === "1.0" || type === "2.0" || type === "3.0") {
+        // ถ้าเป็นเสาร์-อาทิตย์-หยุดพิเศษ: เริ่ม 08:00, จบ 20:00, พัก 90
+        startInput.value = "08:00";
+        endInput.value = "20:00";
+        breakInput.value = "90";
+    }
+    
+    // เมื่อเติมค่าแล้ว ให้สั่งคำนวณ Live Preview ทันที
+    calcLiveOT();
+}
+
+// 🚩 ฟังก์ชัน 2: คำนวณชั่วโมงให้ดูสดๆ บนหน้าจอ (Live Preview)
+/* ══════════════════════════════════
+   OT SYSTEM LOGIC - FULL INTEGRATION
+══════════════════════════════════ */
+
+// 1. คำนวณชั่วโมงดูสดๆ ขณะกรอก
+function calcLiveOT() {
+    const date = document.getElementById('otDate').value || "2026-01-01";
+    const start = document.getElementById('otStart').value;
+    const end = document.getElementById('otEnd').value;
+    const breakMin = parseInt(document.getElementById('otBreak').value) || 0;
+    const previewEl = document.getElementById('otLivePreview');
+
+    if (!start || !end) { previewEl.textContent = "0.00"; return; }
+
+    const startTime = new Date(`${date}T${start}`);
+    let endTime = new Date(`${date}T${end}`);
+    if (endTime < startTime) endTime.setDate(endTime.getDate() + 1);
+
+    const diffMs = endTime - startTime;
+    const actualHours = Math.max(0, (diffMs / (1000 * 60 * 60)) - (breakMin / 60));
+    previewEl.textContent = actualHours.toFixed(2);
+}
+
+// 2. เติมค่าอัตโนมัติเมื่อเลือกประเภท
+function autoFillOT() {
+    const type = document.getElementById('otType').value;
+    const startIn = document.getElementById('otStart'), endIn = document.getElementById('otEnd'), breakIn = document.getElementById('otBreak');
+    if (type === "1.5") { startIn.value = "17:30"; endIn.value = "20:00"; breakIn.value = "0"; } 
+    else if (type) { startIn.value = "08:00"; endIn.value = "20:00"; breakIn.value = "90"; }
+    calcLiveOT();
+}
+
+// 3. ฟังก์ชันรีเฟรชข้อมูล (KPI + ตาราง + กราฟทั้งหมด)
+function refreshOT() {
+    if (!isActive('ot-page')) return;
+    const tb = document.getElementById('otTableBody');
+    if (!tb) return;
+
+    // 1. ดึงข้อมูลตาม Filter ที่เลือกจากหน้าจอ (วันนี้/เดือนนี้/ทั้งปี)
+    const filtered = filterByDateRange(db.ot || [], 'date', 'ot-page');
+    
+    let totalActual = 0;
+    
+    // ตัวแปรสำหรับนับจำนวนวัน
+    let normalDays = 0, weekendDays = 0, holidayDays = 0;
+    
+    // ตัวแปรสำหรับรวมชั่วโมง
+    let normalHrs = 0, weekendHrs = 0, holidayHrs = 0;
+
+    // วนลูปคำนวณข้อมูลตาม Filter
+    filtered.forEach(item => {
+        const hrs = parseFloat(item.actualHours || 0);
+        totalActual += hrs;
+        
+        const rate = parseFloat(item.type).toFixed(1); 
+
+        if (rate === "1.5") {
+            normalDays++;
+            normalHrs += hrs; // บวกชั่วโมงวันปกติ
+        } else if (rate === "1.0" || rate === "2.0") {
+            weekendDays++;
+            weekendHrs += hrs; // บวกชั่วโมงเสาร์-อาทิตย์รวมกัน
+        } else if (rate === "3.0") {
+            holidayDays++;
+            holidayHrs += hrs; // บวกชั่วโมงวันหยุดนักขัตฯ
+        }
+    });
+
+    // --- 🚩 ส่วนที่เพิ่มใหม่: คำนวณ Progress Ring เป้าหมายรายเดือน (Real-time) ---
+    // ดึงค่าจากช่องกรอก ถ้าไม่มีค่าให้ใช้ 40 เป็นค่าเริ่มต้น
+const goalInput = document.getElementById('ot-monthly-goal-input');
+const GOAL_HOURS = parseFloat(goalInput.value) || 40; 
+
+// เก็บค่าเป้าหมายไว้ใน Browser (Optional: เพื่อให้รีเฟรชหน้าแล้วเลขไม่หาย)
+localStorage.setItem('ot_monthly_goal', GOAL_HOURS);
+    const nowReal = new Date();
+    const curM = nowReal.getMonth();
+    const curY = nowReal.getFullYear();
+
+    // คำนวณเฉพาะ OT ของ "เดือนปัจจุบัน" จริงๆ (ไม่สน Filter หน้าจอเพื่อให้วงกลมแม่นยำเสมอ)
+    const thisMonthTotalHrs = (db.ot || []).filter(item => {
+        const d = new Date(item.date);
+        return d.getMonth() === curM && d.getFullYear() === curY;
+    }).reduce((sum, item) => sum + parseFloat(item.actualHours || 0), 0);
+
+    const goalPercent = Math.min(Math.round((thisMonthTotalHrs / GOAL_HOURS) * 100), 100);
+    
+    // อัปเดต Progress Ring UI
+    const ring = document.getElementById('ot-goal-ring');
+    const percentText = document.getElementById('ot-goal-percent');
+    if (ring && percentText) {
+        const circumference = 2 * Math.PI * 50; // 314.159
+        const offset = circumference - (goalPercent / 100) * circumference;
+        ring.style.strokeDashoffset = offset;
+        percentText.textContent = `${goalPercent}%`;
+
+        // เปลี่ยนสีวงกลมตามระดับความขยัน
+        if (goalPercent >= 100) ring.style.stroke = "#dc2626"; // เต็มเป้า = แดง
+        else if (goalPercent >= 80) ring.style.stroke = "#f59e0b"; // ใกล้เต็ม = ส้ม
+        else ring.style.stroke = "#2563eb"; // ปกติ = น้ำเงิน
+    }
+    // --- 🏁 จบส่วน Progress Ring ---
+
+    // 2. แสดงผลตัวเลขลงใน KPI Cards (จำนวนวัน)
+    if(document.getElementById('ot-kpi-normal-days')) document.getElementById('ot-kpi-normal-days').textContent = normalDays;
+    if(document.getElementById('ot-kpi-weekend-days')) document.getElementById('ot-kpi-weekend-days').textContent = weekendDays;
+    if(document.getElementById('ot-kpi-holiday-days')) document.getElementById('ot-kpi-holiday-days').textContent = holidayDays;
+
+    // 3. แสดงผลจำนวนชั่วโมงรวมแยกประเภท
+    if(document.getElementById('ot-kpi-normal-hours')) document.getElementById('ot-kpi-normal-hours').textContent = normalHrs.toFixed(2);
+    if(document.getElementById('ot-kpi-weekend-hours')) document.getElementById('ot-kpi-weekend-hours').textContent = weekendHrs.toFixed(2);
+    if(document.getElementById('ot-kpi-holiday-hours')) document.getElementById('ot-kpi-holiday-hours').textContent = holidayHrs.toFixed(2);
+
+    // 4. ชั่วโมงรวมทั้งหมด (ช่องแรกสุด)
+    const actualKpiEl = document.getElementById('ot-kpi-actual');
+    if (actualKpiEl) actualKpiEl.textContent = totalActual.toFixed(2);
+
+    setText('ot-total-badge', `${totalActual.toFixed(2)} Total Hours`);
+
+    // 5. วาดตารางข้อมูล (เรียงจากใหม่ไปเก่า)
+    const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+    tb.innerHTML = sorted.map(item => `
+        <tr>
+            <td style="font-weight:700; padding-left:15px;">${dateOnly(item.date)}</td>
+            <td style="font-size:.78rem; color:var(--txt2);">${item.job || '—'}</td>
+            <td style="font-family:'DM Mono'; font-size:.72rem;">
+                <span style="color:var(--primary);">${item.start}</span> - <span style="color:var(--red);">${item.end}</span>
+                <br><small style="color:var(--txt4);">พัก ${item.breakMin} นาที</small>
+            </td>
+            <td style="text-align:center; font-weight:800; font-family:'DM Mono'; color:var(--navy);">${item.actualHours.toFixed(2)}</td>
+            <td style="text-align:center;">
+                <span class="ot-badge ${
+                    item.type == 1.5 ? 'ot-normal' : 
+                    item.type == 1.0 ? 'ot-sat' : 
+                    item.type == 2.0 ? 'ot-sun' : 'ot-holiday'
+                }">
+                    ${item.type == 1.5 ? 'โอทีวันปกติ' : 
+                      item.type == 1.0 ? 'โอทีวันเสาร์' : 
+                      item.type == 2.0 ? 'โอทีวันอาทิตย์' : 'วันหยุดนักขัตฯ'}
+                </span>
+            </td>
+            <td style="text-align:center;"><button class="btn-del" onclick="delOTConfirm('${item.id}')">🗑</button></td>
+        </tr>
+    `).join('');
+
+    // 6. อัปเดตกราฟ (ถ้ามีฟังก์ชันอยู่)
+    if(typeof buildOTChart === 'function') buildOTChart(filtered);
+    if(typeof buildOTTypeChart === 'function') buildOTTypeChart(filtered);
+}
+
+// 4. กราฟแท่งรายเดือน (ขยายเต็มพื้นที่)
+// ฟังก์ชันวาดกราฟ OT รายเดือน ฉบับเส้นประสีแดงเด่นชัด (High Visibility)
+function buildOTChart(otData) {
+    const canvas = document.getElementById('otMonthChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    // ทำลายกราฟเก่าทิ้งก่อนสร้างใหม่เพื่อป้องกันการทับซ้อน
+    if (window.otChartObj) window.otChartObj.destroy();
+
+    const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const dataActual = Array(12).fill(0);
+    
+    otData.forEach(item => {
+        const m = new Date(item.date).getMonth();
+        if (m >= 0 && m < 12) dataActual[m] += parseFloat(item.actualHours || 0);
+    });
+
+    // --- 🚩 ดึงค่าเป้าหมายจากช่อง Input ---
+    const goalInput = document.getElementById('ot-monthly-goal-input');
+    const goalVal = goalInput ? parseFloat(goalInput.value) : 40;
+
+    // ไล่สีแท่งกราฟ
+    const barGradient = ctx.createLinearGradient(0, 0, 0, 300);
+    barGradient.addColorStop(0, 'rgba(37, 99, 235, 1)'); 
+    barGradient.addColorStop(1, 'rgba(96, 165, 250, 0.3)');
+
+    window.otChartObj = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'ชม.จริง',
+                data: dataActual,
+                backgroundColor: barGradient,
+                borderColor: '#2563eb',
+                borderWidth: 1.5,
+                borderRadius: 4,
+                barPercentage: 0.5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    padding: 10,
+                    callbacks: { label: (ctx) => ` ทำงานจริง: ${ctx.raw.toFixed(2)} ชม.` }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'Prompt', size: 10 } } },
+                y: {
+                    beginAtZero: true,
+                    // ตั้งค่า Max ให้สูงกว่าเส้นเป้าหมาย 20% เพื่อให้เห็นเส้นชัดเจนไม่ติดขอบบน
+                    suggestedMax: goalVal * 1.2,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                    ticks: { font: { family: 'DM Mono', size: 11 } }
+                }
+            }
+        },
+        // --- 🚩 ส่วนสำคัญ: บังคับวาดเส้นเป้าหมายสีแดงหนา ---
+        plugins: [{
+            id: 'goalLinePainter',
+            afterDatasetsDraw: (chart) => {
+                const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
+                const yPos = y.getPixelForValue(goalVal);
+
+                // ตรวจสอบว่าตำแหน่งเส้นอยู่ในกราฟหรือไม่
+                if (yPos >= top && yPos <= bottom) {
+                    ctx.save();
+                    
+                    // 1. วาดเงาให้เส้น (ทำให้ดูสว่างและเด่น)
+                    ctx.shadowColor = 'rgba(255, 0, 0, 0.6)';
+                    ctx.shadowBlur = 10;
+                    
+                    // 2. ตั้งค่าลักษณะเส้น (สีแดงสด, หนา 3px)
+                    ctx.strokeStyle = '#ff0000'; 
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([8, 5]); // เส้นประขนาดยาว 8 เว้น 5
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(left, yPos);
+                    ctx.lineTo(right, yPos);
+                    ctx.stroke();
+
+                    // 3. วาดข้อความเป้าหมาย
+                    ctx.shadowBlur = 0; // ปิดเงาสำหรับตัวอักษรเพื่อให้ชัด
+                    ctx.fillStyle = '#ff0000';
+                    ctx.font = 'bold 12px Prompt';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`TARGET: ${goalVal} ชม.`, right, yPos - 10);
+                    
+                    ctx.restore();
+                }
+            }
+        }]
+    });
+}
+
+// 5. กราฟวงกลมประเภทโอที
+function buildOTTypeChart(otData) {
+    const canvas = document.getElementById('otTypeChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    // ทำลายกราฟเดิมทิ้งก่อนวาดใหม่
+    if (window.otTypeChartObj) {
+        window.otTypeChartObj.destroy();
+    }
+
+    // 1. ตั้งค่ากลุ่มข้อมูลและสี (Force Key ให้เป็น String ที่แน่นอน)
+    const types = {
+        '1.5': { label: 'วันปกติ', count: 0, color: '#2563eb', bg: 'rgba(37, 99, 235, 0.1)' },
+        '1.0': { label: 'วันเสาร์', count: 0, color: '#059669', bg: 'rgba(5, 150, 105, 0.1)' },
+        '2.0': { label: 'วันอาทิตย์', count: 0, color: '#7c3aed', bg: 'rgba(124, 58, 237, 0.1)' },
+        '3.0': { label: 'นักขัตฯ', count: 0, color: '#dc2626', bg: 'rgba(220, 38, 38, 0.1)' }
+    };
+
+    let grandTotal = 0;
+
+    // 2. วนลูปนับข้อมูล (ใช้ parseFloat และ toFixed เพื่อแก้ปัญหาเลข 1 ไม่ตรงกับ 1.0)
+    otData.forEach(item => {
+        if (item.type) {
+            const typeKey = parseFloat(item.type).toFixed(1); // แปลงให้เป็น "1.0", "1.5" เสมอ
+            if (types[typeKey]) {
+                types[typeKey].count++;
+                grandTotal++;
+            }
+        }
+    });
+
+    // แสดงยอดรวมจำนวนครั้งตรงกลางกราฟ
+    document.getElementById('otTypeTotal').textContent = grandTotal;
+
+    // 3. สร้างป้ายชื่อ (Legend) ด้านล่างกราฟ
+    const legendEl = document.getElementById('otTypeLegend');
+    if (legendEl) {
+        legendEl.innerHTML = Object.values(types).map(t => 
+            t.count > 0 ? `
+                <div style="display:flex; align-items:center; gap:6px; background:${t.bg}; padding:4px 12px; border-radius:99px; font-size:0.68rem; font-weight:800; color:${t.color}; border:1.5px solid ${t.color}40;">
+                    <div style="width:8px; height:8px; border-radius:50%; background:${t.color};"></div>
+                    ${t.label}: ${t.count}
+                </div>` : ''
+        ).join('');
+    }
+
+    // 4. วาดกราฟ Doughnut
+    window.otTypeChartObj = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.values(types).map(t => t.label),
+            datasets: [{
+                data: Object.values(types).map(t => t.count),
+                backgroundColor: Object.values(types).map(t => t.color),
+                borderWidth: 4,
+                borderColor: '#ffffff',
+                hoverOffset: 15,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '78%', // ปรับความบางของวงกลม
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    padding: 12,
+                    cornerRadius: 10,
+                    callbacks: {
+                        label: function(context) {
+                            const val = context.raw;
+                            const pct = ((val / grandTotal) * 100).toFixed(1);
+                            return ` ${context.label}: ${val} ครั้ง (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// เมื่อโหลดหน้าเว็บ ให้ดึงเป้าหมายที่เคยบันทึกไว้มาแสดง
+window.addEventListener('load', () => {
+    const savedGoal = localStorage.getItem('ot_monthly_goal');
+    if (savedGoal && document.getElementById('ot-monthly-goal-input')) {
+        document.getElementById('ot-monthly-goal-input').value = savedGoal;
+        // สั่งคำนวณวงกลมใหม่ทันทีที่โหลดเสร็จ
+        if (typeof refreshOT === 'function') refreshOT();
     }
 });
+// ฟังก์ชันวิเคราะห์และเติมรายละเอียดงานที่ทำบ่อยที่สุดให้อัตโนมัติ
+function predictMostFrequentJob() {
+    // 1. ตรวจสอบว่ามีข้อมูลในระบบไหม
+    if (!db.ot || db.ot.length === 0) return;
 
+    // 2. สร้างตัวนับ (Counter) เพื่อนับว่าแต่ละงานทำไปกี่ครั้ง
+    const jobCounts = {};
+    db.ot.forEach(item => {
+        if (item.job && item.job.trim() !== "") {
+            const jobName = item.job.trim();
+            jobCounts[jobName] = (jobCounts[jobName] || 0) + 1;
+        }
+    });
+
+    // 3. หางานที่ชื่อซ้ำกันมากที่สุด (The Mode)
+    let mostFrequentJob = "";
+    let maxCount = 0;
+
+    for (const job in jobCounts) {
+        if (jobCounts[job] > maxCount) {
+            maxCount = jobCounts[job];
+            mostFrequentJob = job;
+        }
+    }
+
+    // 4. ถ้าเจองานที่ทำบ่อย ให้เติมลงในช่อง Job Name ทันที
+    const jobInput = document.getElementById('otJob');
+    if (jobInput && mostFrequentJob) {
+        // เติมเฉพาะถ้าช่องปัจจุบันยังว่างอยู่ (เพื่อไม่ให้ไปทับถ้าผู้ใช้พิมพ์เองแล้ว)
+        if (jobInput.value === "") {
+            jobInput.value = mostFrequentJob;
+            
+            // แสดงเอฟเฟกต์สีฟ้าอ่อนแวบหนึ่งเพื่อให้รู้ว่าระบบเติมให้
+            jobInput.style.transition = "background-color 0.5s";
+            jobInput.style.backgroundColor = "var(--b100)";
+            setTimeout(() => {
+                jobInput.style.backgroundColor = "";
+            }, 800);
+            
+            // แจ้งเตือนเล็กน้อย (Optional)
+            console.log("Smart Fill: แนะนำงานที่คุณทำบ่อยที่สุด คือ " + mostFrequentJob);
+        }
+    }
+}
 </script>
 </body>
 </html>
