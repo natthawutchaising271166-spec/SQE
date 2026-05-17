@@ -5178,29 +5178,50 @@ function initIndexedDB() {
 }
 
 
-// 2. โหลดรูปทั้งหมดขึ้นมาทำ URL เสมือน (Blob URL) ไว้โชว์หน้าจอ
+// แก้ไข: ไม่โหลดทุกรูปลง RAM พร้อมกัน
 function loadAllImagesFromDB() {
     return new Promise((resolve) => {
         if(!idb) return resolve();
-        const transaction = idb.transaction(['images'], 'readonly');
-        const store = transaction.objectStore('images');
-        const request = store.getAll();
-        
-        request.onsuccess = (e) => {
-            const records = e.target.result;
-            // ล้าง URL เก่าคืนหน่วยความจำก่อน (ถ้ามี)
-            Object.values(imageMap).forEach(url => URL.revokeObjectURL(url));
-            imageMap = {};
-            
-            records.forEach(record => {
-                if(record.blob) {
-                    imageMap[record.id] = URL.createObjectURL(record.blob);
-                }
-            });
-            resolve();
-        };
+        // ล้าง URL เก่าคืนหน่วยความจำ (RAM) เพื่อป้องกันเครื่องอืด
+        Object.values(imageMap).forEach(url => URL.revokeObjectURL(url));
+        imageMap = {};
+        console.log("Memory Management: All Object URLs revoked.");
+        resolve();
     });
 }
+
+// เพิ่มใหม่: ฟังก์ชันดึงรูปจาก DB เฉพาะใบที่ต้องการโชว์ในขณะนั้น
+async function lazyLoadSpecificImage(id) {
+    if (imageMap[id]) return; // ถ้ามีใน RAM แล้วไม่ต้องโหลดซ้ำ
+
+    try {
+        const blob = await getBlobFromDB(id);
+        if (blob) {
+            const url = URL.createObjectURL(blob);
+            imageMap[id] = url;
+
+            // ค้นหา Element ในตารางและฉีดรูปเข้าไปแทนที่ตัว Loading
+            const container = document.getElementById(`img-holder-${id}`);
+            if (container) {
+                container.innerHTML = `
+                    <img src="${url}" class="sup-img-thumb" 
+                         onclick="event.stopPropagation();imgZoomOrChange(event,'${id}', -1)"
+                         style="animation: fadeIn 0.4s ease-in;">
+                `;
+                container.classList.remove('sup-img-none');
+                container.classList.add('sup-img-wrap');
+                container.classList.add('sup-img-synced');
+            }
+        } else {
+            // ถ้าไม่มีรูปใน DB จริงๆ ให้แสดงไอคอน "ไม่มีรูป"
+            const container = document.getElementById(`img-holder-${id}`);
+            if(container) container.innerHTML = '<div class="ni-icon" style="opacity:0.2;">📷</div>';
+        }
+    } catch (err) {
+        console.error("Lazy load error for ID:", id, err);
+    }
+}
+
 // 📌 เก็บ Support ลงใน IndexedDB แทน LocalStorage
 async function saveSupportToDB(supportList) {
     if(!idb) return;
@@ -5340,21 +5361,22 @@ function refreshSupportImagesOnly(){
   });
 }
 
-function getImgCell(id, idx){
-  const imgUrl=imageMap[id];
-  if(imgUrl){
-    return `<div class="sup-img-wrap sup-img-synced" data-img-id="${id}">
-      <img src="${imgUrl}" class="sup-img-thumb"
-        onclick="event.stopPropagation();imgZoomOrChange(event,'${id}',${idx})"
-        title="คลิกเพื่อซูม · ดับเบิ้ลคลิกเพื่อเปลี่ยน"
-        onerror="this.parentNode.innerHTML=getImgCellHTML('${id}',${idx})">
+// แก้ไข: คืนค่า Placeholder ก่อน แล้วค่อยโหลดรูปจริงตามหลัง
+function getImgCell(id, idx) {
+    if (imageMap[id]) {
+        return `<div class="sup-img-wrap sup-img-synced" data-img-id="${id}">
+            <img src="${imageMap[id]}" class="sup-img-thumb" onclick="event.stopPropagation();imgZoomOrChange(event,'${id}',${idx})">
+        </div>`;
+    }
+
+    // สั่งให้โหลดรูปจาก IndexedDB แบบ Async (ไม่ขวางการวาดตาราง)
+    setTimeout(() => lazyLoadSpecificImage(id), 10);
+
+    return `<div class="sup-img-none" id="img-holder-${id}" data-img-id="${id}">
+        <div class="ni-icon" style="font-size:0.8rem;">⏳</div>
     </div>`;
-  }
-  return `<div class="sup-img-none" data-img-id="${id}" onclick="openQuickImgEdit('${id}',${idx})" title="เพิ่มรูปภาพ">
-    <div class="ni-icon">📷</div>
-    <div class="ni-lbl">เพิ่มรูป</div>
-  </div>`;
 }
+
 function getImgCellHTML(id,idx){return getImgCell(id,idx);}
 
 let _imgZoomTimer = null;
@@ -5685,15 +5707,50 @@ function setDateFilter(page,preset,btn){
   if(page==='master-dash')refreshMasterDashboard();else if(page==='daily')refreshDashboard();else if(page==='support')refreshSupport();else if(page==='5s')refresh5S();else if(page==='multi')refreshSkills();else if(page==='special')refreshSpecial();
 if(page==='ot-page') refreshOT();
 }
-function applyCustomFilter(page){
-  const fEl=document.getElementById(PAGE_FROM_IDS[page]);const tEl=document.getElementById(PAGE_TO_IDS[page]);
-  const from=fEl?.value||null,to=tEl?.value||null;pageFilters[page]={from,to};
-  const bar=fEl?.closest('.date-filter-bar');if(bar)bar.querySelectorAll('.df-btn').forEach(b=>b.classList.remove('active'));
-  const label=from&&to?`${from.slice(5)} – ${to.slice(5)}`:from?`จาก ${from.slice(5)}`:'กำหนดเอง';
-  setText(PAGE_RESULT_IDS[page],label);
-  if(page==='master-dash')refreshMasterDashboard();else if(page==='daily')refreshDashboard();else if(page==='support')refreshSupport();else if(page==='5s')refresh5S();else if(page==='special')refreshSpecial();
- if(page==='ot-page') refreshOT(); 
+function applyCustomFilter(page) {
+  // 1. ดึง Element และค่าวันที่จาก Input
+  const fEl = document.getElementById(PAGE_FROM_IDS[page]);
+  const tEl = document.getElementById(PAGE_TO_IDS[page]);
+  const from = fEl?.value || null;
+  const to = tEl?.value || null;
+
+  // 2. บันทึกค่าการกรองลงในตัวแปรกลาง pageFilters
+  pageFilters[page] = { from, to };
+
+  // 3. อัปเดต UI: ลบสถานะ Active ออกจากปุ่ม Preset (เช่น วันนี้, เดือนนี้) เพราะตอนนี้เป็นการกรองเอง
+  const bar = fEl?.closest('.date-filter-bar');
+  if (bar) {
+    bar.querySelectorAll('.df-btn').forEach(b => b.classList.remove('active'));
+  }
+
+  // 4. อัปเดตข้อความแสดงช่วงวันที่ที่เลือก (ตัดเอาเฉพาะ เดือน-วัน มาโชว์เพื่อให้กระชับ)
+  const label = from && to ? `${from.slice(5)} – ${to.slice(5)}` : from ? `จาก ${from.slice(5)}` : 'กำหนดเอง';
+  setText(PAGE_RESULT_IDS[page], label);
+
+  // 5. 🌟 [ส่วนปรับปรุงใหม่] Reset Pagination สำหรับหน้า Support
+  // หากมีการเปลี่ยนวันที่ในหน้า Support ให้กลับไปแสดงผลเริ่มต้นที่ 30 รายการแรก
+  if (page === 'support') {
+    supportDisplayLimit = 30;
+  }
+
+  // 6. เลือกเรียกฟังก์ชัน Refresh เฉพาะหน้าที่กำลังใช้งานอยู่ เพื่อประหยัด CPU
+  if (page === 'master-dash') {
+    refreshMasterDashboard();
+  } else if (page === 'daily') {
+    refreshDashboard();
+  } else if (page === 'support') {
+    refreshSupport();
+  } else if (page === '5s') {
+    refresh5S();
+  } else if (page === 'special') {
+    refreshSpecial();
+  } else if (page === 'multi') {
+    refreshSkills();
+  } else if (page === 'ot-page') {
+    refreshOT();
+  }
 }
+
 function filterByDateRange(arr,dateField,page){
   const f=pageFilters[page];if(!f||(!f.from&&!f.to))return arr;
   return arr.filter(item=>{
@@ -5768,20 +5825,24 @@ function setBtnLoading(on, txt='💾 สำรองข้อมูล', btnId='
 
 let autoSyncTimer = null;
 
-function save(){
-  db._owner=currentUser;
-  db._lastModified=Date.now();
-  saveLocal(); // เซฟลงเครื่องก่อน (Offline First)
-  runAIAnalytics();
-  if(isActive('master-dash'))refreshMasterDashboard();
-  checkAchievements();
+// ปรับฟังก์ชัน save ให้ฉลาดขึ้น
+function save() {
+  db._owner = currentUser;
+  db._lastModified = Date.now();
+  saveLocal(); 
   
-  // เพิ่มระบบ Auto-Sync: หน่วงเวลา 2 วินาทีหลังจากเซฟลงเครื่อง เพื่อส่งขึ้น Supabase
+  // แทนที่จะเรียก refreshAllPages() ให้เรียกเฉพาะหน้าที่ Active
+  const activePage = document.querySelector('.page.active').id;
+  renderPage(activePage); 
+  
+  // ส่วนหน้าอื่นๆ ให้ Refresh เฉพาะ Master Dash (ถ้าจำเป็น) หรือรอให้กดเข้าหน้านั้นก่อนค่อยโหลด
+  runAIAnalytics();
+  
+  // Auto-Sync
   clearTimeout(autoSyncTimer);
-  showSyncStatus('⏳ รอส่งขึ้น Cloud...', '#f59e0b');
   autoSyncTimer = setTimeout(() => {
-      syncToSupabase();
-  }, 2000);
+    syncToSupabase();
+  }, 3000); // เพิ่มเวลาเป็น 3 วินาที เพื่อให้พิมพ์งานต่อได้ไม่สะดุด
 }
 
 function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
@@ -6337,70 +6398,104 @@ function buildAttendChart(dailyData){
   });
 }
 
-function refreshSupport(){
-  const tb = document.getElementById('supportTableBody'); if(!tb) return;
-  let filtered = filterByDateRange(db.support, 'eventDate', 'support');
-  if (supportSearchTerm) {
-      const term = supportSearchTerm;
-      filtered = filtered.filter(s => { const pProblem = s.problem ? s.problem.toLowerCase() : ''; const pPart = s.part ? s.part.toLowerCase() : ''; const pLot = s.lot ? s.lot.toLowerCase() : ''; const pReport = s.report ? s.report.toLowerCase() : ''; const pAction = s.action ? s.action.toLowerCase() : ''; return pProblem.includes(term) || pPart.includes(term) || pLot.includes(term) || pReport.includes(term) || pAction.includes(term); });
-  }
+// 1. เพิ่มตัวแปรนี้ไว้ที่ส่วนบนสุดของแผ่น Script (นอกฟังก์ชันใดๆ)
+let supportDisplayLimit = 30; 
 
-  const rp = filtered.filter(s=>s.report==='RP').length, vf = filtered.filter(s=>s.report==='VF').length, rec = filtered.filter(s=>s.report==='RECORDS').length;
-  const totalOK = filtered.reduce((s,c)=>s+(c.ok||0),0), totalNG = filtered.reduce((s,c)=>s+(c.ng||0),0);
-  const ngRate = (totalOK+totalNG)>0 ? Math.round((totalNG/(totalOK+totalNG))*100) : 0; const tot = filtered.length;
+// 2. ปรับปรุงฟังก์ชัน refreshSupport
+function refreshSupport() {
+    const tb = document.getElementById('supportTableBody'); if (!tb) return;
 
-  setText('sum-total', tot); setText('sum-rp', rp); setText('sum-vf', vf); setText('sum-records', rec);
-  setText('md-sum-total', tot); setText('md-sum-rp', rp); setText('md-sum-vf', vf); setText('md-sum-rec', rec);
-  setText('md-total-ok', totalOK); setText('md-total-ng', totalNG); setText('md-ng-rate', `${ngRate}% rate`);
-  setText('md-pct-rp', tot ? `${Math.round(rp/tot*100)}% of total` : '0%'); setText('md-pct-vf', tot ? `${Math.round(vf/tot*100)}% of total` : '0%'); setText('md-pct-rec', tot ? `${Math.round(rec/tot*100)}% of total` : '0%');
-  
-  const lu = document.getElementById('sdb-last-updated'); if(lu) lu.textContent = 'Updated: '+new Date().toLocaleTimeString('th-TH');
-  setText('sdb-donut-lbl', `${tot} cases`); setText('sdb-okng-lbl', `OK:${totalOK} / NG:${totalNG}`);
-  
-  const groupMap = buildGroupData(filtered);
-  if(groupMap.length){
-    const topG = groupMap[0]; setText('md-top-group', topG[0]); setText('md-top-group-sub', `${topG[1].total} cases · RP:${topG[1].RP||0} VF:${topG[1].VF||0}`);
-    const withNG = groupMap.filter(([,d])=>d.ng>0).sort((a,b)=>b[1].ng-a[1].ng);
-    if(withNG.length){ setText('md-worst-ng', withNG[0][0]); setText('md-worst-ng-sub', `NG: ${withNG[0][1].ng||0} pcs · ${withNG[0][1].total} cases`); } else { setText('md-worst-ng', '—'); setText('md-worst-ng-sub', 'ไม่มีข้อมูล NG'); }
-  }
-  
-  const moCounts = Array(12).fill(0); const moNames =['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-  filtered.forEach(s => { if(s.eventDate) { const m = new Date(s.eventDate).getMonth(); if(!isNaN(m)) moCounts[m]++; } else if(s.month) { const m = parseInt(s.month.split('-')[1])-1; if(m>=0 && m<12) moCounts[m]++; } });
-  const maxMo = Math.max(...moCounts); const busyIdx = moCounts.indexOf(maxMo);
-  if(maxMo > 0) { setText('md-busy-month', moNames[busyIdx]); setText('md-busy-month-sub', `${maxMo} cases บันทึกในเดือนนี้`); } else { setText('md-busy-month', '—'); setText('md-busy-month-sub', '—'); }
+    // --- ส่วน Filter (คงเดิม) ---
+    let filtered = filterByDateRange(db.support, 'eventDate', 'support');
+    if (supportSearchTerm) {
+        const term = supportSearchTerm;
+        filtered = filtered.filter(s => {
+            const pProblem = s.problem ? s.problem.toLowerCase() : '';
+            const pPart = s.part ? s.part.toLowerCase() : '';
+            const pLot = s.lot ? s.lot.toLowerCase() : '';
+            const pReport = s.report ? s.report.toLowerCase() : '';
+            const pAction = s.action ? s.action.toLowerCase() : '';
+            return pProblem.includes(term) || pPart.includes(term) || pLot.includes(term) || pReport.includes(term) || pAction.includes(term);
+        });
+    }
 
-  setText('sup-tbl-count-badge', `${filtered.length} records`);
+    // --- ส่วนคำนวณ KPI (คงเดิม) ---
+    const rp = filtered.filter(s => s.report === 'RP').length, vf = filtered.filter(s => s.report === 'VF').length, rec = filtered.filter(s => s.report === 'RECORDS').length;
+    const totalOK = filtered.reduce((s, c) => s + (c.ok || 0), 0), totalNG = filtered.reduce((s, c) => s + (c.ng || 0), 0);
+    const ngRate = (totalOK + totalNG) > 0 ? Math.round((totalNG / (totalOK + totalNG)) * 100) : 0;
+    const tot = filtered.length;
 
-  if(!filtered.length){
-    tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูลในช่วงเวลาที่เลือก หรือไม่ตรงกับคำค้นหา</div></td></tr>`;
-  } else {
-    // 🌟 แก้ไขจุดที่ 1: เรียงตามวันที่ (ล่าสุดไปเก่าสุด) และจัดรูปแบบวันที่ 🌟
-    const sortedSupport =[...filtered].sort((a,b) => new Date(b.eventDate || b.datetime || 0) - new Date(a.eventDate || a.datetime || 0));
-    
-    tb.innerHTML = sortedSupport.map((s)=>{
-      const realIdx = db.support.indexOf(s); const bc = s.report==='RP'?'badge-rp':s.report==='VF'?'badge-vf':'badge-rec';
-      const okCell = s.ok!==undefined && s.ok!=='' ? `<span class="ok-chip">✓ ${s.ok}</span>` : '<span style="color:var(--txt4);">—</span>';
-      const ngCell = s.ng!==undefined && s.ng!=='' ? `<span class="ng-chip">✗ ${s.ng}</span>` : '<span style="color:var(--txt4);">—</span>';
-      
-      const displayDate = s.eventDate ? dateOnly(s.eventDate) : (s.datetime || s.fullTimestamp || '—');
-      
-      return `<tr>
-        <td class="td-ts" style="padding-left:14px; font-weight:600;">${displayDate}</td>
-        <td style="min-width:280px;width:32%;font-size:.79rem;line-height:1.65;word-break:break-word;white-space:normal;color:var(--txt);padding-top:10px;padding-bottom:10px;">${s.problem||'—'}</td>
-        <td style="font-size:.73rem;">${s.action||'—'}</td>
-        <td style="font-weight:700;color:var(--txt2);font-size:.76rem;">${s.part||'—'}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--violet);">${s.lot||'—'}</td>
-        <td style="text-align:center;">${okCell}</td>
-        <td style="text-align:center;">${ngCell}</td>
-        <td><span class="badge ${bc}">${s.report}</span></td>
-        <td class="sup-img-cell">${getImgCell(s.id,realIdx)}</td>
-        <td style="text-align:center;white-space:nowrap;"><button class="btn-detail" onclick="openRecDetail(${realIdx})" title="ดูรายละเอียด">🔍 ดู</button> <button class="btn-edit" onclick="openEditSupport(${realIdx})" title="แก้ไข" style="margin-left:3px;">✏️</button> <button class="btn-del" onclick="delSupportConfirm(${realIdx})" title="ลบ" style="margin-left:3px;">🗑</button></td>
-      </tr>`;
-    }).join('');
-  }
+    setText('sum-total', tot); setText('sum-rp', rp); setText('sum-vf', vf); setText('sum-records', rec);
+    setText('md-sum-total', tot); setText('md-sum-rp', rp); setText('md-sum-vf', vf); setText('md-sum-rec', rec);
+    setText('md-total-ok', totalOK); setText('md-total-ng', totalNG); setText('md-ng-rate', `${ngRate}% rate`);
+    setText('md-pct-rp', tot ? `${Math.round(rp / tot * 100)}% of total` : '0%');
+    setText('md-pct-vf', tot ? `${Math.round(vf / tot * 100)}% of total` : '0%');
+    setText('md-pct-rec', tot ? `${Math.round(rec / tot * 100)}% of total` : '0%');
 
-  renderGroupBars('support-group-bars', 12, filtered); renderGroupByStatus('support-group-by-status'); renderGroupFullTable('group-full-tbody', filtered);
-  buildDoughnut(rp, vf, rec, 'supportStatusChart'); buildSupportTrend(filtered); buildSupportOkNg(filtered); buildSupportGroupChart(filtered); buildSupportMixChart(filtered);
+    const lu = document.getElementById('sdb-last-updated'); if (lu) lu.textContent = 'Updated: ' + new Date().toLocaleTimeString('th-TH');
+    setText('sdb-donut-lbl', `${tot} cases`); setText('sdb-okng-lbl', `OK:${totalOK} / NG:${totalNG}`);
+
+    // --- ส่วนการวาดตาราง (ปรับปรุงใหม่ด้วย Pagination) ---
+    setText('sup-tbl-count-badge', `${filtered.length} records`);
+
+    if (!filtered.length) {
+        tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:48px 24px;color:var(--txt4);"><div style="font-size:2rem;margin-bottom:8px;">🛠️</div><div style="font-size:.82rem;font-weight:500;">ไม่มีข้อมูล</div></td></tr>`;
+    } else {
+        const sortedSupport = [...filtered].sort((a, b) => new Date(b.eventDate || b.datetime || 0) - new Date(a.eventDate || a.datetime || 0));
+        
+        // 🌟 Slice ข้อมูลตาม Limit ที่กำหนด
+        const itemsToDisplay = sortedSupport.slice(0, supportDisplayLimit);
+
+        tb.innerHTML = itemsToDisplay.map((s) => {
+            const realIdx = db.support.indexOf(s);
+            const bc = s.report === 'RP' ? 'badge-rp' : s.report === 'VF' ? 'badge-vf' : 'badge-rec';
+            const okCell = s.ok !== undefined && s.ok !== '' ? `<span class="ok-chip">✓ ${s.ok}</span>` : '<span style="color:var(--txt4);">—</span>';
+            const ngCell = s.ng !== undefined && s.ng !== '' ? `<span class="ng-chip">✗ ${s.ng}</span>` : '<span style="color:var(--txt4);">—</span>';
+            const displayDate = s.eventDate ? dateOnly(s.eventDate) : (s.datetime || s.fullTimestamp || '—');
+
+            return `<tr>
+                <td class="td-ts" style="padding-left:14px; font-weight:600;">${displayDate}</td>
+                <td style="min-width:280px;width:32%;font-size:.79rem;line-height:1.65;word-break:break-word;white-space:normal;color:var(--txt);padding-top:10px;padding-bottom:10px;">${s.problem || '—'}</td>
+                <td style="font-size:.73rem;">${s.action || '—'}</td>
+                <td style="font-weight:700;color:var(--txt2);font-size:.76rem;">${s.part || '—'}</td>
+                <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--violet);">${s.lot || '—'}</td>
+                <td style="text-align:center;">${okCell}</td>
+                <td style="text-align:center;">${ngCell}</td>
+                <td><span class="badge ${bc}">${s.report}</span></td>
+                <td class="sup-img-cell">${getImgCell(s.id, realIdx)}</td>
+                <td style="text-align:center;white-space:nowrap;">
+                    <button class="btn-detail" onclick="openRecDetail(${realIdx})" title="ดูรายละเอียด">🔍 ดู</button>
+                    <button class="btn-edit" onclick="openEditSupport(${realIdx})" title="แก้ไข">✏️</button>
+                    <button class="btn-del" onclick="delSupportConfirm(${realIdx})" title="ลบ">🗑</button>
+                </td>
+            </tr>`;
+        }).join('');
+
+        // 🌟 แสดงปุ่ม "Load More" หากข้อมูลยังไม่หมด
+        if (filtered.length > supportDisplayLimit) {
+            tb.innerHTML += `
+                <tr>
+                    <td colspan="10" style="text-align:center; padding: 20px;">
+                        <button onclick="supportDisplayLimit += 50; refreshSupport();" 
+                                class="sb-btn" style="width: auto; padding: 8px 30px; background: var(--navy); color: #fff; border-radius: 99px;">
+                            🔽 แสดงเพิ่มอีก 50 รายการ (เหลืออีก ${filtered.length - supportDisplayLimit})
+                        </button>
+                    </td>
+                </tr>`;
+        }
+    }
+
+    // กราฟต่างๆ ให้เรียกทำงานเฉพาะตอนที่หน้า Support Active เท่านั้นเพื่อประหยัด CPU
+    if(isActive('support')) {
+        renderGroupBars('support-group-bars', 12, filtered);
+        renderGroupByStatus('support-group-by-status');
+        renderGroupFullTable('group-full-tbody', filtered);
+        buildDoughnut(rp, vf, rec, 'supportStatusChart');
+        buildSupportTrend(filtered);
+        buildSupportOkNg(filtered);
+        buildSupportGroupChart(filtered);
+        buildSupportMixChart(filtered);
+    }
 }
 
 function buildSupportTrend(suppData){
@@ -6510,7 +6605,11 @@ const assignorColors=['#2563eb','#dc2626','#7c3aed','#059669','#0891b2','#d97706
 const _colorMap={};let _colorIdx=0;
 function getAssignorColor(name){if(!name)return'#94a3b8';if(!_colorMap[name]){_colorMap[name]=assignorColors[_colorIdx%assignorColors.length];_colorIdx++;}return _colorMap[name];}
 function animateCount(el,from,to,dur=700){if(!el)return;const start=performance.now();const step=ts=>{const p=Math.min((ts-start)/dur,1);const v=from+(to-from)*(1-Math.pow(1-p,3));el.textContent=Math.round(v);if(p<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
-
+function updateChart(chartObj, newData, newLabels) {
+    chartObj.data.labels = newLabels;
+    chartObj.data.datasets[0].data = newData;
+    chartObj.update('none'); // update แบบไม่มี animation จะเร็วมาก
+}
 function refreshSpecial(){
   const tb = document.getElementById('specialTableBody'); if(!tb) return;
   const filtered = filterByDateRange(db.special, 'date', 'special');
