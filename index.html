@@ -12,7 +12,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@300;400;500&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
 <style>
 /* ═══════════════════════════════════════════════════
    DESIGN SYSTEM — Power BI / Enterprise Light Theme
@@ -117,9 +116,10 @@
     animation: borderRotate 4s linear infinite;
 }
 
+/* ✅ แก้ไข */
 @keyframes borderRotate {
-    0% { filter: hue-rotate(0deg) brightness(1); }
-    50% { brightness(1.5); }
+    0%   { filter: hue-rotate(0deg) brightness(1); }
+    50%  { filter: hue-rotate(180deg) brightness(1.5); }
     100% { filter: hue-rotate(360deg) brightness(1); }
 }
 
@@ -6846,7 +6846,7 @@ textarea#remark {
 
 /* Wrapper สำหรับกำหนดตำแหน่ง */
 .form-section-input { position: relative; width: 100%; }
-* กิมมิกไอคอน: ให้มีการเรืองแสงอ่อนๆ และกระพริบเบาๆ เหมือนระบบ Security */
+
 .sc-gimmick-icon {
     display: flex;
     align-items: center;
@@ -9019,7 +9019,7 @@ async function handleFormSubmit(e) {
       const keepShift = $id('shift').value;
 
       // ล้างสถานะแก้ไขและกลับหน้าตาปุ่มเป็นปกติ
-      cancelEdit(); 
+      
       extinguishAllGlows();
 
       // คืนค่าฟอร์มบางส่วน (อำนวยความสะดวกให้ User ไม่ต้องเลือกใหม่)
@@ -9048,6 +9048,7 @@ async function handleFormSubmit(e) {
 
       // --- [6] RE-RENDER & AUDIT LOG ---
       refreshAll(); 
+      cancelEdit(); 
       writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
       
       // ล้างสถานะไฮไลท์สีเขียวในตารางหลัง 3 วินาที
@@ -9065,6 +9066,7 @@ async function handleFormSubmit(e) {
     btn.innerHTML = originalBtnHTML;
     btn.style.background = '';
   }
+  
 }
 
 // ฟังก์ชันจัดการแสงนีออนแบบอัจฉริยะ
@@ -9108,11 +9110,12 @@ document.querySelectorAll('.neon-in, #judgmentSelect').forEach(input => {
     // เพิ่มตอน Focus เผื่อกรณีคลิกเข้าไปเฉยๆ
     input.addEventListener('focus', refreshNeonGlow); 
 });
+
 window.editRecord = function(id) {
-  toggleSidebar('open'); // <--- เพิ่มบรรทัดนี้
+
   const r = records.find(x => x.id === id);
   if (!r) return;
-
+toggleSidebar('open'); // <--- เพิ่มบรรทัดนี้
   // ❗ 1. ลบไฮไลท์แถวเดิมทิ้งก่อน (ถ้ามี)
   document.querySelectorAll('tr.is-editing').forEach(el => el.classList.remove('is-editing'));
 
@@ -9175,7 +9178,6 @@ window.editRecord = function(id) {
       }
     }, 300); // รอ 0.3 วินาที
   }
-  toggleSidebar('open');
   autoTranslateDefect(r.defect, false);
 };
 
@@ -9231,47 +9233,55 @@ refreshNeonGlow();
   toast('📋 คัดลอกข้อมูลแล้ว พร้อมบันทึกใหม่');
 };
 
+/* ✅ ฟังก์ชันแก้ไขสมบูรณ์ */
 function cancelEdit() {
   editingId = null;
-  if($id('claimForm')) $id('claimForm').reset();
-  if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
-  handleJudgment('');
-  
-  if($id('refNo')) $id('refNo').style.borderColor = "";
 
-   const btn = $id('submitBtn');
-  if(btn) {
-    btn.innerHTML = '✦ COMMIT DATA';
-    btn.style.background = ''; // คืนค่าเป็นสีน้ำเงินตาม CSS หลัก
-    btn.style.boxShadow = '';
+  if ($id('claimForm')) $id('claimForm').reset();
+  if ($id('inputDate')) $id('inputDate').valueAsDate = new Date();
+
+  handleJudgment('');
+
+  const btn = $id('submitBtn');
+  if (btn) {
+    btn.innerHTML      = '✦ COMMIT DATA';
+    btn.style.background = '';
+    btn.style.boxShadow  = '';
+    btn.disabled         = false; // ✅ reset disabled state
   }
-  
-  if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
-  if($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
+
+  if ($id('cancelEditBtn')) $id('cancelEditBtn').remove();
+  if ($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
 
   document.querySelectorAll('tr.is-editing').forEach(el => el.classList.remove('is-editing'));
 
-  // ✅ เพิ่มบรรทัดนี้: เอาเคอร์เซอร์ออก
+  extinguishAllGlows();
+
   if (document.activeElement) document.activeElement.blur();
 }
 
+/* ✅ ฟังก์ชันแก้ไขสมบูรณ์ */
 function cancelCopy() {
-  if($id('claimForm')) $id('claimForm').reset();
-  if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
-  handleJudgment('');
-  
-  if($id('refNo')) $id('refNo').style.borderColor = "";
-  
-  const btn = $id('submitBtn');
-  if(btn) {
-    btn.innerHTML = '✦ Commit Data';
-    btn.style.background = '';
-  }
-  
-  if($id('cancelEditBtn')) $id('cancelEditBtn').remove();
-  if($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
+  if ($id('claimForm'))  $id('claimForm').reset();
+  if ($id('inputDate'))  $id('inputDate').valueAsDate = new Date();
 
-  // ✅ เพิ่มบรรทัดนี้: เอาเคอร์เซอร์ออก
+  handleJudgment('');
+
+  if ($id('refNo')) $id('refNo').style.borderColor = '';
+
+  const btn = $id('submitBtn');
+  if (btn) {
+    btn.innerHTML        = '✦ COMMIT DATA';
+    btn.style.background = '';
+    btn.style.boxShadow  = '';
+    btn.disabled         = false; // ✅ reset
+  }
+
+  if ($id('cancelEditBtn')) $id('cancelEditBtn').remove();
+  if ($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
+
+  extinguishAllGlows();
+
   if (document.activeElement) document.activeElement.blur();
 }
 
@@ -9294,70 +9304,59 @@ function hideSingleDeleteModal() {
   }
 }
 
-// ⚡ Audit Logic Hook: Backup data before delete
+/* ✅ ฟังก์ชันแก้ไขสมบูรณ์ */
 async function confirmDeleteSingleRow() {
   const idToDelete = _pendingDeleteId;
-  if (!idToDelete) { 
-    toast("❌ ระบบไม่พบรหัสข้อมูล"); 
-    return; 
-  }
+  if (!idToDelete) { toast('❌ ระบบไม่พบรหัสข้อมูล'); return; }
 
-  // 1. ค้นหาข้อมูลก่อนลบเพื่อเก็บไว้ทำ Audit Log
   const recordToDelete = records.find(r => String(r.id) === String(idToDelete));
-  
-  // 2. เพิ่ม Visual Feedback: ใส่ Class เพื่อทำอนิเมชั่นแถวค่อยๆ จางหาย (Optional)
+
+  // Visual: fade-out แถว
   const rowEl = document.querySelector(`tr[data-rid="${idToDelete}"]`);
   if (rowEl) {
-    rowEl.style.transition = "all 0.3s ease";
-    rowEl.style.opacity = "0";
-    rowEl.style.transform = "translateX(20px)";
+    rowEl.style.transition  = 'all 0.3s ease';
+    rowEl.style.opacity     = '0';
+    rowEl.style.transform   = 'translateX(20px)';
   }
 
   hideSingleDeleteModal();
 
   try {
-    // 3. ลบจาก Cloud ถ้าออนไลน์ (ทำก่อนเพื่อความชัวร์)
+    // 1. ลบจาก Cloud
     if (isOnline && getSupabase()) {
       const success = await deleteFromSupabase(idToDelete);
-      if (!success) throw new Error("Cloud delete failed");
+      if (!success) throw new Error('Cloud delete failed');
     }
 
-    // 4. ลบจาก IndexedDB
+    // 2. ลบจาก IndexedDB
     if (db) {
       await new Promise((resolve, reject) => {
-        const tx = db.transaction(IDB_STORE, 'readwrite');
+        const tx    = db.transaction(IDB_STORE, 'readwrite');
         const store = tx.objectStore(IDB_STORE);
-        const req = store.delete(String(idToDelete));
+        store.delete(String(idToDelete));
         tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
+        tx.onerror    = () => reject(tx.error);
       });
     }
 
-    // 5. อัปเดต Global State ใน RAM
+    // 3. ลบจาก RAM
     records = records.filter(r => String(r.id) !== String(idToDelete));
-    
-    // 6. เขียน Audit Log (Async - ไม่ต้องรอเสร็จก็ได้)
-    if (recordToDelete) {
-      writeAuditLog('DELETE', idToDelete, recordToDelete, null);
-    }
 
-    // 🌟 7. จุดสำคัญ: สั่ง Re-calculate ทุกอย่างใหม่ทันที
-    // refreshAll() จะไปเรียก renderTable() ซึ่งจะอัปเดต virtualTableState.allRows ให้ถูกต้อง
+    // 4. Audit Log
+    if (recordToDelete) writeAuditLog('DELETE', idToDelete, recordToDelete, null);
+
+    // 5. ✅ refreshAll() จะ recalculate allRows ก่อน แล้วค่อย updateVirtualScrollState
     refreshAll();
-    
-    // 8. บังคับอัปเดต Virtual Scroll อีกครั้งเพื่อให้จำนวนแถวใน Scroll พื้นที่ว่าง (Spacer) คำนวณใหม่
-    updateVirtualScrollState();
 
-    toast("✅ ลบรายการสำเร็จ");
+    // ✅ ให้ DOM render เสร็จก่อนค่อยคำนวณ scroll
+    requestAnimationFrame(() => updateVirtualScrollState());
+
+    toast('✅ ลบรายการสำเร็จ');
 
   } catch (err) {
-    console.error("Single Delete Error:", err);
-    // หากลบไม่สำเร็จ ให้คืนค่า UI
-    if (rowEl) {
-      rowEl.style.opacity = "1";
-      rowEl.style.transform = "none";
-    }
-    toast("❌ ลบรายการไม่สำเร็จ: " + err.message);
+    console.error('Single Delete Error:', err);
+    if (rowEl) { rowEl.style.opacity = '1'; rowEl.style.transform = 'none'; }
+    toast('❌ ลบรายการไม่สำเร็จ: ' + err.message);
   } finally {
     _pendingDeleteId = null;
   }
@@ -9822,8 +9821,9 @@ function refreshAll() {
   if($id('pctCanUse')) $id('pctCanUse').textContent = pct(ok, tQ);
 
   // 3. อัปเดตข้อมูลส่วนเสริมอื่นๆ
-  updateDatalists(); 
+updateDatalists();
   renderTable();
+  updateAIBrain(); // ✅ เรียกโดยตรง ไม่ต้อง override
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -10373,58 +10373,50 @@ window.refreshDash = function() {
     console.log(`[Dashboard] Refreshed: ${displayData.length} records found.`);
 };
 
-// เก็บข้อมูลตัวเลือกไว้ในตัวแปร Global
+//เก็บข้อมูลตัวเลือกไว้ในตัวแปร Global
 let masterLists = {};
-
-// ฟังก์ชันจัดการ Searchable Dropdown สำหรับทุกช่อง
+/* ✅ ฟังก์ชันแก้ไขสมบูรณ์ */
 function updateDatalists() {
-    const myR = getMyRecords();
-    
-    // กำหนดว่า ID ไหน ใช้ข้อมูลจาก Field ไหนใน Database
-    const fields = {
-        'lineNo': 'line',
-        'refNo': 'ref',
-        'supplier': 'supplier',
-        'partNo': 'partNo',
-        'partOn': 'partName',
-        'defectName': 'defect',
-        'shift': 'shift' // เพิ่ม Shift ด้วย
-    };
+  const myR = getMyRecords();
 
-    for (const [id, key] of Object.entries(fields)) {
-        const inputEl = $id(id);
-        if (!inputEl) continue;
+  const fields = {
+    lineNo     : 'line',
+    refNo      : 'ref',
+    supplier   : 'supplier',
+    partNo     : 'partNo',
+    partOn     : 'partName',
+    defectName : 'defect',
+    shift      : 'shift'
+  };
 
-        // 1. เก็บข้อมูล Unique Values ไว้ค้นหา
-        masterLists[id] = [...new Set(myR.map(r => r[key]).filter(Boolean))].sort();
-        
-        // 2. ปิดระบบ Auto-complete เดิมของ Browser
-        inputEl.setAttribute('autocomplete', 'off');
-        inputEl.removeAttribute('list');
+  for (const [inputId, dbKey] of Object.entries(fields)) {
+    const inputEl = $id(inputId);
+    if (!inputEl) continue;
 
-        // 3. สร้าง Wrapper และกล่องผลลัพธ์ถ้ายังไม่มี
-        if (!inputEl.parentNode.classList.contains('form-section-input')) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'form-section-input';
-            inputEl.parentNode.insertBefore(wrapper, inputEl);
-            wrapper.appendChild(inputEl);
-            
-            const resultBox = document.createElement('div');
-            resultBox.id = 'results-' + id;
-            resultBox.className = 'search-results-container scroll';
-            wrapper.appendChild(resultBox);
-        }
+    // อัปเดต masterLists ทุกครั้ง
+    masterLists[inputId] = [...new Set(myR.map(r => r[dbKey]).filter(Boolean))].sort();
 
-        // 4. ผูกเหตุการณ์การพิมพ์ (Input)
-        inputEl.oninput = function() {
-            showCustomList(this.id, this.value);
-        };
-        
-        // 5. ผูกเหตุการณ์เมื่อคลิก (Focus) ให้แสดงรายการทันที
-        inputEl.onfocus = function() {
-            showCustomList(this.id, this.value);
-        };
+    // ปิด Browser Autocomplete
+    inputEl.setAttribute('autocomplete', 'off');
+    inputEl.removeAttribute('list');
+
+    // สร้าง Wrapper + ResultBox ถ้ายังไม่มี
+    if (!inputEl.parentNode.classList.contains('form-section-input')) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'form-section-input';
+      inputEl.parentNode.insertBefore(wrapper, inputEl);
+      wrapper.appendChild(inputEl);
+
+      const resultBox = document.createElement('div');
+      resultBox.id        = 'results-' + inputId;
+      resultBox.className = 'search-results-container scroll';
+      wrapper.appendChild(resultBox);
+
+      // ✅ ใช้ addEventListener เพื่อไม่ทับ listener เดิม
+      inputEl.addEventListener('input', function() { showCustomList(this.id, this.value); });
+      inputEl.addEventListener('focus', function() { showCustomList(this.id, this.value); });
     }
+  }
 }
 
 // ฟังก์ชันแสดงรายการที่กรองตามคำค้นหา
@@ -10867,84 +10859,77 @@ function updateChartsTheme() {
 /* ══════════════════════════════════════════════════════════════
    13.WINDOW LOAD INITIALIZATION (CLEAN START VERSION)
 ═════════════════════════════════════════════════════════════════ */
+/* ✅ แก้ไข — แยกการ bind ให้ชัดเจน */
 window.addEventListener('load', () => {
-    // 🛡️ [1] SECURITY RESET: ล้างเซสชันเก่าทั้งหมดทันทีที่โหลดหน้าใหม่
-    sessionStorage.clear(); 
+  sessionStorage.clear();
+  initTheme();
+  initAISmartFill();
 
-    // 🎨 [2] THEME & AI INIT: ตั้งค่าธีมสีและเตรียมระบบ AI Smart Fill
-    initTheme();
-    initAISmartFill();
+  if ($id('inputDate')) $id('inputDate').valueAsDate = new Date();
 
-    // 📅 [3] FORM DATE: ตั้งค่าวันที่ในฟอร์มบันทึกเป็นวันปัจจุบัน
-    if ($id('inputDate')) {
-        $id('inputDate').valueAsDate = new Date();
+  if ($id('loginName')) $id('loginName').value = '';
+  if ($id('loginPass')) $id('loginPass').value = '';
+
+  const loginFormEl = $id('loginForm');
+  if (loginFormEl && loginFormEl.tagName === 'FORM') loginFormEl.reset();
+
+  setLoginRole('staff');
+
+  if ($id('loginOverlay')) {
+    $id('loginOverlay').style.display  = 'flex';
+    $id('loginOverlay').style.opacity  = '1';
+    if (typeof gsap !== 'undefined') {
+      gsap.from('#loCard', { scale: 0.95, y: 30, opacity: 0, duration: 0.8, ease: 'power3.out' });
     }
+  }
 
-    // 🧹 [4] LOGIN HARD RESET: ล้างค่าในช่องกรอก Login ให้ว่างเปล่า 100%
-    // ป้องกัน Browser Autofill ที่อาจค้างมาจากครั้งก่อน
-    if ($id('loginName')) $id('loginName').value = '';
-    if ($id('loginPass')) $id('loginPass').value = '';
-    
-    // บังคับรีเซ็ตฟอร์ม (ถ้ามีการใช้ Tag <form>)
-    const loginForm = $id('loginForm');
-    if (loginForm && loginForm.tagName === 'FORM') {
-        loginForm.reset();
-    }
+  if ($id('appShell')) {
+    $id('appShell').style.visibility = 'hidden';
+    $id('appShell').style.opacity    = '0';
+    $id('appShell').classList.remove('visible');
+  }
 
-    // 🔵 [5] ROLE RESET: บังคับให้หน้า Login เริ่มที่โหมด SQE Support (Staff) เสมอ
-    // เพื่อล้าง "โหมดสีทอง" ของหัวหน้างานที่อาจค้างอยู่ในหน้าจอ
-    setLoginRole('staff');
+  // ✅ Ref validation
+  const refIn = $id('refNo');
+  if (refIn) {
+    refIn.style.borderColor = '';
+    refIn.addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+      const val = this.value.trim();
+      const refRegex = /^(V?\d{3}\/\d{4})$/i;
+      if (val === '') {
+        this.style.borderColor = '';
+      } else {
+        this.style.borderColor = refRegex.test(val) ? '#10b981' : '#ef4444';
+      }
+    });
+  }
 
-    // 👁️ [6] VISIBILITY CONTROL: แสดงหน้า Login และซ่อนแอปหลักไว้ก่อน
-    if ($id('loginOverlay')) {
-        $id('loginOverlay').style.display = 'flex';
-        $id('loginOverlay').style.opacity = '1';
-        
-        // เพิ่มอนิเมชั่นทางเข้าให้นุ่มนวล (ถ้ามี GSAP)
-        if (typeof gsap !== 'undefined') {
-            gsap.from('#loCard', { 
-                scale: 0.95, 
-                y: 30, 
-                opacity: 0, 
-                duration: 0.8, 
-                ease: 'power3.out' 
-            });
-        }
+  // ✅ Validation bindings — แยก defectName ออกไปจาก fieldsToWatch เพื่อไม่ให้ซ้ำกับ bindDefectInput
+  const fieldsToWatch = ['inputDate', 'partNo', 'supplier', 'refNo', 'qty', 'judgmentSelect'];
+  fieldsToWatch.forEach(id => {
+    const el = $id(id);
+    if (el) {
+      el.addEventListener('input',  () => validateField(id));
+      el.addEventListener('change', () => validateField(id));
     }
-    
-    if ($id('appShell')) {
-        $id('appShell').style.visibility = 'hidden';
-        $id('appShell').style.opacity = '0';
-        $id('appShell').classList.remove('visible');
-    }
+  });
 
-    // ✅ [7] REFERENCE VALIDATION: ฟังก์ชันตรวจสอบรูปแบบ Ref No (000/0000)
-    const refIn = $id('refNo');
-    if (refIn) {
-        // ล้างค่าสีขอบที่อาจค้าง
-        refIn.style.borderColor = "";
-        
-        refIn.addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-            const val = this.value.trim();
-            // รูปแบบ: 000/0000 หรือ V000/0000
-            const refRegex = /^(V?\d{3}\/\d{4})$/i;
-            
-            if (val === "") {
-                this.style.borderColor = ""; 
-            } else if (refRegex.test(val)) {
-                this.style.borderColor = "#10b981"; // เขียวถ้าถูก
-            } else {
-                this.style.borderColor = "#ef4444"; // แดงถ้าผิด
-            }
-        });
-    }
-const defectInput = document.getElementById('defectName');
-if (defectInput) {
-    // แปลทันทีที่พิมพ์ (Input)
-    defectInput.addEventListener('input', translateDefectToRemark);
-}
-    console.log("[System] Application Initialized & Login Data Cleared.");
+  // ✅ Defect binding — รวมทุก listener ไว้ที่นี่ที่เดียว
+  const defEl = $id('defectName');
+  if (defEl) {
+    defEl.addEventListener('input', function() {
+      validateField('defectName');
+      autoTranslateDefect(this.value, false);
+      translateDefectToRemark();
+    });
+    defEl.addEventListener('change', function() {
+      autoTranslateDefect(this.value, false);
+      translateDefectToRemark();
+    });
+  }
+
+  console.log('[System] Application Initialized & Login Data Cleared.');
 });
 
 // นาฬิกา Realtime
@@ -11002,9 +10987,20 @@ if (tableContainer) {
   });
 }
 
-// Global Form Submit Bindings
 const claimForm = $id('claimForm');
-if(claimForm) claimForm.addEventListener('submit', handleFormSubmit);
+if (claimForm) {
+  claimForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    // ✅ ถอน focus ป้องกัน iOS/Android keyboard ค้าง
+    if (document.activeElement) document.activeElement.blur();
+
+    await handleFormSubmit(e);
+
+    // ✅ ล้างปุ่ม AI Reset หลัง submit เสมอ
+    removeAiResetButton();
+  });
+}
 
 // Search Bindings (Debounce)
 let searchDebounce;
@@ -11479,10 +11475,6 @@ function aiHighlightEffect(el) {
     setTimeout(() => { el.style.backgroundColor = ''; }, 800);
 }
 
-// Hook เข้ากับระบบเดิม
-const originalRefreshAll = refreshAll;
-refreshAll = function() { originalRefreshAll(); updateAIBrain(); };
-
 // ตรวจจับการกด Submit เพื่อซ่อนปุ่มล้าง
 const originalHandleFormSubmit = handleFormSubmit;
 handleFormSubmit = async function(e) {
@@ -11522,29 +11514,24 @@ function closeChangePassModal() {
 /* ═══════════════════════════════════════════════
    15.QUICK DATE FILTER LOGIC
 ════════════════════════════════════════════════ */
+/* ✅ ฟังก์ชันแก้ไขสมบูรณ์ */
 function applyQuickDateFilter(type, btnElement) {
   const now = new Date();
   let startDate = new Date();
-  let endDate = new Date();
+  let endDate   = new Date();
 
-  // 1. คำนวณวันที่ตามประเภท
   if (type === 'today') {
     startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  } 
-  else if (type === '7days') {
-    // วันนี้ - 6 วัน (รวมเป็น 7 วัน)
+    endDate   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  } else if (type === '7days') {
     startDate = new Date(now);
     startDate.setDate(now.getDate() - 6);
     endDate = new Date(now);
-  } 
-  else if (type === 'month') {
-    // วันที่ 1 ถึง วันสุดท้ายของเดือนปัจจุบัน
+  } else if (type === 'month') {
     startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    endDate   = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   }
 
-  // 2. แปลงวันที่ให้อยู่ในรูปแบบ YYYY-MM-DD (สำหรับ Input Type="Date")
   const toDateString = (date) => {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -11553,24 +11540,16 @@ function applyQuickDateFilter(type, btnElement) {
   };
 
   const startStr = toDateString(startDate);
-  const endStr = toDateString(endDate);
+  const endStr   = toDateString(endDate);
 
-  // 3. อัปเดตค่าใน Input Date ที่มีอยู่เดิม
   if ($id('dashStart')) $id('dashStart').value = startStr;
   if ($id('dashEnd'))   $id('dashEnd').value   = endStr;
 
-  // 4. จัดการสีปุ่ม (Highlight ปุ่มที่กด, ลบสีปุ่มอื่น)
   document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active-qb'));
-  if (btnElement) {
-    btnElement.classList.add('active-qb');
-  }
+  if (btnElement) btnElement.classList.add('active-qb');
 
-  // 5. สั่งให้ Dashboard ทำงานใหม่ (Refresh)
   refreshDash();
-  
-  // แสดง Toast ยืนยัน (Optional)
-  // t
-  oast(`📅 กรองข้อมูล: ${startStr} ถึง ${endStr}`);
+  toast(`📅 กรองข้อมูล: ${startStr} ถึง ${endStr}`); // ✅ แก้แล้ว
 }
 /* ══════════════════════════════════════════════════════════════
    16.FEATURE: IMMUTABLE AUDIT LOG (NEW FUNCTIONS)
@@ -12275,48 +12254,57 @@ const validationRules = {
     judgmentSelect: (val) => val !== ""
 };
 
-// 2. ฟังก์ชันตรวจสอบรายช่อง
+/* ✅ ฟังก์ชันแก้ไขสมบูรณ์ */
 function validateField(id) {
-    const el = $id(id);
-    if (!el) return false;
+  const el = $id(id);
+  if (!el) return false;
 
-    const val = el.value;
-    const isValid = validationRules[id] ? validationRules[id](val) : val.trim() !== "";
+  const val     = el.value;
+  const isValid = validationRules[id] ? validationRules[id](val) : val.trim() !== '';
 
+  // ล้าง class เก่าก่อนเสมอ
+  el.classList.remove('is-valid', 'is-invalid');
+
+  if (val !== '') {
     if (isValid) {
-        el.classList.remove('is-invalid');
-        el.classList.add('is-valid');
+      el.classList.add('is-valid');
     } else {
-        if (val !== "") { // จะขึ้นสีแดงต่อเมื่อพิมพ์แล้วแต่ผิด
-            el.classList.remove('is-valid');
-            el.classList.add('is-invalid');
-        } else {
-            el.classList.remove('is-valid', 'is-invalid');
-        }
+      el.classList.add('is-invalid');
     }
-    checkFormCompleteness(); // ตรวจสอบภาพรวมฟอร์มเพื่อเปิด/ปิดปุ่มบันทึก
-    return isValid;
+  }
+
+  checkFormCompleteness(); // อัปเดตสถานะปุ่มบันทึก
+  return isValid;
 }
 
 // 3. ตรวจสอบภาพรวมเพื่อเปิดปุ่ม Commit
+/* ✅ ฟังก์ชันแก้ไขสมบูรณ์ */
 function checkFormCompleteness() {
-    const requiredIds = ['inputDate', 'partNo', 'supplier', 'refNo', 'qty', 'judgmentSelect'];
-    const allValid = requiredIds.every(id => {
-        const el = $id(id);
-        const val = el ? el.value : "";
-        return validationRules[id] ? validationRules[id](val) : val.trim() !== "";
-    });
-
+  // ถ้ากำลังแก้ไข (editingId มีค่า) ให้ปุ่มทำงานปกติเสมอ
+  if (editingId) {
     const btn = $id('submitBtn');
     if (btn) {
-        btn.disabled = !allValid;
-        if (allValid) {
-            btn.style.filter = "none";
-            btn.innerHTML = "✦ COMMIT DATA";
-        } else {
-            btn.innerHTML = "📝 PLEASE FILL REQUIRED FIELDS";
-        }
+      btn.disabled  = false;
+      btn.innerHTML = '📝 อัปเดตข้อมูล (Update)';
     }
+    return;
+  }
+
+  const requiredIds = ['inputDate', 'partNo', 'supplier', 'refNo', 'qty', 'judgmentSelect'];
+  const allValid = requiredIds.every(id => {
+    const el = $id(id);
+    if (!el) return false;
+    const val = el.value;
+    return validationRules[id] ? validationRules[id](val) : val.trim() !== '';
+  });
+
+  const btn = $id('submitBtn');
+  if (btn) {
+    btn.disabled  = !allValid;
+    btn.innerHTML = allValid
+      ? '✦ COMMIT DATA'
+      : '📝 PLEASE FILL REQUIRED FIELDS';
+  }
 }
 
 // 4. ผูกเหตุการณ์ (Event Listeners)
@@ -12438,18 +12426,23 @@ function autoTranslateDefect(val, force = false) {
         if (typeof refreshNeonGlow === 'function') refreshNeonGlow();
     }
 }
-// ดักจับการพิมพ์ในช่อง Defect Name
-const defectInput = document.getElementById('defectName');
-if (defectInput) {
-    defectInput.addEventListener('input', function() {
-        autoTranslateDefect(this.value);
-    });
-    
-    // กรณีเลือกจาก Search Results (Dropdown)
-    defectInput.addEventListener('change', function() {
-        autoTranslateDefect(this.value);
-    });
-}
+/* ✅ แก้ไข — รวมเป็นบล็อกเดียว เปลี่ยนชื่อตัวแปรครั้งที่ 2 */
+
+// ลบบล็อกทั้งสองออกจากที่เดิม แล้วแทนที่ด้วยบล็อกนี้บล็อกเดียว
+(function bindDefectInput() {
+  const el = document.getElementById('defectName');
+  if (!el) return;
+
+  // รวม autoTranslate + translateToRemark ในเหตุการณ์เดียว
+  function onDefectChange() {
+    autoTranslateDefect(this.value, false);
+    translateDefectToRemark();
+  }
+
+  el.addEventListener('input',  onDefectChange);
+  el.addEventListener('change', onDefectChange);
+})();
+
 function translateDefectToRemark() {
     const defectIn = document.getElementById('defectName');
     const remarkIn = document.getElementById('remark');
