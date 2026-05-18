@@ -10508,12 +10508,12 @@ const cleanText = (str) => String(str).toLowerCase().trim().replace(/[^a-z0-9ก
 function smartMapHeaders(excelHeaders) {
   const fieldRules = {
     date: ['inspectiondate', 'inspection date', 'insp. date', 'insp-date', 'date', 'time', 'claimdate', 'dailydate', 'created', 'วันที่', 'วันเวลา', 'insp date', 'check date'],
-    ref: ['ref', 'refer', 'Reference', 'claimno', 'claim no', 'claim-no', 'ref-no', 'ref.no', 'id', 'doc', 'invoice', 'inv', 'itemno', 'item', 'lot', 'no', 'number', 'code', 'refno'],
+    ref: ['ref', 'refer', 'Reference','Reference No.', 'claimno', 'claim no', 'claim-no', 'ref-no', 'ref.no', 'id', 'doc', 'invoice', 'inv', 'itemno', 'item', 'lot', 'no', 'number', 'code', 'refno'],
     partName: ['partname', 'part name', 'Description', 'desc', 'detail', 'name', 'product', 'itemname', 'remark', 'part-name', 'part.name'],
     supplier: ['supplier', 'vendor', 'sup', 'suppliername', 'vendorname', 'company', 'maker', 'factory', 'ผู้ขาย', 'ซัพพลายเออร์'],
-    partNo: ['partno', 'part-no', 'part.no', 'part number', 'partnumber', 'pn', 'part', 'material', 'mat', 'model', 'Material_no'],
+    partNo: ['Part No.','partno', 'part-no', 'part.no', 'part number', 'partnumber', 'pn', 'part', 'material', 'mat', 'model', 'Material_no'],
     qty: ['qty', 'Quantity', 'pcs', 'piece', 'amount', 'count', 'claimqty', 'lotsize', 'number', 'value', 'val', 'total', 'pc', 'ea', 'each'],
-    defect: ['defect', 'problem', 'trouble', 'troubleclaim', 'trouble claim', 'ng', 'symptom', 'cause', 'reason', 'issue'],
+    defect: ['defect','Defect Type', 'problem', 'trouble', 'troubleclaim', 'trouble claim', 'ng', 'symptom', 'cause', 'reason', 'issue'],
     judgment: ['judgment', 'judge', 'status', 'result', 'disposition', 'okng', 'HeadText'],
     shift: ['shift', 'turn', 'workshift', 'day', 'night', 'ผลัด'],
     line: ['line', 'process', 'machine', 'station', 'location', 'productionline', 'ไลน์'],
@@ -11014,88 +11014,45 @@ if($id('searchInput')) {
 
 window.exportToExcel = function() {
   try {
-    // 1. ดึงข้อมูลเฉพาะของ User ปัจจุบัน
     const data = getMyRecords();
-    
-    // ตรวจสอบว่ามีข้อมูลหรือไม่
-    if (!data || data.length === 0) { 
-      toast('⚠️ ไม่มีข้อมูลสำหรับ Export'); 
-      return; 
-    }
+    if (!data || data.length === 0) { toast('⚠️ ไม่มีข้อมูลสำหรับ Export'); return; }
 
     toast('⏳ กำลังสร้างไฟล์ Excel...');
 
-    // 2. จัดรูปแบบข้อมูล (จัดเรียงคอลัมน์ใหม่ให้ครบถ้วนและอ่านง่าย)
+    // ตั้งชื่อหัวตารางให้ตรงตามรูปภาพที่คุณต้องการ
     const exportData = data.map((r, index) => ({
       "No.": index + 1,
-      "Date": r.date || "-",
-      "Shift": r.shift || "-",
-      "Line": r.line || "-",
-      "Reference No.": r.ref || "-",
-      "Supplier": r.supplier || "-",
-      "Part No.": r.partNo || "-",
-      "Part Name": r.partName || "-",
-      "QTY": parseInt(r.qty) || 0,
-      "Defect Type": r.defect || "-",
-      "Judgment": r.judgment || "-",
-      "Remark": r.remark || "-"
+      "Date": r.date || "",
+      "Shift": r.shift || "",
+      "Line": r.line || "",
+      "Claim No": r.ref || "",         // คอลัมน์ที่ระบบบ่นว่าหาไม่เจอ
+      "Vendor Name": r.supplier || "",
+      "Part No": r.partNo || "",
+      "Part Name": r.partName || "",
+      "Qty": parseInt(r.qty) || 0,
+      "Trouble Claim": r.defect || "",
+      "Judgment": r.judgment || "",
+      "REMARK": r.remark || ""
     }));
 
-    // 3. แปลง JSON เป็น Worksheet
     const ws = XLSX.utils.json_to_sheet(exportData);
-
-    // 4. ตั้งค่าความกว้างของคอลัมน์ (Auto-fit แบบกำหนดเอง) ให้ Excel เปิดมาแล้วสวยเลย
-    const wscols =[
-      { wch: 6 },   // No.
-      { wch: 12 },  // Date
-      { wch: 10 },  // Shift
-      { wch: 10 },  // Line
-      { wch: 18 },  // Reference No.
-      { wch: 25 },  // Supplier
-      { wch: 18 },  // Part No.
-      { wch: 30 },  // Part Name
-      { wch: 10 },  // QTY
-      { wch: 20 },  // Defect Type
-      { wch: 15 },  // Judgment
-      { wch: 35 }   // Remark
+    const wscols = [
+      {wch:5}, {wch:12}, {wch:10}, {wch:8}, {wch:15}, {wch:35},
+      {wch:18}, {wch:25}, {wch:8}, {wch:20}, {wch:12}, {wch:40}
     ];
     ws['!cols'] = wscols;
 
-    // 5. สร้าง Workbook และใส่ Worksheet ลงไป
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "SQE_Report");
+    // สำคัญ: ตั้งชื่อ Sheet ให้มีคำว่า "Daily" เพื่อให้ตัว Import หาเจอง่ายขึ้น
+    XLSX.utils.book_append_sheet(wb, ws, "Daily_Report");
 
-    // 6. แปลงไฟล์เป็น Array Buffer (เพื่อแก้ปัญหาเบราว์เซอร์บล็อกการดาวน์โหลด)
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    
-    // 7. สร้าง Blob (ไฟล์เสมือน)
-    const blob = new Blob([wbout], { type: 'application/octet-stream' });
-    
-    // 8. ตั้งชื่อไฟล์ตาม User และวันที่ปัจจุบัน
     const today = new Date().toISOString().slice(0,10);
-    const fileName = `SQE_Export_${currentUser}_${today}.xlsx`;
+    XLSX.writeFile(wb, `SQE_Report_${today}.xlsx`);
 
-    // 9. สร้างลิงก์ดาวน์โหลดจำลองแล้วสั่งคลิกเพื่อโหลด
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.style.display = "none";
-    a.href = url;
-    a.download = fileName;
-    
-    document.body.appendChild(a);
-    a.click(); // สั่งเบราว์เซอร์ดาวน์โหลด
-    
-    // 10. คืนค่าหน่วยความจำและลบปุ่มจำลองทิ้ง
-    setTimeout(() => {
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    }, 100);
-
-    toast('✅ Export Excel สำเร็จ!');
-
+    toast('✅ Export สำเร็จ');
   } catch (error) {
-    console.error("Export Error:", error);
-    toast('❌ เกิดข้อผิดพลาดในการดาวน์โหลด Excel');
+    console.error(error);
+    toast('❌ เกิดข้อผิดพลาดในการส่งออก');
   }
 };
 
