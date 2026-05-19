@@ -7000,6 +7000,31 @@ html.dark-mode #judgmentSelect {
     filter: grayscale(1);
     transform: none !important;
 }
+/* เน้นกลุ่ม Date Control ให้ดูเป็นชุดเดียวกัน */
+.control-group {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    transition: all 0.3s ease;
+}
+
+.control-group:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+.control-input {
+    color: #f8fafc !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+}
+
+/* เอฟเฟกต์ปุ่ม Quick Filter เมื่อถูกเลือก */
+.quick-btn.active-qb {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+    color: white !important;
+    border-color: #60a5fa !important;
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.4) !important;
+}
 </style>
 </head>
 <body>
@@ -9743,87 +9768,67 @@ function renderTable() {
   renderVisibleRows();
 }
 
+/* ══════════════════════════════════════════════════════════════
+   REFRESH ALL (MAIN PAGE KPI - LATEST YEAR ONLY)
+   ปรับปรุงให้การ์ด KPI หน้าหลักแสดงผลเฉพาะปีล่าสุดเป็นค่าเริ่มต้น
+═══════════════════════════════════════════════════════════════ */
 function refreshAll() {
-  // 1. ดึงข้อมูลที่กรองแล้ว (ตามViewingUser)
-  const d = getMyRecords(); 
-  
+  const allData = getMyRecords(); 
+  if (!allData || allData.length === 0) {
+      ['masterQty', 'qtySF', 'qtyVendor', 'qtyCTC', 'qtyCanUse'].forEach(id => animNum(id, 0));
+      return;
+  }
+
+  // 1. หาปีล่าสุด
+  const years = allData.map(r => new Date(r.date).getFullYear());
+  const latestYear = Math.max(...years);
+
+  // 2. กรองข้อมูลเฉพาะปีล่าสุดมาคำนวณ KPI
+  const currentYearData = allData.filter(r => new Date(r.date).getFullYear() === latestYear);
+
   let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
   let sfL = 0, venL = 0, ctcL = 0, okL = 0;
 
-  // คำนวณตัวเลขทางสถิติ
-  d.forEach(r => {
-    tQ += (parseInt(r.qty) || 0);
-    if (r.judgment === 'SF') { sf += r.qty; sfL++; }
-    else if (r.judgment === 'VENDOR FAULT') { ven += r.qty; venL++; }
-    else if (r.judgment === 'CTC') { ctc += r.qty; ctcL++; }
-    else if (r.judgment === 'CAN USE') { ok += r.qty; okL++; }
+  currentYearData.forEach(r => {
+    const q = (parseInt(r.qty) || 0);
+    tQ += q;
+    if (r.judgment === 'SF') { sf += q; sfL++; }
+    else if (r.judgment === 'VENDOR FAULT') { ven += q; venL++; }
+    else if (r.judgment === 'CTC') { ctc += q; ctcL++; }
+    else if (r.judgment === 'CAN USE') { ok += q; okL++; }
   });
 
   const pct = (v, t) => t > 0 ? Math.round((v / t) * 100) + '%' : '0%';
 
-  // --- [ส่วนที่เพิ่มใหม่] การปรับ Layout Header ให้น่าเชื่อถือขึ้นตาม Role ---
-  const pulseText = $id('syncPulseText');
-  const pulseDot = document.querySelector('#syncPulse .sdot');
-  const masterCard = document.querySelector('.kpi-total');
-  const masterLabel = masterCard ? masterCard.querySelector('.kpi-label') : null;
-
-  if (isSupervisor) {
-    // 🛡️ สำหรับหัวหน้างาน (Audit/Verification Mode)
-    if (pulseText) {
-      pulseText.textContent = "VERIFIED ACCESS"; // เปลี่ยนข้อความให้ดูเป็นทางการ
-      pulseText.style.color = "#f59e0b"; // สีทอง/ส้ม บ่งบอกถึงโหมดตรวจสอบ
-    }
-    if (pulseDot) {
-      pulseDot.style.background = "#f59e0b";
-      pulseDot.style.boxShadow = "0 0 8px rgba(245, 158, 11, 0.6)";
-    }
-    if (masterLabel) {
-      masterLabel.textContent = "INSPECTION SUMMARY"; // เปลี่ยนจาก My Total เป็นสรุปผลการตรวจสอบ
-    }
-    // เพิ่มเอฟเฟกต์สีขอบการ์ดหลักให้ดูพรีเมียมขึ้น
-    if (masterCard) masterCard.style.borderTop = "3px solid #f59e0b";
-    
-  } else {
-    // 🛰️ สำหรับพนักงาน (Live Entry Mode)
-    if (pulseText) {
-      pulseText.textContent = "LIVE SYSTEM";
-      pulseText.style.color = "#10b981"; // สีเขียว บ่งบอกว่าระบบทำงานปกติ
-    }
-    if (pulseDot) {
-      pulseDot.style.background = "#10b981";
-      pulseDot.style.boxShadow = "0 0 8px rgba(16, 185, 129, 0.6)";
-    }
-    if (masterLabel) {
-      masterLabel.textContent = "MY PERFORMANCE"; // เปลี่ยนให้ดูมีพลัง (Performance)
-    }
-    if (masterCard) masterCard.style.borderTop = "3px solid #3b82f6";
-  }
-  // -------------------------------------------------------------
-
-  // 2. อัปเดตตัวเลขบน KPI Cards (ใช้ Animation เดิม)
+  // 3. อัปเดตตัวเลข (PCS)
   animNum('masterQty', tQ); 
-  if($id('masterLot')) $id('masterLot').textContent = d.length.toLocaleString();
-  
   animNum('qtySF', sf); 
-  if($id('lotSF')) $id('lotSF').textContent = sfL.toLocaleString(); 
-  if($id('pctSF')) $id('pctSF').textContent = pct(sf, tQ);
-  
   animNum('qtyVendor', ven); 
-  if($id('lotVendor')) $id('lotVendor').textContent = venL.toLocaleString(); 
-  if($id('pctVendor')) $id('pctVendor').textContent = pct(ven, tQ);
-  
   animNum('qtyCTC', ctc); 
-  if($id('lotCTC')) $id('lotCTC').textContent = ctcL.toLocaleString(); 
-  if($id('pctCTC')) $id('pctCTC').textContent = pct(ctc, tQ);
-  
   animNum('qtyCanUse', ok); 
+
+  // 4. อัปเดต Lot (ตัวเลขเล็กๆ ด้านล่าง)
+  if($id('masterLot')) $id('masterLot').textContent = currentYearData.length.toLocaleString();
+  if($id('lotSF')) $id('lotSF').textContent = sfL.toLocaleString(); 
+  if($id('lotVendor')) $id('lotVendor').textContent = venL.toLocaleString(); 
+  if($id('lotCTC')) $id('lotCTC').textContent = ctcL.toLocaleString(); 
   if($id('lotCanUse')) $id('lotCanUse').textContent = okL.toLocaleString(); 
+
+  // 5. อัปเดต % (มุมขวาบนของการ์ด)
+  if($id('pctSF')) $id('pctSF').textContent = pct(sf, tQ);
+  if($id('pctVendor')) $id('pctVendor').textContent = pct(ven, tQ);
+  if($id('pctCTC')) $id('pctCTC').textContent = pct(ctc, tQ);
   if($id('pctCanUse')) $id('pctCanUse').textContent = pct(ok, tQ);
 
-  // 3. อัปเดตข้อมูลส่วนเสริมอื่นๆ
-updateDatalists();
-  renderTable();
-  updateAIBrain(); // ✅ เรียกโดยตรง ไม่ต้อง override
+  // 6. อัปเดตชื่อ Label ให้รู้ว่าโชว์ของปีไหน
+  const masterLabel = document.querySelector('.kpi-total .kpi-label');
+  if (masterLabel) {
+      masterLabel.textContent = isSupervisor ? `SUMMARY (YTD ${latestYear})` : `MY TOTAL (YTD ${latestYear})`;
+  }
+
+  updateDatalists();
+  renderTable(); // ตารางยังโชว์ข้อมูลทั้งหมด เพื่อให้เลื่อนดูประวัติได้
+  updateAIBrain();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -9952,16 +9957,29 @@ function populateDashFilters() {
 }
 
 function resetDashFilters() {
-  // ล้างค่าในช่อง Input/Select ของ Dashboard ให้ว่าง
-  if($id('dashStart')) $id('dashStart').value = '';
-  if($id('dashEnd')) $id('dashEnd').value = '';
-  if($id('dashVendor')) $id('dashVendor').value = 'ALL';
-  
-  // ✅ เพิ่มบรรทัดนี้เพื่อลบการไฮไลท์ปุ่ม Quick Date
-  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active-qb'));
-  
-  refreshDash();
-  toast('🔄 Reset Filters');
+    // 1. ล้างค่าในช่อง Input วันที่ให้เป็นค่าว่าง (เพื่อให้ระบบโชว์ข้อมูลทั้งหมด ไม่กรองวันที่)
+    if (document.getElementById('dashStart')) {
+        document.getElementById('dashStart').value = '';
+    }
+    if (document.getElementById('dashEnd')) {
+        document.getElementById('dashEnd').value = '';
+    }
+    
+    // 2. เลือก Vendor กลับไปที่ "ทั้งหมด" (ALL)
+    if (document.getElementById('dashVendor')) {
+        document.getElementById('dashVendor').value = 'ALL';
+    }
+    
+    // 3. ปิดไฟปุ่มทั้งหมด (ลบ class active-qb ออกจากทุกปุ่มที่เป็น Quick Filter)
+    document.querySelectorAll('.quick-btn').forEach(btn => {
+        btn.classList.remove('active-qb');
+    });
+    
+    // 4. สั่งรีเฟรช Dashboard เพื่อคำนวณกราฟและ KPI ใหม่จากข้อมูลทั้งหมด
+    refreshDash();
+    
+    // 5. แจ้งเตือนผู้ใช้
+    toast('🔄 ล้างการกรองข้อมูลและปิดไฟปุ่มทั้งหมดแล้ว');
 }
 
 // --- Gauges ---
@@ -10105,16 +10123,35 @@ function renderTickerTape(data) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   8.GET CHART DATA (Safe & Consistent)
-   คำนวณข้อมูลรายเดือนและอัปเดตตัวแปร Global สำหรับ Tooltip
-═════════════════════════════════════════════════════════════════ */
+   GET CHART DATA (INTEGRATED VERSION)
+   คำนวณข้อมูลรายเดือน โดยแสดงผลเฉพาะปีล่าสุดเป็นค่าเริ่มต้น
+═══════════════════════════════════════════════════════════════ */
 function getChartData(rawRecords, startVal, endVal) {
-  const currentYear = new Date().getFullYear();
+  // 1. ตรวจสอบเบื้องต้นหากไม่มีข้อมูล
+  if (!rawRecords || rawRecords.length === 0) {
+    globalRichChartData = []; // ล้างค่า Global Variable
+    return { labels: [], data: [], isDaily: false };
+  }
+
+  // 2. กำหนดปีเป้าหมาย (Target Year)
+  // หากไม่มีการเลือกวันที่ (startVal/endVal ว่างเปล่า) ให้หา "ปีล่าสุด" จากข้อมูลที่มี
+  // หากมีการเลือกช่วงวันที่ ให้ปล่อยเป็น null เพื่อนำข้อมูลทั้งหมดตาม Filter มาแสดงผล
+  let targetYear = null;
+  if (!startVal && !endVal) {
+    const years = rawRecords.map(r => new Date(r.date).getFullYear());
+    targetYear = Math.max(...years);
+  } else {
+    // กรณีมีการเลือกดูช่วงวันที่ข้ามปี หรือ 7 วันล่าสุด ให้ใช้ปีปัจจุบันของเครื่องเป็นหัวข้อโครงสร้าง
+    targetYear = null; 
+  }
+
+  // ปีที่จะใช้เป็นโครงสร้างแสดงผล (ถ้า TargetYear มีค่าให้ใช้ปีนั้น ถ้าไม่มีให้ใช้ปีปัจจุบันของระบบ)
+  const displayYear = targetYear || new Date().getFullYear();
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
-  // ✅ เริ่มต้นสร้างโครงสร้างข้อมูล 12 เดือน (เคลียร์ค่าเก่า)
+  // 3. ✅ เริ่มต้นสร้างโครงสร้างข้อมูล 12 เดือน (ล้างค่าเก่าและระบุปี)
   const monthlyData = Array.from({length: 12}, (_, i) => ({
-    monthStr: `${currentYear}-${String(i+1).padStart(2,'0')}`,
+    monthStr: `${displayYear}-${String(i+1).padStart(2,'0')}`,
     label: months[i],
     type: 'monthly',
     totalQty: 0, 
@@ -10125,33 +10162,55 @@ function getChartData(rawRecords, startVal, endVal) {
     CAN_USE: { qty: 0, lot: 0 }
   }));
 
-  // วนลูปเก็บข้อมูลจาก rawRecords (ที่ Filter แล้ว)
-  if (rawRecords && Array.isArray(rawRecords)) {
-      rawRecords.forEach(r => {
-        if (!r.date) return;
-        const mIndex = new Date(r.date).getMonth();
-        // ตรวจสอบ Index ป้องกันหายนอก Array
-        if (mIndex >= 0 && mIndex < 12) {
-            const mBox = monthlyData[mIndex];
-            mBox.totalQty += (parseInt(r.qty) || 0); 
-            mBox.totalLot += 1;
-            
-            if (r.judgment === 'SF') { mBox.SF.qty += r.qty; mBox.SF.lot += 1; }
-            else if (r.judgment === 'VENDOR FAULT') { mBox.VENDOR.qty += r.qty; mBox.VENDOR.lot += 1; }
-            else if (r.judgment === 'CTC') { mBox.CTC.qty += r.qty; mBox.CTC.lot += 1; }
-            else if (r.judgment === 'CAN USE') { mBox.CAN_USE.qty += r.qty; mBox.CAN_USE.lot += 1; }
-        }
-      });
-  }
+  // 4. วนลูปเก็บข้อมูลจาก rawRecords
+  rawRecords.forEach(r => {
+    if (!r.date) return;
+    
+    const d = new Date(r.date);
+    const rYear = d.getFullYear();
+    const mIndex = d.getMonth();
 
-  // ✅ สำคัญ: อัปเดต Global Variable ทุกครั้ง
+    // 💡 หัวใจสำคัญ: หาก targetYear ถูกกำหนดไว้ (Default State) 
+    // จะข้ามข้อมูลที่ไม่ใช่ปีนั้นทิ้งไป เพื่อไม่ให้ยอดรวมปนกันหลายปี
+    if (targetYear !== null && rYear !== targetYear) return;
+
+    // ตรวจสอบ Index ป้องกันหายนอก Array และทำการรวมยอด
+    if (mIndex >= 0 && mIndex < 12) {
+        const mBox = monthlyData[mIndex];
+        const qtyValue = parseInt(r.qty) || 0;
+
+        mBox.totalQty += qtyValue; 
+        mBox.totalLot += 1;
+        
+        // แยกหมวดหมู่ตาม Judgment
+        if (r.judgment === 'SF') { 
+            mBox.SF.qty += qtyValue; 
+            mBox.SF.lot += 1; 
+        }
+        else if (r.judgment === 'VENDOR FAULT') { 
+            mBox.VENDOR.qty += qtyValue; 
+            mBox.VENDOR.lot += 1; 
+        }
+        else if (r.judgment === 'CTC') { 
+            mBox.CTC.qty += qtyValue; 
+            mBox.CTC.lot += 1; 
+        }
+        else if (r.judgment === 'CAN USE') { 
+            mBox.CAN_USE.qty += qtyValue; 
+            mBox.CAN_USE.lot += 1; 
+        }
+    }
+  });
+
+  // 5. ✅ สำคัญ: อัปเดต Global Variable ทุกครั้งเพื่อใช้แสดงผลใน Tooltip ของกราฟ
   globalRichChartData = monthlyData;
   
-  // คืนค่า Labels และ Data สำหรับกราฟ
+  // 6. คืนค่า Labels และ Data สำหรับไปวาดเส้นกราฟ (Line Chart)
   return { 
       labels: monthlyData.map(m => m.label), 
       data: monthlyData.map(m => m.totalQty), 
-      isDaily: false 
+      isDaily: false,
+      year: displayYear // ส่งค่าปีที่แสดงผลกลับไปด้วย (ถ้าต้องการนำไปอัปเดตหัวข้อกราฟ)
   };
 }
 
@@ -10257,85 +10316,105 @@ callbacks: {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   10.MASTER DASHBOARD REFRESH (Consolidated)
-   รวม Logic การคำนวณและอัปเดตหน้า Dashboard ทั้งหมด
-═════════════════════════════════════════════════════════════════ */
+   MASTER DASHBOARD REFRESH (ULTIMATE ACCURACY VERSION)
+   ควบคุมทุก Metrics (PCS, LOT, %, RANKING, CHART) ให้ตรงตาม Filter 100%
+═══════════════════════════════════════════════════════════════ */
 window.refreshDash = function() {
-    // 1. ตั้งค่า Filter และดึงข้อมูลพื้นฐาน
-    populateDashFilters(); // อัปเดตรายชื่อ Vendor ใน Dropdown
-    const allMyRecords = getMyRecords();
+    populateDashFilters(); // อัปเดต Dropdown รายชื่อ Vendor
+    const allMyRecords = getMyRecords(); // ดึงข้อมูลดิบทั้งหมดของผู้ใช้รายนี้
+    
+    // ตรวจสอบกรณีไม่มีข้อมูล
+    if (!allMyRecords || allMyRecords.length === 0) {
+        resetDashboardState();
+        return;
+    }
+
+    // อ่านค่าจากตัวกรองหน้า Dashboard
     const startVal = $id('dashStart') ? $id('dashStart').value : '';
     const endVal = $id('dashEnd') ? $id('dashEnd').value : '';
     const vendorFilter = $id('dashVendor') ? $id('dashVendor').value : 'ALL';
 
-    // 2. กรองข้อมูล (Filtering)
-    let displayData = allMyRecords.filter(r => {
-        let matchDate = true;
-        let matchVendor = true;
-        const rDate = r.date ? String(r.date).substring(0, 10) : ""; 
+    // 🌟 1. LOGIC: ค้นหาปีล่าสุดเพื่อใช้เป็นค่าเริ่มต้น (กรณีไม่ได้เลือกวันที่เอง)
+    let defaultYear = null;
+    if (!startVal && !endVal) {
+        const years = allMyRecords.map(r => new Date(r.date).getFullYear());
+        defaultYear = Math.max(...years);
+    }
 
-        // กรองตามวันที่
+    // 🌟 2. FILTER STAGE: สร้างข้อมูล "ก้อนกลาง" (displayData) ที่ทุกส่วนต้องใช้ร่วมกัน
+    const displayData = allMyRecords.filter(r => {
+        const d = new Date(r.date);
+        const rYear = d.getFullYear();
+        const rDateStr = r.date ? String(r.date).substring(0, 10) : ""; 
+
+        // ตรวจสอบเงื่อนไขวันที่
+        let matchDate = true;
         if (startVal || endVal) {
-            if (!rDate) matchDate = false; 
-            else {
-                if (startVal && rDate < startVal) matchDate = false;
-                if (endVal && rDate > endVal) matchDate = false;
-            }
+            // โหมด Filter: ตรวจตามช่วงวันที่เลือก
+            if (startVal && rDateStr < startVal) matchDate = false;
+            if (endVal && rDateStr > endVal) matchDate = false;
+        } else {
+            // โหมด Default: ตรวจตามปีล่าสุดเท่านั้น
+            if (rYear !== defaultYear) matchDate = false;
         }
-        // กรองตาม Vendor
-        if (vendorFilter && vendorFilter !== 'ALL') {
-            matchVendor = (r.supplier === vendorFilter);
+
+        // ตรวจสอบเงื่อนไข Vendor
+        let matchVendor = true;
+        if (vendorFilter !== 'ALL') {
+            if (r.supplier !== vendorFilter) matchVendor = false;
         }
+
         return matchDate && matchVendor;
     });
 
-    // 3. คำนวณ Aggregates (คำนวณครั้งเดียวเพื่อประสิทธิภาพ)
+    // 🌟 3. CALCULATION STAGE: คำนวณตัวเลข PCS และ LOT จากข้อมูลที่กรองแล้วเท่านั้น
     let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
-    let lotSf = 0, lotVen = 0, lotCtc = 0, lotOk = 0;
+    let sfL = 0, venL = 0, ctcL = 0, okL = 0;
 
     displayData.forEach(r => {
         const qty = parseInt(r.qty) || 0;
         tQ += qty;
-        
-        if (r.judgment === 'SF') { sf += qty; lotSf++; }
-        else if (r.judgment === 'VENDOR FAULT') { ven += qty; lotVen++; }
-        else if (r.judgment === 'CTC') { ctc += qty; lotCtc++; }
-        else if (r.judgment === 'CAN USE') { ok += qty; lotOk++; }
+        if (r.judgment === 'SF') { sf += qty; sfL++; }
+        else if (r.judgment === 'VENDOR FAULT') { ven += qty; venL++; }
+        else if (r.judgment === 'CTC') { ctc += qty; ctcL++; }
+        else if (r.judgment === 'CAN USE') { ok += qty; okL++; }
     });
 
-    // 4. อัปเดตตัวเลข KPI (DOM Elements)
-    const passPct = tQ > 0 ? Math.round(((ok) / tQ) * 100) : 0;
-    const calcPct = (val) => tQ > 0 ? Math.round((val/tQ)*100) + '%' : '0%';
+    // คำนวณเปอร์เซ็นต์
+    const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
+    const calcPct = (val) => tQ > 0 ? Math.round((val / tQ) * 100) + '%' : '0%';
 
-    // Hero KPI
+    // 🌟 4. UI UPDATE: อัปเดตตัวเลขการ์ดสถิติ (KPIs)
+    // ส่วน Hero (รวมทั้งหมด)
     animNum('heroTotalQty', tQ);
     if($id('heroLot')) $id('heroLot').textContent = displayData.length.toLocaleString();
     if($id('heroPct')) $id('heroPct').textContent = passPct + '%';
 
-    // Stats Row (4 cards)
+    // ส่วน Category (SF, CTC, CAN USE, VENDOR)
     animNum('dashStatSF', sf); 
-    if($id('dashLotSF')) $id('dashLotSF').textContent = lotSf;
+    if($id('dashLotSF')) $id('dashLotSF').textContent = sfL.toLocaleString();
     if($id('dashPctSF')) $id('dashPctSF').textContent = calcPct(sf);
 
     animNum('dashStatCTC', ctc); 
-    if($id('dashLotCTC')) $id('dashLotCTC').textContent = lotCtc;
+    if($id('dashLotCTC')) $id('dashLotCTC').textContent = ctcL.toLocaleString();
     if($id('dashPctCTC')) $id('dashPctCTC').textContent = calcPct(ctc);
 
     animNum('dashStatCanUse', ok); 
-    if($id('dashLotCanUse')) $id('dashLotCanUse').textContent = lotOk;
+    if($id('dashLotCanUse')) $id('dashLotCanUse').textContent = okL.toLocaleString();
     if($id('dashPctCanUse')) $id('dashPctCanUse').textContent = calcPct(ok);
 
     animNum('dashStatVendor', ven); 
-    if($id('dashLotVendor')) $id('dashLotVendor').textContent = lotVen;
+    if($id('dashLotVendor')) $id('dashLotVendor').textContent = venL.toLocaleString();
     if($id('dashPctVendor')) $id('dashPctVendor').textContent = calcPct(ven);
 
-    // 5. อัปเดต Gauges (หน้าปัด)
+    // 🌟 5. VISUALS: อัปเดตหน้าปัด (Gauges)
     updateMainGauge(passPct);
     updateMiniGauge('sf', sf, tQ);
     updateMiniGauge('vendor', ven, tQ);
     updateMiniGauge('ctc', ctc, tQ);
 
-    // 6. อัปเดต Lists & Feed (รายการ)
+    // 🌟 6. RANKINGS & LISTS: ส่ง displayData ที่กรองแล้วไปจัดอันดับ Top 5
+    // ทุกรายการในหน้านี้จะตรงกับปี/ช่วงวันที่เลือกทันที
     renderList('supplierList', displayData, 'supplier');
     renderList('dashDefectList', displayData, 'defect');
     renderList('partList', displayData, 'partNo');
@@ -10343,34 +10422,22 @@ window.refreshDash = function() {
     renderTopLines(displayData);   
     renderTickerTape(displayData); 
 
-    // 7. อัปเดต Charts (กราฟ)
-    // ดึงข้อมูลกราฟ (กรุ๊ปตามเดือน)
+    // 🌟 7. TREND CHART: อัปเดตกราฟเส้น
+    // ส่ง displayData เข้าไปเพื่อให้ฟังก์ชัน getChartData วาดเฉพาะข้อมูลที่กรองมาแล้ว
     const chartDataObj = getChartData(displayData, startVal, endVal);
     
-    if (!mainTrendChartInstance) {
-        initMainChart(); // สร้างกราฟครั้งแรกถ้ายังไม่มี
-    }
-
+    if (!mainTrendChartInstance) { initMainChart(); }
     if (mainTrendChartInstance) {
-        // ตั้งค่าตัวเลือกแกน X
-        mainTrendChartInstance.options.scales.x.ticks.maxTicksLimit = chartDataObj.isDaily ? 12 : 12;
-        mainTrendChartInstance.options.scales.x.ticks.autoSkip = true;
-        
-        // ส่งข้อมูลเข้ากราฟ
         mainTrendChartInstance.data.labels = chartDataObj.labels;
         mainTrendChartInstance.data.datasets[0].data = chartDataObj.data;
-        
-        // อัปเดตกราฟ
         mainTrendChartInstance.update('none'); 
-        
-        // บังคับให้กราฟปรับขนาดใหม่ (Fix ปัญหากราฟแบน)
         mainTrendChartInstance.resize();
     }
     
-    // 8. อัปเดตสถิติข้างกราฟ (High/Low/Avg)
+    // อัปเดต High/Low/Avg ข้างกราฟ
     updateChartStats(chartDataObj.data); 
 
-    console.log(`[Dashboard] Refreshed: ${displayData.length} records found.`);
+    console.log(`[Dashboard] Sync Complete: ${displayData.length} Lots | Year Locked: ${defaultYear || 'Manual Range'}`);
 };
 
 //เก็บข้อมูลตัวเลือกไว้ในตัวแปร Global
@@ -11469,44 +11536,59 @@ function closeChangePassModal() {
     });
 }
 /* ═══════════════════════════════════════════════
-   15.QUICK DATE FILTER LOGIC
+   FIXED: QUICK DATE FILTER (LATEST YEAR/MONTH ONLY)
+   ปุ่มลัดจะ snap กลับมาที่ปีและเดือนปัจจุบันเสมอ
 ════════════════════════════════════════════════ */
-/* ✅ ฟังก์ชันแก้ไขสมบูรณ์ */
 function applyQuickDateFilter(type, btnElement) {
-  const now = new Date();
-  let startDate = new Date();
-  let endDate   = new Date();
+    // กำหนดเวลา "ปัจจุบัน" (Latest) ณ วินาทีที่กดปุ่ม
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth(); // 0-11
+    const day = now.getDate();
 
-  if (type === 'today') {
-    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    endDate   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  } else if (type === '7days') {
-    startDate = new Date(now);
-    startDate.setDate(now.getDate() - 6);
-    endDate = new Date(now);
-  } else if (type === 'month') {
-    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    endDate   = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  }
+    let startDate, endDate;
 
-  const toDateString = (date) => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  };
+    if (type === 'today') {
+        // วันนี้ ของปีและเดือนล่าสุด
+        startDate = new Date(year, month, day);
+        endDate = new Date(year, month, day);
+    } 
+    else if (type === '7days') {
+        // ถอยหลังจากวันนี้ไป 6 วัน (รวมวันนี้เป็น 7 วันพอดี) 
+        // โดยอิงจากวันปัจจุบันของปีล่าสุดเสมอ
+        endDate = new Date(year, month, day);
+        startDate = new Date(year, month, day - 6);
+    } 
+    else if (type === 'month') {
+        // ตั้งแต่ต้นเดือน ถึง วันสุดท้ายของเดือนล่าสุด (ปัจจุบัน)
+        startDate = new Date(year, month, 1);
+        endDate = new Date(year, month + 1, 0); // วันที่ 0 ของเดือนถัดไป คือวันสุดท้ายของเดือนนี้
+    }
 
-  const startStr = toDateString(startDate);
-  const endStr   = toDateString(endDate);
+    // Helper function สำหรับแปลงเป็น YYYY-MM-DD เพื่อใส่ใน input
+    const formatDate = (d) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    };
 
-  if ($id('dashStart')) $id('dashStart').value = startStr;
-  if ($id('dashEnd'))   $id('dashEnd').value   = endStr;
+    const startStr = formatDate(startDate);
+    const endStr = formatDate(endDate);
 
-  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active-qb'));
-  if (btnElement) btnElement.classList.add('active-qb');
+    // อัปเดตค่าลงในช่อง Input ของ Dashboard
+    if (document.getElementById('dashStart')) document.getElementById('dashStart').value = startStr;
+    if (document.getElementById('dashEnd')) document.getElementById('dashEnd').value = endStr;
 
-  refreshDash();
-  toast(`📅 กรองข้อมูล: ${startStr} ถึง ${endStr}`); // ✅ แก้แล้ว
+    // จัดการด้าน UI: ลบไฮไลท์ปุ่มอื่น และไฮไลท์ปุ่มที่กด
+    document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active-qb'));
+    if (btnElement) btnElement.classList.add('active-qb');
+
+    // สั่งรีเฟรชข้อมูลใน Dashboard ทันที
+    refreshDash();
+    
+    // แจ้งเตือนสถานะ
+    toast(`📅 แสดงข้อมูลล่าสุด: ${startStr} ถึง ${endStr}`);
 }
 /* ══════════════════════════════════════════════════════════════
    16.FEATURE: IMMUTABLE AUDIT LOG (NEW FUNCTIONS)
