@@ -3271,13 +3271,16 @@ canvas {
 .market-change.up { color: #10b981; }
 .market-change.down { color: #ef4444; }
 
-/* ═══ COCKPIT BOTTOM ROW ═══ */
+/* 1. ให้แถวล่างขยายกินพื้นที่ที่เหลือทั้งหมด */
 .cockpit-bottom-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-top: 0.5rem;
-  flex-shrink: 0;
+    flex: 1; 
+    min-height: 0; /* สำคัญเพื่อให้ scroll ทำงาน */
+}
+
+/* 2. ให้พาเนล Feed สูงเต็ม 100% ของพื้นที่แถว */
+.incident-feed-panel {
+    height: 100% !important; 
+    max-height: none !important;
 }
 
 /* ═══ INCIDENT FEED PANEL ═══ */
@@ -7025,6 +7028,492 @@ html.dark-mode #judgmentSelect {
     border-color: #60a5fa !important;
     box-shadow: 0 0 12px rgba(37, 99, 235, 0.4) !important;
 }
+/* ปรับแถวล่างสุดให้แบ่งเป็น 3 คอลัมน์ */
+.cockpit-bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr; /* ให้ Scorecard กว้างกว่านิดหน่อยเพื่อโชว์รายละเอียด */
+    gap: 1rem;
+    margin-top: 0.5rem;
+    height: 500px; /* กำหนดความสูงคงที่เพื่อให้ทั้ง 3 อันเท่ากัน */
+}
+
+/* ตกแต่ง Scorecard Panel ให้มีเส้นขอบด้านบนสีชมพูเหมือน Top Lines */
+.scorecard-panel {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9)) !important;
+    border: 1px solid rgba(59, 130, 246, 0.12) !important;
+    position: relative;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* เพิ่มเส้นแสง Gradient ด้านบน (สีชมพู-ม่วง เหมือนรูป Top Lines) */
+.scorecard-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ec4899, #8b5cf6, #6366f1);
+    z-index: 1;
+}
+
+.scorecard-legend {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.55rem;
+    color: #64748b;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 10px 5px;
+    background: rgba(0,0,0,0.1);
+}
+
+/* สำหรับหน้าจอ Tablet/Mobile ให้ปรับกลับเป็นคอลัมน์เดียว */
+@media (max-width: 1200px) {
+    .cockpit-bottom-row {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+}
+/* แอนิเมชันชีพจรสำหรับเกรด D */
+@keyframes danger-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.scorecard-item {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scorecard-item:hover {
+    background: rgba(30, 41, 59, 0.6);
+    transform: translateX(5px) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.grade-orb {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* แถบความร้อนใต้ชื่อ */
+.heat-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.heat-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease-out;
+}
+/* ค้นหาหรือเพิ่ม CSS ส่วนนี้เข้าไป */
+.cockpit-bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr !important; /* บังคับแบ่ง 3 ส่วนเท่ากัน */
+    gap: 1rem;
+    height: 500px; /* หรือความสูงที่คุณต้องการ */
+    align-items: stretch; /* บังคับให้ทุกกล่องยืดความสูงเท่ากัน */
+}
+
+/* บังคับให้ Panel ภายในทุกอันสูงเต็มพื้นที่ */
+.market-panel, .incident-feed-panel, .top-line-panel {
+    height: 100% !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ส่วนของเนื้อหาข้างในให้มี Scrollbar แยกกันเมื่อข้อมูลยาวเกิน */
+.market-list, .incident-list, .top-line-list {
+    flex: 1;
+    overflow-y: auto; 
+    padding-right: 5px;
+}
+/* เอฟเฟกต์แสงวิ่งบน Bar (Shimmer Effect) */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.neon-bar {
+  position: relative;
+}
+
+.neon-bar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+.futuristic-line-item {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.futuristic-line-item:hover {
+  background: rgba(255,255,255,0.08) !important;
+  transform: translateX(5px);
+  border-color: rgba(255,255,255,0.2) !important;
+}
+/* ชีพจรสำหรับจุด Live และป้ายวิกฤต */
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); transform: scale(1); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); transform: scale(1); }
+}
+
+@keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* นำไปใช้งานกับ Class */
+.live-indicator { animation: pulse-green 2s infinite; }
+.status-critical { animation: pulse-red 2s infinite; }
+
+/* สไตล์พื้นฐานสำหรับ Glassmorphism Tooltip (จะเรียกใช้ผ่าน JS) */
+.glass-tooltip {
+    background: rgba(15, 23, 42, 0.8) !important;
+    backdrop-filter: blur(12px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    border-radius: 12px !important;
+}
+/* 1. อนิเมชันเด้งขึ้น + กระพริบสว่างช้าๆ (Ultra-Premium Warning) */
+@keyframes paretoWarningBounce {
+    0%, 100% { 
+        transform: translateY(0) scale(1);
+        background: rgba(239, 68, 68, 0.1); 
+        border-color: rgba(239, 68, 68, 0.3);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    50% { 
+        transform: translateY(-12px) scale(1.02); /* เด้งขึ้นสูงและขยายตัวเล็กน้อย */
+        background: rgba(239, 68, 68, 0.35); /* กระพริบแดงสว่างขึ้น */
+        border-color: #ef4444; 
+        box-shadow: 0 20px 40px rgba(239, 68, 68, 0.45); /* เรืองแสงแดงใต้กล่อง */
+    }
+}
+
+/* 2. อัปเดตคลาสให้ใช้งานอนิเมชันใหม่ */
+.pareto-critical-item {
+    animation: paretoWarningBounce 3.5s infinite ease-in-out; /* 3.5 วินาทีต่อรอบ คือจังหวะที่ช้าและดูสุขุม */
+    border-left: 6px solid #ef4444 !important; /* เน้นขอบข้างให้หนาขึ้น */
+    position: relative;
+    z-index: 100; /* ให้ลอยทับตัวอื่นเวลาเด้งขึ้น */
+    transition: all 0.3s ease;
+    border-radius: 12px !important;
+}
+
+/* แถม: ทำให้ไอคอนไซเรนหมุนเล็กน้อยเวลาเด้ง */
+.pareto-critical-item .market-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.stat-delta {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 800;
+    margin-top: -4px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-left: 2px;
+}
+
+/* สีปกติ (ยังไม่มีการคำนวณ) */
+.stat-delta { color: #64748b; }
+
+/* เมื่อยอดแย่ลง (สำหรับงานเสียคือเลขขึ้น) */
+.stat-delta.up { color: #ef4444; } 
+
+/* เมื่อยอดดีขึ้น (สำหรับงานเสียคือเลขลง) */
+.stat-delta.down { color: #10b981; }
+
+/* สำหรับเคสที่เป็นค่ากลาง */
+.stat-delta.neutral { color: #94a3b8; }
+/* แก้ไขแอนิเมชั่นที่หายไป */
+@keyframes rowDeletePulse {
+  0% { opacity: 0.5; transform: translateX(0); }
+  50% { opacity: 0.2; transform: translateX(-10px); background: rgba(239, 68, 68, 0.2); }
+  100% { opacity: 0; transform: translateX(50px); }
+}
+
+@keyframes btnSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); box-shadow: 0 0 20px #10b981; }
+  100% { transform: scale(1); }
+}
+
+/* เพิ่มให้ Virtual Scroll สมูทขึ้น */
+tbody tr {
+  contain: strict;
+  height: 70px;
+  max-height: 70px;
+  overflow: hidden;
+}
+/* การประยุกต์ใช้ Filter กับหน้าปัดหลัก */
+#mainGaugeArc {
+    filter: url(#neonGlow);
+    stroke-linecap: round;
+    transition: stroke-dasharray 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* เอฟเฟกต์ "เข็มเรืองแสง" */
+.gauge-needle-shape {
+    filter: drop-shadow(0 0 5px #fff) url(#neonGlow);
+}
+
+/* สร้าง Animation การเต้นของแสง (Breathing Effect) */
+@keyframes neonBreathing {
+    0%, 100% { filter: url(#neonGlow) brightness(1); opacity: 0.8; }
+    50% { filter: url(#pulseGlow) brightness(1.4); opacity: 1; }
+}
+
+/* ใช้เฉพาะตอนสถานะวิกฤต (Critical) */
+.status-critical #mainGaugeArc {
+    animation: neonBreathing 1.5s infinite ease-in-out;
+    stroke: #ef4444;
+}
+
+/* เอฟเฟกต์แสงวิ่งที่ Top Line Bars */
+.neon-bar {
+    position: relative;
+    filter: drop-shadow(0 0 8px currentColor);
+}
+
+.neon-bar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: scanline 2s linear infinite;
+}
+
+@keyframes scanline {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+/* 1. ปรับอนิเมชันให้เน้นที่ "สีขอบ" และ "การเรืองแสง" แทนสีพื้นหลัง */
+@keyframes borderWarningGlow {
+    0%, 100% { 
+        transform: translateY(0);
+        border-color: rgba(239, 68, 68, 0.3); /* ขอบแดงจางๆ */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* เงาปกติ */
+    }
+    50% { 
+        transform: translateY(-10px); /* เด้งขึ้น */
+        border-color: #ef4444; /* ขอบแดงสว่าง */
+        /* สร้างรัศมีแสงสีแดงแผ่ออกมาจากขอบ */
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), inset 0 0 10px rgba(239, 68, 68, 0.2); 
+    }
+}
+
+/* 2. ตั้งค่าคลาสให้พื้นหลังใสหรือสีเดียวกับรายการอื่น */
+.pareto-critical-item {
+    animation: borderWarningGlow 3s infinite ease-in-out;
+    background: rgba(15, 23, 42, 0.6) !important; /* ใช้สีพื้นหลังเข้มปกติเหมือนรายการอื่น */
+    border: 2px solid rgba(239, 68, 68, 0.3) !important; /* ขอบรอบด้าน */
+    border-left: 8px solid #ef4444 !important; /* เน้นขอบซ้ายให้หนาเป็นพิเศษ */
+    position: relative;
+    z-index: 100;
+    border-radius: 12px !important;
+    transition: all 0.3s ease;
+}
+/* แอนิเมชันเตือนสิ่งผิดปกติ (Anomaly) */
+@keyframes anomaly-pulse-red {
+    0% { color: #f8fafc; text-shadow: 0 0 5px rgba(239, 68, 68, 0); }
+    50% { 
+        color: #ef4444; 
+        text-shadow: 0 0 20px #ef4444, 0 0 40px rgba(239, 68, 68, 0.5); 
+        transform: scale(1.1); 
+    }
+    100% { color: #f8fafc; text-shadow: 0 0 5px rgba(239, 68, 68, 0); }
+}
+
+.anomaly-alert {
+    animation: anomaly-pulse-red 0.8s infinite ease-in-out;
+    font-weight: 900 !important;
+    position: relative;
+}
+
+/* เพิ่ม Icon แจ้งเตือนเล็กๆ ข้างตัวเลข */
+.anomaly-alert::after {
+    content: "⚠️ HIGH SPIKE";
+    position: absolute;
+    top: -15px;
+    right: 0;
+    font-size: 0.5rem;
+    background: #ef4444;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    animation: none;
+}
+/* ═══════════════════════════════════════════════════
+   ULTRA-COMPACT FUTURISTIC RANKING SYSTEM
+═══════════════════════════════════════════════════ */
+
+/* 1. กำหนดธีมสีแยกตามหมวดหมู่ (อ้างอิงจาก data-theme) */
+.market-panel[data-theme="supplier"] { --accent: #10b981; --accent-rgb: 16, 185, 129; }
+.market-panel[data-theme="defect"]   { --accent: #f59e0b; --accent-rgb: 245, 158, 11; }
+.market-panel[data-theme="part"]     { --accent: #8b5cf6; --accent-rgb: 139, 92, 246; }
+
+/* 2. สไตล์ของแต่ละแถว (Item) */
+.futuristic-item {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+    opacity: 0; /* เริ่มต้นซ่อนไว้เพื่อทำ Stagger Animation */
+    transform: translateY(10px);
+}
+
+.futuristic-item:hover {
+    background: rgba(var(--accent-rgb), 0.1);
+    border-color: var(--accent);
+    transform: translateX(5px) scale(1.01);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* 3. ข้าวหลามตัดขนาดจิ๋ว (Micro Diamond) */
+.rank-diamond-mini {
+    width: 18px;
+    height: 18px;
+    background: var(--accent);
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-weight: 900;
+    font-size: 0.65rem;
+    transform: rotate(45deg);
+    flex-shrink: 0;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.4);
+}
+
+/* ปรับตัวเลขข้างในข้าวหลามตัดให้ตั้งตรง */
+.rank-diamond-mini span {
+    transform: rotate(-45deg);
+    display: block;
+}
+
+/* 4. ส่วนข้อมูลชื่อและ Bar */
+.item-info {
+    flex: 1;
+    min-width: 0; /* ป้องกันการเบียดตัวเลข */
+}
+
+.item-name {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* ตัดคำยาวเป็น ... */
+    margin-bottom: 2px;
+}
+
+/* แถบพลัง (Energy Bar) */
+.energy-track {
+    height: 3px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    overflow: hidden;
+    width: 90%;
+}
+
+.energy-fill {
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--accent));
+    border-radius: 10px;
+    width: 0; /* JS จะขยายให้ */
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+}
+
+/* แสงวิ่ง (Scanline Effect) */
+.energy-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: energy-scan 2s infinite;
+}
+
+@keyframes energy-scan {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* 5. ชุดตัวเลขสถิติด้านขวา */
+.item-stats {
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    flex-shrink: 0;
+    min-width: 65px;
+}
+
+.val-main {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+}
+
+.val-pct {
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: var(--accent);
+    opacity: 0.8;
+}
+
+/* Responsive สำหรับจอเล็กพิเศษ */
+@media (max-width: 450px) {
+    .item-stats { min-width: 50px; }
+    .val-main { font-size: 0.75rem; }
+    .item-name { font-size: 0.62rem; }
+}
 </style>
 </head>
 <body>
@@ -7698,6 +8187,22 @@ html.dark-mode #judgmentSelect {
   <span class="trend-value">Good</span>
 </div>
 </div>
+<!-- PARETO AUDIT FOCUS CARD -->
+<div class="market-panel" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(239, 68, 68, 0.3);">
+  <div class="market-header">
+    <div class="market-title" style="color: #f87171;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      AUDIT STRATEGY (PARETO 80/20)
+    </div>
+    <div id="paretoStatus" class="market-badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444;">ANALYZING...</div>
+  </div>
+  <div class="market-list" id="paretoFocusList">
+    <!-- รายชื่อพาร์ทเนอร์ที่ต้องรีบเข้าไป Audit จะถูกใส่ที่นี่ -->
+  </div>
+  <div id="paretoSummary" style="font-size: 0.6rem; color: #94a3b8; margin-top: 10px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+    * คำนวณจากสัดส่วน Vendor Fault เท่านั้น
+  </div>
+</div>
        <!-- MINI GAUGES ROW (SPORT STYLE) -->
 <div class="gauge-row">
   
@@ -7844,7 +8349,7 @@ html.dark-mode #judgmentSelect {
     ═══════════════════════════════════════════════════════ -->
     <div class="cockpit-center">
       
-            <!-- ★ STATS ROW: SF, CTC, CAN USE, VENDOR ★ -->
+       <!-- ★ STATS ROW: SF, CTC, CAN USE, VENDOR ★ -->
       <div class="stats-row">
         
         <!-- 1. SF FAULT (ส้ม) -->
@@ -7854,6 +8359,8 @@ html.dark-mode #judgmentSelect {
             <span class="stat-icon">🔶</span>
           </div>
           <div class="stat-number" id="dashStatSF">0</div>
+          <!-- ส่วน Delta Comparison -->
+          <div class="stat-delta" id="deltaSF">--</div> 
           <div class="stat-footer">
             <span class="stat-sub"><span id="dashLotSF">0</span> Lots</span>
             <span class="stat-pct" id="dashPctSF">0%</span>
@@ -7867,6 +8374,8 @@ html.dark-mode #judgmentSelect {
             <span class="stat-icon">🔴</span>
           </div>
           <div class="stat-number" id="dashStatCTC">0</div>
+          <!-- ส่วน Delta Comparison -->
+          <div class="stat-delta" id="deltaCTC">--</div> 
           <div class="stat-footer">
             <span class="stat-sub"><span id="dashLotCTC">0</span> Lots</span>
             <span class="stat-pct" id="dashPctCTC">0%</span>
@@ -7880,6 +8389,8 @@ html.dark-mode #judgmentSelect {
             <span class="stat-icon">🟢</span>
           </div>
           <div class="stat-number" id="dashStatCanUse">0</div>
+          <!-- ส่วน Delta Comparison -->
+          <div class="stat-delta" id="deltaCanUse">--</div> 
           <div class="stat-footer">
             <span class="stat-sub"><span id="dashLotCanUse">0</span> Lots</span>
             <span class="stat-pct" id="dashPctCanUse">0%</span>
@@ -7893,6 +8404,8 @@ html.dark-mode #judgmentSelect {
             <span class="stat-icon">🔵</span>
           </div>
           <div class="stat-number" id="dashStatVendor">0</div>
+          <!-- ส่วน Delta Comparison -->
+          <div class="stat-delta" id="deltaVendor">--</div> 
           <div class="stat-footer">
             <span class="stat-sub"><span id="dashLotVendor">0</span> Lots</span>
             <span class="stat-pct" id="dashPctVendor">0%</span>
@@ -7919,50 +8432,87 @@ html.dark-mode #judgmentSelect {
         </div>
       </div>
       
-      <!-- BOTTOM ROW -->
-      <div class="cockpit-bottom-row">
-        
-        <!-- LIVE INCIDENT FEED -->
-        <div class="incident-feed-panel">
-          <div class="feed-header">
-            <div class="feed-title">
-              <span class="live-indicator"></span>
-              LIVE INCIDENT FEED
-            </div>
-          </div>
-          <div class="incident-list" id="incidentList">
-            <!-- Injected by JS -->
-          </div>
-        </div>
-        
-        <!-- TOP LINE PANEL -->
-        <div class="top-line-panel">
-          <div class="top-line-header">
-            <div class="top-line-title">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2">
-                <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-              </svg>
-              TOP LINES
-            </div>
-            <div class="top-line-badge">
-              <span class="pulse-dot"></span>
-              TRENDING
-            </div>
-          </div>
-          <div class="top-line-list" id="topLineList">
-            <!-- Injected by JS -->
-          </div>
-        </div>
-        
+     <!-- ═══════════════════════════════════════════════════════
+     BOTTOM ROW — AUTO-EXPAND LAYOUT (GRADE | FEED | TOP LINES)
+═══════════════════════════════════════════════════════ -->
+<!-- ค้นหาบรรทัดนี้ในไฟล์ของคุณ -->
+<div class="cockpit-bottom-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.5rem; flex: 1; min-height: 0;">
+  
+  <!-- [1] SUPPLIER QUALITY SCORECARD -->
+  <div class="market-panel scorecard-panel" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.92)); border: 1px solid rgba(139, 92, 246, 0.18); border-radius: 18px; padding: 1.1rem; display: flex; flex-direction: column; position: relative; overflow: hidden; height: 100%;">
+    <!-- เส้นแสง Gradient ด้านบน -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #ec4899, #8b5cf6, #6366f1); z-index: 1;"></div>
+    
+    <div class="market-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; padding-bottom: 0.7rem; border-bottom: 1px solid rgba(139, 92, 246, 0.15); flex-shrink: 0;">
+      <div class="market-title" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-head); font-size: 0.72rem; font-weight: 800; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.08em;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+        SUPPLIER GRADE
       </div>
+      <div class="market-badge" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.25); font-size: 0.55rem; font-weight: 700; padding: 3px 8px; border-radius: 99px; letter-spacing: 0.05em;">MONTHLY</div>
+    </div>
+    
+    <!-- ส่วนรายการ (ขยายเต็มพื้นที่ตรงกลาง) -->
+    <div class="market-list scroll" id="supplierScorecardList" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding-right: 4px;">
+      <!-- Injected by JS -->
+    </div>
+
+    <div style="margin-top: auto; display: flex; justify-content: space-between; font-size: 0.65rem; color: #64748b; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; font-family: var(--font-mono); flex-shrink: 0;">
+      <span style="color: #10b981;">A:<0.5%</span>
+      <span style="color: #3b82f6;">B:<2%</span>
+      <span style="color: #f59e0b;">C:<5%</span>
+      <span style="color: #ef4444;">D:>5%</span>
+    </div>
+  </div>
+
+  <!-- [2] LIVE INCIDENT FEED -->
+  <div class="incident-feed-panel" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.92)); border: 1px solid rgba(139, 92, 246, 0.18); border-radius: 18px; padding: 1.1rem; display: flex; flex-direction: column; position: relative; overflow: hidden; height: 100%;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #ec4899, #8b5cf6, #60a5fa); border-radius: 18px 18px 0 0;"></div>
+
+    <div class="feed-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; padding-bottom: 0.7rem; border-bottom: 1px solid rgba(139, 92, 246, 0.15); flex-shrink: 0;">
+      <div class="feed-title" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-head); font-size: 0.72rem; font-weight: 800; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.08em;">
+        <span class="live-indicator"></span>
+        LIVE INCIDENT FEED
+      </div>
+      <div style="font-size: 0.5rem; font-weight: 800; padding: 3px 8px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25); letter-spacing: 0.05em;">REAL-TIME</div>
+    </div>
+
+    <div class="incident-list scroll" id="incidentList" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; padding-right: 4px;">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+  
+  <!-- [3] TOP LINE PANEL -->
+  <div class="top-line-panel" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.92)); border: 1px solid rgba(139, 92, 246, 0.18); border-radius: 19px; padding: 1.1rem; display: flex; flex-direction: column; position: relative; overflow: hidden; height: 100%;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #60a5fa, #8b5cf6, #ec4899); border-radius: 18px 18px 0 0;"></div>
+
+    <div class="top-line-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; padding-bottom: 0.7rem; border-bottom: 1px solid rgba(139, 92, 246, 0.15); flex-shrink: 0;">
+      <div class="top-line-title" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-head); font-size: 0.72rem; font-weight: 800; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.08em;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2.5">
+          <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+        </svg>
+        TOP LINES
+      </div>
+      <div class="top-line-badge" style="display: flex; align-items: center; gap: 4px; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: rgba(236, 72, 153, 0.15); border: 1px solid rgba(236, 72, 153, 0.25); color: #f472b6; letter-spacing: 0.05em;">
+        <span class="pulse-dot"></span>TRENDING
+      </div>
+    </div>
+
+    <div class="top-line-list scroll" id="topLineList" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding-right: 4px;">
+      <!-- Injected by JS -->
+    </div>
+  </div>
 
 </div>
-    
+
+</div>
+
     <!-- RIGHT PANEL — MARKET LEADERS -->
     <div class="cockpit-right">
       
       <!-- TOP SUPPLIERS -->
-      <div class="market-panel">
+      <div class="market-panel" data-theme="supplier">
         <div class="market-header">
           <div class="market-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>
@@ -7970,13 +8520,14 @@ html.dark-mode #judgmentSelect {
           </div>
           <div class="market-badge green">MARKET LEADERS</div>
         </div>
+        
         <div class="market-list" id="supplierList">
           <!-- Injected by JS -->
         </div>
       </div>
       
       <!-- TOP DEFECTS -->
-      <div class="market-panel">
+      <div class="market-panel" data-theme="defect">
         <div class="market-header">
           <div class="market-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -7990,7 +8541,7 @@ html.dark-mode #judgmentSelect {
       </div>
       
       <!-- TOP PARTS -->
-      <div class="market-panel compact">
+      <div class="market-panel" data-theme="part">
         <div class="market-header">
           <div class="market-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
@@ -8125,11 +8676,9 @@ html.dark-mode #judgmentSelect {
 ═══════════════════════════════════════════════════ -->
 <div id="userGuideModal" class="guide-overlay" style="display:none;">
     <div class="guide-card shadow-2xl">
-        <!-- Close Button -->
         <button onclick="closeUserGuide()" class="guide-close">&times;</button>
-        
         <div class="guide-layout">
-            <!-- Sidebar Navigation -->
+            <!-- Sidebar -->
             <div class="guide-nav">
                 <div class="nav-header">
                     <div class="brand-dot"></div>
@@ -8145,19 +8694,44 @@ html.dark-mode #judgmentSelect {
                 </div>
                 <div class="nav-footer">SQE SUPPORT V4.5</div>
             </div>
-
-            <!-- Content Area -->
+            <!-- Content -->
             <div id="guideContent" class="guide-main">
-                <!-- เนื้อหาจะเปลี่ยนไปตามปุ่มที่กด โดยใช้ JavaScript -->
+                <!-- เนื้อหาจะเปลี่ยนไปตามปุ่มที่กด -->
             </div>
         </div>
     </div>
 </div>
+<!-- SVG Filter Definitions (ซ่อนไว้ไม่ต้องแสดงผล) -->
+<svg style="position: absolute; width: 0; height: 0;" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- Filter สำหรับแสงเรืองระดับ Ultra -->
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- 1. ทำให้เส้นเบลอออกรอบข้าง -->
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <!-- 2. เพิ่มความเข้มของแสงเบลอ -->
+      <feComponentTransfer in="blur" result="intenseBlur">
+        <feFuncA type="linear" slope="2" />
+      </feComponentTransfer>
+      <!-- 3. วางภาพจริงทับลงบนแสงเบลอ -->
+      <feMerge>
+        <feMergeNode in="intenseBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Filter สำหรับเอฟเฟกต์ "เส้นเลือดใหญ่" (Pulse) -->
+    <filter id="pulseGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+</svg>
 <style>
 @keyframes modalPop {
   from { opacity:0; transform:scale(0.9); }
   to { opacity:1; transform:scale(1); }
 }
+
 </style>
 <script>
 
@@ -8237,19 +8811,23 @@ function hideInitOverlay() {
 function animNum(id, target) {
   const el = $id(id);
   if (!el) return;
-  const cur = parseInt(el.textContent.replace(/,/g, '')) || 0;
-  if (cur === target) { el.textContent = target.toLocaleString(); return; }
-  el.classList.add('num-pop');
-  setTimeout(() => el.classList.remove('num-pop'), 400);
   
-  if (typeof gsap !== 'undefined') {
-    gsap.to({ v: cur }, {
-      v: target, duration: 0.7, ease: 'power2.out',
-      onUpdate: function() { el.textContent = Math.round(this.targets()[0].v).toLocaleString(); }
-    });
-  } else {
-    el.textContent = target.toLocaleString();
-  }
+  // ดึงค่าปัจจุบันจากหน้าจอ (ตัดลูกน้ำออกก่อนคำนวณ)
+  const cur = parseInt(el.textContent.replace(/,/g, '')) || 0;
+  
+  // ถ้าค่าเท่าเดิมไม่ต้องรัน Animation
+  if (cur === target) return;
+
+  // ใช้ GSAP สร้างการวิ่งของตัวเลข
+  gsap.to({ v: cur }, {
+    v: target,
+    duration: 1.2, // วิ่งนาน 1.2 วินาทีเพื่อให้ดูพรีเมียม
+    ease: "expo.out", // เริ่มเร็วแล้วค่อยๆ ช้าลงอย่างนุ่มนวล
+    onUpdate: function() {
+      // อัปเดตตัวเลขพร้อมใส่เครื่องหมายลูกน้ำ (Comma)
+      el.textContent = Math.round(this.targets()[0].v).toLocaleString();
+    }
+  });
 }
 
 function shake(el) {
@@ -8907,7 +9485,10 @@ function handleJudgment(val) {
   }
 }
 
-/// ฟังก์ชัน handleFormSubmit ฉบับอัปเกรด (Security + AI + Visual Feedback)
+/* ══════════════════════════════════════════════════════════════
+   MAIN FUNCTION: handleFormSubmit (Integrated with Outlier Detection)
+   รองรับ: การตรวจสอบความถูกต้อง + AI ตรวจสอบยอดผิดปกติ + การบันทึก Cloud/Local
+   ══════════════════════════════════════════════════════════════ */
 async function handleFormSubmit(e) {
   let oldRecord = null;
   let auditAction = 'INSERT';
@@ -8915,20 +9496,24 @@ async function handleFormSubmit(e) {
   
   if (_isInitializing) { toast('⏳ กรุณารอให้ระบบโหลดเสร็จ'); return; }
 
-  // --- [1] การเตรียมข้อมูลและ Advanced Validation ---
+  // --- [1] การเตรียมข้อมูลและ UI Elements ---
   const btn = $id('submitBtn');
   const refInput = $id('refNo');
   const qtyInput = $id('qty');
   const dateInput = $id('inputDate');
   const jdgSelect = $id('judgmentSelect');
+  const partNoInput = $id('partNo');
 
   const ref = refInput.value.trim();
   const supp = $id('supplier').value.trim();
+  const partNoVal = partNoInput.value.trim();
   const qty = parseInt(qtyInput.value) || 0;
   const jdg = jdgSelect.value;
   const selectedDate = new Date(dateInput.value);
   const today = new Date();
-  today.setHours(23, 59, 59, 999); // ตั้งค่าให้ครอบคลุมถึงสิ้นวัน
+  today.setHours(23, 59, 59, 999);
+
+  // --- [2] ขั้นตอน Advanced Validation ---
 
   // 🛡️ Rule 1: ตรวจสอบรูปแบบ Reference (000/0000 หรือ V000/0000)
   const refRegex = /^(V?\d{3}\/\d{4})$/i; 
@@ -8969,7 +9554,34 @@ async function handleFormSubmit(e) {
     return;
   }
 
-  // 🌟 [AUTOMATION 1: START LOADING] 🌟
+  // 🌟 [INTEGRATED: A. ระบบตรวจจับจำนวนผิดปกติ (Outlier Detection)] 🌟
+  // ค้นหาประวัติของ Part No นี้ (ไม่รวมรายการที่กำลังแก้ไขอยู่)
+  const history = records.filter(r => r.partNo === partNoVal && r.id !== editingId);
+  
+  if (history.length >= 3) { // เริ่มตรวจเมื่อมีประวัติอย่างน้อย 3 รายการขึ้นไป
+    const avgQty = history.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0) / history.length;
+    const thresholdMultiplier = 5; // กำหนดเกณฑ์: 5 เท่าของค่าเฉลี่ย
+
+    if (qty > avgQty * thresholdMultiplier) {
+      // หยุดการส่งข้อมูลชั่วคราวและถามความสมัครใจของผู้ใช้
+      const userConfirmed = confirm(
+        `🚨 แจ้งเตือน: พบจำนวนผิดปกติ (Outlier Detection)\n\n` +
+        `พาร์ท: ${partNoVal}\n` +
+        `จำนวนที่กรอก: ${qty.toLocaleString()} PCS\n` +
+        `ค่าเฉลี่ยเดิม: ${Math.round(avgQty).toLocaleString()} PCS\n\n` +
+        `ยอดนี้สูงกว่าปกติเกิน 5 เท่า! ข้อมูลถูกต้องใช่หรือไม่?`
+      );
+
+      if (!userConfirmed) {
+        qtyInput.focus();
+        qtyInput.classList.add('is-invalid');
+        toast('📝 กรุณาตรวจสอบและแก้ไขจำนวนอีกครั้ง');
+        return; // ยกเลิกการบันทึก
+      }
+    }
+  }
+
+  // 🌟 [AUTOMATION: START LOADING UI] 🌟
   const originalBtnHTML = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = `
@@ -8982,7 +9594,7 @@ async function handleFormSubmit(e) {
     </div>
   `;
 
-  // --- [2] สร้างโครงสร้างข้อมูล ---
+  // --- [3] สร้างโครงสร้างข้อมูลสำหรับบันทึก ---
   const rowId = editingId || generateUUID();
   const rowData = {
     id: rowId,
@@ -8992,7 +9604,7 @@ async function handleFormSubmit(e) {
     ref: ref.toUpperCase(),
     line: $id('lineNo').value,
     supplier: supp,
-    partNo: $id('partNo').value,
+    partNo: partNoVal,
     partName: $id('partOn') ? $id('partOn').value : '',
     qty: qty,
     defect: $id('defectName').value,
@@ -9004,7 +9616,7 @@ async function handleFormSubmit(e) {
   };
 
   try {
-    // --- [3] บันทึกลง Cloud (Supabase) ---
+    // --- [4] บันทึกลง Cloud (Supabase) ---
     if (isOnline && getSupabase()) {
       const success = await pushToSupabase([rowData]);
       if (success) {
@@ -9013,7 +9625,7 @@ async function handleFormSubmit(e) {
       }
     }
 
-    // --- [4] อัปเดตข้อมูลในระบบ (RAM & Local DB) ---
+    // --- [5] อัปเดตข้อมูลในระบบ (RAM & Local DB) ---
     if (editingId) {
       oldRecord = records.find(r => String(r.id) === String(editingId));
       const index = records.findIndex(r => String(r.id) === String(editingId));
@@ -9028,7 +9640,7 @@ async function handleFormSubmit(e) {
     
     await dbPutBulk([rowData]);  
 
-    // 🌟 [AUTOMATION 2: SUCCESS SEQUENCE] 🌟
+    // 🌟 [AUTOMATION: SUCCESS FEEDBACK] 🌟
     btn.innerHTML = '<span>✅ DATA SECURED</span>';
     btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
     btn.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.5)';
@@ -9036,22 +9648,20 @@ async function handleFormSubmit(e) {
     const brandLogo = document.querySelector('#brandCard div:first-child');
     if(brandLogo) brandLogo.classList.add('logo-success-glow');
 
-    // หน่วงเวลาเพื่อให้ User เห็นสถานะ Success แวบหนึ่ง
+    // หน่วงเวลาเล็กน้อยเพื่อให้ผลลัพธ์ Visual ค้างหน้าจอ
     setTimeout(() => {
       
-      // --- [5] UI RESET & CLEANUP SEQUENCE ---
+      // --- [6] UI RESET & CLEANUP ---
       const keepDate = dateInput.value;
       const keepShift = $id('shift').value;
 
-      // ล้างสถานะแก้ไขและกลับหน้าตาปุ่มเป็นปกติ
-      
       extinguishAllGlows();
 
-      // คืนค่าฟอร์มบางส่วน (อำนวยความสะดวกให้ User ไม่ต้องเลือกใหม่)
+      // คืนค่าพื้นฐาน
       if($id('inputDate')) $id('inputDate').value = keepDate;
       if($id('shift')) $id('shift').value = keepShift;
 
-      // ล้าง UI ส่วนเกิน (Dropdowns / AI Buttons / Validation Colors)
+      // ล้าง UI ส่วนเกิน
       document.querySelectorAll('.search-results-container').forEach(box => box.style.display = 'none');
       document.querySelectorAll('.neon-in').forEach(input => {
         input.classList.remove('input-dropdown-open', 'is-valid', 'is-invalid');
@@ -9059,11 +9669,11 @@ async function handleFormSubmit(e) {
         input.style.backgroundColor = "";
       });
       
-      removeAiResetButton(); // ล้างปุ่ม Reset ของ AI ออก
+      removeAiResetButton();
 
-      if (document.activeElement) document.activeElement.blur(); // เอาเคอร์เซอร์ออก
+      if (document.activeElement) document.activeElement.blur();
 
-      // ย้อนกลับปุ่มเป็นสถานะเตรียมพร้อม
+      // คืนค่าปุ่ม
       btn.innerHTML = originalBtnHTML;
       btn.style.background = ''; 
       btn.style.boxShadow = '';
@@ -9071,12 +9681,12 @@ async function handleFormSubmit(e) {
       
       if(brandLogo) brandLogo.classList.remove('logo-success-glow');
 
-      // --- [6] RE-RENDER & AUDIT LOG ---
+      // --- [7] RE-RENDER & AUDIT LOG ---
       refreshAll(); 
       cancelEdit(); 
       writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
       
-      // ล้างสถานะไฮไลท์สีเขียวในตารางหลัง 3 วินาที
+      // ล้างสถานะไฮไลท์รายการใหม่
       setTimeout(() => {
           const idx = records.findIndex(x => x.id === rowId);
           if(idx > -1) records[idx]._isNew = false;
@@ -9091,7 +9701,6 @@ async function handleFormSubmit(e) {
     btn.innerHTML = originalBtnHTML;
     btn.style.background = '';
   }
-  
 }
 
 // ฟังก์ชันจัดการแสงนีออนแบบอัจฉริยะ
@@ -10063,22 +10672,88 @@ function updateMiniGauge(type, val, total) {
 
 // --- Dashboard Lists ---
 function renderList(elementId, data, key) {
-  const map = {}; 
-  let totalAll = 0;
-  data.forEach(r => { if(r[key]) { map[r[key]] = (map[r[key]]||0)+r.qty; totalAll += r.qty; } });
-  const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  
-  const html = sorted.map((item,i) => {
-    const pct = totalAll > 0 ? ((item[1]/totalAll)*100).toFixed(1) : 0;
-    return `<div class="market-item"><div class="market-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':'default'}">${i+1}</div><div class="market-info"><div class="market-name">${escapeHtml(item[0])}</div></div><div class="market-stats"><div class="market-value-group"><span class="market-value">${item[1].toLocaleString()}</span><span class="market-pct">${pct}%</span></div></div></div>`;
-  }).join('');
-  if($id(elementId)) $id(elementId).innerHTML = html;
+    const listEl = $id(elementId);
+    if (!listEl) return;
+
+    // 1. ประมวลผลข้อมูล (รวมยอด QTY ตามประเภท)
+    const map = {}; 
+    let totalAll = 0;
+    data.forEach(r => { 
+        if(r[key]) { 
+            const val = String(r[key]).trim();
+            map[val] = (map[val] || 0) + (parseInt(r.qty) || 0); 
+            totalAll += (parseInt(r.qty) || 0); 
+        } 
+    });
+
+    // 2. จัดอันดับ 5 อันดับแรก (เรียงลำดับจากมากไปน้อย)
+    const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    
+    if (sorted.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:#475569;font-size:0.6rem;font-family:var(--font-head);opacity:0.5;">- NO DATA DETECTED -</div>';
+        return;
+    }
+
+    const maxVal = sorted[0][1]; // ค่าสูงสุดใช้เพื่อคำนวณความกว้าง Bar (เทียบเป็น 100%)
+
+    // 3. สร้าง HTML Template
+    const html = sorted.map((item, i) => {
+        const name = item[0];
+        const qty = item[1];
+        const pctOfTotal = totalAll > 0 ? ((qty / totalAll) * 100).toFixed(1) : 0;
+        const barWidth = (qty / maxVal) * 100; // ความยาว Bar สัมพัทธ์กับอันดับ 1
+
+        return `
+            <div class="futuristic-item stagger-in">
+                <!-- ข้าวหลามตัดจิ๋วพร้อมลำดับ -->
+                <div class="rank-diamond-mini">
+                    <span>${i + 1}</span>
+                </div>
+                
+                <div class="item-info">
+                    <div class="item-name" title="${escapeHtml(name)}">${escapeHtml(name)}</div>
+                    <div class="energy-track">
+                        <!-- แถบพลังที่จะขยายตามความกว้างที่คำนวณ -->
+                        <div class="energy-fill" style="width: ${barWidth}%"></div>
+                    </div>
+                </div>
+                
+                <div class="item-stats">
+                    <span class="val-main">${qty.toLocaleString()}</span>
+                    <span class="val-pct">${pctOfTotal}%</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    listEl.innerHTML = html;
+
+    // 4. การจัดการอนิเมชั่น (Staggered Entrance)
+    if (window.gsap) {
+        // ใช้ GSAP เพื่อความนุ่มนวลสูงสุด
+        gsap.to(`#${elementId} .stagger-in`, {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            stagger: 0.08, // ให้ค่อยๆ โผล่ตามกันมา
+            ease: "expo.out"
+        });
+    } else {
+        // กรณีไม่มี GSAP ให้แสดงทันทีด้วย CSS
+        const items = listEl.querySelectorAll('.stagger-in');
+        items.forEach((el, index) => {
+            setTimeout(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }
 }
 
 function renderIncidentFeed(data) {
   const items = [...data].filter(r => r.judgment === 'VENDOR FAULT').sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 15);
   const html = items.map(r => `
-    <div class="incident-item critical">
+    <div class="incident-item critical"> 
       <div class="inc-row-1"><div class="incident-ref-badge">${escapeHtml(r.ref)}</div><div class="inc-badge VENDOR">VENDOR FAULT</div></div>
       <div class="inc-row-2"><div class="inc-text-main">${escapeHtml(r.supplier)}</div><div class="inc-qty">${r.qty.toLocaleString()} <span style="font-size:0.6rem;color:#94a3b8">PCS</span></div></div>
       <div class="inc-text-sub"><span class="inc-text-highlight">${escapeHtml(r.partNo)}</span> | ${escapeHtml(r.partName) || 'N/A'}</div>
@@ -10094,18 +10769,72 @@ function renderIncidentFeed(data) {
 function renderTopLines(data) {
   const listEl = $id('topLineList');
   if (!listEl) return;
-  const map = {}; let totalAll = 0;
-  data.forEach(r => { if(r.line && r.line !== '-') { map[r.line] = (map[r.line] || 0) + r.qty; totalAll += r.qty; } });
+  
+  const map = {}; 
+  let totalAll = 0;
+  
+  // รวมยอดตาม Line
+  data.forEach(r => { 
+    if(r.line && r.line !== '-') { 
+      map[r.line] = (map[r.line] || 0) + r.qty; 
+      totalAll += r.qty; 
+    } 
+  });
+  
   const sorted = Object.entries(map).sort((a,b) => b[1] - a[1]).slice(0, 5);
   
-  if (sorted.length === 0) { listEl.innerHTML = '<div class="top-line-empty"><div class="top-line-empty-text">No line data available</div></div>'; return; }
+  if (sorted.length === 0) { 
+    listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:#475569">No data found</div>'; 
+    return; 
+  }
+
+  const maxVal = sorted[0][1]; // หาค่าสูงสุดเพื่อเทียบความยาว Bar
   
-  const maxVal = sorted[0][1];
+  // กำหนด Palette สี Neon สำหรับแต่ละอันดับ
+  const neonColors = [
+    'linear-gradient(90deg, #FF0080, #7928CA)', // Rank 1: Pink-Purple
+    'linear-gradient(90deg, #7928CA, #FF4D4D)', // Rank 2: Purple-Red
+    'linear-gradient(90deg, #0070F3, #00DFD8)', // Rank 3: Blue-Cyan
+    'linear-gradient(90deg, #50E3C2, #156963)', // Rank 4: Green-Dark
+    'linear-gradient(90deg, #F5A623, #F8E71C)'  // Rank 5: Orange-Yellow
+  ];
+
   const html = sorted.map((item, i) => {
-    const qty = item[1]; const pct = totalAll > 0 ? ((qty/totalAll)*100).toFixed(1) : 0;
-    const barWidth = Math.max((qty / maxVal) * 100, 5);
-    return `<div class="line-item rank-${i + 1}"><div class="line-rank ${i<5?`r${i+1}`:'r-default'}">${i + 1}</div><div class="line-info-group"><div class="line-name">LINE: ${escapeHtml(item[0])}</div><div class="line-bar-container"><div class="line-bar" style="width:${barWidth}%"></div></div></div><div class="line-stats"><div class="market-value-group"><span class="line-qty">${qty.toLocaleString()}</span><span class="market-pct">${pct}%</span></div><div class="line-lots">PCS</div></div></div>`;
+    const qty = item[1]; 
+    const pct = totalAll > 0 ? ((qty/totalAll)*100).toFixed(1) : 0;
+    const barWidth = (qty / maxVal) * 100;
+    const color = neonColors[i] || neonColors[4];
+    
+    return `
+      <div class="futuristic-line-item" style="margin-bottom: 8px; padding: 8px 12px; background: rgba(15, 23, 42, 0.4); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <!-- ปรับขนาด Rank Badge ให้เล็กลงเล็กน้อย -->
+            <div style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: ${color}; border-radius: 5px; font-size: 0.7rem; font-weight: 900; color: #fff; box-shadow: 0 0 10px ${color}66;">
+              ${i+1}
+            </div>
+            <span style="font-size: 0.75rem; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">LINE: ${item[0]}</span>
+          </div>
+          <div style="text-align: right;">
+             <span style="font-family: 'DM Mono', monospace; font-size: 0.9rem; font-weight: 700; color: #ffffff;">${qty.toLocaleString()}</span>
+             <span style="font-size: 0.55rem; color: #94a3b8; font-weight: 800; margin-left: 2px;">PCS</span>
+          </div>
+        </div>
+        
+        <!-- ปรับความสูง Progress Bar ให้บางลง (จาก 8px เหลือ 4px) -->
+        <div style="height: 4px; width: 100%; background: rgba(0,0,0,0.4); border-radius: 10px; overflow: hidden; position: relative;">
+          <div class="neon-bar" style="width: ${barWidth}%; height: 100%; background: ${color}; box-shadow: 0 0 10px ${color}; border-radius: 10px; transition: width 1s ease-out;"></div>
+        </div>
+        
+        <!-- ปรับระยะห่าง SHARE ให้ชิดขึ้น -->
+        <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+           <span style="font-family: 'DM Mono', monospace; font-size: 0.7rem; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">
+      SHARE: <span>${pct}%</span>
+           </span>
+        </div>
+      </div>`;
   }).join('');
+  
   listEl.innerHTML = html;
 }
 
@@ -10218,94 +10947,162 @@ function getChartData(rawRecords, startVal, endVal) {
    9.DASHBOARD & CHART LOGIC
 ═════════════════════════════════════════════════════════════════ */
 function initMainChart() {
-  const ctx = $id('mainTrendChart');
-  if (!ctx) return;
+  const canvas = $id('mainTrendChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
 
-  // ถ้ากราฟเดิมมีอยู่ ให้ทำลายทิ้งก่อน
+  // ถ้ากราฟเดิมมีอยู่ ให้ทำลายทิ้งก่อนเพื่อป้องกันการซ้อนทับ
   if (mainTrendChartInstance) {
     mainTrendChartInstance.destroy();
     mainTrendChartInstance = null;
   }
 
   const isDark = document.documentElement.classList.contains('dark-mode');
-  const gridColor = isDark ? '#334155' : '#e2e8f0';
   const tickColor = isDark ? '#94a3b8' : '#64748b';
+  
+  // 1. กำหนดสี (ลดความทึบแสงของ Background เพื่อความสะอาด)
+  const colors = {
+    vendor: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' }, 
+    sf:     { border: '#f97316', bg: 'rgba(249, 115, 22, 0.1)' }, 
+    ctc:    { border: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' }, 
+    canUse: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' }  
+  };
+
+  // 2. Helper สำหรับสร้าง Layered Gradient
+  const createGradient = (colorObj) => {
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, colorObj.bg);
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    return gradient;
+  };
+
+  // 3. Helper สำหรับสร้างชุดข้อมูล
+  const createDataset = (label, colorObj) => ({
+    label: label,
+    data: [],
+    borderColor: colorObj.border,
+    backgroundColor: createGradient(colorObj),
+    borderWidth: 2,
+    fill: true,           
+    tension: 0.4,         
+    pointRadius: 0,              // ซ่อนจุดปกติเพื่อให้เส้นดูคม (Minimal)
+    pointHitRadius: 10,          // รัศมีตรวจจับเมาส์
+    pointHoverRadius: 6,         // จุดจะขยายเมื่อชี้ (Elastic Effect)
+    pointHoverBackgroundColor: '#fff',
+    pointHoverBorderColor: colorObj.border,
+    pointHoverBorderWidth: 3,
+    stacked: false 
+  });
 
   mainTrendChartInstance = new Chart(ctx, {
     type: 'line',
     data: {
       labels: [],
-      datasets:[{
-        label: 'Total QTY', data: [],
-        borderColor: '#10b981', 
-        backgroundColor: (context) => {
-          const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, 'rgba(16, 185, 129, 0.5)'); 
-          gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)'); 
-          return gradient;
-        },
-        borderWidth: 3, pointBackgroundColor: '#10b981', pointBorderColor: '#fff',
-        pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8, fill: true, tension: 0.4 
-      }]
+      datasets: [
+        createDataset('Can Use (OK)', colors.canUse),
+        createDataset('CTC Fault', colors.ctc),
+        createDataset('SF Fault', colors.sf),
+        createDataset('Vendor Fault', colors.vendor)
+      ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 800, easing: 'easeOutQuart' },
-      interaction: { mode: 'index', intersect: false },
-      layout: { padding: { top: 10, right: 20, left: 10, bottom: 0 } },
+      
+      // === [NEW] อนิเมชั่นระดับพรีเมียม (No Glow) ===
+      animation: {
+        duration: 2000,         // วาดเส้น 2 วินาที
+        easing: 'easeOutQuart', // เริ่มเร็วและค่อยๆ นุ่มนวลตอนท้าย
+        delay: (context) => {   // Progressive Drawing: วาดจากซ้ายไปขวา
+          let delay = 0;
+          if (context.type === 'data' && context.mode === 'default') {
+            delay = context.dataIndex * 60 + context.datasetIndex * 150;
+          }
+          return delay;
+        }
+      },
+
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+
       plugins: {
         legend: { display: false },
         tooltip: {
           backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
           titleColor: isDark ? '#34d399' : '#0f172a',
           bodyColor: isDark ? '#e2e8f0' : '#334155',
-          borderColor: isDark ? 'rgba(16, 185, 129, 0.4)' : 'rgba(226, 232, 240, 0.8)',
-          borderWidth: 1, padding: 12, boxPadding: 6, usePointStyle: true,
-callbacks: {
-  title: (context) => {
-    // ✅ FIX: เช็คว่ามีข้อมูลหรือไม่ก่อนอ่านค่า dataIndex
-    if (!context || !context.length || !globalRichChartData) return 'No Data';
-    
-    const rich = globalRichChartData[context[0].dataIndex];
-    if(!rich) return 'Unknown Date';
-    
-    const isDaily = rich.type === 'daily';
-    return isDaily ? '📅 Date: ' + rich.label : '📊 Month: ' + rich.label;
-  },
-  label: () => null,
-  afterBody: (context) => {
-    // ✅ FIX: เช็คความปลอดภัยก่อนคำนวณเปอร์เซ็นต์
-    if (!context || !context.length || !globalRichChartData) return ['No Data available'];
-    
-    const rich = globalRichChartData[context[0].dataIndex];
-    if(!rich || rich.totalQty === 0) return ['No Data available'];
+          borderColor: isDark ? 'rgba(59, 130, 246, 0.3)' : 'rgba(226, 232, 240, 0.8)',
+          borderWidth: 1,
+          padding: 12,
+          cornerRadius: 10,
+          displayColors: false, 
+          titleFont: { family: 'Sora', size: 13, weight: '800' },
+          bodyFont: { 
+            family: "'DM Mono', 'Courier New', monospace", // เพื่อให้คอลัมน์ตัวเลขตรงกันเป๊ะ
+            size: 11,
+            lineHeight: 1.6
+          },
+          callbacks: {
+            title: (context) => {
+              if (!context || !context.length || !globalRichChartData) return 'No Data';
+              const rich = globalRichChartData[context[0].dataIndex];
+              return `📊 SUMMARY - ${rich.label.toUpperCase()}`;
+            },
+            label: () => null, // ปิดการแสดงผล Label ปกติเพื่อคุม Layout ใน afterBody
+            afterBody: (context) => {
+              if (!context || !context.length || !globalRichChartData) return [];
+              const rich = globalRichChartData[context[0].dataIndex];
+              if(!rich || rich.totalQty === 0) return [];
 
-    const getPct = (val) => ((val / rich.totalQty) * 100).toFixed(1) + '%';
-    return[
-      `TOTAL : ${rich.totalQty.toLocaleString()} PCS | ${rich.totalLot} Lots`, `---------------------------------`,
-      `🔴 VENDOR : ${rich.VENDOR.qty.toLocaleString()} PCS | ${rich.VENDOR.lot} L | ${getPct(rich.VENDOR.qty)}`,
-      `🟠 SF FAULT : ${rich.SF.qty.toLocaleString()} PCS | ${rich.SF.lot} L | ${getPct(rich.SF.qty)}`,
-      `🔵 CTC : ${rich.CTC.qty.toLocaleString()} PCS | ${rich.CTC.lot} L | ${getPct(rich.CTC.qty)}`,
-      `🟢 CAN USE : ${rich.CAN_USE.qty.toLocaleString()} PCS | ${rich.CAN_USE.lot} L | ${getPct(rich.CAN_USE.qty)}`
-    ];
-  }
-}
+              // ฟังก์ชันจัดฟอร์แมตแถวแบบ Matrix (Label | Lot | PCS | %)
+              const formatRow = (label, icon, dataObj) => {
+                const qty = (dataObj.qty || 0).toLocaleString();
+                const lot = (dataObj.lot || 0).toLocaleString();
+                const pct = ((dataObj.qty / rich.totalQty) * 100).toFixed(1);
+                
+                // ใช้การ pad เพื่อจัดระเบียบตัวเลขให้ตรงเป็นแนวตั้ง
+                return `${icon} ${label.padEnd(6)}: ${lot.padStart(3)}L │ ${qty.padStart(5)}P │ ${pct.padStart(5)}%`;
+              };
+
+              return [
+                `TOTAL: ${rich.totalQty.toLocaleString()} PCS │ ${rich.totalLot.toLocaleString()} LOTS`,
+                `──────────────────────────────────`,
+                formatRow('OK',     '🟢', rich.CAN_USE),
+                formatRow('CTC',    '🔵', rich.CTC),
+                formatRow('SF',     '🟠', rich.SF),
+                formatRow('VENDOR', '🔴', rich.VENDOR),
+                `──────────────────────────────────`
+              ];
+            }
+          }
         }
       },
       scales: {
         x: { 
+          stacked: false,
           border: { display: false }, 
           grid: { display: false }, 
           ticks: { 
             color: tickColor, 
-            font: { family: 'Sora', size: 10, weight: '600' },
-            maxTicksLimit: 12,
-            autoSkip: true,
-            maxRotation: 0
+            font: { family: 'Sora', size: 10, weight: '600' }
           } 
         },
-        y: { border: { display: false }, grid: { display: false }, ticks: { display: false } }
+        y: { 
+          stacked: false,
+          beginAtZero: true,
+          border: { display: false }, 
+          grid: { 
+            color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+            drawTicks: false 
+          }, 
+          ticks: { 
+            color: tickColor,
+            font: { family: 'DM Mono', size: 10 },
+            callback: (val) => val >= 1000 ? (val/1000).toFixed(1) + 'k' : val 
+          } 
+        }
       }
     }
   });
@@ -10315,59 +11112,115 @@ callbacks: {
   }
 }
 
+/**
+ * ตรวจสอบความผิดปกติของยอด PCS วันนี้ เทียบกับค่าเฉลี่ย 7 วันย้อนหลัง
+ * @param {number} todayQty - ยอดรวมของวันนี้
+ * @param {Array} allRecords - ข้อมูลทั้งหมดที่มีในระบบ
+ * @returns {boolean} - true ถ้าผิดปกติ
+ */
+function isAnomalyDetected(todayQty, allRecords) {
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+
+    // 1. กำหนดช่วง 7 วันย้อนหลัง (ไม่นับวันนี้)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(now.getDate() - 7);
+    sevenDaysAgo.setHours(0,0,0,0);
+
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
+    yesterday.setHours(23,59,59,999);
+
+    // 2. กรองข้อมูล 7 วันที่ผ่านมา
+    const historicalData = allRecords.filter(r => {
+        const d = new Date(r.date);
+        return d >= sevenDaysAgo && d <= yesterday;
+    });
+
+    if (historicalData.length === 0) return false; // ไม่มีประวัติ ไม่ต้องตรวจ
+
+    // 3. คำนวณค่าเฉลี่ยต่อวัน (Total Qty ใน 7 วัน / 7)
+    const totalHistoricalQty = historicalData.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
+    const avgQty = totalHistoricalQty / 7;
+
+    // 4. ตรวจสอบเงื่อนไข: ยอดวันนี้ > (ค่าเฉลี่ย * 2) และต้องมียอดนัยสำคัญ (เช่น > 50 ชิ้น)
+    // เพื่อป้องกันกรณีเฉลี่ย 1 ชิ้น แล้ววันนี้มา 3 ชิ้น (ซึ่งคือ 300% แต่ไม่ใช่เรื่องใหญ่)
+    const threshold = avgQty * 2;
+    const isSpike = todayQty > threshold && todayQty > 50; 
+
+    if (isSpike) {
+        console.warn(`[Anomaly Detected] Today: ${todayQty}, Avg: ${avgQty.toFixed(2)}, Threshold: ${threshold}`);
+    }
+
+    return isSpike;
+}
+
 /* ══════════════════════════════════════════════════════════════
    MASTER DASHBOARD REFRESH (ULTIMATE ACCURACY VERSION)
    ควบคุมทุก Metrics (PCS, LOT, %, RANKING, CHART) ให้ตรงตาม Filter 100%
 ═══════════════════════════════════════════════════════════════ */
 window.refreshDash = function() {
-    populateDashFilters(); // อัปเดต Dropdown รายชื่อ Vendor
-    const allMyRecords = getMyRecords(); // ดึงข้อมูลดิบทั้งหมดของผู้ใช้รายนี้
+    populateDashFilters(); 
+    const allMyRecords = getMyRecords(); 
     
-    // ตรวจสอบกรณีไม่มีข้อมูล
     if (!allMyRecords || allMyRecords.length === 0) {
         resetDashboardState();
         return;
     }
 
-    // อ่านค่าจากตัวกรองหน้า Dashboard
+    // 1. อ่านค่า Filter ปัจจุบัน
     const startVal = $id('dashStart') ? $id('dashStart').value : '';
     const endVal = $id('dashEnd') ? $id('dashEnd').value : '';
     const vendorFilter = $id('dashVendor') ? $id('dashVendor').value : 'ALL';
 
-    // 🌟 1. LOGIC: ค้นหาปีล่าสุดเพื่อใช้เป็นค่าเริ่มต้น (กรณีไม่ได้เลือกวันที่เอง)
+    // 🌟 2. กำหนดช่วงเวลาสำหรับเปรียบเทียบ (Delta Time-shift)
     let defaultYear = null;
-    if (!startVal && !endVal) {
+    let isCustomRange = startVal && endVal;
+    
+    let currentStart, currentEnd, prevStart, prevEnd;
+
+    if (isCustomRange) {
+        currentStart = new Date(startVal);
+        currentEnd = new Date(endVal);
+        let duration = currentEnd.getTime() - currentStart.getTime();
+        prevEnd = new Date(currentStart.getTime() - (24 * 60 * 60 * 1000));
+        prevStart = new Date(prevEnd.getTime() - duration);
+    } else {
+        const now = new Date();
+        currentStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        currentEnd = now;
+        prevStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        prevEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+        
         const years = allMyRecords.map(r => new Date(r.date).getFullYear());
         defaultYear = Math.max(...years);
     }
 
-    // 🌟 2. FILTER STAGE: สร้างข้อมูล "ก้อนกลาง" (displayData) ที่ทุกส่วนต้องใช้ร่วมกัน
-    const displayData = allMyRecords.filter(r => {
-        const d = new Date(r.date);
-        const rYear = d.getFullYear();
-        const rDateStr = r.date ? String(r.date).substring(0, 10) : ""; 
+    // 🌟 3. แยกข้อมูลเป็น 2 กลุ่ม: ปัจจุบัน และ ก่อนหน้า
+    const displayData = []; 
+    const previousData = []; 
 
-        // ตรวจสอบเงื่อนไขวันที่
-        let matchDate = true;
-        if (startVal || endVal) {
-            // โหมด Filter: ตรวจตามช่วงวันที่เลือก
-            if (startVal && rDateStr < startVal) matchDate = false;
-            if (endVal && rDateStr > endVal) matchDate = false;
+    allMyRecords.forEach(r => {
+        const rDate = new Date(r.date);
+        const rDateStr = r.date ? String(r.date).substring(0, 10) : "";
+        const rYear = rDate.getFullYear();
+
+        if (vendorFilter !== 'ALL' && r.supplier !== vendorFilter) return;
+
+        let matchCurrent = false;
+        if (isCustomRange) {
+            if (rDateStr >= startVal && rDateStr <= endVal) matchCurrent = true;
         } else {
-            // โหมด Default: ตรวจตามปีล่าสุดเท่านั้น
-            if (rYear !== defaultYear) matchDate = false;
+            if (rYear === defaultYear) matchCurrent = true;
         }
+        if (matchCurrent) displayData.push(r);
 
-        // ตรวจสอบเงื่อนไข Vendor
-        let matchVendor = true;
-        if (vendorFilter !== 'ALL') {
-            if (r.supplier !== vendorFilter) matchVendor = false;
+        if (rDate >= prevStart && rDate <= prevEnd) {
+            previousData.push(r);
         }
-
-        return matchDate && matchVendor;
     });
 
-    // 🌟 3. CALCULATION STAGE: คำนวณตัวเลข PCS และ LOT จากข้อมูลที่กรองแล้วเท่านั้น
+    // 🌟 4. คำนวณสถิติชุดปัจจุบัน
     let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
     let sfL = 0, venL = 0, ctcL = 0, okL = 0;
 
@@ -10380,17 +11233,65 @@ window.refreshDash = function() {
         else if (r.judgment === 'CAN USE') { ok += qty; okL++; }
     });
 
-    // คำนวณเปอร์เซ็นต์
+    // 🌟 5. คำนวณสถิติชุดก่อนหน้า (เพื่อหาค่า Difference)
+    let p_sf = 0, p_ven = 0, p_ctc = 0, p_ok = 0;
+    previousData.forEach(r => {
+        const qty = parseInt(r.qty) || 0;
+        if (r.judgment === 'SF') p_sf += qty;
+        else if (r.judgment === 'VENDOR FAULT') p_ven += qty;
+        else if (r.judgment === 'CTC') p_ctc += qty;
+        else if (r.judgment === 'CAN USE') p_ok += qty;
+    });
+
+    // 🚀 [ADDON: ANOMALY DETECTION LOGIC] 🚀
+    // ตรวจสอบว่ายอดวันนี้พุ่งสูงผิดปกติเกิน 200% ของค่าเฉลี่ย 7 วันย้อนหลังหรือไม่
+    const checkAnomaly = () => {
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        
+        // ยอดรวม "วันนี้" (อิงตาม Filter ปัจจุบัน เช่นถ้าเลือก Vendor A ก็ตรวจเฉพาะ Vendor A)
+        const todayTotal = displayData
+            .filter(r => r.date === todayStr)
+            .reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
+
+        // หาค่าเฉลี่ย 7 วันย้อนหลังของชุดข้อมูลนี้
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(now.getDate() - 7);
+        const yesterday = new Date();
+        yesterday.setDate(now.getDate() - 1);
+
+        const histData = allMyRecords.filter(r => {
+            const d = new Date(r.date);
+            const matchVendor = (vendorFilter === 'ALL' || r.supplier === vendorFilter);
+            return d >= sevenDaysAgo && d <= yesterday && matchVendor;
+        });
+
+        const histTotal = histData.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
+        const avgHist = histTotal / 7;
+
+        // เงื่อนไข: วันนี้ > (ค่าเฉลี่ย * 2) และต้องมียอด > 50 ชิ้นเพื่อกัน Error จากยอดน้อยๆ
+        const isSpike = todayTotal > (avgHist * 2) && todayTotal > 50;
+        
+        const heroEl = $id('heroTotalQty');
+        if (heroEl) {
+            if (isSpike) {
+                heroEl.classList.add('anomaly-alert');
+                if (!_isInitializing) toast('🚨 SPIKE DETECTED: งานเสียพุ่งสูงผิดปกติวันนี้!');
+            } else {
+                heroEl.classList.remove('anomaly-alert');
+            }
+        }
+    };
+    checkAnomaly(); // รันระบบตรวจจับ
+
     const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
     const calcPct = (val) => tQ > 0 ? Math.round((val / tQ) * 100) + '%' : '0%';
 
-    // 🌟 4. UI UPDATE: อัปเดตตัวเลขการ์ดสถิติ (KPIs)
-    // ส่วน Hero (รวมทั้งหมด)
-    animNum('heroTotalQty', tQ);
+    // 🌟 6. UI UPDATE: Main KPIs
+    animNum('heroTotalQty', tQ); 
     if($id('heroLot')) $id('heroLot').textContent = displayData.length.toLocaleString();
     if($id('heroPct')) $id('heroPct').textContent = passPct + '%';
 
-    // ส่วน Category (SF, CTC, CAN USE, VENDOR)
     animNum('dashStatSF', sf); 
     if($id('dashLotSF')) $id('dashLotSF').textContent = sfL.toLocaleString();
     if($id('dashPctSF')) $id('dashPctSF').textContent = calcPct(sf);
@@ -10407,14 +11308,18 @@ window.refreshDash = function() {
     if($id('dashLotVendor')) $id('dashLotVendor').textContent = venL.toLocaleString();
     if($id('dashPctVendor')) $id('dashPctVendor').textContent = calcPct(ven);
 
-    // 🌟 5. VISUALS: อัปเดตหน้าปัด (Gauges)
+    // 🌟 7. อัปเดตลูกศรแนวโน้ม (Delta Indicators)
+    updateDelta('deltaSF', sf, p_sf, true);
+    updateDelta('deltaCTC', ctc, p_ctc, true);
+    updateDelta('deltaVendor', ven, p_ven, true);
+    updateDelta('deltaCanUse', ok, p_ok, false);
+
+    // 🌟 8. VISUALS: Gauges & Lists
     updateMainGauge(passPct);
     updateMiniGauge('sf', sf, tQ);
     updateMiniGauge('vendor', ven, tQ);
     updateMiniGauge('ctc', ctc, tQ);
 
-    // 🌟 6. RANKINGS & LISTS: ส่ง displayData ที่กรองแล้วไปจัดอันดับ Top 5
-    // ทุกรายการในหน้านี้จะตรงกับปี/ช่วงวันที่เลือกทันที
     renderList('supplierList', displayData, 'supplier');
     renderList('dashDefectList', displayData, 'defect');
     renderList('partList', displayData, 'partNo');
@@ -10422,23 +11327,105 @@ window.refreshDash = function() {
     renderTopLines(displayData);   
     renderTickerTape(displayData); 
 
-    // 🌟 7. TREND CHART: อัปเดตกราฟเส้น
-    // ส่ง displayData เข้าไปเพื่อให้ฟังก์ชัน getChartData วาดเฉพาะข้อมูลที่กรองมาแล้ว
+    // 🌟 9. TREND CHART
     const chartDataObj = getChartData(displayData, startVal, endVal);
-    
     if (!mainTrendChartInstance) { initMainChart(); }
-    if (mainTrendChartInstance) {
+    if (mainTrendChartInstance && globalRichChartData) {
         mainTrendChartInstance.data.labels = chartDataObj.labels;
-        mainTrendChartInstance.data.datasets[0].data = chartDataObj.data;
-        mainTrendChartInstance.update('none'); 
-        mainTrendChartInstance.resize();
+        mainTrendChartInstance.data.datasets[0].data = globalRichChartData.map(m => m.CAN_USE.qty);
+        mainTrendChartInstance.data.datasets[1].data = globalRichChartData.map(m => m.CTC.qty);
+        mainTrendChartInstance.data.datasets[2].data = globalRichChartData.map(m => m.SF.qty);
+        mainTrendChartInstance.data.datasets[3].data = globalRichChartData.map(m => m.VENDOR.qty);
+        mainTrendChartInstance.update(); 
     }
     
-    // อัปเดต High/Low/Avg ข้างกราฟ
     updateChartStats(chartDataObj.data); 
+    renderParetoFocus(displayData);
+    renderSupplierScorecard(displayData);
 
-    console.log(`[Dashboard] Sync Complete: ${displayData.length} Lots | Year Locked: ${defaultYear || 'Manual Range'}`);
+    console.log(`[Dashboard Update] Anomaly Detection Executed. Current window: ${displayData.length} entries.`);
 };
+/* ══════════════════════════════════════════════════════════════
+   PARETO FOCUS LOGIC: Identifying High-Impact Suppliers
+   เป้าหมาย: ค้นหา Supplier 20% ที่สร้างปัญหา 80% (หรือ Top 2 > 50%)
+   ══════════════════════════════════════════════════════════════ */
+function renderParetoFocus(data) {
+  const listEl = $id('paretoFocusList');
+  const statusEl = $id('paretoStatus');
+  const summaryEl = $id('paretoSummary');
+  if (!listEl) return;
+
+  // 1. กรองเฉพาะ Vendor Fault และกลุ่มตาม Supplier
+  const vendorData = data.filter(r => r.judgment === 'VENDOR FAULT');
+  const map = {};
+  let totalVendorQty = 0;
+
+  vendorData.forEach(r => {
+    map[r.supplier] = (map[r.supplier] || 0) + r.qty;
+    totalVendorQty += r.qty;
+  });
+
+  // 2. เรียงลำดับจากมากไปน้อย
+  const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]);
+
+  if (sorted.length === 0) {
+    listEl.innerHTML = '<div style="text-align:center; padding:1rem; color:#64748b;">✅ No Vendor Faults in this period.</div>';
+    statusEl.textContent = "SAFE";
+    statusEl.style.color = "#10b981"; statusEl.style.borderColor = "#10b981";
+    return;
+  }
+
+  // 3. คำนวณหาค่าสะสม (Cumulative)
+  let cumulativeQty = 0;
+  let focusHtml = '';
+  let top2Percentage = 0;
+
+  sorted.forEach((item, index) => {
+    const supplierName = item[0];
+    const qty = item[1];
+    const pct = (qty / totalVendorQty) * 100;
+    cumulativeQty += qty;
+
+    if (index < 2) top2Percentage += pct;
+
+    // --- ส่วนที่แก้ไข: การใส่ Class กระพริบ ---
+    const isCritical = index < 2 && top2Percentage > 50; // เช็คว่าเป็น 2 อันดับแรกที่เกิน 50% หรือไม่
+    const criticalClass = isCritical ? 'pareto-critical-item' : ''; // ถ้าวิกฤตให้ใส่คลาสกระพริบ
+
+    if (index < 3 || (cumulativeQty / totalVendorQty) <= 0.85) {
+      focusHtml += `
+        <div class="market-item ${criticalClass}" style="margin-bottom: 8px;">
+          <div class="market-rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : 'default'}">
+            ${index + 1}
+          </div>
+          <div class="market-info">
+            <div class="market-name" style="${isCritical ? 'color: #f87171; font-weight: 800;' : ''}">
+               ${isCritical ? '🚨 ' : ''}${escapeHtml(supplierName)}
+            </div>
+            <div style="font-size: 0.55rem; color: #94a3b8;">Impact: ${pct.toFixed(1)}% of all defects</div>
+          </div>
+          <div class="market-stats">
+            <div class="market-value" style="${isCritical ? 'color: #f87171;' : ''}">${qty.toLocaleString()}</div>
+            <div style="font-size: 0.5rem; color: #64748b; font-weight: 700;">PCS</div>
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  // 4. อัปเดตสถานะ Strategy
+  if (top2Percentage > 50) {
+    statusEl.textContent = "CRITICAL AUDIT";
+    statusEl.className = "market-badge critical-alert"; // ใช้ class กระพริบที่มีอยู่แล้ว
+    summaryEl.innerHTML = `⚠️ <b>Focus Note:</b> Supplier 2 รายแรกนี้ครอบคลุมปัญหาเกิน <b>${top2Percentage.toFixed(0)}%</b> แนะนำให้เข้าทำ On-site Audit ทันที`;
+  } else if (sorted.length > 0) {
+    statusEl.textContent = "NORMAL TRACK";
+    statusEl.style.color = "#fbbf24"; statusEl.style.borderColor = "#fbbf24";
+    summaryEl.innerHTML = `💡 <b>Strategy:</b> กระจายการตรวจสอบตามแผนปกติ เนื่องจากไม่มี Supplier รายใดกินสัดส่วนพุ่งโดด`;
+  }
+
+  listEl.innerHTML = focusHtml;
+}
 
 //เก็บข้อมูลตัวเลือกไว้ในตัวแปร Global
 let masterLists = {};
@@ -11021,21 +12008,18 @@ function updateVirtualScrollState() {
   if (!container) return;
 
   const scrollTop = container.scrollTop;
-  const viewportHeight = container.clientHeight; // ดึงความสูงจริงของพื้นที่แสดงผล ณ ขณะนั้น
+  const viewportHeight = container.clientHeight;
 
-  // คำนวณ Index แถวเริ่มต้น
-  const startRow = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT));
-  
-  // คำนวณจำนวนแถวที่ควรจะมองเห็น + Buffer 15 แถวเพื่อความลื่นไหล
+  // ปรับ Buffer ให้เหมาะสม (ป้องกันการเห็นพื้นที่สีขาวขณะไถเร็วๆ)
+  const startRow = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - 5);
   const visibleCount = Math.ceil(viewportHeight / ROW_HEIGHT) + 15;
-  
-  virtualTableState.visibleStart = startRow;
-  virtualTableState.visibleEnd = Math.min(virtualTableState.allRows.length, startRow + visibleCount);
-  
-  // สั่งวาดแถวใหม่
-  window.requestAnimationFrame(() => renderVisibleRows());
-}
 
+  virtualTableState.visibleStart = startRow;
+  virtualTableState.visibleEnd = startRow + visibleCount;
+  
+  // ใช้ requestAnimationFrame เพื่อประสิทธิภาพสูงสุด
+  window.requestAnimationFrame(renderVisibleRows);
+}
 // 1. เพิ่ม Resize Listener (พร้อมระบบหน่วงเวลา 150ms เพื่อประสิทธิภาพ)
 let tableResizeDebounce;
 window.addEventListener('resize', () => {
@@ -11301,36 +12285,58 @@ function spawnCancelButton(text, onClickCallback) {
 // เพิ่มตัวแปรเก็บความจำใหม่
 let aiBrain = { partNoMap: {}, partNameMap: {}, defectToRemarkMap: {} };
 
+/* ══════════════════════════════════════════════════════════════
+   AI BRAIN v5.0: Collaborative Learning & Consistency Check
+   เรียนรู้จากข้อมูล "ทุกคน" เพื่อความแม่นยำในการเดาและตรวจสอบข้อมูล
+   ══════════════════════════════════════════════════════════════ */
 function updateAIBrain() {
-    const myRecords = getMyRecords();
-    if (!myRecords || myRecords.length === 0) return;
+    // 🌟 เปลี่ยนจาก getMyRecords() เป็น records (ข้อมูลทั้งหมดในระบบ)
+    const allRecords = records; 
+    if (!allRecords || allRecords.length === 0) return;
 
-    // ล้างค่าเก่าก่อนอัปเดตใหม่
+    // 1. [RESET] ล้างค่าเก่าก่อนประมวลผลความรู้ชุดใหม่
     aiBrain.partNoMap = {}; 
     aiBrain.partNameMap = {};
-    aiBrain.defectToRemarkMap = {}; // เพิ่มการจำ Remark ตามปัญหา
+    aiBrain.defectToRemarkMap = {}; 
+    aiBrain.supplierPartMap = {}; // 🆕 เพิ่มสำหรับเก็บความสัมพันธ์ Part <-> Supplier
 
     const tempStore = {};
-    const defectTempStore = {}; // สำหรับเก็บประวัติ Remark
+    const defectTempStore = {}; 
 
-    myRecords.forEach(r => {
+    // 2. [ITERATION] วนลูปอ่านข้อมูล "ทุกคน" เพื่อสร้างสมองส่วนกลาง
+    allRecords.forEach(r => {
         const pNo = String(r.partNo || "").trim();
         const pName = String(r.partName || "").trim();
         const def = String(r.defect || "").trim().toLowerCase();
         const rem = String(r.remark || "").trim();
+        const supp = String(r.supplier || "").trim();
 
-        // เก็บข้อมูล Part (โค้ดเดิม)
-        if (pNo) { if (!tempStore[pNo]) tempStore[pNo] = []; tempStore[pNo].push(r); }
-        if (pName) { if (!tempStore[pName]) tempStore[pName] = []; tempStore[pName].push(r); }
+        // --- ส่วนที่ 1: เก็บสถิติพาร์ท (เพื่อนำไปหาค่าที่ใช้บ่อยที่สุด) ---
+        if (pNo) { 
+            if (!tempStore[pNo]) tempStore[pNo] = []; 
+            tempStore[pNo].push(r); 
+        }
+        if (pName) { 
+            if (!tempStore[pName]) tempStore[pName] = []; 
+            tempStore[pName].push(r); 
+        }
 
-        // เก็บข้อมูล Remark ที่เคยใช้คู่กับปัญหานี้
-        if (def && rem && rem !== "-") {
+        // --- ส่วนที่ 2: เก็บสถิติ Remark ตามปัญหา (Defect) ---
+        if (def && rem && rem !== "-" && rem !== "") {
             if (!defectTempStore[def]) defectTempStore[def] = [];
             defectTempStore[def].push(rem);
         }
+
+        // --- 🆕 ส่วนที่ 3: เก็บความสัมพันธ์ Part กับ Supplier (เพื่อเช็คการคีย์ผิด) ---
+        if (pNo && supp) {
+            if (!aiBrain.supplierPartMap[pNo]) {
+                aiBrain.supplierPartMap[pNo] = new Set();
+            }
+            aiBrain.supplierPartMap[pNo].add(supp);
+        }
     });
 
-    // ฟังก์ชันหาค่าที่ใช้บ่อยที่สุด (Mode)
+    // 3. [PROCESSING] ฟังก์ชันหาค่าที่ใช้บ่อยที่สุด (Mode)
     const getMode = (arr) => {
         if (!arr || arr.length === 0) return null;
         const counts = {}; let max = 0, result = null;
@@ -11341,22 +12347,15 @@ function updateAIBrain() {
         return result;
     };
 
-    // 1. ประมวลผลสมองส่วน Part (โค้ดเดิม)
-    // ... (ส่วนการวนลูป tempStore เดิมของคุณ) ...
+    // --- ประมวลผลสมองส่วน Part Attributes (โค้ดเดิมที่ปรับปรุง) ---
     for (let key in tempStore) {
         const recordsForKey = tempStore[key];
         const mode = (k) => {
-            const counts = {}; let m = 0, res = null;
-            recordsForKey.forEach(item => {
-                const v = item[k];
-                if (v && v !== '-' && v !== '') {
-                    counts[v] = (counts[v] || 0) + 1;
-                    if (counts[v] > m) { m = counts[v]; res = v; }
-                }
-            });
-            return res;
+            const values = recordsForKey.map(item => item[k]).filter(v => v && v !== '-' && v !== '');
+            return getMode(values);
         };
-        aiBrain.partNoMap[key.toLowerCase()] = aiBrain.partNameMap[key.toLowerCase()] = {
+        
+        const brainData = {
             supplier: mode('supplier'),
             partNo: mode('partNo'),
             partName: mode('partName'),
@@ -11364,15 +12363,21 @@ function updateAIBrain() {
             defect: mode('defect'),
             judgment: mode('judgment')
         };
+
+        aiBrain.partNoMap[key.toLowerCase()] = brainData;
+        aiBrain.partNameMap[key.toLowerCase()] = brainData;
     }
 
-    // 2. ประมวลผลสมองส่วน Remark (ใหม่!)
-    // ระบบจะดูว่าปัญหานี้ ปกติคุณพิมพ์ Remark ว่าอะไร แล้วจำอันที่ใช้บ่อยที่สุดไว้
+    // --- ประมวลผลสมองส่วน Remark Suggestion (โค้ดเดิม) ---
     for (let defKey in defectTempStore) {
         aiBrain.defectToRemarkMap[defKey] = getMode(defectTempStore[defKey]);
     }
     
-    console.log("[AI Brain] Learned " + Object.keys(aiBrain.defectToRemarkMap).length + " custom defect patterns.");
+    // 4. [LOGGING] แจ้งสถานะการเรียนรู้
+    console.log(`[AI Collaborative Brain] Knowledge Base Updated:`);
+    console.log(` - Learned from ${allRecords.length} historical entries.`);
+    console.log(` - Mapped ${Object.keys(aiBrain.partNoMap).length} unique part patterns.`);
+    console.log(` - Found ${Object.keys(aiBrain.defectToRemarkMap).length} common defect descriptions.`);
 }
 
 function aiInstantFill(inputVal, source) {
@@ -12524,6 +13529,144 @@ function translateDefectToRemark() {
 
     // อัปเดตสถานะแสงไฟ Neon ของฟอร์ม (เพื่อให้ปุ่ม Commit เช็คความพร้อม)
     if (typeof refreshNeonGlow === 'function') refreshNeonGlow();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FUNCTION: renderSupplierScorecard
+   วิเคราะห์ "ความประพฤติ" ของ Supplier โดยคำนวณจากสัดส่วนของเสีย
+   ══════════════════════════════════════════════════════════════ */
+function renderSupplierScorecard(data) {
+    const listEl = document.getElementById('supplierScorecardList');
+    if (!listEl) return;
+
+    // 1. ประมวลผลข้อมูล
+    const supplierStats = {};
+    data.forEach(r => {
+        const sName = r.supplier || "Unknown";
+        if (!supplierStats[sName]) supplierStats[sName] = { total: 0, ng: 0 };
+        const qty = parseInt(r.qty) || 0;
+        supplierStats[sName].total += qty;
+        if (r.judgment === 'VENDOR FAULT') supplierStats[sName].ng += qty;
+    });
+
+    const results = Object.entries(supplierStats).map(([name, stats]) => {
+        const rate = stats.total > 0 ? (stats.ng / stats.total) * 100 : 0;
+        let grade, color, shadow, label, icon;
+
+        if (rate <= 0.5) {
+            grade = 'A'; color = '#10b981'; shadow = '0 0 15px #10b981'; label = 'EXCELLENT'; icon = '🛡️';
+        } else if (rate <= 2.0) {
+            grade = 'B'; color = '#3b82f6'; shadow = '0 0 15px #3b82f6'; label = 'QUALIFIED'; icon = '💎';
+        } else if (rate <= 5.0) {
+            grade = 'C'; color = '#f59e0b'; shadow = '0 0 15px #f59e0b'; label = 'WATCHLIST'; icon = '⚠️';
+        } else {
+            grade = 'D'; color = '#ef4444'; shadow = '0 0 20px #ef4444'; label = 'CRITICAL'; icon = '🚨';
+        }
+
+        return { name, rate, grade, color, shadow, label, icon, ng: stats.ng, total: stats.total };
+    }).sort((a, b) => b.rate - a.rate);
+
+listEl.innerHTML = results.map(item => `
+        <div class="scorecard-item" style="padding: 12px 15px;">
+            <!-- Left: Grade Orb -->
+            <div class="grade-orb" style="color: ${item.color}; border: 2.2px solid ${item.color}; width: 42px; height: 42px; font-size: 1.3rem; box-shadow: inset 0 0 10px ${item.color}40, ${item.shadow}60; ${item.grade === 'D' ? 'animation: danger-pulse 2s infinite;' : ''}">
+                ${item.grade}
+            </div>
+
+            <!-- Center: Main Info -->
+            <div style="flex: 1; margin: 0 12px; min-width: 0;">
+                <!-- ชื่อ Vendor: บรรทัดเดียวเป๊ะ -->
+                <div style="font-size: 0.95rem; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 2px 4px rgba(0,0,0,0.5); margin-bottom: 4px;" title="${item.name}">
+                    ${item.icon} ${item.name}
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 800; color: ${item.color};">
+                        ${item.rate.toFixed(1)}%
+                    </div>
+                    <div style="padding: 1px 6px; border-radius: 4px; background: ${item.color}20; border: 1px solid ${item.color}40; color: ${item.color}; font-size: 0.5rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
+                        ${item.label}
+                    </div>
+                </div>
+                
+                <div class="heat-track" style="height: 4px; margin-top: 8px;">
+                    <div class="heat-fill" style="width: ${Math.min(item.rate * 10, 100)}%; background: ${item.color}; box-shadow: 0 0 8px ${item.color}60;"></div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 6px; opacity: 0.8;">
+                    <span style="font-size: 0.6rem; color: #94a3b8;">TOTAL: <b>${item.total}</b></span>
+                    <span style="font-size: 0.6rem; color: #94a3b8;">NG: <b style="color:#fff">${item.ng}</b></span>
+                </div>
+            </div>
+
+            <!-- Right: Rank -->
+            <div style="text-align: right; flex-shrink: 0;">
+                <div style="font-size: 0.6rem; color: #475569; font-family: var(--font-mono); font-weight: 800;">
+                    RANK #${results.indexOf(item) + 1}
+                </div>
+                <div style="margin-top: 15px; font-size: 1rem;">
+                    ${item.grade === 'D' ? '⚠️' : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateDelta(elementId, currentVal, previousVal, isInverse = true) {
+    const el = $id(elementId);
+    if (!el) return;
+    if (previousVal === 0) { el.textContent = "New"; el.className = "stat-delta neutral"; return; }
+
+    const diff = ((currentVal - previousVal) / previousVal) * 100;
+    const arrow = diff > 0 ? "▲" : (diff < 0 ? "▼" : "•");
+    el.textContent = `${arrow} ${Math.abs(diff).toFixed(1)}%`;
+    
+    // isInverse = true หมายถึง "ถ้าเลขเพิ่ม = ไม่ดี (แดง)" ใช้กับ Fault
+    if (diff === 0) el.className = "stat-delta neutral";
+    else if (isInverse) el.className = diff > 0 ? "stat-delta up" : "stat-delta down";
+    else el.className = diff > 0 ? "stat-delta down" : "stat-delta up"; // สำหรับ Can Use
+}
+
+// ในฟังก์ชัน refreshDash ให้เพิ่มการดึงข้อมูลช่วงก่อนหน้า (Previous Period) 
+// แล้วเรียก updateDelta('deltaSF', currentSFTotal, previousSFTotal);
+
+function renderDrillDownChart(data) {
+    const ctx = $id('ddChart').getContext('2d');
+    if (ddChartInstance) ddChartInstance.destroy();
+
+    // ประมวลผลข้อมูลย้อนหลัง 6 เดือน
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const now = new Date();
+    const last6 = [];
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        last6.push({ label: months[d.getMonth()], month: d.getMonth(), year: d.getFullYear(), qty: 0 });
+    }
+
+    data.forEach(r => {
+        const rd = new Date(r.date);
+        const target = last6.find(m => m.month === rd.getMonth() && m.year === rd.getFullYear());
+        if (target) target.qty += r.qty;
+    });
+
+    ddChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: last6.map(m => m.label),
+            datasets: [{
+                label: 'NG Quantity',
+                data: last6.map(m => m.qty),
+                backgroundColor: '#3b82f6',
+                borderRadius: 5
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } } }
+        }
+    });
 }
 </script>
 </body>
