@@ -7514,6 +7514,59 @@ tbody tr {
     .val-main { font-size: 0.75rem; }
     .item-name { font-size: 0.62rem; }
 }
+/* ส่วนหัวของกราฟที่ปรับใหม่ */
+.chart-panel .chart-header {
+    padding: 1.5rem 1.8rem;
+    background: rgba(255, 255, 255, 0.02); /* เพิ่มมิติที่หัว */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chart-panel .chart-title {
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    color: #f8fafc;
+    text-transform: uppercase;
+}
+
+/* ปรับแต่งป้ายสถิติ (High/Low/Avg) ให้ดูคมชัด */
+.chart-panel .chart-stats {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.chart-panel .stat-item {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px 14px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 75px;
+}
+
+.chart-panel .stat-label {
+    font-size: 0.55rem;
+    font-weight: 800;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.chart-panel .stat-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+/* สีเฉพาะจุด */
+.chart-panel .stat-value.high { color: #10b981; } /* เขียวมรกต */
+.chart-panel .stat-value.low  { color: #f43f5e; } /* แดงกุหลาบ */
+.chart-panel .stat-value.avg  { color: #3b82f6; } /* ฟ้า */
+
+/* ปรับแต่งเส้น Grid ของ Chart.js ผ่าน CSS (Fallback) */
+#mainTrendChart {
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+}
 </style>
 </head>
 <body>
@@ -8421,12 +8474,21 @@ tbody tr {
             <div class="chart-title">PRODUCTION TREND</div>
             <div class="chart-subtitle">Monthly Performance Analysis</div>
           </div>
-          <div class="chart-stats" id="chartStats">
-            <div class="stat-item"><span class="stat-label">High</span><span class="stat-value high" id="statHigh">0</span></div>
-            <div class="stat-item"><span class="stat-label">Low</span><span class="stat-value low" id="statLow">0</span></div>
-            <div class="stat-item"><span class="stat-label">Avg</span><span class="stat-value" id="statAvg">0</span></div>
-          </div>
-        </div>
+<div class="chart-stats" id="chartStats">
+  <div class="stat-item">
+    <span class="stat-label">MAX PEAK</span>
+    <span class="stat-value high" id="statHigh">0</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">MINIMUM</span>
+    <span class="stat-value low" id="statLow">0</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">AVERAGE</span>
+    <span class="stat-value avg" id="statAvg">0</span> <!-- เพิ่ม class avg -->
+  </div>
+</div>
+</div>
         <div class="chart-body">
           <canvas id="mainTrendChart"></canvas>
         </div>
@@ -10951,7 +11013,7 @@ function initMainChart() {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  // ถ้ากราฟเดิมมีอยู่ ให้ทำลายทิ้งก่อนเพื่อป้องกันการซ้อนทับ
+  // ทำลายกราฟเดิมเพื่อป้องกัน Memory Leak และการวาดทับ
   if (mainTrendChartInstance) {
     mainTrendChartInstance.destroy();
     mainTrendChartInstance = null;
@@ -10959,39 +11021,40 @@ function initMainChart() {
 
   const isDark = document.documentElement.classList.contains('dark-mode');
   const tickColor = isDark ? '#94a3b8' : '#64748b';
-  
-  // 1. กำหนดสี (ลดความทึบแสงของ Background เพื่อความสะอาด)
-  const colors = {
-    vendor: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' }, 
-    sf:     { border: '#f97316', bg: 'rgba(249, 115, 22, 0.1)' }, 
-    ctc:    { border: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' }, 
-    canUse: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' }  
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+
+  // 1. 🎨 ชุดสีระดับพรีเมียม (Sharp & High Contrast)
+  const palette = {
+    canUse: { stroke: '#10b981', fill: 'rgba(16, 185, 129, 0.12)' }, // Emerald
+    ctc:    { stroke: '#3b82f6', fill: 'rgba(59, 130, 246, 0.12)' }, // Blue
+    sf:     { stroke: '#f97316', fill: 'rgba(249, 115, 22, 0.12)' }, // Orange
+    vendor: { stroke: '#ef4444', fill: 'rgba(239, 68, 68, 0.12)' }  // Red
   };
 
-  // 2. Helper สำหรับสร้าง Layered Gradient
-  const createGradient = (colorObj) => {
+  // 2. 🌊 Helper สำหรับสร้าง Gradient แบบจางหาย (Fade-out)
+  const createSmoothGradient = (colorFill) => {
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, colorObj.bg);
+    gradient.addColorStop(0, colorFill);
     gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
     return gradient;
   };
 
-  // 3. Helper สำหรับสร้างชุดข้อมูล
-  const createDataset = (label, colorObj) => ({
+  // 3. 🛠️ Helper สำหรับสร้าง Dataset ที่มีความหนาและคมชัด
+  const createDataset = (label, colorSet) => ({
     label: label,
     data: [],
-    borderColor: colorObj.border,
-    backgroundColor: createGradient(colorObj),
-    borderWidth: 2,
-    fill: true,           
-    tension: 0.4,         
-    pointRadius: 0,              // ซ่อนจุดปกติเพื่อให้เส้นดูคม (Minimal)
-    pointHitRadius: 10,          // รัศมีตรวจจับเมาส์
-    pointHoverRadius: 6,         // จุดจะขยายเมื่อชี้ (Elastic Effect)
-    pointHoverBackgroundColor: '#fff',
-    pointHoverBorderColor: colorObj.border,
-    pointHoverBorderWidth: 3,
-    stacked: false 
+    borderColor: colorSet.stroke,
+    backgroundColor: createSmoothGradient(colorSet.fill),
+    borderWidth: 3.5,            // เส้นหนาพิเศษให้ดูเด่นชัด
+    fill: true,                  // เติมสีพื้นหลังใต้กราฟ
+    tension: 0.4,                // ความโค้งมนที่ดูเป็นธรรมชาติ
+    pointRadius: 0,              // ซ่อนจุดในสถานะปกติเพื่อให้เส้นดู Sharp
+    pointHitRadius: 15,          // พื้นที่ตรวจจับเมาส์กว้างขึ้นเพื่อให้ชี้ง่าย
+    pointHoverRadius: 6,         // จุดจะปรากฏขึ้นเมื่อ Hover
+    pointHoverBackgroundColor: colorSet.stroke,
+    pointHoverBorderColor: '#fff',
+    pointHoverBorderWidth: 2,
+    stacked: false
   });
 
   mainTrendChartInstance = new Chart(ctx, {
@@ -10999,27 +11062,20 @@ function initMainChart() {
     data: {
       labels: [],
       datasets: [
-        createDataset('Can Use (OK)', colors.canUse),
-        createDataset('CTC Fault', colors.ctc),
-        createDataset('SF Fault', colors.sf),
-        createDataset('Vendor Fault', colors.vendor)
+        createDataset('Can Use (OK)', palette.canUse),
+        createDataset('CTC Fault', palette.ctc),
+        createDataset('SF Fault', palette.sf),
+        createDataset('Vendor Fault', palette.vendor)
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       
-      // === [NEW] อนิเมชั่นระดับพรีเมียม (No Glow) ===
+      // อนิเมชั่นการวาดเส้นจากซ้ายไปขวาแบบมืออาชีพ
       animation: {
-        duration: 2000,         // วาดเส้น 2 วินาที
-        easing: 'easeOutQuart', // เริ่มเร็วและค่อยๆ นุ่มนวลตอนท้าย
-        delay: (context) => {   // Progressive Drawing: วาดจากซ้ายไปขวา
-          let delay = 0;
-          if (context.type === 'data' && context.mode === 'default') {
-            delay = context.dataIndex * 60 + context.datasetIndex * 150;
-          }
-          return delay;
-        }
+        duration: 1500,
+        easing: 'easeOutQuart'
       },
 
       interaction: {
@@ -11028,52 +11084,51 @@ function initMainChart() {
       },
 
       plugins: {
-        legend: { display: false },
+        legend: { display: false }, // ซ่อน Legend เพื่อให้กราฟเต็มพื้นที่
         tooltip: {
-          backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+          enabled: true,
+          backgroundColor: isDark ? 'rgba(15, 23, 42, 0.98)' : 'rgba(255, 255, 255, 0.98)',
           titleColor: isDark ? '#34d399' : '#0f172a',
           bodyColor: isDark ? '#e2e8f0' : '#334155',
           borderColor: isDark ? 'rgba(59, 130, 246, 0.3)' : 'rgba(226, 232, 240, 0.8)',
           borderWidth: 1,
-          padding: 12,
-          cornerRadius: 10,
-          displayColors: false, 
-          titleFont: { family: 'Sora', size: 13, weight: '800' },
+          padding: 15,
+          cornerRadius: 12,
+          displayColors: false, // ซ่อนกล่องสีมาตรฐานเพื่อใช้ Icon แทน
+          titleFont: { family: 'Sora', size: 14, weight: '800' },
           bodyFont: { 
-            family: "'DM Mono', 'Courier New', monospace", // เพื่อให้คอลัมน์ตัวเลขตรงกันเป๊ะ
+            family: "'DM Mono', monospace", // ใช้ Monospace เพื่อให้คอลัมน์ตัวเลขตรงกัน
             size: 11,
-            lineHeight: 1.6
+            lineHeight: 1.8
           },
           callbacks: {
             title: (context) => {
-              if (!context || !context.length || !globalRichChartData) return 'No Data';
+              if (!globalRichChartData) return 'Performance Analysis';
               const rich = globalRichChartData[context[0].dataIndex];
-              return `📊 SUMMARY - ${rich.label.toUpperCase()}`;
+              return `📊 PERIOD: ${rich.label.toUpperCase()}`;
             },
-            label: () => null, // ปิดการแสดงผล Label ปกติเพื่อคุม Layout ใน afterBody
+            label: () => null, // ปิดการแสดงผล Label ปกติ
             afterBody: (context) => {
-              if (!context || !context.length || !globalRichChartData) return [];
+              if (!globalRichChartData) return [];
               const rich = globalRichChartData[context[0].dataIndex];
-              if(!rich || rich.totalQty === 0) return [];
+              if (!rich || rich.totalQty === 0) return ['No Production Recorded'];
 
-              // ฟังก์ชันจัดฟอร์แมตแถวแบบ Matrix (Label | Lot | PCS | %)
-              const formatRow = (label, icon, dataObj) => {
-                const qty = (dataObj.qty || 0).toLocaleString();
-                const lot = (dataObj.lot || 0).toLocaleString();
-                const pct = ((dataObj.qty / rich.totalQty) * 100).toFixed(1);
-                
-                // ใช้การ pad เพื่อจัดระเบียบตัวเลขให้ตรงเป็นแนวตั้ง
-                return `${icon} ${label.padEnd(6)}: ${lot.padStart(3)}L │ ${qty.padStart(5)}P │ ${pct.padStart(5)}%`;
+              // ฟังก์ชันช่วยจัด Format ตัวเลขให้ตรงกัน (Matrix Style)
+              const fmt = (label, icon, dataObj) => {
+                const qty = (dataObj.qty || 0).toLocaleString().padStart(5);
+                const lot = (dataObj.lot || 0).toString().padStart(3);
+                const pct = ((dataObj.qty / rich.totalQty) * 100).toFixed(1).padStart(5);
+                return `${icon} ${label.padEnd(7)}: ${lot}L │ ${qty}P │ ${pct}%`;
               };
 
               return [
-                `TOTAL: ${rich.totalQty.toLocaleString()} PCS │ ${rich.totalLot.toLocaleString()} LOTS`,
-                `──────────────────────────────────`,
-                formatRow('OK',     '🟢', rich.CAN_USE),
-                formatRow('CTC',    '🔵', rich.CTC),
-                formatRow('SF',     '🟠', rich.SF),
-                formatRow('VENDOR', '🔴', rich.VENDOR),
-                `──────────────────────────────────`
+                `TOTAL YIELD: ${rich.totalQty.toLocaleString()} PCS │ ${rich.totalLot} LOTS`,
+                `───────────────────────────────────`,
+                fmt('OK',     '🟢', rich.CAN_USE),
+                fmt('CTC',    '🔵', rich.CTC),
+                fmt('SF',     '🟠', rich.SF),
+                fmt('VENDOR', '🔴', rich.VENDOR),
+                `───────────────────────────────────`
               ];
             }
           }
@@ -11081,25 +11136,25 @@ function initMainChart() {
       },
       scales: {
         x: { 
-          stacked: false,
-          border: { display: false }, 
-          grid: { display: false }, 
+          border: { display: false },
+          grid: { display: false }, // ซ่อนเส้นแนวตั้งเพื่อให้กราฟดูคลีน
           ticks: { 
             color: tickColor, 
-            font: { family: 'Sora', size: 10, weight: '600' }
+            font: { family: 'Sora', size: 11, weight: '600' },
+            padding: 10
           } 
         },
         y: { 
-          stacked: false,
           beginAtZero: true,
-          border: { display: false }, 
+          border: { display: false },
           grid: { 
-            color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+            color: gridColor,
             drawTicks: false 
           }, 
           ticks: { 
             color: tickColor,
-            font: { family: 'DM Mono', size: 10 },
+            font: { family: 'DM Mono', size: 10, weight: '600' },
+            padding: 10,
             callback: (val) => val >= 1000 ? (val/1000).toFixed(1) + 'k' : val 
           } 
         }
@@ -13612,19 +13667,47 @@ listEl.innerHTML = results.map(item => `
     `).join('');
 }
 
+/* ══════════════════════════════════════════════════════════════
+   UPGRADED: updateDelta (CAP AT 100%)
+   ปรับปรุงการแสดงผลค่าเปรียบเทียบให้ไม่เกิน 100% สำหรับ KPI Cards
+   ══════════════════════════════════════════════════════════════ */
 function updateDelta(elementId, currentVal, previousVal, isInverse = true) {
     const el = $id(elementId);
     if (!el) return;
-    if (previousVal === 0) { el.textContent = "New"; el.className = "stat-delta neutral"; return; }
+    
+    // กรณีข้อมูลใหม่ (ฐานเป็น 0)
+    if (previousVal === 0) { 
+        el.textContent = "New"; 
+        el.className = "stat-delta neutral"; 
+        return; 
+    }
 
     const diff = ((currentVal - previousVal) / previousVal) * 100;
     const arrow = diff > 0 ? "▲" : (diff < 0 ? "▼" : "•");
-    el.textContent = `${arrow} ${Math.abs(diff).toFixed(1)}%`;
     
-    // isInverse = true หมายถึง "ถ้าเลขเพิ่ม = ไม่ดี (แดง)" ใช้กับ Fault
-    if (diff === 0) el.className = "stat-delta neutral";
-    else if (isInverse) el.className = diff > 0 ? "stat-delta up" : "stat-delta down";
-    else el.className = diff > 0 ? "stat-delta down" : "stat-delta up"; // สำหรับ Can Use
+    // --- Logic จำกัดเพดานที่ 100% ---
+    let displayVal = "";
+    if (Math.abs(diff) > 100) {
+        displayVal = ">100%";
+    } else {
+        displayVal = Math.abs(diff).toFixed(1) + "%";
+    }
+
+    el.textContent = `${arrow} ${displayVal}`;
+    
+    // กำหนดสีตามเงื่อนไข (isInverse = true คือเลขขึ้นแล้วเป็นสีแดง เช่น งานเสีย)
+    if (Math.abs(diff) < 0.01) {
+        el.className = "stat-delta neutral";
+        el.textContent = "• 0%";
+    }
+    else if (isInverse) {
+        // สำหรับพวก Fault: เพิ่ม = แย่ลง (แดง), ลด = ดีขึ้น (เขียว)
+        el.className = diff > 0 ? "stat-delta up" : "stat-delta down";
+    }
+    else {
+        // สำหรับ Can Use: เพิ่ม = ดีขึ้น (เขียว), ลด = แย่ลง (แดง)
+        el.className = diff > 0 ? "stat-delta down" : "stat-delta up"; 
+    }
 }
 
 // ในฟังก์ชัน refreshDash ให้เพิ่มการดึงข้อมูลช่วงก่อนหน้า (Previous Period) 
