@@ -7567,6 +7567,418 @@ tbody tr {
 #mainTrendChart {
     filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
 }
+/* --- ปรับปรุงส่วนรายการ Ranking ให้ชัดเจนทุกอุปกรณ์ --- */
+.market-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    min-height: 55px; /* เพิ่มความสูงเล็กน้อยกันเบียด */
+    position: relative;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 12px;
+    margin-bottom: 6px;
+    overflow: hidden;
+}
+
+/* ปรับให้ชื่อพาร์ทและแถบสีอยู่ด้วยกัน */
+.market-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.market-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* แถบ Bar ให้บางลงเพื่อไม่ให้แย่งสายตาจากตัวเลข */
+.market-bar-bg {
+    height: 4px; 
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    width: 100%;
+}
+
+/* ส่วนตัวเลขด้านขวา: ทำให้เด่นและชัดเจนที่สุด */
+.market-stats {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 75px; /* ล็อกความกว้างกันตัวเลขกระโดด */
+    z-index: 10; /* ให้ตัวเลขอยู่ชั้นบนสุดเสมอ */
+}
+
+.market-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem !important; /* ขนาดใหญ่ขึ้น */
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    line-height: 1;
+    /* เพิ่มเงาตัวเลขให้ชัดเจนแม้อยู่บนแถบสี */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.market-pct {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--accent); /* สีตามหมวดหมู่ */
+    margin-top: 2px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ปรับให้แสดงผลได้ดีบนมือถือ */
+@media (max-width: 600px) {
+    .market-value { font-size: 0.9rem !important; }
+    .market-item { gap: 8px; padding: 8px; }
+    .market-stats { min-width: 65px; }
+}
+/* 1. ปรับปรุง Header ให้ความสูงลดลง */
+.chart-panel .chart-header {
+    padding: 0.6rem 1.2rem; /* ลดจากเดิมที่ค่อนข้างกว้าง */
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center; /* จัดให้อยู่กึ่งกลางแนวตั้งพอดี */
+    justify-content: space-between;
+}
+
+/* 2. ย่อขนาดตัวหนังสือหัวข้อ */
+.chart-panel .chart-title {
+    font-size: 0.85rem; /* เล็กลงแต่ยังอ่านง่าย */
+    margin-bottom: 0px;
+    color: #f8fafc;
+    font-weight: 800;
+}
+
+.chart-panel .chart-subtitle {
+    font-size: 0.6rem;
+    color: #64748b;
+}
+
+/* 3. ปรับ Stat Boxes ให้แบนลง (Compact Style) */
+.chart-panel .chart-stats {
+    display: flex;
+    gap: 0.5rem; /* ลดระยะห่างระหว่างกล่อง */
+}
+
+.chart-panel .stat-item {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 3px 10px; /* ลด Padding บน-ล่าง ให้แบนลง */
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 65px; /* ลดความกว้างขั้นต่ำ */
+    gap: 0px; /* ตัดช่องว่างระหว่าง label กับ value */
+}
+
+.chart-panel .stat-label {
+    font-size: 0.45rem; /* ขนาดจิ๋ว */
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.chart-panel .stat-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem; /* ลดขนาดตัวเลขลง */
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+/* 4. Responsive: เมื่อจอเล็กมากๆ ให้ย่อลงอีก */
+@media (max-width: 768px) {
+    .chart-panel .chart-header {
+        padding: 0.4rem 0.8rem;
+    }
+    .chart-panel .chart-title-group {
+        display: none; /* ซ่อน subtitle หรือ title ไปเลยถ้าจำเป็นเพื่อประหยัดที่ */
+    }
+    .chart-panel .stat-item {
+        min-width: 55px;
+        padding: 2px 6px;
+    }
+}
+/* ═══════════════════════════════════════════════════
+   ULTRA-MODERN STATS CARD (COCKPIT V5)
+═══════════════════════════════════════════════════ */
+.cockpit-center .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+}
+
+/* แสงเรืองรองที่มุมการ์ด (Ambient Light) */
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: -20%; left: -20%;
+    width: 70%; height: 70%;
+    background: radial-gradient(circle, var(--card-accent) 0%, transparent 70%);
+    opacity: 0.15;
+    pointer-events: none;
+    transition: opacity 0.4s;
+}
+
+/* เส้นขอบนีออนด้านบน */
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--card-accent), transparent);
+    box-shadow: 0 0 15px var(--card-accent);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7);
+}
+
+.stat-card:hover::before {
+    opacity: 0.3;
+}
+
+/* กำหนดสีแยกตามประเภท */
+.stat-card.sf { --card-accent: #f97316; }
+.stat-card.ctc { --card-accent: #ef4444; }
+.stat-card.canuse { --card-accent: #10b981; }
+.stat-card.vendor { --card-accent: #3b82f6; }
+
+/* รายละเอียดภายใน */
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.stat-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--card-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 8px rgba(var(--card-accent), 0.5);
+}
+
+.stat-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    margin: 0.2rem 0;
+    letter-spacing: -1px;
+}
+
+/* Delta Badge (ลูกศรขึ้นลง) */
+.stat-delta {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.stat-delta.up { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.stat-delta.down { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.stat-delta.neutral { background: rgba(148, 163, 184, 0.1); color: #94a3b8; }
+
+.stat-footer {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.stat-sub-label {
+    font-size: 0.6rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.stat-sub-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #cbd5e1;
+}
+
+/* แถบ Share % ด้านล่าง (Heat Track) */
+.stat-share-bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.stat-share-fill {
+    height: 100%;
+    background: var(--card-accent);
+    box-shadow: 0 0 10px var(--card-accent);
+    transition: width 1s ease-out;
+}
+/* ═══════════════════════════════════════════════════
+   ULTRA-LUXE HERO KPI (TOTAL PCS)
+═══════════════════════════════════════════════════ */
+.hero-kpi-card {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(15, 23, 42, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 24px;
+    padding: 1.2rem 1.5rem; 
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.6), 
+                inset 0 0 20px rgba(16, 185, 129, 0.05);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    min-height: 155px;
+}
+
+/* แสงออร่าสีเขียวที่พื้นหลัง */
+.hero-kpi-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -50%;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
+    z-index: 0;
+}
+
+/* เส้นเรืองแสงวิ่งที่ขอบล่าง */
+.hero-kpi-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 10%; right: 10%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #10b981, #34d399, transparent);
+    box-shadow: 0 -5px 15px #10b981;
+    border-radius: 4px 4px 0 0;
+}
+
+.hero-kpi-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    border-color: #10b981;
+    box-shadow: 0 30px 60px -12px rgba(16, 185, 129, 0.3);
+}
+
+.hero-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #10b981;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.hero-icon-box {
+    width: 45px;
+    height: 45px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    font-size: 1.5rem;
+    box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.1);
+}
+
+.hero-main-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 3.5rem; /* ตัวเลขใหญ่สะใจ */
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    margin: 0.5rem 0;
+    letter-spacing: -3px;
+    text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.hero-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    z-index: 1;
+}
+
+.hero-sub-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-sub-label {
+    font-size: 0.65rem;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hero-sub-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #e2e8f0;
+}
+
+.hero-badge-pct {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 800;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+}
 </style>
 </head>
 <body>
@@ -8126,18 +8538,30 @@ tbody tr {
     <div class="cockpit-left">
       
       <!-- ★ HERO KPI: TOTAL PCS ★ -->
-      <div class="hero-kpi-card">
-        <div class="hero-header">
-          <span class="hero-title">Total PCS</span>
-          <span class="hero-icon">📦</span>
+<!-- HERO KPI CARD -->
+<div class="hero-kpi-card">
+    <div class="hero-header">
+        <div class="hero-title">Production Summary</div>
+        <div class="hero-icon-box">📦</div>
+    </div>
+    
+    <div style="display: flex; align-items: baseline; gap: 10px;">
+        <div class="hero-main-val" id="heroTotalQty">0</div>
+        <div style="color: #64748b; font-weight: 700; font-size: 1rem;">PCS</div>
+    </div>
+
+    <div class="hero-footer">
+        <div class="hero-sub-item">
+            <span class="hero-sub-label">Total Verified</span>
+            <span class="hero-sub-value"><span id="heroLot">0</span> <small style="font-size: 0.7rem; color: #475569;">LOTS</small></span>
         </div>
-        <div class="hero-value" id="heroTotalQty">0</div>
-        <div class="hero-footer">
-          <span class="stat-sub"><span id="heroLot">0</span> Lots</span>
-          <span class="stat-pct" id="heroPct">100%</span>
+        
+        <div style="text-align: right;">
+            <span class="hero-sub-label" style="display: block; margin-bottom: 4px;">Pass Rate</span>
+            <div class="hero-badge-pct" id="heroPct">0%</div>
         </div>
-        <div class="hero-sparkline" id="heroSparkline"></div>
-      </div>
+    </div>
+</div>
       
 <!-- MAIN SPEEDOMETER — PASS RATE (SPORT STYLE) -->
 <div class="gauge-cluster main-gauge">
@@ -8404,68 +8828,98 @@ tbody tr {
       
        <!-- ★ STATS ROW: SF, CTC, CAN USE, VENDOR ★ -->
       <div class="stats-row">
-        
-        <!-- 1. SF FAULT (ส้ม) -->
-        <div class="stat-card sf">
-          <div class="stat-header">
+    <!-- SF FAULT -->
+    <div class="stat-card sf">
+        <div class="stat-header">
             <span class="stat-title">SF Fault</span>
-            <span class="stat-icon">🔶</span>
-          </div>
-          <div class="stat-number" id="dashStatSF">0</div>
-          <!-- ส่วน Delta Comparison -->
-          <div class="stat-delta" id="deltaSF">--</div> 
-          <div class="stat-footer">
-            <span class="stat-sub"><span id="dashLotSF">0</span> Lots</span>
-            <span class="stat-pct" id="dashPctSF">0%</span>
-          </div>
+            <div style="color: var(--card-accent); font-size: 1rem;">◆</div>
         </div>
-        
-        <!-- 2. CTC FAULT (แดง) -->
-        <div class="stat-card ctc">
-          <div class="stat-header">
+        <div class="stat-number" id="dashStatSF">0</div>
+        <div class="stat-delta" id="deltaSF">--</div>
+        <div class="stat-footer">
+            <div>
+                <div class="stat-sub-label">Total Lots</div>
+                <div class="stat-sub-value" id="dashLotSF">0</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="stat-sub-label">Share</div>
+                <div class="stat-sub-value" id="dashPctSF" style="color: var(--card-accent)">0%</div>
+            </div>
+        </div>
+        <div class="stat-share-bar">
+            <div class="stat-share-fill" id="barSF" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- CTC FAULT -->
+    <div class="stat-card ctc">
+        <div class="stat-header">
             <span class="stat-title">CTC Fault</span>
-            <span class="stat-icon">🔴</span>
-          </div>
-          <div class="stat-number" id="dashStatCTC">0</div>
-          <!-- ส่วน Delta Comparison -->
-          <div class="stat-delta" id="deltaCTC">--</div> 
-          <div class="stat-footer">
-            <span class="stat-sub"><span id="dashLotCTC">0</span> Lots</span>
-            <span class="stat-pct" id="dashPctCTC">0%</span>
-          </div>
+            <div style="color: var(--card-accent); font-size: 1rem;">●</div>
         </div>
-        
-        <!-- 3. CAN USE (เขียว) -->
-        <div class="stat-card canuse">
-          <div class="stat-header">
-            <span class="stat-title">Can Use</span>
-            <span class="stat-icon">🟢</span>
-          </div>
-          <div class="stat-number" id="dashStatCanUse">0</div>
-          <!-- ส่วน Delta Comparison -->
-          <div class="stat-delta" id="deltaCanUse">--</div> 
-          <div class="stat-footer">
-            <span class="stat-sub"><span id="dashLotCanUse">0</span> Lots</span>
-            <span class="stat-pct" id="dashPctCanUse">0%</span>
-          </div>
+        <div class="stat-number" id="dashStatCTC">0</div>
+        <div class="stat-delta" id="deltaCTC">--</div>
+        <div class="stat-footer">
+            <div>
+                <div class="stat-sub-label">Total Lots</div>
+                <div class="stat-sub-value" id="dashLotCTC">0</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="stat-sub-label">Share</div>
+                <div class="stat-sub-value" id="dashPctCTC" style="color: var(--card-accent)">0%</div>
+            </div>
         </div>
-        
-        <!-- 4. VENDOR FAULT (น้ำเงิน) -->
-        <div class="stat-card vendor">
-          <div class="stat-header">
+        <div class="stat-share-bar">
+            <div class="stat-share-fill" id="barCTC" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- CAN USE -->
+    <div class="stat-card canuse">
+        <div class="stat-header">
+            <span class="stat-title">Can Use (OK)</span>
+            <div style="color: var(--card-accent); font-size: 1rem;">▲</div>
+        </div>
+        <div class="stat-number" id="dashStatCanUse">0</div>
+        <div class="stat-delta" id="deltaCanUse">--</div>
+        <div class="stat-footer">
+            <div>
+                <div class="stat-sub-label">Total Lots</div>
+                <div class="stat-sub-value" id="dashLotCanUse">0</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="stat-sub-label">Share</div>
+                <div class="stat-sub-value" id="dashPctCanUse" style="color: var(--card-accent)">0%</div>
+            </div>
+        </div>
+        <div class="stat-share-bar">
+            <div class="stat-share-fill" id="barCanUse" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- VENDOR FAULT -->
+    <div class="stat-card vendor">
+        <div class="stat-header">
             <span class="stat-title">Vendor Fault</span>
-            <span class="stat-icon">🔵</span>
-          </div>
-          <div class="stat-number" id="dashStatVendor">0</div>
-          <!-- ส่วน Delta Comparison -->
-          <div class="stat-delta" id="deltaVendor">--</div> 
-          <div class="stat-footer">
-            <span class="stat-sub"><span id="dashLotVendor">0</span> Lots</span>
-            <span class="stat-pct" id="dashPctVendor">0%</span>
-          </div>
+            <div style="color: var(--card-accent); font-size: 1rem;">■</div>
         </div>
-        
-      </div>
+        <div class="stat-number" id="dashStatVendor">0</div>
+        <div class="stat-delta" id="deltaVendor">--</div>
+        <div class="stat-footer">
+            <div>
+                <div class="stat-sub-label">Total Lots</div>
+                <div class="stat-sub-value" id="dashLotVendor">0</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="stat-sub-label">Share</div>
+                <div class="stat-sub-value" id="dashPctVendor" style="color: var(--card-accent)">0%</div>
+            </div>
+        </div>
+        <div class="stat-share-bar">
+            <div class="stat-share-fill" id="barVendor" style="width: 0%"></div>
+        </div>
+    </div>
+</div>
       
       <!-- MAIN CHART -->
       <div class="chart-panel main-chart">
@@ -10732,7 +11186,7 @@ function updateMiniGauge(type, val, total) {
   if(needle) needle.style.transform = `rotate(${-90 + (pct*1.8)}deg)`;
 }
 
-// --- Dashboard Lists ---
+// --- Dashboard Lists (ปรับปรุงเพื่อความชัดเจนของตัวเลขทุกอุปกรณ์) ---
 function renderList(elementId, data, key) {
     const listEl = $id(elementId);
     if (!listEl) return;
@@ -10743,12 +11197,13 @@ function renderList(elementId, data, key) {
     data.forEach(r => { 
         if(r[key]) { 
             const val = String(r[key]).trim();
-            map[val] = (map[val] || 0) + (parseInt(r.qty) || 0); 
-            totalAll += (parseInt(r.qty) || 0); 
+            const q = (parseInt(r.qty) || 0);
+            map[val] = (map[val] || 0) + q; 
+            totalAll += q; 
         } 
     });
 
-    // 2. จัดอันดับ 5 อันดับแรก (เรียงลำดับจากมากไปน้อย)
+    // 2. จัดอันดับ 5 อันดับแรก
     const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 5);
     
     if (sorted.length === 0) {
@@ -10756,33 +11211,40 @@ function renderList(elementId, data, key) {
         return;
     }
 
-    const maxVal = sorted[0][1]; // ค่าสูงสุดใช้เพื่อคำนวณความกว้าง Bar (เทียบเป็น 100%)
+    const maxVal = sorted[0][1];
 
-    // 3. สร้าง HTML Template
+    // 3. สร้าง HTML Template ใหม่
     const html = sorted.map((item, i) => {
         const name = item[0];
         const qty = item[1];
         const pctOfTotal = totalAll > 0 ? ((qty / totalAll) * 100).toFixed(1) : 0;
-        const barWidth = (qty / maxVal) * 100; // ความยาว Bar สัมพัทธ์กับอันดับ 1
+        const barWidth = (qty / maxVal) * 100;
 
         return `
-            <div class="futuristic-item stagger-in">
-                <!-- ข้าวหลามตัดจิ๋วพร้อมลำดับ -->
-                <div class="rank-diamond-mini">
+            <div class="futuristic-item stagger-in" style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 6px; position: relative; min-height: 50px; overflow: hidden;">
+                <!-- อันดับ -->
+                <div class="rank-diamond-mini" style="flex-shrink: 0; z-index: 2;">
                     <span>${i + 1}</span>
                 </div>
                 
-                <div class="item-info">
-                    <div class="item-name" title="${escapeHtml(name)}">${escapeHtml(name)}</div>
-                    <div class="energy-track">
-                        <!-- แถบพลังที่จะขยายตามความกว้างที่คำนวณ -->
-                        <div class="energy-fill" style="width: ${barWidth}%"></div>
+                <!-- ข้อมูลชื่อและแถบพลัง -->
+                <div class="item-info" style="flex: 1; margin: 0 12px; min-width: 0; z-index: 2;">
+                    <div class="item-name" title="${escapeHtml(name)}" style="font-size: 0.7rem; font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px;">
+                        ${escapeHtml(name)}
+                    </div>
+                    <div class="energy-track" style="height: 4px; background: rgba(0,0,0,0.3); border-radius: 10px; width: 85%;">
+                        <div class="energy-fill" style="width: ${barWidth}%; height: 100%; border-radius: 10px; transition: width 1.2s ease;"></div>
                     </div>
                 </div>
                 
-                <div class="item-stats">
-                    <span class="val-main">${qty.toLocaleString()}</span>
-                    <span class="val-pct">${pctOfTotal}%</span>
+                <!-- ส่วนตัวเลข (ปรับให้ชัดเจนที่สุด) -->
+                <div class="item-stats" style="text-align: right; min-width: 70px; flex-shrink: 0; z-index: 5; position: relative;">
+                    <span class="val-main" style="display: block; font-family: 'DM Mono', monospace; font-size: 0.95rem; font-weight: 900; color: #ffffff; line-height: 1; text-shadow: 0 0 10px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,1);">
+                        ${qty.toLocaleString()}
+                    </span>
+                    <span class="val-pct" style="font-size: 0.6rem; font-weight: 800; color: var(--accent); text-shadow: 0 1px 3px rgba(0,0,0,0.8); opacity: 1;">
+                        ${pctOfTotal}%
+                    </span>
                 </div>
             </div>
         `;
@@ -10790,18 +11252,16 @@ function renderList(elementId, data, key) {
 
     listEl.innerHTML = html;
 
-    // 4. การจัดการอนิเมชั่น (Staggered Entrance)
+    // 4. การจัดการอนิเมชั่น
     if (window.gsap) {
-        // ใช้ GSAP เพื่อความนุ่มนวลสูงสุด
         gsap.to(`#${elementId} .stagger-in`, {
             opacity: 1,
             y: 0,
             duration: 0.5,
-            stagger: 0.08, // ให้ค่อยๆ โผล่ตามกันมา
+            stagger: 0.08,
             ease: "expo.out"
         });
     } else {
-        // กรณีไม่มี GSAP ให้แสดงทันทีด้วย CSS
         const items = listEl.querySelectorAll('.stagger-in');
         items.forEach((el, index) => {
             setTimeout(() => {
@@ -11393,7 +11853,19 @@ window.refreshDash = function() {
         mainTrendChartInstance.data.datasets[3].data = globalRichChartData.map(m => m.VENDOR.qty);
         mainTrendChartInstance.update(); 
     }
-    
+    // เพิ่มการอัพเดตแถบ Share Bar (Energy Fill)
+const updateBar = (id, pctStr) => {
+    const el = document.getElementById(id);
+    if (el) el.style.width = pctStr;
+};
+// ตัวอย่างการอัพเดตใน JS
+animNum('heroTotalQty', tQ); // ยอด PCS รวม
+if(document.getElementById('heroLot')) document.getElementById('heroLot').textContent = displayData.length.toLocaleString();
+if(document.getElementById('heroPct')) document.getElementById('heroPct').textContent = passPct + '%';
+updateBar('barSF', calcPct(sf));
+updateBar('barCTC', calcPct(ctc));
+updateBar('barCanUse', calcPct(ok));
+updateBar('barVendor', calcPct(ven));
     updateChartStats(chartDataObj.data); 
     renderParetoFocus(displayData);
     renderSupplierScorecard(displayData);
