@@ -8034,6 +8034,562 @@ tbody tr {
     box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 
                 0 0 15px -5px var(--card-accent) !important;
 }
+<!-- ═══════════════════════════════════════════════════
+     FIX: DASHBOARD HEADER OVERLAP & WRAPPING
+═══════════════════════════════════════════════════ -->
+<style>
+/* 1. บังคับ Header ให้เรียงแนวนอนแถวเดียวเท่านั้น */
+.dash-topbar-cockpit {
+    flex-wrap: nowrap !important; 
+    height: 64px !important;
+    min-height: 64px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* 2. ป้องกันกลุ่มปุ่มกดตกลงมาบรรทัดใหม่ */
+.topbar-controls {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    flex-shrink: 0 !important; /* ห้ามถูกบีบจนเบี้ยว */
+    gap: 0.5rem !important;
+}
+
+/* 3. จัดการแถบวิ่ง (Ticker) ให้ยืดหยุ่น */
+.topbar-ticker {
+    flex: 1 !important;
+    min-width: 0 !important; /* ยอมให้หดตัวได้ถ้าพื้นที่ไม่พอ */
+    margin: 0 15px !important;
+}
+
+/* 4. ปรับแต่ง Input ใน Header ให้ขนาดคงที่เพื่อป้องกันการเบียด */
+.control-group {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+}
+
+.control-select {
+    max-width: 150px !important;
+}
+
+/* 5. ระบบ Smart Responsive: 
+   หากหน้าจอแคบกว่า 1200px ให้ซ่อนแถบวิ่ง (Ticker) 
+   เพื่อรักษาพื้นที่ให้โลโก้และปุ่มกดให้อยู่ในแถวเดียวกันได้ */
+@media (max-width: 1200px) {
+    .topbar-ticker {
+        display: none !important;
+    }
+    .dash-topbar-cockpit {
+        justify-content: space-between !important;
+    }
+    /* ย่อขนาดปุ่มในหน้าจอเล็ก */
+    .quick-btn {
+        padding: 0.4rem 0.5rem !important;
+        font-size: 0.6rem !important;
+    }
+}
+
+/* 6. ล็อกตำแหน่ง Body ของ Dashboard ให้เริ่มต่อจาก Header พอดี */
+.cockpit-body {
+    margin-top: 0 !important;
+    padding-top: 10px !important;
+}
+/* ═══════════════════════════════════════════════════
+   NEW GAUGE DESIGN SYSTEM (NO OVERFLOW)
+═══════════════════════════════════════════════════ */
+.main-gauge {
+    padding: 1rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px !important;
+    overflow: hidden !important; /* บังคับห้ามเลยกรอบ */
+}
+
+.gauge-ring-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-width: 200px; /* คุมขนาดสูงสุด */
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gauge-svg-engine {
+    width: 100%;
+    height: 100%;
+    overflow: visible; /* ให้แสง Glow แสดงผลได้แต่ถูกคุมด้วย wrapper */
+}
+
+/* ข้อความกลางหน้าปัด */
+.gauge-center-data {
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    top: 55%; /* ปรับให้ค่อนไปทางล่างเพื่อให้สมดุลกับเข็ม */
+}
+
+.gauge-value-main {
+    font-family: 'Orbitron', 'Sora', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -1px;
+    background: linear-gradient(180deg, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+}
+
+.gauge-status-label {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-top: 5px;
+    background: rgba(255,255,255,0.05);
+    color: #64748b;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ตัวเลข 0 และ 100 */
+.gauge-label-num {
+    fill: #475569;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-anchor: middle;
+}
+
+/* การเคลื่อนไหว */
+.gauge-arc-transition {
+    transition: stroke-dasharray 1.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.needle-group {
+    transform-origin: 100px 100px; /* ต้องตรงกับจุดกึ่งกลางของวงกลมใน SVG */
+    transition: transform 1.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ขีด Ticks */
+.gauge-tick-line {
+    stroke: rgba(255,255,255,0.1);
+    stroke-width: 1;
+}
+
+.gauge-tick-line.major {
+    stroke: rgba(255,255,255,0.3);
+    stroke-width: 2;
+}
+
+/* สถานะสีตัวอักษรตามค่า */
+.state-critical { color: #ef4444 !important; text-shadow: 0 0 15px rgba(239,68,68,0.5); }
+.state-warning { color: #f59e0b !important; text-shadow: 0 0 15px rgba(245,158,11,0.5); }
+.state-excellent { color: #10b981 !important; text-shadow: 0 0 15px rgba(16,185,129,0.5); }
+/* การ์ดรายการ Supplier แต่ละแถว */
+.scorecard-item {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden; /* ป้องกันของล้น */
+}
+
+/* วงกลมเกรด (Grade Orb) */
+.grade-orb {
+    flex-shrink: 0; /* ห้ามโดนบีบขนาด */
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    border: 2px solid currentColor;
+}
+
+/* ส่วนเนื้อหาตรงกลาง */
+.score-info {
+    flex: 1; /* กินพื้นที่ที่เหลือ */
+    min-width: 0; /* สำคัญมาก: เพื่อให้ตัดคำ (Ellipsis) ทำงานได้ */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* ชื่อ Supplier */
+.supplier-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.supplier-name-text {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* ถ้าชื่อยาวเกินจะขึ้น ... */
+}
+
+/* แถวเปอร์เซ็นต์และป้ายสถานะ */
+.rate-status-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* ให้ขึ้นบรรทัดใหม่ได้ถ้าที่แคบ */
+    gap: 8px;
+}
+
+.rate-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+/* ตัวเลขสถิติด้านล่าง (Total/NG) */
+.stats-mini-row {
+    display: flex;
+    gap: 12px;
+    font-size: 0.65rem;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+/* อันดับ (Rank) */
+.rank-badge-mini {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 0.55rem;
+    font-weight: 800;
+    color: #475569;
+    font-family: var(--font-mono);
+    opacity: 0.8;
+}
+
+/* Media Query สำหรับจอเล็กพิเศษ */
+@media (max-width: 400px) {
+    .grade-orb {
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+    .rate-value {
+        font-size: 0.9rem;
+    }
+}
+/* คอนเทนเนอร์รายการ */
+.scorecard-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0; /* สำหรับอนิเมชั่น */
+    transform: translateY(10px);
+}
+
+.scorecard-item:hover {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(4px);
+}
+
+/* วงกลมเกรด */
+.grade-orb-mini {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    border: 2px solid currentColor;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+}
+
+/* ข้อมูลหลัก */
+.score-main-info {
+    flex: 1;
+    min-width: 0; /* สำคัญ: เพื่อให้ตัดคำได้ */
+}
+
+.score-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.score-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.65rem;
+    font-family: 'DM Mono', monospace;
+    color: #94a3b8;
+}
+
+/* ส่วนตัวเลขด้านขวา */
+.score-stats-right {
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 60px;
+}
+
+.score-rate {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+/* สถานะ "ไม่มีข้อมูล" */
+.score-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+    color: #475569;
+    text-align: center;
+}
+.grade-filter-btn {
+    background: transparent;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #64748b;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.grade-filter-btn span {
+    font-size: 0.6rem;
+    opacity: 0.7;
+}
+
+.grade-filter-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+.grade-filter-btn.active#btn-grade-ALL { color: white; }
+
+/* คอนเทนเนอร์ปุ่ม Filter แบบ Pill */
+.grade-pill-group {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 16px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    justify-content: center;
+}
+
+.pill-btn {
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* เอฟเฟกต์ปุ่มที่เลือก (Glow Effect) */
+.pill-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+/* การ์ดรายการ Supplier (Premium Glass) */
+.supplier-glass-card {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    opacity: 0; /* เริ่มต้นซ่อนไว้เพื่อทำอนิเมชั่น */
+}
+
+.supplier-glass-card:hover {
+    border-color: var(--accent-color);
+    background: rgba(30, 41, 59, 0.9);
+    transform: scale(1.02) translateX(5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* ชื่อ Vendor - เน้นให้ใหญ่และขาวจัด */
+.vendor-name-highlight {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.2px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    margin-bottom: 2px;
+}
+
+/* Keyframes สำหรับอนิเมชั่นไหลเข้า */
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* การ์ดหลัก - ปรับ Padding ให้ยืดหยุ่น */
+.supplier-glass-card {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 2vw, 15px); /* เว้นวรรคตามขนาดจอ */
+    padding: clamp(10px, 2.5vw, 14px);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 8px;
+    overflow: hidden; /* ป้องกันของล้น */
+    min-width: 0; /* สำคัญ: ยอมให้ Flex child หดตัวได้ */
+}
+
+/* วงกลมเกรด - ปรับขนาดตามจอ */
+.grade-orb-responsive {
+    flex-shrink: 0;
+    width: clamp(34px, 8vw, 42px);
+    height: clamp(34px, 8vw, 42px);
+    border-radius: 50%;
+    border: 2px solid var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    color: var(--accent-color);
+    background: var(--accent-color)15;
+}
+
+/* ส่วนชื่อพาร์ทเนอร์ - ใช้ flex: 1 และ min-width: 0 เพื่อให้บีบได้ */
+.vendor-info-container {
+    flex: 1;
+    min-width: 0; 
+    display: flex;
+    flex-direction: column;
+}
+
+/* ชื่อ Vendor - ใช้ clamp และทำ ellipsis (ขึ้น ... เมื่อยาวเกิน) */
+.vendor-name-highlight {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(0.75rem, 2.2vw, 0.95rem); /* ยืดหยุ่น 0.75 ถึง 0.95 */
+    font-weight: 800;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* ถ้าชื่อยาวเกินจะตัดเป็น ... */
+    width: 100%;
+}
+
+/* ตัวเลขสถิติด้านล่าง (Total/NG) */
+.vendor-sub-stats {
+    display: flex;
+    gap: 8px;
+    font-size: clamp(0.55rem, 1.5vw, 0.65rem);
+    color: #94a3b8;
+    font-family: 'DM Mono';
+}
+
+/* เปอร์เซ็นต์ด้านขวา */
+.vendor-rate-display {
+    text-align: right;
+    flex-shrink: 0;
+    min-width: fit-content;
+}
+
+.rate-number {
+    display: block;
+    font-family: 'DM Mono';
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    font-weight: 800;
+    color: var(--accent-color);
+    line-height: 1;
+}
+
+.rate-label {
+    display: block;
+    font-size: clamp(0.45rem, 1.2vw, 0.5rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #475569;
+}
+/* --- อนิเมชั่นการเต้นของหัวใจสำหรับเกรด D --- */
+@keyframes orb-heartbeat {
+    0%, 100% { 
+        transform: scale(1); 
+        box-shadow: 0 0 0 0 transparent; 
+    }
+    15% { 
+        transform: scale(1.1); /* จังหวะเต้นครั้งที่ 1 */
+        box-shadow: 0 0 15px 2px var(--pulse-color); 
+    }
+    30% { 
+        transform: scale(1.02); 
+        box-shadow: 0 0 5px 1px var(--pulse-color); 
+    }
+    45% { 
+        transform: scale(1.15); /* จังหวะเต้นครั้งที่ 2 (แรงกว่าเล็กน้อย) */
+        box-shadow: 0 0 20px 4px var(--pulse-color); 
+    }
+}
+
+.pulse-heartbeat {
+    /* เรียกใช้งานอนิเมชั่น */
+    animation: orb-heartbeat 2.5s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    position: relative;
+    z-index: 5;
+}
 </style>
 </head>
 <body>
@@ -8618,107 +9174,70 @@ tbody tr {
     </div>
 </div>
       
-<!-- MAIN SPEEDOMETER — PASS RATE (SPORT STYLE) -->
+<!-- MAIN SPEEDOMETER — PASS RATE (FUTURISTIC RE-DESIGN) -->
 <div class="gauge-cluster main-gauge">
-<div class="gauge-ring" id="mainGaugeRing">
-    
-  <!-- ตัวเลขกลางวง -->
-  <div class="gauge-center">
-    <div class="gauge-value" id="mainGaugeValue" style="font-size: clamp(1.8rem, 5vw, 2.8rem);">0%</div>
-  </div>
+  <div class="gauge-ring-wrapper">
+    <div class="gauge-center-data">
+      <div class="gauge-value-main" id="mainGaugeValue">0%</div>
+      <div class="gauge-status-label" id="mainGaugeStatus">ANALYZING</div>
+    </div>
 
-  <!-- SVG Structure (Sport Style) -->
-  <svg viewBox="0 0 200 200" class="gauge-svg" style="position: relative; z-index: 10;">
+    <svg viewBox="0 0 200 200" class="gauge-svg-engine" preserveAspectRatio="xMidYMid meet">
       <defs>
-  <!-- ตัวทำเรืองแสงบางๆ -->
-  <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
-    <feGaussianBlur stdDeviation="1.5" result="blur" />
-    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-  </filter>
-</defs>
-
-        <!-- Gradient สีแบบ Heatmap -->
+        <!-- แสงเรืองรอง (Glow Filter) -->
+        <filter id="ultraGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+        
+        <!-- Gradient หลักของหน้าปัด -->
         <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" style="stop-color:#ef4444"/>
-          <stop offset="35%" style="stop-color:#f59e0b"/>
-          <stop offset="70%" style="stop-color:#84cc16"/>
-          <stop offset="100%" style="stop-color:#10b981"/>
+          <stop offset="0%" style="stop-color:#ef4444" /> <!-- Red -->
+          <stop offset="40%" style="stop-color:#f59e0b" /> <!-- Orange -->
+          <stop offset="80%" style="stop-color:#10b981" /> <!-- Green -->
+          <stop offset="100%" style="stop-color:#34d399" /> <!-- Mint -->
         </linearGradient>
-        
-        <!-- Needle Gradient -->
-        <linearGradient id="mainNeedleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style="stop-color:#ffffff"/>
-          <stop offset="40%" style="stop-color:#e2e8f0"/>
-          <stop offset="100%" style="stop-color:#64748b"/>
-        </linearGradient>
-        
-        <!-- Glow Filters -->
-        <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="blur"/>
-          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-        </filter>
-        
-        <filter id="needleGlow" x="-100%" y="-100%" width="300%" height="300%">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
-          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-        </filter>
-        
-        <!-- Glass Reflection -->
-        <linearGradient id="mainGlassReflect" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style="stop-color:rgba(255,255,255,0.15)"/>
-          <stop offset="40%" style="stop-color:rgba(255,255,255,0.05)"/>
-          <stop offset="100%" style="stop-color:transparent"/>
-        </linearGradient>
-        
-        <!-- Outer Ring Gradient -->
-        <linearGradient id="outerRingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" style="stop-color:#1e293b"/>
-          <stop offset="50%" style="stop-color:#334155"/>
-          <stop offset="100%" style="stop-color:#1e293b"/>
+
+        <!-- แสงสะท้อนผิวกระจก -->
+        <linearGradient id="glassReflect" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:rgba(255,255,255,0.1)" />
+          <stop offset="50%" style="stop-color:transparent" />
         </linearGradient>
       </defs>
 
-      <!-- 1. Outer Ring (ขอบนอก) -->
-      <circle cx="100" cy="100" r="95" fill="none" stroke="url(#outerRingGradient)" stroke-width="3"/>
+      <!-- 1. ขอบวงแหวนนอกสุด (Outer Rim) -->
+      <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
       
-      <!-- 2. Inner Shadow Ring -->
-      <circle cx="100" cy="100" r="88" fill="none" stroke="#0f172a" stroke-width="2" opacity="0.5"/>
+      <!-- 2. พื้นหลังรางเกจ (Track) -->
+      <path d="M 35 155 A 80 85 0 1 1 165 155" fill="none" stroke="rgba(15, 23, 42, 0.6)" stroke-width="12" stroke-linecap="round" />
       
-      <!-- 3. Background Track (เส้นดำด้านล่าง) -->
-      <path d="M 15 100 A 85 85 0 1 1 185 100" fill="none" stroke="#1e293b" stroke-width="14" stroke-linecap="round"/>
-      
-      <!-- 4. Tick Marks Container -->
-      <g id="gaugeTicks"></g>
-      
-      <!-- 5. Progress Arc (เส้นสีที่วิ่ง) -->
-      <path id="mainGaugeArc" d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="url(#gaugeGradient)" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 267" filter="url(#neonGlow)" style="transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1)"/>
-      
-      <!-- 7. Needle Group (เข็ม) -->
-      <g id="gaugeNeedle" style="transform-origin: 100px 100px; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
-         <!-- เข็มแบบสามเหลี่ยมคม (Sport Style) -->
-         <polygon points="100,18 94,88 100,100 106,88" fill="url(#mainNeedleGradient)" filter="url(#needleGlow)"/>
-         
-         <!-- Hub (จุดศูนย์กลาง) -->
-         <circle cx="100" cy="100" r="12" fill="#0f172a" stroke="#475569" stroke-width="2"/>
-         <circle cx="100" cy="100" r="5" fill="#10b981" filter="url(#needleGlow)"/>
+      <!-- 3. ขีดสเกลดิจิทัล (Digital Ticks) -->
+      <g id="digitalTicks" class="gauge-ticks-group"></g>
+
+      <!-- 4. แถบสีแสดงผล (Active Progress) -->
+      <path id="mainGaugeArc" d="M 35 155 A 80 85 0 1 1 165 155" 
+            fill="none" stroke="url(#gaugeGradient)" stroke-width="12" 
+            stroke-linecap="round" stroke-dasharray="0 400" 
+            filter="url(#ultraGlow)" class="gauge-arc-transition" />
+
+      <!-- 5. ชุดเข็มไมล์ (Futuristic Needle) -->
+      <g id="gaugeNeedle" class="needle-group">
+        <!-- เงาเข็ม -->
+        <path d="M 100 100 L 100 35" stroke="rgba(0,0,0,0.3)" stroke-width="4" stroke-linecap="round" transform="rotate(-115 100 100)" />
+        <!-- ตัวเข็ม -->
+        <path d="M 100 105 L 96 100 L 100 30 L 104 100 Z" fill="#ffffff" filter="url(#ultraGlow)" />
+        <!-- จุดหมุนกลาง (Multi-layer Hub) -->
+        <circle cx="100" cy="100" r="10" fill="#0f172a" stroke="#475569" stroke-width="1" />
+        <circle cx="100" cy="100" r="4" id="needleCore" fill="#10b981" />
       </g>
       
-      <!-- 8. Glass Reflection Overlay -->
-      <ellipse cx="100" cy="60" rx="60" ry="30" fill="url(#mainGlassReflect)" opacity="0.5"/>
-      
- 
-      <!-- 9. Small Highlight Dots -->
-      <circle cx="25" cy="85" r="2" fill="rgba(255,255,255,0.1)"/>
-      <circle cx="175" cy="85" r="2" fill="rgba(255,255,255,0.1)"/>
+      <!-- 6. ตัวเลขบอกพิกัด 0 - 100 -->
+      <text x="30" y="175" class="gauge-label-num">0</text>
+      <text x="170" y="175" class="gauge-label-num">100</text>
     </svg>
   </div>
+</div>
 
-  <!-- Trend อยู่นอกวงกลม -->
-<div class="gauge-trend" id="mainGaugeTrend">
-  <div class="trend-arrow"></div> <!-- ใช้ CSS วาดสามเหลี่ยม -->
-  <span class="trend-value">Good</span>
-</div>
-</div>
 <!-- PARETO AUDIT FOCUS CARD -->
 <div class="market-panel" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(239, 68, 68, 0.3);">
   <div class="market-header">
@@ -9024,10 +9543,19 @@ tbody tr {
       <div class="market-badge" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.25); font-size: 0.55rem; font-weight: 700; padding: 3px 8px; border-radius: 99px; letter-spacing: 0.05em;">MONTHLY</div>
     </div>
     
-    <!-- ส่วนรายการ (ขยายเต็มพื้นที่ตรงกลาง) -->
-    <div class="market-list scroll" id="supplierScorecardList" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding-right: 4px;">
-      <!-- Injected by JS -->
-    </div>
+<!-- แถบ Filter เกรด -->
+<div class="scorecard-filters" style="display: flex; justify-content: space-around; padding: 10px; background: rgba(15, 23, 42, 0.5); border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
+    <button onclick="filterScorecard('ALL')" class="grade-filter-btn active" id="btn-grade-ALL">ALL</button>
+    <button onclick="filterScorecard('A')" class="grade-filter-btn" id="btn-grade-A" style="color: #10b981;">A <span id="count-A">0</span></button>
+    <button onclick="filterScorecard('B')" class="grade-filter-btn" id="btn-grade-B" style="color: #3b82f6;">B <span id="count-B">0</span></button>
+    <button onclick="filterScorecard('C')" class="grade-filter-btn" id="btn-grade-C" style="color: #f59e0b;">C <span id="count-C">0</span></button>
+    <button onclick="filterScorecard('D')" class="grade-filter-btn" id="btn-grade-D" style="color: #ef4444;">D <span id="count-D">0</span></button>
+</div>
+
+<!-- ส่วนแสดงผลรายการ -->
+<div id="supplierScorecardList" class="scroll" style="height: 350px; overflow-y: auto;">
+    <!-- รายการจะถูกฉีดเข้าที่นี่โดย JS -->
+</div>
 
     <div style="margin-top: auto; display: flex; justify-content: space-between; font-size: 0.65rem; color: #64748b; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; font-family: var(--font-mono); flex-shrink: 0;">
       <span style="color: #10b981;">A:<0.5%</span>
@@ -11162,76 +11690,93 @@ function resetDashFilters() {
     toast('🔄 ล้างการกรองข้อมูลและปิดไฟปุ่มทั้งหมดแล้ว');
 }
 
-// --- Gauges ---
 function updateMainGauge(pct) {
-  const valDisplay = document.getElementById('mainGaugeValue');
-  const trendBox = document.getElementById('mainGaugeTrend');
-  const trendText = trendBox ? trendBox.querySelector('.trend-value') : null;
-  const trendArrow = trendBox ? trendBox.querySelector('.trend-arrow') : null;
+    const valDisplay = document.getElementById('mainGaugeValue');
+    const statusLabel = document.getElementById('mainGaugeStatus');
+    const arc = document.getElementById('mainGaugeArc');
+    const needle = document.getElementById('gaugeNeedle');
+    const core = document.getElementById('needleCore');
 
-  // 1. กำหนดสีและคำอธิบายตามค่าเปอร์เซ็นต์
-  let statusColor = '';
-  let statusText = '';
-  let statusClass = '';
-  let rotation = '0deg';
+    // 1. กำหนดสถานะคำพูดตาม Level
+    let statusText = 'CRITICAL';
+    let statusColor = '#ef4444'; // สีสำหรับการเรืองแสงของตัวเลข
 
-  if (pct >= 90) {
-    statusColor = '#10b981'; // เขียว
-    statusText = 'Excellent';
-    statusClass = 'status-excellent';
-    rotation = '0deg';
-  } else if (pct >= 75) {
-    statusColor = '#84cc16'; // เขียวอ่อน
-    statusText = 'Good';
-    statusClass = 'status-good';
-    rotation = '0deg';
-  } else if (pct >= 50) {
-    statusColor = '#f59e0b'; // ส้ม/เหลือง
-    statusText = 'Fair';
-    statusClass = 'status-warning';
-    rotation = '90deg';
-  } else {
-    statusColor = '#ef4444'; // แดง
-    statusText = 'Critical';
-    statusClass = 'status-critical';
-    rotation = '180deg';
-  }
+    if (pct >= 95) { 
+        statusText = 'ULTRA-PERFECT'; 
+        statusColor = '#06b6d4'; 
+    } else if (pct >= 85) { 
+        statusText = 'OPTIMIZED'; 
+        statusColor = '#22c55e'; 
+    } else if (pct >= 70) { 
+        statusText = 'STABLE'; 
+        statusColor = '#eab308'; 
+    } else if (pct >= 50) { 
+        statusText = 'CAUTION'; 
+        statusColor = '#f97316'; 
+    }
 
-  // 2. อัปเดตตัวเลขเปอร์เซ็นต์ (เปลี่ยนสีและเงาเรืองแสง)
-  if (valDisplay) {
-    valDisplay.textContent = pct + '%';
-    valDisplay.style.color = statusColor;
-    valDisplay.style.webkitTextFillColor = statusColor; // สำหรับบาง Browser
-    valDisplay.style.filter = `drop-shadow(0 0 12px ${statusColor}66)`; 
-  }
+    // 2. อัปเดตตัวเลขพร้อมแอนิเมชันเด้ง
+    if (valDisplay) {
+        valDisplay.textContent = pct + '%';
+        valDisplay.style.textShadow = `0 0 25px ${statusColor}88`;
+        valDisplay.classList.remove('num-changed');
+        void valDisplay.offsetWidth; // Trigger reflow
+        valDisplay.classList.add('num-changed');
+    }
 
-  // 3. อัปเดตแถบสีของ Gauge (ขยับเส้นสี)
-  const arc = document.getElementById('mainGaugeArc');
-  if (arc) {
-    const circ = 267; // ค่าความยาวเส้นรอบวงที่ตั้งไว้
-    arc.style.strokeDasharray = `${(pct / 100) * circ} ${circ}`;
-  }
+    // 3. อัปเดตป้ายชื่อสถานะ
+    if (statusLabel) {
+        statusLabel.textContent = statusText;
+        statusLabel.style.color = statusColor;
+        statusLabel.style.borderColor = `${statusColor}44`;
+    }
 
-  // 4. อัปเดตเข็มไมล์
-  const needle = document.getElementById('gaugeNeedle');
-  if (needle) {
-    needle.style.transform = `rotate(${-90 + (pct * 1.8)}deg)`;
-  }
+    // 4. คำนวณความยาว Arc (อิงตาม Path 82 radius)
+    // ความยาวจริงของ Path ประมาณ 370 หน่วย
+    if (arc) {
+        const pathLength = 370;
+        const dashOffset = (pct / 100) * pathLength;
+        arc.style.strokeDasharray = `${dashOffset} 400`;
+    }
 
-  // 5. อัปเดตกล่องสถานะด้านล่าง (สีขอบ, สีตัวอักษร, และลูกศร)
-  if (trendBox && trendText && trendArrow) {
-    trendBox.className = 'gauge-trend ' + statusClass; // เปลี่ยน class เพื่อใช้ animation ที่ตั้งไว้
-    trendBox.style.borderColor = statusColor;
-    trendBox.style.color = statusColor;
-    trendBox.style.boxShadow = `0 0 15px ${statusColor}33`;
-    
-    trendText.textContent = statusText;
-    trendText.style.color = statusColor;
-    
-    trendArrow.style.borderBottomColor = statusColor; // เปลี่ยนสีลูกศร
-    trendArrow.style.transform = `rotate(${rotation})`;
-  }
+    // 5. ขยับเข็ม (0% = -115deg, 100% = 115deg)
+    if (needle) {
+        const angle = -130 + (pct * 2.6);
+        needle.style.transform = `rotate(${angle}deg)`;
+    }
+
+    if (core) core.style.fill = statusColor;
 }
+
+// เรียกวาดขีดหน้าปัดทันทีที่เปิด Dashboard
+function drawGaugeUI() {
+    const ticksContainer = document.getElementById('digitalTicks');
+    if (!ticksContainer) return;
+    ticksContainer.innerHTML = '';
+    
+    // วาด 40 ขีดดิจิทัล
+    for (let i = 0; i <= 40; i++) {
+        const angle = -115 + (i * 5.75); // กระจาย 40 ขีดใน 230 องศา
+        const isMajor = i % 10 === 0;
+        const r = 90;
+        const len = isMajor ? 10 : 5;
+        
+        const rad = (angle - 90) * (Math.PI / 180);
+        const x1 = 100 + r * Math.cos(rad);
+        const y1 = 100 + r * Math.sin(rad);
+        const x2 = 100 + (r - len) * Math.cos(rad);
+        const y2 = 100 + (r - len) * Math.sin(rad);
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+        line.setAttribute("class", "gauge-tick-line");
+        line.style.strokeWidth = isMajor ? "2" : "1";
+        ticksContainer.appendChild(line);
+    }
+}
+// สั่งรันตอนเปิด Dashboard
+drawGaugeUI();
 
 function updateMiniGauge(type, val, total) {
   const pct = total > 0 ? Math.round((val/total)*100) : 0;
@@ -14121,7 +14666,21 @@ function renderSupplierScorecard(data) {
     const listEl = document.getElementById('supplierScorecardList');
     if (!listEl) return;
 
-    // 1. ประมวลผลข้อมูล
+    // 1. ตรวจสอบว่ามีข้อมูลไหม
+    if (!data || data.length === 0) {
+        listEl.innerHTML = `
+            <div class="score-empty-state">
+                <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">🔍</div>
+                <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                    No Data Detected
+                </div>
+                <div style="font-size: 0.6rem; opacity: 0.7;">กรุณาเลือกช่วงเวลาหรือพนักงาน</div>
+            </div>
+        `;
+        return;
+    }
+
+    // 2. คำนวณสถิติ Supplier
     const supplierStats = {};
     data.forEach(r => {
         const sName = r.supplier || "Unknown";
@@ -14131,67 +14690,55 @@ function renderSupplierScorecard(data) {
         if (r.judgment === 'VENDOR FAULT') supplierStats[sName].ng += qty;
     });
 
+    // 3. จัดกลุ่มเกรด
     const results = Object.entries(supplierStats).map(([name, stats]) => {
         const rate = stats.total > 0 ? (stats.ng / stats.total) * 100 : 0;
-        let grade, color, shadow, label, icon;
+        let grade, color, label;
 
-        if (rate <= 0.5) {
-            grade = 'A'; color = '#10b981'; shadow = '0 0 15px #10b981'; label = 'EXCELLENT'; icon = '🛡️';
-        } else if (rate <= 2.0) {
-            grade = 'B'; color = '#3b82f6'; shadow = '0 0 15px #3b82f6'; label = 'QUALIFIED'; icon = '💎';
-        } else if (rate <= 5.0) {
-            grade = 'C'; color = '#f59e0b'; shadow = '0 0 15px #f59e0b'; label = 'WATCHLIST'; icon = '⚠️';
-        } else {
-            grade = 'D'; color = '#ef4444'; shadow = '0 0 20px #ef4444'; label = 'CRITICAL'; icon = '🚨';
-        }
+        if (rate <= 0.5) { grade = 'A'; color = '#10b981'; label = 'EXCELLENT'; }
+        else if (rate <= 2.0) { grade = 'B'; color = '#3b82f6'; label = 'QUALIFIED'; }
+        else if (rate <= 5.0) { grade = 'C'; color = '#f59e0b'; label = 'WATCHLIST'; }
+        else { grade = 'D'; color = '#ef4444'; label = 'CRITICAL'; }
 
-        return { name, rate, grade, color, shadow, label, icon, ng: stats.ng, total: stats.total };
+        return { name, rate, grade, color, label, ng: stats.ng, total: stats.total };
     }).sort((a, b) => b.rate - a.rate);
 
-listEl.innerHTML = results.map(item => `
-        <div class="scorecard-item" style="padding: 12px 15px;">
-            <!-- Left: Grade Orb -->
-            <div class="grade-orb" style="color: ${item.color}; border: 2.2px solid ${item.color}; width: 42px; height: 42px; font-size: 1.3rem; box-shadow: inset 0 0 10px ${item.color}40, ${item.shadow}60; ${item.grade === 'D' ? 'animation: danger-pulse 2s infinite;' : ''}">
+    // 4. วาด HTML
+    listEl.innerHTML = results.map(item => `
+        <div class="scorecard-item">
+            <div class="grade-orb-mini" style="color: ${item.color}; border-color: ${item.color}40; background: ${item.color}10;">
                 ${item.grade}
             </div>
-
-            <!-- Center: Main Info -->
-            <div style="flex: 1; margin: 0 12px; min-width: 0;">
-                <!-- ชื่อ Vendor: บรรทัดเดียวเป๊ะ -->
-                <div style="font-size: 0.95rem; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 2px 4px rgba(0,0,0,0.5); margin-bottom: 4px;" title="${item.name}">
-                    ${item.icon} ${item.name}
-                </div>
-                
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 800; color: ${item.color};">
-                        ${item.rate.toFixed(1)}%
-                    </div>
-                    <div style="padding: 1px 6px; border-radius: 4px; background: ${item.color}20; border: 1px solid ${item.color}40; color: ${item.color}; font-size: 0.5rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
-                        ${item.label}
-                    </div>
-                </div>
-                
-                <div class="heat-track" style="height: 4px; margin-top: 8px;">
-                    <div class="heat-fill" style="width: ${Math.min(item.rate * 10, 100)}%; background: ${item.color}; box-shadow: 0 0 8px ${item.color}60;"></div>
-                </div>
-
-                <div style="display: flex; gap: 10px; margin-top: 6px; opacity: 0.8;">
-                    <span style="font-size: 0.6rem; color: #94a3b8;">TOTAL: <b>${item.total}</b></span>
-                    <span style="font-size: 0.6rem; color: #94a3b8;">NG: <b style="color:#fff">${item.ng}</b></span>
+            <div class="score-main-info">
+                <span class="score-name" title="${item.name}">${item.name}</span>
+                <div class="score-meta">
+                    <span>T: ${item.total}</span>
+                    <span style="color: ${item.color}">NG: ${item.ng}</span>
                 </div>
             </div>
-
-            <!-- Right: Rank -->
-            <div style="text-align: right; flex-shrink: 0;">
-                <div style="font-size: 0.6rem; color: #475569; font-family: var(--font-mono); font-weight: 800;">
-                    RANK #${results.indexOf(item) + 1}
-                </div>
-                <div style="margin-top: 15px; font-size: 1rem;">
-                    ${item.grade === 'D' ? '⚠️' : ''}
-                </div>
+            <div class="score-stats-right">
+                <span class="score-rate" style="color: ${item.color}">${item.rate.toFixed(1)}%</span>
+                <span style="font-size: 0.5rem; font-weight: 800; opacity: 0.6;">${item.label}</span>
             </div>
         </div>
     `).join('');
+
+    // 5. รันอนิเมชั่นไหลเข้า (ใช้ GSAP สั่ง Stagger)
+    if (window.gsap) {
+        gsap.to('.scorecard-item', {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            stagger: 0.08,
+            ease: "power2.out"
+        });
+    } else {
+        // Fallback กรณีไม่มี GSAP
+        document.querySelectorAll('.scorecard-item').forEach(el => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        });
+    }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -14278,6 +14825,168 @@ function renderDrillDownChart(data) {
         }
     });
 }
+let currentGradeFilter = 'ALL'; // ตัวแปรเก็บสถานะการ Filter ปัจจุบัน
+let cachedScorecardData = [];   // เก็บข้อมูลที่คำนวณแล้วไว้เพื่อ Filter ซ้ำได้เร็ว
+
+function renderSupplierScorecard(data) {
+    if (!data) return;
+
+    // 1. คำนวณสถิติ
+    const supplierStats = {};
+    data.forEach(r => {
+        const sName = r.supplier || "Unknown";
+        if (!supplierStats[sName]) supplierStats[sName] = { total: 0, ng: 0 };
+        const qty = parseInt(r.qty) || 0;
+        supplierStats[sName].total += qty;
+        if (r.judgment === 'VENDOR FAULT') supplierStats[sName].ng += qty;
+    });
+
+    // 2. จัดกลุ่มเกรดและนับจำนวน
+    let counts = { A: 0, B: 0, C: 0, D: 0 };
+    cachedScorecardData = Object.entries(supplierStats).map(([name, stats]) => {
+        const rate = stats.total > 0 ? (stats.ng / stats.total) * 100 : 0;
+        let grade, color;
+
+        if (rate <= 0.5) { grade = 'A'; color = '#10b981'; }
+        else if (rate <= 2.0) { grade = 'B'; color = '#3b82f6'; }
+        else if (rate <= 5.0) { grade = 'C'; color = '#f59e0b'; }
+        else { grade = 'D'; color = '#ef4444'; }
+
+        counts[grade]++;
+        return { name, rate, grade, color, total: stats.total, ng: stats.ng };
+    }).sort((a, b) => b.rate - a.rate);
+
+    // อัปเดตตัวเลขบนปุ่ม Filter
+    ['A', 'B', 'C', 'D'].forEach(g => {
+        const el = document.getElementById(`count-${g}`);
+        if(el) el.textContent = counts[g];
+    });
+
+    displayFilteredScorecard();
+}
+
+// ฟังก์ชันสำหรับเปลี่ยนกลุ่มที่ต้องการดู
+function filterScorecard(grade) {
+    currentGradeFilter = grade;
+    
+    // อัปเดต UI ของปุ่ม
+    document.querySelectorAll('.grade-filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`btn-grade-${grade}`).classList.add('active');
+    
+    displayFilteredScorecard();
+}
+
+function displayFilteredScorecard() {
+    const listEl = document.getElementById('supplierScorecardList');
+    if (!listEl) return;
+
+    // 1. กรองข้อมูลตามเกรดที่เลือก
+    const filtered = currentGradeFilter === 'ALL' 
+        ? cachedScorecardData 
+        : cachedScorecardData.filter(item => item.grade === currentGradeFilter);
+
+    // 2. กรณีไม่มีข้อมูล
+    if (filtered.length === 0) {
+        listEl.innerHTML = `
+            <div style="text-align:center; padding:3rem; color:#475569; display:flex; flex-direction:column; align-items:center; gap:10px;">
+                <span style="font-size: 2rem; opacity: 0.5;">🔍</span>
+                <div style="font-size:0.8rem; font-weight:700;">No Data in Grade ${currentGradeFilter}</div>
+            </div>`;
+        return;
+    }
+
+    // 3. วาดรายการใหม่ (Staggered Animation + Pulse for Grade D)
+    listEl.innerHTML = filtered.map((item, index) => {
+        const delay = index < 15 ? index * 0.05 : 0; 
+        const isCritical = item.grade === 'D'; // ตรวจสอบว่าเป็นเกรด D หรือไม่
+        
+        return `
+            <div class="supplier-glass-card" 
+                 style="
+                    display: flex;
+                    align-items: center;
+                    gap: clamp(8px, 2vw, 15px);
+                    padding: clamp(10px, 2.5vw, 14px);
+                    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+                    border-radius: 16px;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    margin-bottom: 8px;
+                    transition: all 0.3s ease;
+                    animation: slideInUp 0.4s ease forwards;
+                    animation-delay: ${delay}s;
+                    opacity: 0;
+                    --accent-color: ${item.color};
+                    min-width: 0;
+                 ">
+                
+                <!-- วงกลมเกรด (เพิ่มคลาส pulse-heartbeat ถ้าเป็นเกรด D) -->
+                <div class="${isCritical ? 'pulse-heartbeat' : ''}" 
+                     style="
+                        width: clamp(36px, 8vw, 42px);
+                        height: clamp(36px, 8vw, 42px);
+                        border-radius: 50%;
+                        border: 2.2px solid ${item.color};
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 900;
+                        font-family: 'Sora', sans-serif;
+                        font-size: clamp(1rem, 3vw, 1.2rem);
+                        color: ${item.color};
+                        background: ${item.color}20;
+                        flex-shrink: 0;
+                        box-shadow: inset 0 0 10px ${item.color}30;
+                        --pulse-color: ${item.color}66; /* สีที่ใช้วาบออกรอบๆ */
+                     ">
+                    ${item.grade}
+                </div>
+
+                <!-- ข้อมูลชื่อ Vendor -->
+                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
+                    <div style="
+                        font-family: 'Sora', sans-serif;
+                        font-size: clamp(0.8rem, 2.2vw, 0.95rem);
+                        font-weight: 800;
+                        color: #ffffff;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+                        width: 100%;
+                    " title="${item.name}">
+                        ${item.name}
+                    </div>
+                    <div style="display: flex; gap: clamp(6px, 2vw, 12px); font-size: clamp(0.55rem, 1.5vw, 0.65rem); color: #94a3b8; font-family: 'DM Mono'; font-weight: 600; margin-top: 2px;">
+                        <span>TOTAL: <b style="color: #f1f5f9;">${item.total}</b></span>
+                        <span style="color: ${item.color}ee">NG: <b>${item.ng}</b></span>
+                    </div>
+                </div>
+
+                <!-- เปอร์เซ็นต์ด้านขวา -->
+                <div style="text-align: right; flex-shrink: 0; min-width: fit-content;">
+                    <div style="font-family: 'DM Mono'; font-size: clamp(0.95rem, 2.5vw, 1.1rem); font-weight: 800; color: ${item.color}; line-height: 1;">
+                        ${item.rate.toFixed(1)}%
+                    </div>
+                    <div style="font-size: clamp(0.45rem, 1.2vw, 0.5rem); font-weight: 800; color: #475569; text-transform: uppercase; margin-top: 2px; letter-spacing: 0.5px;">
+                        ${isCritical ? '🚨 CRITICAL' : (item.grade === 'A' ? '🛡️ EXCELLENT' : 'STANDARD')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ฟังก์ชันช่วยแสดงชื่อสถานะแบบสวยๆ
+function getGradeLabel(grade) {
+    const labels = { 'A': 'Excellent', 'B': 'Standard', 'C': 'Watchlist', 'D': 'Critical' };
+    return labels[grade] || '';
+}
+// สั่งให้กราฟและ Gauge ปรับขนาดใหม่ทันทีเมื่อมีการเปลี่ยนแปลง Layout
+window.addEventListener('resize', function() {
+    if (typeof mainTrendChartInstance !== 'undefined' && mainTrendChartInstance) {
+        mainTrendChartInstance.resize();
+    }
+});
 </script>
 </body>
 </html>
