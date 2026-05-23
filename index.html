@@ -7979,6 +7979,61 @@ tbody tr {
     border: 1px solid rgba(16, 185, 129, 0.3);
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
 }
+/* ═══════════════════════════════════════════════════
+   ULTRA-CONSISTENT DARK GLASS SYSTEM
+   (อัพเกรดแสงเงาให้เด่นชัดทุกกล่องโดยไม่เปลี่ยนขนาด)
+═══════════════════════════════════════════════════ */
+
+/* เลือกเป้าหมายทุกกล่อง: KPI, Chart, List, Feed */
+.hero-kpi-card, 
+.stat-card, 
+.chart-panel, 
+.market-panel, 
+.incident-feed-panel, 
+.top-line-panel,
+.scorecard-panel {
+    /* 1. พื้นหลัง: ใช้ Gradient ไล่ระดับจากเทาเข้มไปดำสนิท เพื่อสร้างมิติ */
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+    
+    /* 2. การตัดขอบ: ให้ขอบสว่างขึ้นเล็กน้อยเพื่อให้กล่องไม่กลืนไปกับพื้นหลัง */
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    
+    /* 3. เงาด้านนอก (Depth): ใช้เงาสองชั้นเพื่อความนุ่มนวลและดูเหมือนลอยอยู่จริง */
+    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6), 
+                0 5px 15px -5px rgba(0, 0, 0, 0.4) !important;
+    
+    /* 4. Glass Effect: เพิ่มความฟุ้งกระจายของแสงด้านหลัง */
+    backdrop-filter: blur(15px);
+    
+    /* 5. รักษาขนาดเดิม: ป้องกันการขยายตัวจาก padding/border */
+    box-sizing: border-box !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* เพิ่มเส้นแสงนีออนด้านบน (Top Edge Glow) ให้ชัดเจนเท่ากันทุกกล่อง */
+.hero-kpi-card::before, 
+.stat-card::before, 
+.chart-panel::before, 
+.market-panel::before, 
+.incident-feed-panel::before, 
+.top-line-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 2px;
+    background: var(--card-accent, #3b82f6); /* ใช้สีตามประเภทงาน */
+    filter: blur(1px);
+    box-shadow: 0 0 12px var(--card-accent);
+    opacity: 0.8;
+}
+
+/* Hover Effect: เมื่อเอาเมาส์ชี้ ให้เรืองแสงขึ้นมาโดยไม่ขยับขนาด */
+.stat-card:hover, .market-panel:hover, .top-line-panel:hover {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    background: linear-gradient(145deg, rgba(35, 48, 68, 0.9) 0%, rgba(20, 30, 50, 0.98) 100%) !important;
+    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 
+                0 0 15px -5px var(--card-accent) !important;
+}
 </style>
 </head>
 <body>
