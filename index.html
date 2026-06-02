@@ -8590,6 +8590,85 @@ tbody tr {
     position: relative;
     z-index: 5;
 }
+/* เส้นแสงสแกนวิ่งลงมา */
+.risk-scanner-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 100px;
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+    border-top: 1px solid rgba(239, 68, 68, 0.4);
+    z-index: 2;
+    pointer-events: none;
+    animation: riskScan 4s linear infinite;
+}
+
+@keyframes riskScan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(500%); }
+}
+
+/* จุดกระพริบ Live Ping */
+.live-ping {
+    width: 8px; height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+}
+.live-ping::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid #ef4444;
+    animation: pingPulse 1.5s infinite;
+}
+
+@keyframes pingPulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+/* การ์ดความเสี่ยงแบบพรีเมียม */
+.risk-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.risk-card.high-volatility {
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.05);
+    animation: criticalBorder 2s infinite alternate;
+}
+
+@keyframes criticalBorder {
+    from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+    to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+}
+
+/* ป้ายสถานะกระพริบ */
+.status-glitch {
+    font-size: 0.5rem;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #ef4444;
+    color: white;
+    text-transform: uppercase;
+    animation: glitchText 0.3s infinite;
+}
+
+@keyframes glitchText {
+    0% { opacity: 1; transform: skew(0deg); }
+    50% { opacity: 0.8; transform: skew(10deg); }
+    100% { opacity: 1; transform: skew(0deg); }
+}
 </style>
 </head>
 <body>
@@ -9528,42 +9607,56 @@ tbody tr {
 <!-- ค้นหาบรรทัดนี้ในไฟล์ของคุณ -->
 <div class="cockpit-bottom-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.5rem; flex: 1; min-height: 0;">
   
-  <!-- [1] SUPPLIER QUALITY SCORECARD -->
-  <div class="market-panel scorecard-panel" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.92)); border: 1px solid rgba(139, 92, 246, 0.18); border-radius: 18px; padding: 1.1rem; display: flex; flex-direction: column; position: relative; overflow: hidden; height: 100%;">
-    <!-- เส้นแสง Gradient ด้านบน -->
-    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #ec4899, #8b5cf6, #6366f1); z-index: 1;"></div>
+<!-- [1] DYNAMIC NEURAL RISK DETECTOR -->
+<div class="market-panel scorecard-panel" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 100%) !important; border: 1px solid rgba(59, 130, 246, 0.2) !important; position: relative; overflow: hidden;">
     
-    <div class="market-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; padding-bottom: 0.7rem; border-bottom: 1px solid rgba(139, 92, 246, 0.15); flex-shrink: 0;">
-      <div class="market-title" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-head); font-size: 0.72rem; font-weight: 800; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.08em;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5">
-          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-        </svg>
-        SUPPLIER GRADE
-      </div>
-      <div class="market-badge" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.25); font-size: 0.55rem; font-weight: 700; padding: 3px 8px; border-radius: 99px; letter-spacing: 0.05em;">MONTHLY</div>
+    <!-- Scanner Animation -->
+    <div class="risk-scanner-line"></div>
+
+    <div class="market-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px;">
+        <div class="market-title" style="color: #60a5fa; display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-family: 'Sora'; font-size: 0.8rem; font-weight: 800;">
+                <span class="live-ping" id="riskStatusPing"></span>
+                RISK INTELLIGENCE
+            </div>
+            <!-- แสดงวันที่ที่กำลังวิเคราะห์ -->
+            <div id="riskAnalysisDate" style="font-size: 0.55rem; color: #94a3b8; font-family: 'DM Mono'; letter-spacing: 1px;">
+                PERIOD: --/--/----
+            </div>
+        </div>
+        <div class="market-badge" style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid #3b82f6;">AUTO-SCAN</div>
     </div>
-    
-<!-- แถบ Filter เกรด -->
-<div class="scorecard-filters" style="display: flex; justify-content: space-around; padding: 10px; background: rgba(15, 23, 42, 0.5); border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
-    <button onclick="filterScorecard('ALL')" class="grade-filter-btn active" id="btn-grade-ALL">ALL</button>
-    <button onclick="filterScorecard('A')" class="grade-filter-btn" id="btn-grade-A" style="color: #10b981;">A <span id="count-A">0</span></button>
-    <button onclick="filterScorecard('B')" class="grade-filter-btn" id="btn-grade-B" style="color: #3b82f6;">B <span id="count-B">0</span></button>
-    <button onclick="filterScorecard('C')" class="grade-filter-btn" id="btn-grade-C" style="color: #f59e0b;">C <span id="count-C">0</span></button>
-    <button onclick="filterScorecard('D')" class="grade-filter-btn" id="btn-grade-D" style="color: #ef4444;">D <span id="count-D">0</span></button>
+
+    <!-- Stats Summary Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0;">
+        <div class="risk-summary-box" style="border-left: 3px solid #ef4444; background: rgba(239, 68, 68, 0.05);">
+            <div class="label">SENSITIVE SPIKES</div>
+            <div id="count-high-risk" class="value">0</div>
+            <div class="sub-label">Abnormal Activity</div>
+        </div>
+        <div class="risk-summary-box" style="border-left: 3px solid #10b981; background: rgba(16, 185, 129, 0.05);">
+            <div class="label">STABLE VENDORS</div>
+            <div id="count-stable" class="value">0</div>
+            <div class="sub-label">Consistently Good</div>
+        </div>
+    </div>
+
+    <!-- Detailed List (พิกัดความเสี่ยง) -->
+    <div id="riskAlertList" class="scroll" style="height: 360px; overflow-y: auto; padding-right: 4px;">
+        <!-- ข้อมูลพฤติกรรม Supplier รายวันจะถูกฉีดเข้าที่นี่ -->
+    </div>
+
+    <div style="margin-top: auto; padding: 8px; background: rgba(255,255,255,0.02); border-radius: 8px; font-size: 0.5rem; color: #475569; text-align: center; font-family: 'DM Mono';">
+        NEURAL NETWORK COMPARING ACTIVE FILTER VS. HISTORICAL PERFORMANCE
+    </div>
 </div>
 
-<!-- ส่วนแสดงผลรายการ -->
-<div id="supplierScorecardList" class="scroll" style="height: 350px; overflow-y: auto;">
-    <!-- รายการจะถูกฉีดเข้าที่นี่โดย JS -->
-</div>
-
-    <div style="margin-top: auto; display: flex; justify-content: space-between; font-size: 0.65rem; color: #64748b; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; font-family: var(--font-mono); flex-shrink: 0;">
-      <span style="color: #10b981;">A:<0.5%</span>
-      <span style="color: #3b82f6;">B:<2%</span>
-      <span style="color: #f59e0b;">C:<5%</span>
-      <span style="color: #ef4444;">D:>5%</span>
-    </div>
-  </div>
+<style>
+.risk-summary-box { padding: 10px 15px; border-radius: 12px; }
+.risk-summary-box .label { font-size: 0.5rem; color: #94a3b8; font-weight: 800; letter-spacing: 0.05em; }
+.risk-summary-box .value { font-family: 'DM Mono'; font-size: 1.6rem; font-weight: 800; color: #fff; line-height: 1.2; }
+.risk-summary-box .sub-label { font-size: 0.45rem; color: #475569; font-weight: 700; }
+</style>
 
   <!-- [2] LIVE INCIDENT FEED -->
   <div class="incident-feed-panel" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.92)); border: 1px solid rgba(139, 92, 246, 0.18); border-radius: 18px; padding: 1.1rem; display: flex; flex-direction: column; position: relative; overflow: hidden; height: 100%;">
@@ -10005,35 +10098,70 @@ async function fetchFromSupabase(inspector) {
   const sb = getSupabase();
   if (!sb) return null;
   
+  // 1. Clean Input: ตัดช่องว่างและแปลงเป็นตัวพิมพ์เล็กเพื่อความแม่นยำในการ Query
+  const cleanInspector = (inspector || '').trim().toLowerCase();
+  if (!cleanInspector) return [];
+
   try {
     let allData = [];
     let fetchMore = true;
     let from = 0;
-    const step = 1000; // ดึงทีละ 1000 รายการ
+    const step = 1000; // ดึงรอบละ 1000 รายการ
 
     while (fetchMore) {
       const { data, error } = await sb
         .from('records')
         .select('*')
-        .eq('inspector', inspector) // ✅ ใช้ eq แทน ilike เพื่อความชัวเจน
+        .eq('inspector', cleanInspector) // ใช้ข้อมูลที่ trim แล้วค้นหา
         .order('date', { ascending: false })
         .range(from, from + step - 1);
         
       if (error) throw error;
       
       if (data && data.length > 0) {
-        allData = allData.concat(data);
+        // 2. Process & Merge: 
+        // - ใช้ Spread Operator (...) ในการ push ข้อมูลเข้า array แทน concat เพื่อประหยัด Memory
+        // - ทำความสะอาดข้อมูล strings แต่ละ field ที่ดึงมาจาก DB เพื่อป้องกัน Error ในการแสดงผล
+        const sanitizedChunk = data.map(r => ({
+          ...r,
+          inspector: String(r.inspector || '').trim().toLowerCase(),
+          supplier: String(r.supplier || '').trim(),
+          partNo: String(r.partNo || '').trim(),
+          _isSaved: true // ทำเครื่องหมายว่าข้อมูลชุดนี้อยู่บน Cloud แล้ว
+        }));
+
+        allData.push(...sanitizedChunk);
+        
+        // ขยับ index สำหรับดึงข้อมูลรอบถัดไป
         from += step;
+        
+        // ถ้าจำนวนที่ดึงมาได้น้อยกว่าค่า step แสดงว่าหมดข้อมูลในระบบแล้ว
         if (data.length < step) fetchMore = false;
       } else {
         fetchMore = false;
       }
     }
-    return allData.length > 0 ? allData.map(r => ({ ...r, _isSaved: true })) : [];
+
+    return allData;
   } catch (err) {
     console.error('[Supabase Fetch Error]', err);
-    return null;
+    return null; // คืนค่า null เพื่อให้ระบบหลักรู้ว่าเกิด Network/Auth Error
   }
+}
+
+// ปรับปรุงการเซฟข้อมูลเพื่อป้องกัน Data Corruption
+async function dbPutBulk(recordsArray) {
+  return new Promise((resolve) => {
+    if (!db) return resolve(false);
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    const store = tx.objectStore(IDB_STORE);
+    recordsArray.forEach(r => {
+      // ทำความสะอาดข้อมูลก่อนลง Local DB
+      if(r.id) store.put(JSON.parse(JSON.stringify(r)));
+    });
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = () => resolve(false);
+  });
 }
 
 async function pushToSupabase(rows) {
@@ -10589,11 +10717,20 @@ function handleJudgment(val) {
    รองรับ: การตรวจสอบความถูกต้อง + AI ตรวจสอบยอดผิดปกติ + การบันทึก Cloud/Local
    ══════════════════════════════════════════════════════════════ */
 async function handleFormSubmit(e) {
+    e.preventDefault();
+  
+  if (isSupervisor) {
+    toast('🚫 โหมดหัวหน้างาน: อ่านข้อมูลได้เท่านั้น ไม่สามารถบันทึกได้');
+    return;
+  }
   let oldRecord = null;
   let auditAction = 'INSERT';
   e.preventDefault();
   
-  if (_isInitializing) { toast('⏳ กรุณารอให้ระบบโหลดเสร็จ'); return; }
+  if (_isInitializing) { 
+    toast('⏳ ระบบกำลังเตรียมความพร้อม กรุณารอสักครู่'); 
+    return; 
+  }
 
   // --- [1] การเตรียมข้อมูลและ UI Elements ---
   const btn = $id('submitBtn');
@@ -10602,9 +10739,10 @@ async function handleFormSubmit(e) {
   const dateInput = $id('inputDate');
   const jdgSelect = $id('judgmentSelect');
   const partNoInput = $id('partNo');
+  const supplierInput = $id('supplier');
 
   const ref = refInput.value.trim();
-  const supp = $id('supplier').value.trim();
+  const supp = supplierInput.value.trim();
   const partNoVal = partNoInput.value.trim();
   const qty = parseInt(qtyInput.value) || 0;
   const jdg = jdgSelect.value;
@@ -10612,88 +10750,72 @@ async function handleFormSubmit(e) {
   const today = new Date();
   today.setHours(23, 59, 59, 999);
 
-  // --- [2] ขั้นตอน Advanced Validation ---
 
-  // 🛡️ Rule 1: ตรวจสอบรูปแบบ Reference (000/0000 หรือ V000/0000)
+  // --- [2] ขั้นตอน Advanced Validation (Fix Validation) ---
+
+  // 🛡️ 2.1 ตรวจสอบรูปแบบ Reference
   const refRegex = /^(V?\d{3}\/\d{4})$/i; 
   if (!refRegex.test(ref)) {
     shake(refInput);
     refInput.classList.add('is-invalid');
-    toast('❌ รูปแบบ Ref ผิด! ต้องเป็น 000/0000 หรือ V000/0000');
+    toast('❌ รูปแบบ Ref ผิด! ต้องเป็น 000/2024 หรือ V000/2024');
     refInput.focus();
     return;
   }
 
-  // 🛡️ Rule 2: ตรวจสอบจำนวน (ต้องมากกว่า 0)
+  // 🛡️ 2.2 ตรวจสอบจำนวน
   if (qty <= 0) {
     shake(qtyInput);
     qtyInput.classList.add('is-invalid');
-    toast('❌ จำนวน (QTY) ต้องมากกว่า 0');
+    toast('❌ จำนวน (Quantity) ต้องมากกว่า 0');
     return;
   }
 
-  // 🛡️ Rule 3: ป้องกันการลงข้อมูลในอนาคต
+  // 🛡️ 2.3 ป้องกันวันที่ล่วงหน้า
   if (selectedDate > today) {
     shake(dateInput);
-    toast('❌ ห้ามบันทึกข้อมูลวันที่ล่วงหน้า (Future Date)');
+    toast('❌ ห้ามบันทึกข้อมูลวันที่ล่วงหน้า');
     return;
   }
 
-  // 🛡️ Rule 4: ตรวจสอบข้อมูลซ้ำ (กรณีไม่ใช่การแก้ไข)
+  // 🛡️ 2.4 ตรวจสอบข้อมูลซ้ำ (ยกเว้นโหมดแก้ไข)
   if (!editingId && isDuplicate(ref)) {
     shake(refInput);
-    toast('⚠️ Duplicate! REF นี้มีในระบบแล้ว');
+    toast('⚠️ ข้อมูลซ้ำ! Reference นี้ถูกบันทึกไปแล้ว');
     return;
   }
 
-  // 🛡️ Rule 5: ตรวจสอบการเลือก Judgment
+  // 🛡️ 2.5 ตรวจสอบผลการตัดสิน
   if (!jdg) {
     shake(jdgSelect);
-    toast('❌ กรุณาเลือกผลการตัดสิน (Judgment)');
+    toast('❌ กรุณาเลือก Judgment');
     return;
   }
 
-  // 🌟 [INTEGRATED: A. ระบบตรวจจับจำนวนผิดปกติ (Outlier Detection)] 🌟
-  // ค้นหาประวัติของ Part No นี้ (ไม่รวมรายการที่กำลังแก้ไขอยู่)
+  // 🌟 [AI: Outlier Detection] ตรวจสอบยอดพุ่งผิดปกติ 🌟
   const history = records.filter(r => r.partNo === partNoVal && r.id !== editingId);
-  
-  if (history.length >= 3) { // เริ่มตรวจเมื่อมีประวัติอย่างน้อย 3 รายการขึ้นไป
+  if (history.length >= 3) {
     const avgQty = history.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0) / history.length;
-    const thresholdMultiplier = 5; // กำหนดเกณฑ์: 5 เท่าของค่าเฉลี่ย
-
-    if (qty > avgQty * thresholdMultiplier) {
-      // หยุดการส่งข้อมูลชั่วคราวและถามความสมัครใจของผู้ใช้
-      const userConfirmed = confirm(
-        `🚨 แจ้งเตือน: พบจำนวนผิดปกติ (Outlier Detection)\n\n` +
-        `พาร์ท: ${partNoVal}\n` +
-        `จำนวนที่กรอก: ${qty.toLocaleString()} PCS\n` +
-        `ค่าเฉลี่ยเดิม: ${Math.round(avgQty).toLocaleString()} PCS\n\n` +
-        `ยอดนี้สูงกว่าปกติเกิน 5 เท่า! ข้อมูลถูกต้องใช่หรือไม่?`
-      );
-
+    if (qty > avgQty * 5) {
+      const userConfirmed = confirm(`🚨 พบจำนวนผิดปกติ!\nจำนวนที่กรอก (${qty}) สูงกว่าค่าเฉลี่ยเดิม 5 เท่า\nยืนยันว่าข้อมูลถูกต้องใช่หรือไม่?`);
       if (!userConfirmed) {
         qtyInput.focus();
-        qtyInput.classList.add('is-invalid');
-        toast('📝 กรุณาตรวจสอบและแก้ไขจำนวนอีกครั้ง');
-        return; // ยกเลิกการบันทึก
+        return;
       }
     }
   }
 
-  // 🌟 [AUTOMATION: START LOADING UI] 🌟
+  // 🌟 [UI: Start Saving Process] 🌟
   const originalBtnHTML = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = `
     <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-      <svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      <span>SECURE SAVING...</span>
+      <svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><circle cx="12" cy="12" r="10" opacity="0.25"></circle><path d="M4 12a8 8 0 018-8" opacity="0.75"></path></svg>
+      <span>COMMITTING...</span>
     </div>
   `;
 
-  // --- [3] สร้างโครงสร้างข้อมูลสำหรับบันทึก ---
+  // --- [3] สร้าง Object ข้อมูล (Smart Fill Data) ---
   const rowId = editingId || generateUUID();
   const rowData = {
     id: rowId,
@@ -10724,22 +10846,23 @@ async function handleFormSubmit(e) {
       }
     }
 
-    // --- [5] อัปเดตข้อมูลในระบบ (RAM & Local DB) ---
+    // --- [5] อัปเดต Global State และ Local Storage (Fix logic) ---
     if (editingId) {
       oldRecord = records.find(r => String(r.id) === String(editingId));
       const index = records.findIndex(r => String(r.id) === String(editingId));
-      if (index > -1) records[index] = { ...rowData }; 
+      if (index > -1) {
+        records[index] = { ...rowData }; 
+      }
       auditAction = 'UPDATE';
-      toast('✅ อัปเดตข้อมูลสำเร็จ');
     } else {
       records.unshift(rowData); 
       auditAction = 'INSERT';
-      toast('✅ บันทึกข้อมูลใหม่สำเร็จ');
     }
     
+    // บันทึกลงฐานข้อมูลในเครื่อง (IndexedDB)
     await dbPutBulk([rowData]);  
 
-    // 🌟 [AUTOMATION: SUCCESS FEEDBACK] 🌟
+    // 🌟 [SUCCESS UI FEEDBACK] 🌟
     btn.innerHTML = '<span>✅ DATA SECURED</span>';
     btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
     btn.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.5)';
@@ -10747,32 +10870,31 @@ async function handleFormSubmit(e) {
     const brandLogo = document.querySelector('#brandCard div:first-child');
     if(brandLogo) brandLogo.classList.add('logo-success-glow');
 
-    // หน่วงเวลาเล็กน้อยเพื่อให้ผลลัพธ์ Visual ค้างหน้าจอ
+    // หน่วงเวลาเพื่อให้ผู้ใช้เห็นความสำเร็จ (UX)
     setTimeout(() => {
       
-      // --- [6] UI RESET & CLEANUP ---
+      // --- [6] CLEANUP & RESET (Fix Kit 4) ---
       const keepDate = dateInput.value;
       const keepShift = $id('shift').value;
 
-      extinguishAllGlows();
+      // ล้างค่าฟอร์ม
+      $id('claimForm').reset();
+      editingId = null; // 🔴 สำคัญ: ต้องรีเซ็ตเป็น null ทุกครั้งหลังบันทึกเสร็จ
 
-      // คืนค่าพื้นฐาน
+      // คืนค่าฟิลด์ที่ควรค้างไว้
       if($id('inputDate')) $id('inputDate').value = keepDate;
       if($id('shift')) $id('shift').value = keepShift;
 
-      // ล้าง UI ส่วนเกิน
-      document.querySelectorAll('.search-results-container').forEach(box => box.style.display = 'none');
+      // ล้างสถานะแสงเรือง/Error ของ Input ทั้งหมด
+      extinguishAllGlows();
       document.querySelectorAll('.neon-in').forEach(input => {
         input.classList.remove('input-dropdown-open', 'is-valid', 'is-invalid');
         input.style.borderColor = "";
-        input.style.backgroundColor = "";
       });
       
       removeAiResetButton();
 
-      if (document.activeElement) document.activeElement.blur();
-
-      // คืนค่าปุ่ม
+      // คืนสถานะปุ่ม
       btn.innerHTML = originalBtnHTML;
       btn.style.background = ''; 
       btn.style.boxShadow = '';
@@ -10780,25 +10902,20 @@ async function handleFormSubmit(e) {
       
       if(brandLogo) brandLogo.classList.remove('logo-success-glow');
 
-      // --- [7] RE-RENDER & AUDIT LOG ---
+      // --- [7] RE-RENDER & LOGGING ---
       refreshAll(); 
-      cancelEdit(); 
       writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
       
-      // ล้างสถานะไฮไลท์รายการใหม่
-      setTimeout(() => {
-          const idx = records.findIndex(x => x.id === rowId);
-          if(idx > -1) records[idx]._isNew = false;
-      }, 3000);
+      if (document.activeElement) document.activeElement.blur();
+      toast(auditAction === 'INSERT' ? '✅ บันทึกรายการใหม่เรียบร้อย' : '✅ อัปเดตข้อมูลเรียบร้อย');
 
-    }, 1200);
+    }, 1000);
 
   } catch (err) {
-    console.error("Critical Save Error:", err);
-    toast('❌ บันทึกไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ');
+    console.error("Submission Error:", err);
+    toast('❌ บันทึกไม่สำเร็จ กรุณาเช็คอินเทอร์เน็ต');
     btn.disabled = false;
     btn.innerHTML = originalBtnHTML;
-    btn.style.background = '';
   }
 }
 
@@ -11038,62 +11155,144 @@ function hideSingleDeleteModal() {
 }
 
 /* ✅ ฟังก์ชันแก้ไขสมบูรณ์ */
+/* ══════════════════════════════════════════════════════════════
+   REVISED JAVASCRIPT: DELETE LOGIC & ERROR PREVENTION
+   (รวมการแก้ไขจุดที่ 2: การลบข้อมูล และการป้องกันระบบล่ม)
+   ══════════════════════════════════════════════════════════════ */
+
+/**
+ * 1. ฟังก์ชันลบข้อมูลรายการเดียวแบบสมบูรณ์
+ * รองรับ: Animation, Cloud Delete, Local Delete, Virtual Scroll Sync และ Error Recovery
+ */
 async function confirmDeleteSingleRow() {
   const idToDelete = _pendingDeleteId;
-  if (!idToDelete) { toast('❌ ระบบไม่พบรหัสข้อมูล'); return; }
+  if (!idToDelete) { 
+    toast('❌ ระบบไม่พบรหัสข้อมูล'); 
+    return; 
+  }
 
+  // ค้นหาข้อมูลเดิมไว้ทำ Audit Log และกรณีต้องกู้คืน (Rollback)
   const recordToDelete = records.find(r => String(r.id) === String(idToDelete));
+  if (!recordToDelete) return;
 
-  // Visual: fade-out แถว
+  // [Visual Feedback] เริ่มทำ Animation ทันทีเพื่อให้ User รู้สึกว่าระบบตอบสนองเร็ว
   const rowEl = document.querySelector(`tr[data-rid="${idToDelete}"]`);
   if (rowEl) {
-    rowEl.style.transition  = 'all 0.3s ease';
-    rowEl.style.opacity     = '0';
-    rowEl.style.transform   = 'translateX(20px)';
+    rowEl.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 1, 1)';
+    rowEl.style.opacity = '0';
+    rowEl.style.transform = 'translateX(50px)';
   }
 
   hideSingleDeleteModal();
 
   try {
-    // 1. ลบจาก Cloud
+    // A. ลบจาก Cloud (Supabase)
     if (isOnline && getSupabase()) {
       const success = await deleteFromSupabase(idToDelete);
-      if (!success) throw new Error('Cloud delete failed');
+      if (!success) throw new Error('ไม่สามารถลบข้อมูลบน Cloud ได้');
     }
 
-    // 2. ลบจาก IndexedDB
+    // B. ลบจาก Local Database (IndexedDB)
     if (db) {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      const store = tx.objectStore(IDB_STORE);
       await new Promise((resolve, reject) => {
-        const tx    = db.transaction(IDB_STORE, 'readwrite');
-        const store = tx.objectStore(IDB_STORE);
-        store.delete(String(idToDelete));
-        tx.oncomplete = () => resolve();
-        tx.onerror    = () => reject(tx.error);
+        const req = store.delete(String(idToDelete));
+        req.onsuccess = resolve;
+        req.onerror = reject;
       });
     }
 
-    // 3. ลบจาก RAM
+    // C. อัปเดตข้อมูลใน RAM (State Management)
+    // ลบออกจากตัวแปรหลัก
     records = records.filter(r => String(r.id) !== String(idToDelete));
+    
+    // ลบออกจากสถานะตาราง Virtual Scroll
+    virtualTableState.allRows = virtualTableState.allRows.filter(r => String(r.id) !== String(idToDelete));
 
-    // 4. Audit Log
-    if (recordToDelete) writeAuditLog('DELETE', idToDelete, recordToDelete, null);
+    // D. บันทึกประวัติ (Audit Log)
+    if (typeof writeAuditLog === 'function') {
+      writeAuditLog('DELETE', idToDelete, recordToDelete, null);
+    }
 
-    // 5. ✅ refreshAll() จะ recalculate allRows ก่อน แล้วค่อย updateVirtualScrollState
+    // E. สั่ง Render ใหม่เฉพาะส่วนที่มองเห็น (Smooth Transition)
+    renderVisibleRows(); 
+    
+    // F. รีเฟรชตัวเลข KPI หน้าหลัก
     refreshAll();
 
-    // ✅ ให้ DOM render เสร็จก่อนค่อยคำนวณ scroll
-    requestAnimationFrame(() => updateVirtualScrollState());
+    // G. คำนวณตำแหน่ง Scroll ใหม่ให้แม่นยำ
+    requestAnimationFrame(() => {
+      if (typeof updateVirtualScrollState === 'function') {
+        updateVirtualScrollState();
+      }
+    });
 
-    toast('✅ ลบรายการสำเร็จ');
+    toast('🗑️ ลบรายการเรียบร้อยแล้ว');
 
   } catch (err) {
-    console.error('Single Delete Error:', err);
-    if (rowEl) { rowEl.style.opacity = '1'; rowEl.style.transform = 'none'; }
-    toast('❌ ลบรายการไม่สำเร็จ: ' + err.message);
+    console.error('Critical Delete Error:', err);
+    
+    // [Error Recovery] หากลบไม่สำเร็จ ให้ดึงแถวกลับมาแสดงเหมือนเดิม
+    if (rowEl) {
+      rowEl.style.opacity = '1';
+      rowEl.style.transform = 'none';
+      toast('❌ ลบไม่สำเร็จ: ' + err.message);
+    }
   } finally {
     _pendingDeleteId = null;
   }
 }
+
+/**
+ * 2. ปรับปรุงการตรวจจับยอดผิดปกติ (Anomaly Detection)
+ * ป้องกันการคำนวณผิดพลาดกรณีข้อมูลน้อย หรือเกิดค่า NaN
+ */
+function isAnomalyDetected(todayQty, allRecords) {
+    // ถ้าจำนวนน้อยกว่า 10 ชิ้น ไม่ถือว่าเป็นนัยสำคัญในการเตือน
+    if (!todayQty || todayQty < 10) return false;
+
+    const now = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(now.getDate() - 7);
+
+    // กรองข้อมูลประวัติ 7 วันที่ผ่านมา (ไม่นับวันนี้)
+    const historicalData = allRecords.filter(r => {
+        const d = new Date(r.date);
+        return d >= sevenDaysAgo && d < now.setHours(0,0,0,0);
+    });
+
+    if (historicalData.length === 0) return false;
+
+    // คำนวณค่าเฉลี่ยแบบปลอดภัย (ป้องกัน Division by Zero)
+    const totalQty = historicalData.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
+    const avgQty = totalQty / 7;
+
+    // เงื่อนไข: ยอดวันนี้พุ่งเกิน 3 เท่าของค่าเฉลี่ย 7 วัน
+    return todayQty > (avgQty * 3);
+}
+
+/**
+ * 3. ระบบป้องกันสิทธิ์ (Role Protection)
+ * ตรวจสอบสถานะ Supervisor ก่อนดำเนินการที่กระทบกับข้อมูล
+ */
+function isActionRestricted() {
+    if (isSupervisor) {
+        toast('🚫 Read-Only: หัวหน้างานสามารถดูข้อมูลได้เท่านั้น');
+        return true;
+    }
+    return false;
+}
+
+// นำไปใช้ใน handleFormSubmit
+const originalSubmit = handleFormSubmit;
+handleFormSubmit = async function(e) {
+    if (isActionRestricted()) {
+        e.preventDefault();
+        return;
+    }
+    return originalSubmit.apply(this, arguments);
+};
 
 // --- ลบข้อมูล (ทั้งหมด) ---
 function showClearAllModal() {
@@ -11277,7 +11476,11 @@ function getCurrentFilteredData() {
           matchAllTerms = false;
           break;
         }
-
+// เพิ่มการเช็คความยาวตัวอักษรก่อนเริ่มค้นหา เพื่อประหยัด CPU
+if (searchTerms.length > 0 && searchValue.length < 2) {
+    // ถ้าพิมพ์แค่ตัวเดียว ไม่ต้องค้นหาละเอียดมาก ให้โชว์ตามปกติ
+    return results; 
+}
         // --- การคำนวณคะแนนความแม่นยำ ---
         if (fields.ref === term) relevanceScore += 5000;
         if (isDateMatch) relevanceScore += 2500; // ให้คะแนนวันที่สูง
@@ -12066,32 +12269,36 @@ function getChartData(rawRecords, startVal, endVal) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   9.DASHBOARD & CHART LOGIC
+   DASHBOARD & CHART.JS MEMORY MANAGEMENT (ชุดที่ 6)
+   จัดการการสร้าง/ทำลายกราฟ และล้างหน่วยความจำแดชบอร์ด
 ═════════════════════════════════════════════════════════════════ */
+
 function initMainChart() {
   const canvas = $id('mainTrendChart');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
 
-  // ทำลายกราฟเดิมเพื่อป้องกัน Memory Leak และการวาดทับ
-  if (mainTrendChartInstance) {
-    mainTrendChartInstance.destroy();
-    mainTrendChartInstance = null;
+  // 1. [Memory Management] ตรวจสอบและทำลายอินสแตนซ์เดิมอย่างเข้มงวด
+  // ป้องกัน Error: Canvas is already in use. Chart with ID '0' must be destroyed before the canvas can be reused.
+  if (mainTrendChartInstance !== null) {
+    if (typeof mainTrendChartInstance.destroy === 'function') {
+      mainTrendChartInstance.destroy();
+    }
+    mainTrendChartInstance = null; // ปล่อย Reference ให้ Garbage Collector ทำงาน
   }
 
+  const ctx = canvas.getContext('2d');
   const isDark = document.documentElement.classList.contains('dark-mode');
   const tickColor = isDark ? '#94a3b8' : '#64748b';
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
 
-  // 1. 🎨 ชุดสีระดับพรีเมียม (Sharp & High Contrast)
+  // --- Helpers สำหรับ Dataset & Gradients (Premium UI) ---
   const palette = {
-    canUse: { stroke: '#10b981', fill: 'rgba(16, 185, 129, 0.12)' }, // Emerald
-    ctc:    { stroke: '#3b82f6', fill: 'rgba(59, 130, 246, 0.12)' }, // Blue
-    sf:     { stroke: '#f97316', fill: 'rgba(249, 115, 22, 0.12)' }, // Orange
-    vendor: { stroke: '#ef4444', fill: 'rgba(239, 68, 68, 0.12)' }  // Red
+    canUse: { stroke: '#10b981', fill: 'rgba(16, 185, 129, 0.12)' },
+    ctc:    { stroke: '#3b82f6', fill: 'rgba(59, 130, 246, 0.12)' },
+    sf:     { stroke: '#f97316', fill: 'rgba(249, 115, 22, 0.12)' },
+    vendor: { stroke: '#ef4444', fill: 'rgba(239, 68, 68, 0.12)' }
   };
 
-  // 2. 🌊 Helper สำหรับสร้าง Gradient แบบจางหาย (Fade-out)
   const createSmoothGradient = (colorFill) => {
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
     gradient.addColorStop(0, colorFill);
@@ -12099,24 +12306,23 @@ function initMainChart() {
     return gradient;
   };
 
-  // 3. 🛠️ Helper สำหรับสร้าง Dataset ที่มีความหนาและคมชัด
   const createDataset = (label, colorSet) => ({
     label: label,
     data: [],
     borderColor: colorSet.stroke,
     backgroundColor: createSmoothGradient(colorSet.fill),
-    borderWidth: 3.5,            // เส้นหนาพิเศษให้ดูเด่นชัด
-    fill: true,                  // เติมสีพื้นหลังใต้กราฟ
-    tension: 0.4,                // ความโค้งมนที่ดูเป็นธรรมชาติ
-    pointRadius: 0,              // ซ่อนจุดในสถานะปกติเพื่อให้เส้นดู Sharp
-    pointHitRadius: 15,          // พื้นที่ตรวจจับเมาส์กว้างขึ้นเพื่อให้ชี้ง่าย
-    pointHoverRadius: 6,         // จุดจะปรากฏขึ้นเมื่อ Hover
+    borderWidth: 3.5,
+    fill: true,
+    tension: 0.4,
+    pointRadius: 0,
+    pointHitRadius: 15,
+    pointHoverRadius: 6,
     pointHoverBackgroundColor: colorSet.stroke,
     pointHoverBorderColor: '#fff',
-    pointHoverBorderWidth: 2,
-    stacked: false
+    pointHoverBorderWidth: 2
   });
 
+  // 2. [Initialization] สร้างกราฟใหม่ลงในตัวแปร Global
   mainTrendChartInstance = new Chart(ctx, {
     type: 'line',
     data: {
@@ -12131,20 +12337,10 @@ function initMainChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      
-      // อนิเมชั่นการวาดเส้นจากซ้ายไปขวาแบบมืออาชีพ
-      animation: {
-        duration: 1500,
-        easing: 'easeOutQuart'
-      },
-
-      interaction: {
-        mode: 'index',
-        intersect: false,
-      },
-
+      animation: { duration: 1500, easing: 'easeOutQuart' },
+      interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { display: false }, // ซ่อน Legend เพื่อให้กราฟเต็มพื้นที่
+        legend: { display: false },
         tooltip: {
           enabled: true,
           backgroundColor: isDark ? 'rgba(15, 23, 42, 0.98)' : 'rgba(255, 255, 255, 0.98)',
@@ -12154,33 +12350,24 @@ function initMainChart() {
           borderWidth: 1,
           padding: 15,
           cornerRadius: 12,
-          displayColors: false, // ซ่อนกล่องสีมาตรฐานเพื่อใช้ Icon แทน
+          displayColors: false,
           titleFont: { family: 'Sora', size: 14, weight: '800' },
-          bodyFont: { 
-            family: "'DM Mono', monospace", // ใช้ Monospace เพื่อให้คอลัมน์ตัวเลขตรงกัน
-            size: 11,
-            lineHeight: 1.8
-          },
+          bodyFont: { family: "'DM Mono', monospace", size: 11, lineHeight: 1.8 },
           callbacks: {
             title: (context) => {
-              if (!globalRichChartData) return 'Performance Analysis';
-              const rich = globalRichChartData[context[0].dataIndex];
-              return `📊 PERIOD: ${rich.label.toUpperCase()}`;
+              if (!globalRichChartData || !globalRichChartData[context[0].dataIndex]) return 'Performance Analysis';
+              return `📊 PERIOD: ${globalRichChartData[context[0].dataIndex].label.toUpperCase()}`;
             },
-            label: () => null, // ปิดการแสดงผล Label ปกติ
+            label: () => null,
             afterBody: (context) => {
-              if (!globalRichChartData) return [];
               const rich = globalRichChartData[context[0].dataIndex];
               if (!rich || rich.totalQty === 0) return ['No Production Recorded'];
-
-              // ฟังก์ชันช่วยจัด Format ตัวเลขให้ตรงกัน (Matrix Style)
               const fmt = (label, icon, dataObj) => {
                 const qty = (dataObj.qty || 0).toLocaleString().padStart(5);
                 const lot = (dataObj.lot || 0).toString().padStart(3);
-                const pct = ((dataObj.qty / rich.totalQty) * 100).toFixed(1).padStart(5);
+                const pct = rich.totalQty > 0 ? ((dataObj.qty / rich.totalQty) * 100).toFixed(1).padStart(5) : "0.0";
                 return `${icon} ${label.padEnd(7)}: ${lot}L │ ${qty}P │ ${pct}%`;
               };
-
               return [
                 `TOTAL YIELD: ${rich.totalQty.toLocaleString()} PCS │ ${rich.totalLot} LOTS`,
                 `───────────────────────────────────`,
@@ -12196,35 +12383,65 @@ function initMainChart() {
       },
       scales: {
         x: { 
-          border: { display: false },
-          grid: { display: false }, // ซ่อนเส้นแนวตั้งเพื่อให้กราฟดูคลีน
-          ticks: { 
-            color: tickColor, 
-            font: { family: 'Sora', size: 11, weight: '600' },
-            padding: 10
-          } 
+          grid: { display: false },
+          ticks: { color: tickColor, font: { family: 'Sora', size: 11, weight: '600' } } 
         },
         y: { 
           beginAtZero: true,
-          border: { display: false },
-          grid: { 
-            color: gridColor,
-            drawTicks: false 
-          }, 
+          grid: { color: gridColor, drawTicks: false }, 
           ticks: { 
-            color: tickColor,
-            font: { family: 'DM Mono', size: 10, weight: '600' },
-            padding: 10,
+            color: tickColor, 
+            font: { family: 'DM Mono', size: 10 },
             callback: (val) => val >= 1000 ? (val/1000).toFixed(1) + 'k' : val 
           } 
         }
       }
     }
   });
+}
 
+/**
+ * 3. [Cleanup Logic] ฟังก์ชันสำหรับล้างสถานะแดชบอร์ดทั้งหมด
+ * เรียกใช้เมื่อปิด Modal หรือเปลี่ยน User เพื่อคืนค่าหน่วยความจำ
+ */
+function resetDashboardState() {
+  // ทำลายกราฟ
   if (mainTrendChartInstance) {
-    mainTrendChartInstance.resize();
+    mainTrendChartInstance.destroy();
+    mainTrendChartInstance = null;
   }
+
+  // ล้างข้อมูลการคำนวณใน RAM
+  globalRichChartData = [];
+
+  // รีเซ็ตตัวเลขบน UI กลับเป็น 0 ทันที
+  const numericElements = [
+    'heroTotalQty', 'heroLot', 'heroPct', 
+    'dashStatSF', 'dashLotSF', 'dashPctSF',
+    'dashStatCTC', 'dashLotCTC', 'dashPctCTC',
+    'dashStatVendor', 'dashLotVendor', 'dashPctVendor',
+    'dashStatCanUse', 'dashLotCanUse', 'dashPctCanUse',
+    'statHigh', 'statLow', 'statAvg'
+  ];
+
+  numericElements.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '0';
+  });
+
+  // รีเซ็ตแถบสี (Energy Bars)
+  document.querySelectorAll('.stat-share-fill, .energy-fill, .neon-bar').forEach(bar => {
+    bar.style.width = '0%';
+  });
+
+  // ล้างรายการใน List
+  const listContainers = ['supplierList', 'dashDefectList', 'partList', 'incidentList', 'topLineList', 'riskAlertList'];
+  listContainers.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '';
+  });
+
+  console.log("[System] Dashboard memory and state cleared.");
 }
 
 /**
@@ -12274,6 +12491,10 @@ function isAnomalyDetected(todayQty, allRecords) {
    MASTER DASHBOARD REFRESH (ULTIMATE ACCURACY VERSION)
    ควบคุมทุก Metrics (PCS, LOT, %, RANKING, CHART) ให้ตรงตาม Filter 100%
 ═══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   MASTER DASHBOARD REFRESH (INTEGRATED DAILY RISK & ANOMALY)
+   ฟังก์ชันเดียวที่ควบคุมทุกระบบ: สถิติ, กราฟ, และการตรวจจับความเสี่ยง
+   ══════════════════════════════════════════════════════════════ */
 window.refreshDash = function() {
     populateDashFilters(); 
     const allMyRecords = getMyRecords(); 
@@ -12287,11 +12508,11 @@ window.refreshDash = function() {
     const startVal = $id('dashStart') ? $id('dashStart').value : '';
     const endVal = $id('dashEnd') ? $id('dashEnd').value : '';
     const vendorFilter = $id('dashVendor') ? $id('dashVendor').value : 'ALL';
+    const todayStr = new Date().toISOString().split('T')[0];
 
-    // 🌟 2. กำหนดช่วงเวลาสำหรับเปรียบเทียบ (Delta Time-shift)
+    // 🌟 2. กำหนดช่วงเวลาสำหรับเปรียบเทียบ (Current vs Previous)
     let defaultYear = null;
     let isCustomRange = startVal && endVal;
-    
     let currentStart, currentEnd, prevStart, prevEnd;
 
     if (isCustomRange) {
@@ -12306,22 +12527,24 @@ window.refreshDash = function() {
         currentEnd = now;
         prevStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         prevEnd = new Date(now.getFullYear(), now.getMonth(), 0);
-        
         const years = allMyRecords.map(r => new Date(r.date).getFullYear());
         defaultYear = Math.max(...years);
     }
 
-    // 🌟 3. แยกข้อมูลเป็น 2 กลุ่ม: ปัจจุบัน และ ก่อนหน้า
+    // 🌟 3. คัดกรองข้อมูล (Current, Previous, และ Today)
     const displayData = []; 
-    const previousData = []; 
+    const previousData = [];
+    const recordsToday = []; // สำหรับ Risk Alert
 
     allMyRecords.forEach(r => {
         const rDate = new Date(r.date);
         const rDateStr = r.date ? String(r.date).substring(0, 10) : "";
         const rYear = rDate.getFullYear();
 
+        // กรอง Vendor ก่อน
         if (vendorFilter !== 'ALL' && r.supplier !== vendorFilter) return;
 
+        // แยกข้อมูล Current/Previous
         let matchCurrent = false;
         if (isCustomRange) {
             if (rDateStr >= startVal && rDateStr <= endVal) matchCurrent = true;
@@ -12329,13 +12552,13 @@ window.refreshDash = function() {
             if (rYear === defaultYear) matchCurrent = true;
         }
         if (matchCurrent) displayData.push(r);
-
-        if (rDate >= prevStart && rDate <= prevEnd) {
-            previousData.push(r);
-        }
+        if (rDate >= prevStart && rDate <= prevEnd) previousData.push(r);
+        
+        // เก็บข้อมูลของ "วันนี้" จริงๆ สำหรับ Risk Monitor
+        if (rDateStr === todayStr) recordsToday.push(r);
     });
 
-    // 🌟 4. คำนวณสถิติชุดปัจจุบัน
+    // 🌟 4. คำนวณสถิติหลัก (Display Period)
     let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
     let sfL = 0, venL = 0, ctcL = 0, okL = 0;
 
@@ -12348,7 +12571,7 @@ window.refreshDash = function() {
         else if (r.judgment === 'CAN USE') { ok += qty; okL++; }
     });
 
-    // 🌟 5. คำนวณสถิติชุดก่อนหน้า (เพื่อหาค่า Difference)
+    // 🌟 5. คำนวณสถิติช่วงก่อนหน้า (สำหรับ Deltas)
     let p_sf = 0, p_ven = 0, p_ctc = 0, p_ok = 0;
     previousData.forEach(r => {
         const qty = parseInt(r.qty) || 0;
@@ -12358,82 +12581,68 @@ window.refreshDash = function() {
         else if (r.judgment === 'CAN USE') p_ok += qty;
     });
 
-    // 🚀 [ADDON: ANOMALY DETECTION LOGIC] 🚀
-    // ตรวจสอบว่ายอดวันนี้พุ่งสูงผิดปกติเกิน 200% ของค่าเฉลี่ย 7 วันย้อนหลังหรือไม่
+    // 🚀 6. [AI LOGIC] ANOMALY DETECTION (เช็คยอดรวมวันนี้พุ่งสูง)
     const checkAnomaly = () => {
-        const now = new Date();
-        const todayStr = now.toISOString().split('T')[0];
+        const todayTotalQty = recordsToday.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
         
-        // ยอดรวม "วันนี้" (อิงตาม Filter ปัจจุบัน เช่นถ้าเลือก Vendor A ก็ตรวจเฉพาะ Vendor A)
-        const todayTotal = displayData
-            .filter(r => r.date === todayStr)
-            .reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
-
-        // หาค่าเฉลี่ย 7 วันย้อนหลังของชุดข้อมูลนี้
+        // หาค่าเฉลี่ย 7 วันย้อนหลัง (Baseline)
         const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(now.getDate() - 7);
-        const yesterday = new Date();
-        yesterday.setDate(now.getDate() - 1);
-
+        sevenDaysAgo.setDate(new Date().getDate() - 7);
         const histData = allMyRecords.filter(r => {
             const d = new Date(r.date);
-            const matchVendor = (vendorFilter === 'ALL' || r.supplier === vendorFilter);
-            return d >= sevenDaysAgo && d <= yesterday && matchVendor;
+            return d >= sevenDaysAgo && d < new Date().setHours(0,0,0,0);
         });
+        const avgHist = (histData.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0) / 7) || 1;
 
-        const histTotal = histData.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
-        const avgHist = histTotal / 7;
-
-        // เงื่อนไข: วันนี้ > (ค่าเฉลี่ย * 2) และต้องมียอด > 50 ชิ้นเพื่อกัน Error จากยอดน้อยๆ
-        const isSpike = todayTotal > (avgHist * 2) && todayTotal > 50;
-        
+        const isSpike = todayTotalQty > (avgHist * 2) && todayTotalQty > 50;
         const heroEl = $id('heroTotalQty');
         if (heroEl) {
             if (isSpike) {
                 heroEl.classList.add('anomaly-alert');
-                if (!_isInitializing) toast('🚨 SPIKE DETECTED: งานเสียพุ่งสูงผิดปกติวันนี้!');
+                if (!_isInitializing) toast('🚨 SPIKE: วันนี้มียอด NG พุ่งสูงผิดปกติ!');
             } else {
                 heroEl.classList.remove('anomaly-alert');
             }
         }
     };
-    checkAnomaly(); // รันระบบตรวจจับ
+    checkAnomaly();
 
+    // 🌟 7. UI UPDATE: Main KPIs & Deltas
     const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
     const calcPct = (val) => tQ > 0 ? Math.round((val / tQ) * 100) + '%' : '0%';
 
-    // 🌟 6. UI UPDATE: Main KPIs
     animNum('heroTotalQty', tQ); 
     if($id('heroLot')) $id('heroLot').textContent = displayData.length.toLocaleString();
     if($id('heroPct')) $id('heroPct').textContent = passPct + '%';
 
-    animNum('dashStatSF', sf); 
-    if($id('dashLotSF')) $id('dashLotSF').textContent = sfL.toLocaleString();
-    if($id('dashPctSF')) $id('dashPctSF').textContent = calcPct(sf);
+    // อัปเดต Stats Cards และป้าย %
+    const updateStat = (id, val, lotId, lotVal, pctId, pctVal) => {
+        animNum(id, val);
+        if($id(lotId)) $id(lotId).textContent = lotVal.toLocaleString();
+        if($id(pctId)) $id(pctId).textContent = pctVal;
+    };
+    updateStat('dashStatSF', sf, 'dashLotSF', sfL, 'dashPctSF', calcPct(sf));
+    updateStat('dashStatCTC', ctc, 'dashLotCTC', ctcL, 'dashPctCTC', calcPct(ctc));
+    updateStat('dashStatCanUse', ok, 'dashLotCanUse', okL, 'dashPctCanUse', calcPct(ok));
+    updateStat('dashStatVendor', ven, 'dashLotVendor', venL, 'dashPctVendor', calcPct(ven));
 
-    animNum('dashStatCTC', ctc); 
-    if($id('dashLotCTC')) $id('dashLotCTC').textContent = ctcL.toLocaleString();
-    if($id('dashPctCTC')) $id('dashPctCTC').textContent = calcPct(ctc);
-
-    animNum('dashStatCanUse', ok); 
-    if($id('dashLotCanUse')) $id('dashLotCanUse').textContent = okL.toLocaleString();
-    if($id('dashPctCanUse')) $id('dashPctCanUse').textContent = calcPct(ok);
-
-    animNum('dashStatVendor', ven); 
-    if($id('dashLotVendor')) $id('dashLotVendor').textContent = venL.toLocaleString();
-    if($id('dashPctVendor')) $id('dashPctVendor').textContent = calcPct(ven);
-
-    // 🌟 7. อัปเดตลูกศรแนวโน้ม (Delta Indicators)
+    // อัปเดตลูกศรขึ้น/ลง (Deltas)
     updateDelta('deltaSF', sf, p_sf, true);
     updateDelta('deltaCTC', ctc, p_ctc, true);
     updateDelta('deltaVendor', ven, p_ven, true);
     updateDelta('deltaCanUse', ok, p_ok, false);
 
-    // 🌟 8. VISUALS: Gauges & Lists
+    // 🌟 8. VISUALS: Gauges, Energy Bars & Lists
     updateMainGauge(passPct);
     updateMiniGauge('sf', sf, tQ);
     updateMiniGauge('vendor', ven, tQ);
     updateMiniGauge('ctc', ctc, tQ);
+
+    const updateBar = (id, pctStr) => { if ($id(id)) $id(id).style.width = pctStr; };
+    updateBar('barSF', calcPct(sf));
+    updateBar('barCTC', calcPct(ctc));
+    updateBar('barCanUse', calcPct(ok));
+    updateBar('barVendor', calcPct(ven));
 
     renderList('supplierList', displayData, 'supplier');
     renderList('dashDefectList', displayData, 'defect');
@@ -12441,8 +12650,15 @@ window.refreshDash = function() {
     renderIncidentFeed(displayData);
     renderTopLines(displayData);   
     renderTickerTape(displayData); 
+    renderRiskAlert(allMyRecords);
 
-    // 🌟 9. TREND CHART
+    // 🌟 9. [NEW] INTEGRATED DAILY RISK ALERT
+    // เรียกฟังก์ชัน Risk Alert โดยใช้ข้อมูลทั้งหมดเพื่อหา Baseline
+    if (typeof renderRiskAlert === 'function') {
+        renderRiskAlert(allMyRecords);
+    }
+
+    // 🌟 10. TREND CHART & OTHERS
     const chartDataObj = getChartData(displayData, startVal, endVal);
     if (!mainTrendChartInstance) { initMainChart(); }
     if (mainTrendChartInstance && globalRichChartData) {
@@ -12453,24 +12669,12 @@ window.refreshDash = function() {
         mainTrendChartInstance.data.datasets[3].data = globalRichChartData.map(m => m.VENDOR.qty);
         mainTrendChartInstance.update(); 
     }
-    // เพิ่มการอัพเดตแถบ Share Bar (Energy Fill)
-const updateBar = (id, pctStr) => {
-    const el = document.getElementById(id);
-    if (el) el.style.width = pctStr;
-};
-// ตัวอย่างการอัพเดตใน JS
-animNum('heroTotalQty', tQ); // ยอด PCS รวม
-if(document.getElementById('heroLot')) document.getElementById('heroLot').textContent = displayData.length.toLocaleString();
-if(document.getElementById('heroPct')) document.getElementById('heroPct').textContent = passPct + '%';
-updateBar('barSF', calcPct(sf));
-updateBar('barCTC', calcPct(ctc));
-updateBar('barCanUse', calcPct(ok));
-updateBar('barVendor', calcPct(ven));
+    
     updateChartStats(chartDataObj.data); 
     renderParetoFocus(displayData);
     renderSupplierScorecard(displayData);
 
-    console.log(`[Dashboard Update] Anomaly Detection Executed. Current window: ${displayData.length} entries.`);
+    console.log(`[Dashboard Update] All systems synced. Records processed: ${displayData.length}`);
 };
 /* ══════════════════════════════════════════════════════════════
    PARETO FOCUS LOGIC: Identifying High-Impact Suppliers
@@ -13130,6 +13334,11 @@ window.addEventListener('offline', () => {
   toast('🔴 ออฟไลน์ ข้อมูลจะถูกบันทึกไว้ในเครื่อง');
 });
 
+/* ══════════════════════════════════════════════════════════════
+   VIRTUAL TABLE RENDERING & LISTENERS (FIX PERFORMANCE)
+   จัดการการแสดงผลตารางปริมาณมากและการดักจับเหตุการณ์ต่าง ๆ
+═════════════════════════════════════════════════════════════════ */
+
 function updateVirtualScrollState() {
   const container = $id('tableContainer');
   if (!container) return;
@@ -13137,55 +13346,79 @@ function updateVirtualScrollState() {
   const scrollTop = container.scrollTop;
   const viewportHeight = container.clientHeight;
 
-  // ปรับ Buffer ให้เหมาะสม (ป้องกันการเห็นพื้นที่สีขาวขณะไถเร็วๆ)
-  const startRow = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - 5);
-  const visibleCount = Math.ceil(viewportHeight / ROW_HEIGHT) + 15;
+  // ชุดที่ 5 Fix: กำหนดค่า Row Height พื้นฐานหากหาค่าคงที่ไม่ได้
+  const rowHeight = (typeof ROW_HEIGHT !== 'undefined') ? ROW_HEIGHT : 70;
 
+  // ชุดที่ 5 Fix: ป้องกันค่า NaN หรือติดลบ (Boundary Check)
+  // เริ่มต้นคำนวณแถวที่ต้องแสดงผล โดยเผื่อ Buffer ไว้ด้านบน 5 แถว
+  const startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - 5);
+
+  // ชุดที่ 5 Fix: คำนวณจำนวนแถวที่จะแสดงตามความสูงหน้าจอจริง 
+  // หากหน้าจอถูกซ่อน (height=0) ให้ใช้ค่าเริ่มต้น 10 แถวเพื่อป้องกัน Error
+  const visibleCount = Math.max(10, Math.ceil(viewportHeight / rowHeight) + 15);
+
+  // อัปเดตสถานะ Global ของตาราง Virtual
   virtualTableState.visibleStart = startRow;
   virtualTableState.visibleEnd = startRow + visibleCount;
   
-  // ใช้ requestAnimationFrame เพื่อประสิทธิภาพสูงสุด
-  window.requestAnimationFrame(renderVisibleRows);
+  // ใช้ requestAnimationFrame เพื่อให้เบราว์เซอร์วาดตารางในจังหวะที่เหมาะสมที่สุด (60fps)
+  window.requestAnimationFrame(() => {
+    if (typeof renderVisibleRows === 'function') {
+      renderVisibleRows();
+    }
+  });
 }
-// 1. เพิ่ม Resize Listener (พร้อมระบบหน่วงเวลา 150ms เพื่อประสิทธิภาพ)
+
+// 1. Resize Listener: ปรับปรุงประสิทธิภาพด้วย Debounce 
+// เพื่อไม่ให้ระบบคำนวณใหม่ทุก ๆ พิกเซลที่ย่อขยายหน้าจอ
 let tableResizeDebounce;
 window.addEventListener('resize', () => {
   clearTimeout(tableResizeDebounce);
   tableResizeDebounce = setTimeout(() => {
-    console.log("[System] Window resized, recalculating table viewport...");
+    console.log("[System] Viewport updated, recalculating virtual table...");
     updateVirtualScrollState();
   }, 150);
 });
 
-// 2. ปรับปรุง Scroll Listener เดิมให้เรียกใช้ฟังก์ชันกลาง
-const tableContainer = document.getElementById('tableContainer');
-if (tableContainer) {
-  tableContainer.addEventListener('scroll', () => {
+// 2. Scroll Listener: เรียกใช้ฟังก์ชันที่ปรับปรุงใหม่
+const tableContainerElement = document.getElementById('tableContainer');
+if (tableContainerElement) {
+  tableContainerElement.addEventListener('scroll', () => {
     updateVirtualScrollState();
-  });
+  }, { passive: true }); // ใช้ passive: true เพื่อประสิทธิภาพการ Scroll ที่ดีขึ้น
 }
 
-const claimForm = $id('claimForm');
-if (claimForm) {
-  claimForm.addEventListener('submit', async function(e) {
+// 3. Claim Form Submit: จัดการการบันทึกข้อมูลและรีเซ็ตสถานะ
+const claimFormElement = $id('claimForm');
+if (claimFormElement) {
+  claimFormElement.addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    // ✅ ถอน focus ป้องกัน iOS/Android keyboard ค้าง
+    // ✅ ถอน focus ออกจาก Input ทั้งหมด เพื่อป้องกันคีย์บอร์ดค้างใน Tablet/Mobile
     if (document.activeElement) document.activeElement.blur();
 
+    // เรียกฟังก์ชันบันทึกข้อมูลหลัก
     await handleFormSubmit(e);
 
-    // ✅ ล้างปุ่ม AI Reset หลัง submit เสมอ
-    removeAiResetButton();
+    // ✅ ล้างสถานะปุ่มช่วยเหลือของ AI หลังจากบันทึกสำเร็จ
+    if (typeof removeAiResetButton === 'function') {
+      removeAiResetButton();
+    }
   });
 }
 
-// Search Bindings (Debounce)
-let searchDebounce;
-if($id('searchInput')) {
-  $id('searchInput').addEventListener('input', () => {
-    clearTimeout(searchDebounce);
-    searchDebounce = setTimeout(renderTable, 300);
+// 4. Search Input Bindings: ระบบค้นหาพร้อมการหน่วงเวลา (Debounce)
+let searchDebounceTimer;
+const searchInputElement = $id('searchInput');
+if (searchInputElement) {
+  searchInputElement.addEventListener('input', (e) => {
+    clearTimeout(searchDebounceTimer);
+    // หน่วงเวลา 300ms เพื่อรอให้ผู้ใช้พิมพ์เสร็จก่อนเริ่มค้นหาจริง (ลดภาระ CPU)
+    searchDebounceTimer = setTimeout(() => {
+      if (typeof renderTable === 'function') {
+        renderTable();
+      }
+    }, 300);
   });
 }
 
@@ -13842,108 +14075,147 @@ function closeAuditModal() {
   if (modal) modal.style.display = 'none';
 }
 
-/// ════════════════════════════════════════════════════════════
-// AUDIT TRAIL RENDER (UPDATED)
-// จัดหน้าตรง Screenshot
-// ══════════════════════════════════════════════════════════════
+
+/* ══════════════════════════════════════════════════════════════
+   ชุดที่ 7: AUDIT LOG & SECURITY FIX (COMPLETE VERSION)
+   จัดการแสดงผลประวัติการแก้ไข พร้อมระบบป้องกันความปลอดภัยสูงสุด
+═════════════════════════════════════════════════════════════════ */
+
 function renderAuditTimeline(data) {
   const listEl = document.getElementById('auditLogList');
   if (!listEl) return;
 
-  //1. Styles mapping
+  // 1. ตรวจสอบข้อมูลเบื้องต้น (Security Fix)
+  if (!data || data.length === 0) {
+    listEl.innerHTML = `
+      <div style="text-align:center; padding:3rem; color:#94a3b8; font-family:var(--font-head);">
+        <div style="font-size:2rem; margin-bottom:1rem;">📂</div>
+        <div style="font-size:0.85rem; font-weight:600;">ไม่พบประวัติการเปลี่ยนแปลงสำหรับรายการนี้</div>
+      </div>`;
+    return;
+  }
+
+  // 2. Styles mapping สำหรับ Action ต่างๆ
   const styles = {
     'INSERT': { border: '#10b981', badgeBg: 'rgba(16, 185, 129, 0.15)', badgeText: '#10b981', badgeLabel: 'CREATED' },
     'UPDATE': { border: '#3b82f6', badgeBg: 'rgba(59, 130, 246, 0.15)', badgeText: '#3b82f6', badgeLabel: 'UPDATED' },
     'DELETE': { border: '#ef4444', badgeBg: 'rgba(239, 68, 68, 0.15)', badgeText: '#ef4444', badgeLabel: 'DELETED' }
   };
 
-  //2. Container
   let html = '';
 
+  // 3. วนลูปสร้างรายการ Timeline
   data.forEach((log, index) => {
     const s = styles[log.action] || styles['UPDATE'];
     
-    //3. Date Format: 06 พ.ค. 69 16:19
+    // แปลงวันที่เป็นรูปแบบภาษาไทยที่อ่านง่าย
     const dateStr = new Date(log.created_at).toLocaleString('th-TH', { 
       day: '2-digit', month: 'short', year: '2-digit', 
-      hour: '2-digit', minute: '2-digit' 
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
     });
 
-    //4. Diff Logic (ส่วนที่แก้ไข)
+    // 🛡️ [SECURITY FIX]: ป้องกัน Crash โดยการใช้ Default Object {} 
+    // และการทำ Destructuring เพื่อแยกฟิลด์ระบบออกจากข้อมูลที่ User แก้ไข
+    const rawOld = log.old_data || {};
+    const rawNew = log.new_data || {};
+
+    // กรองฟิลด์ที่ไม่ต้องการแสดงใน Diff (System Fields)
+    const filterInternal = ({ id, created_at, updated_at, _isSaved, _isOffline, _score, ...rest }) => rest;
+    const oldData = filterInternal(rawOld);
+    const newData = filterInternal(rawNew);
+
     let diffHtml = '';
-    if (log.action === 'UPDATE' && log.old_data && log.new_data) {
-      
-      // ✅ FIX: เพิ่ม || {} เพื่อป้องกัน Crash หาก log.old_data หรือ log.new_data เป็น null
-      const { id, created_at, updated_at, ...old } = log.old_data || {};
-      const { id: _, created_at: __, updated_at: ___, ...newData } = log.new_data || {};
-      
+
+    // 4. Logic การเปรียบเทียบข้อมูล (Diff Logic)
+    if (log.action === 'UPDATE') {
       diffHtml = `
-        <div style="margin-top:1rem; background: rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 0 0.75rem 0.75rem 0.75rem;">
-          <div style="font-size: 0.7rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
-            Changes Made
+        <div style="margin-top:1rem; background: rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 0.75rem;">
+          <div style="font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem; display:flex; align-items:center; gap:5px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Changes Detected
           </div>
       `;
 
+      let hasChanges = false;
+      // เปรียบเทียบตาม Key ของข้อมูลใหม่
       Object.keys(newData).forEach(key => {
-        if (old[key] !== newData[key]) {
+        // [SECURITY]: บังคับเป็น String และใช้ escapeHtml เพื่อป้องกัน XSS
+        const oldVal = oldData[key] !== undefined ? String(oldData[key]) : '-';
+        const newVal = newData[key] !== undefined ? String(newData[key]) : '-';
+
+        if (oldVal !== newVal) {
+          hasChanges = true;
           diffHtml += `
-            <div style="display: flex; align-items: center; gap:1rem; margin-bottom: 0.75rem; font-family: var(--font-mono);">
-              <div style="width: 60px; font-size: 0.8rem; font-weight: 700; color: #94a3b8;">${key}</div>
+            <div style="display: flex; align-items: center; gap:1rem; margin-bottom: 0.6rem; font-family: var(--font-mono);">
+              <div style="width: 75px; font-size: 0.75rem; font-weight: 700; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(key)}">
+                ${escapeHtml(key)}
+              </div>
               
-              <div style="flex:1; display: flex; align-items: center; gap: 0.75rem; background: rgba(0,0,0,0.2); padding: 0.5rem 0.75rem; border-radius: 6px;">
-                <!-- Old Value (Red) -->
-                <div style="color: #ef4444; text-decoration: line-through; opacity: 0.8; font-size: 0.9rem; min-width: 40px; text-align: right;">
-                  ${old[key] || '-'}
+              <div style="flex:1; display: flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.25); padding: 0.4rem 0.75rem; border-radius: 6px; overflow: hidden;">
+                <div style="color: #ef4444; text-decoration: line-through; opacity: 0.6; font-size: 0.8rem; flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  ${escapeHtml(oldVal)}
                 </div>
-                
-                <!-- Arrow -->
-                <div style="color: #475569; font-size: 0.9rem;">→</div>
-                
-                <!-- New Value (Green) -->
-                <div style="color: #10b981; font-weight: 800; font-size: 1rem; text-shadow: 0 0 10px rgba(16,185,129,0.4); min-width: 40px;">
-                  ${newData[key] || '-'}
+                <div style="color: #475569; font-size: 0.8rem;">➔</div>
+                <div style="color: #10b981; font-weight: 800; font-size: 0.85rem; flex: 1; text-shadow: 0 0 10px rgba(16,185,129,0.3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  ${escapeHtml(newVal)}
                 </div>
               </div>
             </div>
           `;
         }
       });
+
+      if (!hasChanges) diffHtml += `<div style="color:#64748b; font-size:0.75rem; font-style:italic;">No visible data changes (Metadata only)</div>`;
       diffHtml += '</div>';
+
+    } else if (log.action === 'INSERT') {
+       diffHtml = `
+        <div style="margin-top:1rem; padding: 0.75rem; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1); border-radius: 8px; color: #10b981; font-size: 0.75rem; display: flex; align-items: center; gap: 8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+          <b>Initial Entry:</b> ข้อมูลถูกสร้างขึ้นใหม่ในระบบเรียบร้อยแล้ว
+        </div>`;
     } else if (log.action === 'DELETE') {
-       diffHtml = `<div style="margin-top:1rem; color:#64748b; font-style:italic; font-size:0.8rem; padding-left:0.5rem; border-left:2px solid #334155;">Item removed from database</div>`;
+       diffHtml = `
+        <div style="margin-top:1rem; padding: 0.75rem; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.1); border-radius: 8px; color: #ef4444; font-size: 0.75rem; display: flex; align-items: center; gap: 8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <b>Record Removed:</b> รายการนี้ถูกลบออกจากฐานข้อมูล
+        </div>`;
     }
 
-    //5. Build Item
+    // 5. ประกอบร่างการ์ดประวัติ (Audit Card)
     html += `
-      <div style="position: relative; margin-bottom: 2rem; animation: slideIn 0.3s ease-out both;" style="animation-delay: ${index * 0.1}s">
+      <div style="position: relative; margin-bottom: 1.5rem; animation: slideInUp 0.4s ease-out both; animation-delay: ${index * 0.08}s">
+        <!-- Vertical Line Link -->
+        ${index !== data.length - 1 ? '<div style="position:absolute; left: 18px; top: 40px; bottom: -25px; width: 2px; background: rgba(255,255,255,0.05); z-index:0;"></div>' : ''}
         
-        <!-- Card -->
-        <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.08); border-left: 4px solid ${s.border}; border-radius: 10px; padding: 1rem 1.25rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.08); border-left: 4px solid ${s.border}; border-radius: 12px; padding: 1.25rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); position:relative; z-index:1;">
           
           <!-- Card Header -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-            <div style="background: ${s.badgeBg}; color: ${s.badgeText}; padding: 4px 12px; border-radius: 4px; font-weight: 700; font-size: 0.7rem; letter-spacing: 0.05em; font-family: var(--font-head);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+            <div style="background: ${s.badgeBg}; color: ${s.badgeText}; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; letter-spacing: 0.05em; font-family: var(--font-head); text-transform: uppercase;">
               ${s.badgeLabel}
             </div>
-            <div style="font-family: var(--font-mono); color: #94a3b8; font-size: 0.75rem;">
+            <div style="font-family: var(--font-mono); color: #64748b; font-size: 0.7rem; font-weight: 600;">
               ${dateStr}
             </div>
           </div>
 
-          <!-- User Info -->
-          <div style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 6px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            ${escapeHtml(log.inspector || 'Unknown User')}
+          <!-- User Info (Inspector) -->
+          <div style="color: #f8fafc; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 8px;">
+            <div style="width:24px; height:24px; border-radius:50%; background:rgba(59,130,246,0.2); display:flex; align-items:center; justify-content:center; color:#3b82f6;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            ${escapeHtml(log.inspector || 'System Process')}
           </div>
 
-          <!-- Diff Content -->
+          <!-- Diff Table / Content -->
           ${diffHtml}
         </div>
-
       </div>
     `;
   });
 
+  // 6. ส่งผลลัพธ์ลง DOM
   listEl.innerHTML = html;
 }
 
@@ -13960,13 +14232,29 @@ function setLoginRole(role) {
     const core = document.getElementById('mascotCore');
     const base = document.getElementById('mascotBase');
 
-    if (role === 'supervisor') {
-        isSupervisor = true;
+    // --- ส่วนที่เพิ่ม: Login & Role Protection Logic ---
+    // 1. กำหนดค่าสิทธิ์และบันทึกลง SessionStorage ทันที
+    isSupervisor = (role === 'supervisor');
+    sessionStorage.setItem('isSupervisor', isSupervisor);
+
+    // 2. ล้างข้อมูลเก่าในหน่วยความจำ เพื่อป้องกันข้อมูลปนกันระหว่าง Role
+    records = []; 
+    
+    // 3. ล้างช่องรหัสผ่านทุกครั้งที่สลับโหมด เพื่อความปลอดภัย
+    if (document.getElementById('loginPass')) {
+        document.getElementById('loginPass').value = '';
+    }
+    // ------------------------------------------------
+
+    if (isSupervisor) {
+        // --- โหมดหัวหน้างาน (Black & Gold Theme) ---
         overlay.classList.add('is-head-mode');
         brandAccent.style.color = '#f59e0b';
         tabSuper.classList.add('active');
         tabStaff.classList.remove('active');
-        passField.style.display = 'none';
+        
+        // หัวหน้างานไม่ต้องกรอกรหัสผ่าน (สิทธิ์เฉพาะไอดีที่กำหนด)
+        passField.style.display = 'none'; 
         
         // ขยับ Slider ไปขวา + เปลี่ยนสีเป็นทอง
         roleSlider.style.transform = 'translateX(100%)';
@@ -13977,12 +14265,15 @@ function setLoginRole(role) {
         if(eye) eye.style.fill = '#f59e0b';
         if(core) core.style.stroke = '#f59e0b';
         if(base) base.style.fill = 'rgba(245, 158, 11, 0.3)';
+
     } else {
-        isSupervisor = false;
+        // --- โหมดพนักงานปกติ (Blue Theme) ---
         overlay.classList.remove('is-head-mode');
         brandAccent.style.color = '#2563eb';
         tabStaff.classList.add('active');
         tabSuper.classList.remove('active');
+        
+        // พนักงานต้องกรอกรหัสผ่านเสมอ
         passField.style.display = 'block';
         
         // ขยับ Slider ไปซ้าย + เปลี่ยนสีเป็นน้ำเงิน
@@ -13995,6 +14286,8 @@ function setLoginRole(role) {
         if(core) core.style.stroke = '#3b82f6';
         if(base) base.style.fill = 'rgba(59, 130, 246, 0.2)';
     }
+
+    console.log(`[Role System] Mode switched to: ${role.toUpperCase()}`);
 }
 
 async function loadStaffList() {
@@ -14054,8 +14347,10 @@ async function switchView(targetEmail) {
                 // 4. ล้างข้อมูลเก่าและแทนที่ด้วยข้อมูลของพนักงานที่เลือก
                 records = data.map(r => ({ ...r, _isSaved: true }));
                 
-                // 5. สั่งรีเฟรช KPI และตารางใหม่ทั้งหมด
-                refreshAll();
+// ... ภายใน try-catch ของ switchView หลังดึง data สำเร็จ
+records = data.map(r => ({ ...r, _isSaved: true }));
+updateAIBrain(); // ✨ สั่งให้ AI เรียนรู้พฤติกรรมการพิมพ์ของพนักงานคนนี้ใหม่ทันที
+refreshAll();
             }
         } catch (e) {
             console.error("Switch View Error:", e);
@@ -14658,87 +14953,155 @@ function translateDefectToRemark() {
     if (typeof refreshNeonGlow === 'function') refreshNeonGlow();
 }
 
-/* ══════════════════════════════════════════════════════════════
-   FUNCTION: renderSupplierScorecard
-   วิเคราะห์ "ความประพฤติ" ของ Supplier โดยคำนวณจากสัดส่วนของเสีย
-   ══════════════════════════════════════════════════════════════ */
-function renderSupplierScorecard(data) {
-    const listEl = document.getElementById('supplierScorecardList');
-    if (!listEl) return;
+function renderRiskAlert(allData) {
+    const listEl = document.getElementById('riskAlertList');
+    const dateLabel = document.getElementById('riskAnalysisDate');
+    if (!listEl || !allData || allData.length === 0) return;
 
-    // 1. ตรวจสอบว่ามีข้อมูลไหม
-    if (!data || data.length === 0) {
-        listEl.innerHTML = `
-            <div class="score-empty-state">
-                <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">🔍</div>
-                <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                    No Data Detected
-                </div>
-                <div style="font-size: 0.6rem; opacity: 0.7;">กรุณาเลือกช่วงเวลาหรือพนักงาน</div>
-            </div>
-        `;
+    // 1. ดึงช่วงวันที่ที่ User เลือกจากหน้า Dashboard
+    const startVal = document.getElementById('dashStart').value;
+    const endVal = document.getElementById('dashEnd').value;
+
+    let targetData = [];
+    let periodText = "";
+
+    if (startVal && endVal) {
+        // กรณีเลือกช่วงวันที่: วิเคราะห์ข้อมูลในช่วงนั้น
+        targetData = allData.filter(r => r.date >= startVal && r.date <= endVal);
+        periodText = `${formatDateDisplay(startVal)} - ${formatDateDisplay(endVal)}`;
+    } else {
+        // กรณีไม่ได้เลือกวันที่: หาวันล่าสุดที่มีการลงข้อมูล (ไม่ใช่เอา Today จริงๆ)
+        const latestDate = [...new Set(allData.map(r => r.date))].sort().reverse()[0];
+        targetData = allData.filter(r => r.date === latestDate);
+        periodText = `LATEST: ${formatDateDisplay(latestDate)}`;
+    }
+
+    if(dateLabel) dateLabel.textContent = `PERIOD: ${periodText}`;
+
+    // 2. คำนวณ Historical Baseline (ข้อมูลก่อนหน้าช่วงที่เลือก)
+    const historyData = allData.filter(r => !targetData.includes(r));
+    const baselineStats = {};
+    historyData.forEach(r => {
+        if (!baselineStats[r.supplier]) baselineStats[r.supplier] = { total: 0, ng: 0 };
+        baselineStats[r.supplier].total += r.qty;
+        if (r.judgment === 'VENDOR FAULT') baselineStats[r.supplier].ng += r.qty;
+    });
+
+    // 3. วิเคราะห์ข้อมูลในช่วงเป้าหมาย (Active Window)
+    const activeStats = {};
+    targetData.forEach(r => {
+        if (!activeStats[r.supplier]) activeStats[r.supplier] = { 
+            total: 0, ng: 0, defects: {}, lines: new Set() 
+        };
+        activeStats[r.supplier].total += r.qty;
+        if (r.judgment === 'VENDOR FAULT') {
+            activeStats[r.supplier].ng += r.qty;
+            // เก็บข้อมูลเพิ่ม: อาการเสียที่เจอ และ ไลน์ที่เจอ
+            activeStats[r.supplier].defects[r.defect] = (activeStats[r.supplier].defects[r.defect] || 0) + r.qty;
+            if(r.line) activeStats[r.supplier].lines.add(r.line);
+        }
+    });
+
+    let highRiskCount = 0;
+    let stableCount = 0;
+    const results = [];
+
+    // 4. เปรียบเทียบ Neural Logic
+    Object.entries(activeStats).forEach(([name, cur]) => {
+        const curRate = (cur.ng / cur.total) * 100;
+        const hist = baselineStats[name] || { total: 100, ng: 0.5 }; // ป้องกันหาร 0
+        const histRate = hist.total > 0 ? (hist.ng / hist.total) * 100 : 0.5;
+
+        const volatility = curRate / (histRate || 0.1);
+        const isSpike = curRate > (histRate * 1.5) && cur.ng > 0; // เสียพุ่งเกิน 1.5 เท่าจากปกติ
+
+        if (isSpike) highRiskCount++; else stableCount++;
+
+        // หาอาการเสียที่หนักที่สุดของเจ้านี้ในรอบนี้
+        const topDefect = Object.entries(cur.defects).sort((a,b) => b[1] - a[1])[0] || ["N/A", 0];
+
+        results.push({
+            name, curRate, histRate, volatility, isSpike,
+            ng: cur.ng,
+            topDefect: topDefect[0],
+            lineCount: cur.lines.size
+        });
+    });
+
+    // 5. อัปเดต UI
+    animNum('count-high-risk', highRiskCount);
+    animNum('count-stable', stableCount);
+    
+    // เปลี่ยนสี Ping ตามความเสี่ยง
+    const ping = document.getElementById('riskStatusPing');
+    if(ping) ping.style.background = highRiskCount > 0 ? '#ef4444' : '#10b981';
+
+    if (results.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center; padding:4rem; color:#475569; font-size:0.6rem;">NO DATA IN THIS PERIOD</div>`;
         return;
     }
 
-    // 2. คำนวณสถิติ Supplier
-    const supplierStats = {};
-    data.forEach(r => {
-        const sName = r.supplier || "Unknown";
-        if (!supplierStats[sName]) supplierStats[sName] = { total: 0, ng: 0 };
-        const qty = parseInt(r.qty) || 0;
-        supplierStats[sName].total += qty;
-        if (r.judgment === 'VENDOR FAULT') supplierStats[sName].ng += qty;
-    });
+    // 6. วาดรายการ (เต็มกล่อง สวยงาม)
+    results.sort((a,b) => b.volatility - a.volatility);
+    listEl.innerHTML = results.map(item => {
+        const accent = item.isSpike ? '#ef4444' : '#10b981';
+        return `
+            <div class="risk-card ${item.isSpike ? 'high-volatility' : ''}" style="border-left: 4px solid ${accent}; margin-bottom:10px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="flex: 1; min-width: 0;">
+                        <div class="vendor-name-highlight" style="font-size: 0.8rem; color: #fff;">${item.name}</div>
+                        <div style="display: flex; gap: 6px; margin-top: 4px;">
+                            ${item.isSpike ? '<span class="status-glitch">VOLATILE</span>' : '<span style="color:#10b981; font-size:0.5rem; font-weight:800;">● STABLE</span>'}
+                            <span style="font-size: 0.55rem; color: #64748b; font-family: 'DM Mono';">NG: ${item.ng} PCS</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-family: 'DM Mono'; font-size: 1.1rem; font-weight: 800; color: ${accent};">${item.curRate.toFixed(1)}%</div>
+                        <div style="font-size: 0.45rem; color: #475569; font-weight: 700;">BASE: ${item.histRate.toFixed(1)}%</div>
+                    </div>
+                </div>
+                
+                <!-- ข้อมูลเพิ่มเติมที่ทำให้กล่องดูเต็ม -->
+                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 0.55rem; color: #94a3b8;">
+                        <i style="color: ${accent}">⚠️ Top Issue:</i> ${item.topDefect}
+                    </div>
+                    <div style="font-size: 0.55rem; color: #64748b;">
+                        Lines Active: <b style="color:#cbd5e1">${item.lineCount}</b>
+                    </div>
+                </div>
 
-    // 3. จัดกลุ่มเกรด
-    const results = Object.entries(supplierStats).map(([name, stats]) => {
-        const rate = stats.total > 0 ? (stats.ng / stats.total) * 100 : 0;
-        let grade, color, label;
-
-        if (rate <= 0.5) { grade = 'A'; color = '#10b981'; label = 'EXCELLENT'; }
-        else if (rate <= 2.0) { grade = 'B'; color = '#3b82f6'; label = 'QUALIFIED'; }
-        else if (rate <= 5.0) { grade = 'C'; color = '#f59e0b'; label = 'WATCHLIST'; }
-        else { grade = 'D'; color = '#ef4444'; label = 'CRITICAL'; }
-
-        return { name, rate, grade, color, label, ng: stats.ng, total: stats.total };
-    }).sort((a, b) => b.rate - a.rate);
-
-    // 4. วาด HTML
-    listEl.innerHTML = results.map(item => `
-        <div class="scorecard-item">
-            <div class="grade-orb-mini" style="color: ${item.color}; border-color: ${item.color}40; background: ${item.color}10;">
-                ${item.grade}
-            </div>
-            <div class="score-main-info">
-                <span class="score-name" title="${item.name}">${item.name}</span>
-                <div class="score-meta">
-                    <span>T: ${item.total}</span>
-                    <span style="color: ${item.color}">NG: ${item.ng}</span>
+                <!-- แถบพลังความเสี่ยง -->
+                <div style="height: 2px; width: 100%; background: rgba(255,255,255,0.05); margin-top: 8px; border-radius: 2px; overflow: hidden;">
+                    <div style="height: 100%; width: ${Math.min(item.volatility * 20, 100)}%; background: ${accent}; box-shadow: 0 0 10px ${accent}; transition: width 1s ease;"></div>
                 </div>
             </div>
-            <div class="score-stats-right">
-                <span class="score-rate" style="color: ${item.color}">${item.rate.toFixed(1)}%</span>
-                <span style="font-size: 0.5rem; font-weight: 800; opacity: 0.6;">${item.label}</span>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
+}
 
-    // 5. รันอนิเมชั่นไหลเข้า (ใช้ GSAP สั่ง Stagger)
-    if (window.gsap) {
-        gsap.to('.scorecard-item', {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            stagger: 0.08,
-            ease: "power2.out"
-        });
-    } else {
-        // Fallback กรณีไม่มี GSAP
-        document.querySelectorAll('.scorecard-item').forEach(el => {
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0)';
-        });
-    }
+// แยก UI ออกมาเพื่อให้ Code สะอาดขึ้น
+function renderRiskListUI(results, container) {
+    results.sort((a, b) => b.volatility - a.volatility);
+    container.innerHTML = results.map(item => {
+        const riskColor = item.isSpike ? '#ef4444' : '#10b981';
+        return `
+            <div class="risk-card ${item.isSpike ? 'high-volatility' : ''}">
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="flex: 1; min-width: 0;">
+                        <div class="vendor-name-highlight">${item.name}</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            ${item.isSpike ? '<span class="status-glitch">High Risk</span>' : '<span style="color:#10b981;font-size:0.5rem;font-weight:800;">● STABLE</span>'}
+                            <span style="font-size: 0.6rem; color: #94a3b8;">NG: ${item.todayNG}</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-family: 'DM Mono'; font-size: 1.1rem; font-weight: 800; color: ${riskColor};">${item.todayRate.toFixed(1)}%</div>
+                        <div style="font-size: 0.45rem; color: #475569;">Base: ${item.historyRate.toFixed(1)}%</div>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
 }
 
 /* ══════════════════════════════════════════════════════════════
