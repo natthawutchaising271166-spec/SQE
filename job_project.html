@@ -6435,6 +6435,44 @@ function refreshSupport() {
     const lu = document.getElementById('sdb-last-updated'); if (lu) lu.textContent = 'Updated: ' + new Date().toLocaleTimeString('th-TH');
     setText('sdb-donut-lbl', `${tot} cases`); setText('sdb-okng-lbl', `OK:${totalOK} / NG:${totalNG}`);
 
+    // --- ส่วนคำนวณ SMART INSIGHTS (แก้ไขปัญหาตัวเลขไม่แสดง) ---
+    const groupsForInsight = buildGroupData(filtered); 
+    if (groupsForInsight.length > 0) {
+        // 1. Top Problem Group (กลุ่มที่พบปัญหาบ่อยสุด)
+        const topG = groupsForInsight[0];
+        setText('md-top-group', topG[0]);
+        setText('md-top-group-sub', `${topG[1].total} รายการ (${Math.round(topG[1].total / (tot || 1) * 100)}%)`);
+
+        // 2. Highest NG (พาร์ทที่เสียเยอะที่สุด)
+        const ngSorted = [...groupsForInsight].sort((a, b) => b[1].ng - a[1].ng);
+        if (ngSorted[0][1].ng > 0) {
+            setText('md-worst-ng', ngSorted[0][0]);
+            setText('md-worst-ng-sub', `เสียสะสม ${ngSorted[0][1].ng} ชิ้น`);
+        } else {
+            setText('md-worst-ng', 'ไม่พบของเสีย');
+            setText('md-worst-ng-sub', 'ข้อมูลปกติ');
+        }
+
+        // 3. Busiest Month (เดือนที่มีงานเยอะที่สุด)
+        const mCounts = {};
+        filtered.forEach(s => { const m = s.month || 'Unknown'; mCounts[m] = (mCounts[m] || 0) + 1; });
+        const busyM = Object.entries(mCounts).sort((a, b) => b[1] - a[1])[0];
+        if (busyM) {
+            let mLabel = busyM[0];
+            if (mLabel.includes('-')) {
+                const [y, m] = mLabel.split('-');
+                const d = new Date(y, parseInt(m) - 1);
+                mLabel = d.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+            }
+            setText('md-busy-month', mLabel);
+            setText('md-busy-month-sub', `ตรวจไป ${busyM[1]} รายการ`);
+        }
+    } else {
+        // กรณีไม่มีข้อมูลให้รีเซ็ตเป็นขีด
+        ['md-top-group','md-top-group-sub','md-worst-ng','md-worst-ng-sub','md-busy-month','md-busy-month-sub'].forEach(id => setText(id, '—'));
+    }
+    // --- จบส่วนคำนวณ SMART INSIGHTS ---
+
     // --- ส่วนการวาดตาราง (ปรับปรุงใหม่ด้วย Pagination) ---
     setText('sup-tbl-count-badge', `${filtered.length} records`);
 
