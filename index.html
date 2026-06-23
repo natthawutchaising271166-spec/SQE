@@ -8669,6 +8669,405 @@ tbody tr {
     50% { opacity: 0.8; transform: skew(10deg); }
     100% { opacity: 1; transform: skew(0deg); }
 }
+/* 1. เพิ่มพื้นที่ว่างด้านล่างฟอร์ม เพื่อให้เลื่อนช่องสุดท้าย (Judgment) ขึ้นมาพ้นคีย์บอร์ดได้ */
+#claimForm {
+    padding-bottom: 250px !important; /* พื้นที่เผื่อคีย์บอร์ดโผล่มา */
+}
+
+/* 2. ตั้งค่าระยะห่างเมื่อช่องข้อมูลถูกเลื่อนขึ้นมา (Scroll Margin) */
+.neon-in, #judgmentSelect, textarea.neon-in {
+    scroll-margin-top: 100px;    /* เวลากระโดดขึ้นมา ให้ห่างจากขอบบน 100px */
+    scroll-margin-bottom: 100px; /* เวลากระโดดขึ้นมา ให้ห่างจากขอบล่าง 100px */
+}
+
+/* 3. ปรับแต่ง Sidebar ให้รองรับการเลื่อนที่สมูท */
+#sidebar {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; /* สำหรับ iOS */
+}
+/* DESIGN SYSTEM V5 - THE ULTIMATE GLASS */
+:root {
+  --bg-canvas: #eef2fb;
+  --blue-600: #2563eb;
+  --accent-red: #ef4444;
+  --accent-grn: #10b981;
+  --accent-or: #f97316;
+  --row-h: 70px; /* ความสูงแถวคงที่สำหรับ Virtual Scroll */
+}
+
+/* ปรับปรุงตารางให้สมดุล */
+tbody tr {
+  height: var(--row-h);
+  contain: strict; /* เพิ่มความเร็วในการเรนเดอร์ */
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+/* เอฟเฟกต์การ์ด Dashboard ให้ลึกและมีมิติ */
+.stat-card, .chart-panel, .market-panel {
+  backdrop-filter: blur(15px);
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* คีย์บอร์ดไม่บังช่องกรอกใน Tablet */
+.keyboard-focus-active {
+  /* ลบบรรทัด transform ออก */
+  border-color: var(--blue-600) !important;
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.4) !important;
+  z-index: 100;
+}
+/* สไตล์สำหรับหน่วยในตาราง */
+.qty-unit-label {
+    display: inline-block;
+    padding: 1px 4px;
+    background: rgba(37, 99, 235, 0.05);
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+}
+
+/* คอนเทนเนอร์จัดวาง (Compact Row) */
+.unit-breakdown-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ดีไซน์ป้ายแบบใหม่ (Split-Tone Pill) */
+.unit-badge-compact {
+    display: inline-flex;
+    align-items: center;
+    height: 22px; /* ความสูงคงที่เพื่อให้ดูเป็นระเบียบ */
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--accent-glow);
+    border-radius: 4px; /* ทรงเหลี่ยมมุมโค้งดูเป็นงานวิศวกรรม */
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+/* ส่วนตัวอักษรหน่วย (KG, PCS...) */
+.badge-label {
+    padding: 0 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--accent-glow);
+    text-transform: uppercase;
+}
+
+/* ส่วนตัวเลขจำนวน (Value) */
+.badge-val {
+    height: 100%;
+    padding: 0 6px;
+    background: var(--accent-glow);
+    color: #0f172a; /* สีตัวอักษรเข้มบนพื้นสว่าง */
+    font-family: 'Sora', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+}
+
+/* กำหนดสีแยกตามหมวดหมู่ */
+.stat-card.sf { --accent-glow: #f97316; }     /* ส้ม */
+.stat-card.ctc { --accent-glow: #3b82f6; }    /* ฟ้า */
+.stat-card.vendor { --accent-glow: #ef4444; } /* แดง */
+.stat-card.canuse { --accent-glow: #10b981; } /* เขียว */
+
+/* Hover Effect: เรืองแสงเล็กน้อย */
+.unit-badge-compact:hover {
+    box-shadow: 0 0 12px var(--accent-glow);
+    transform: translateY(-1px);
+}
+/* แอนิเมชั่นการโผล่ขึ้นมาของป้าย */
+@keyframes badgeSlideIn {
+    from { opacity: 0; transform: translateX(5px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* สถานะเมื่อไม่มีข้อมูลในเดือนนั้น */
+.chart-no-data {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    color: #475569; /* สีเทาเข้ม */
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    animation: badgeSlideIn 0.3s ease forwards;
+}
+
+/* สไตล์ป้ายหน่วยงานบนกราฟ (Tech Blue) */
+#chartMonthlyBreakdown .unit-badge-compact {
+    animation: badgeSlideIn 0.3s ease forwards;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid #3b82f6;
+    color: #60a5fa;
+}
+
+#chartMonthlyBreakdown .badge-val {
+    background: #3b82f6;
+    color: #ffffff;
+}
+/* ═══════════════════════════════════════════════════
+   NEW: FUTURISTIC UNIT BADGE SYSTEM
+═══════════════════════════════════════════════════ */
+.risk-intel-item {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.risk-intel-item:hover {
+    background: rgba(30, 41, 59, 0.8);
+    transform: translateY(-3px);
+    border-color: var(--judgment-color);
+    box-shadow: 0 10px 30px -10px var(--judgment-shadow);
+}
+
+/* สไตล์ป้ายแยกหน่วย (ตามรูปที่ส่งมา) */
+.unit-badge-split {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    border-radius: 5px;
+    border: 1px solid var(--judgment-color);
+    overflow: hidden;
+    margin-right: 8px;
+    margin-top: 8px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 800;
+}
+
+.ub-label {
+    background: #0f172a;
+    color: var(--judgment-color);
+    padding: 0 8px;
+    font-size: 10px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    letter-spacing: 1px;
+}
+
+.ub-val {
+    background: var(--judgment-color);
+    color: #000; /* ตัวเลขสีเข้มบนพื้นสว่าง */
+    padding: 0 8px;
+    font-size: 12px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* แอนิเมชันสำหรับข้อมูลใหม่ */
+@keyframes neonPulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; filter: brightness(1.3); }
+    100% { opacity: 0.8; }
+}
+
+.risk-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.risk-title-main {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.risk-meta-info {
+    font-size: 0.65rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+/* ═══════════════════════════════════════════════════
+   ULTRA-COMPACT NANO CHIPS (Horizontal Layout)
+═══════════════════════════════════════════════════ */
+.badge-row-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px; /* ระยะห่างระหว่างป้าย */
+    margin-top: 6px;
+    align-items: center;
+}
+
+.unit-badge-split {
+    display: inline-flex;
+    align-items: center;
+    height: 16px; /* บางลงพิเศษ */
+    border-radius: 3px;
+    border: 1px solid var(--judgment-color);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.unit-badge-split:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 8px var(--judgment-color);
+}
+
+.ub-label {
+    padding: 0 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 7.5px; /* เล็กแต่คม */
+    font-weight: 800;
+    color: var(--judgment-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-right: 1px solid var(--judgment-color);
+    background: rgba(15, 23, 42, 0.8);
+}
+
+.ub-val {
+    padding: 0 5px;
+    font-family: 'Sora', sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    color: #fff; /* ตัวเลขขาวบนพื้น Judgment */
+    background: var(--judgment-color);
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+/* เพิ่ม Effect เมื่อเป็นสีแดงให้ตัวเลขดูชัด */
+[style*="--judgment-color: #ef4444"] .ub-val { color: #fff; }
+[style*="--judgment-color: #10b981"] .ub-val { color: #000; }
+
+/* ═══════════════════════════════════════════════════
+   TOP LINES: MODERN HORIZONTAL BREAKDOWN
+═══════════════════════════════════════════════════ */
+.line-unit-tag {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 800;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-right: 4px;
+}
+
+.line-unit-tag b {
+    color: #fff;
+    margin-left: 3px;
+}
+
+.line-stat-main {
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #fff;
+    line-height: 1;
+}
+
+.line-share-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+/* ═══════════════════════════════════════════════════
+   PARETO SCROLL SYSTEM (Fixed 2 Items View)
+═══════════════════════════════════════════════════ */
+#paretoFocusList {
+    max-height: 230px; /* ล็อคความสูงให้เห็นประมาณ 2 รายการพอดี */
+    overflow-y: auto;  /* เปิดการเลื่อนแนวตั้ง */
+    padding-right: 5px;
+    scroll-behavior: smooth; /* ทำให้เวลาเลื่อนดูนุ่มนวล */
+}
+
+/* ซ่อนแถบ Scrollbar แต่ยังเลื่อนได้ (สไตล์มินิมอล) */
+#paretoFocusList::-webkit-scrollbar {
+    width: 4px;
+}
+#paretoFocusList::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+#paretoFocusList::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3); /* สีฟ้าจางๆ */
+    border-radius: 10px;
+}
+
+/* ปรับปรุงการ์ดให้คมชัดและมีมิติ */
+.pareto-item-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 10px; /* ระยะห่างระหว่างรายการ */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.pareto-item-card:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    transform: translateX(2px);
+}
+/* ═══════════════════════════════════════════════════
+   PARETO RANKING ANIMATIONS (Pulse Glow)
+═══════════════════════════════════════════════════ */
+
+/* อันดับ 1: แดงนีออน (Critical Risk) */
+@keyframes pulse-red-glow {
+    0%, 100% { 
+        border-color: rgba(239, 68, 68, 0.3); 
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
+    }
+    50% { 
+        border-color: rgba(239, 68, 68, 1); 
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), inset 0 0 10px rgba(239, 68, 68, 0.2); 
+    }
+}
+
+/* อันดับ 2: เหลืองทอง (High Warning) */
+@keyframes pulse-yellow-glow {
+    0%, 100% { 
+        border-color: rgba(245, 158, 11, 0.2); 
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
+    }
+    50% { 
+        border-color: rgba(245, 158, 11, 1); 
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.4), inset 0 0 8px rgba(245, 158, 11, 0.1); 
+    }
+}
+
+.rank-top-1 {
+    animation: pulse-red-glow 2s infinite ease-in-out;
+    border-width: 1.5px !important;
+}
+
+.rank-top-2 {
+    animation: pulse-yellow-glow 2s infinite ease-in-out;
+    border-width: 1.5px !important;
+}
+
 </style>
 </head>
 <body>
@@ -9006,6 +9405,17 @@ tbody tr {
             border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
         }
+        /* บังคับปิดแสงช่อง Unit ถ้ายังไม่พร้อม */
+#unit:not(.is-filled) {
+    border-color: var(--border) !important;
+    box-shadow: none !important;
+    background-color: var(--bg-input) !important;
+}
+
+/* ปรับสีตัวอักษรคำว่า UNIT ให้จางลงเหมือนช่องอื่นที่ยังไม่กรอก */
+#unit option[value=""][disabled] {
+    color: var(--text-300);
+}
       </style>
 
       <div style="margin-bottom:1.2rem;">
@@ -9031,31 +9441,48 @@ tbody tr {
           <input type="text" id="defectName" placeholder="Defect Type *" required class="neon-in" style="height:40px; border-radius:10px;">
         </div>
 
-        <div style="background: var(--bg-card); border-radius:16px; padding:0.8rem; border:1px solid var(--border); box-shadow: var(--shadow-sm); display:flex; flex-direction:column; gap:0.5rem;">
-          <div class="sidebar-section-title" style="margin-bottom:0.1rem; color:var(--blue-500); font-size:0.6rem;">REFERENCE INFO</div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-            <div class="form-section-input">
-                <!-- ตัวอย่างช่อง Ref No ที่อัพเกรดแล้ว -->
-<div class="form-section-input">
-    <input type="text" id="refNo" placeholder="REF No*" required class="neon-in">
-    <span class="validation-msg">รูปแบบต้องเป็น 000/0000 หรือ V000/0000</span>
+<div style="background: var(--bg-card); border-radius:16px; padding:0.8rem; border:1px solid var(--border); box-shadow: var(--shadow-sm); display:flex; flex-direction:column; gap:0.5rem;">
+  <div class="sidebar-section-title" style="margin-bottom:0.1rem; color:var(--blue-500); font-size:0.6rem;">REFERENCE INFO</div>
+  
+  <!-- แถวที่ 1: แบ่ง 2 คอลัมน์เหมือนเดิม -->
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+    <!-- คอลัมน์ซ้าย: Ref No -->
+    <div class="form-section-input">
+      <input type="text" id="refNo" placeholder="REF No*" required class="neon-in" style="height: 40px;">
+      <span class="validation-msg">รูปแบบผิด</span>
+    </div>
+    
+<!-- คอลัมน์ขวา: QTY + Unit (ปรับปรุงให้เห็นตัวเลขชัดเจน) -->
+<div style="display: flex; height: 40px; width: 100%;">
+  <input type="number" id="qty" placeholder="Qty*" min="1" required class="neon-in" 
+         style="flex: 1.2; border-top-right-radius: 0; border-bottom-right-radius: 0; 
+                padding: 0 5px !important; text-align: center; font-weight: 800; font-size: 0.95rem; min-width: 0;">
+  
+  <select id="unit" class="neon-in" 
+          style="flex: 0.8; border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 1px solid rgba(59, 130, 246, 0.2); 
+                 background-color: var(--bg-input); padding: 0 !important; font-size: 0.65rem; font-weight: 800; 
+                 cursor: pointer; text-align: center; appearance: none; background-image: none;">
+                 <option value="" disabled selected>UNIT</option> 
+    <option value="PCS">PCS</option>
+    <option value="KG">KG</option>
+    <option value="ROLL">ROLL</option>
+    <option value="MTR">MTR</option>
+    <option value="SET">SET</option>
+  </select>
 </div>
-            </div>
-            <div class="form-section-input">
-    <input type="number" id="qty" placeholder="Quantity *" min="1" required class="neon-in">
-    <span class="validation-msg">จำนวนต้องมากกว่า 0</span>
 </div>
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-            <select id="shift" class="neon-in no-auto-glow" style="height:40px; border-radius:10px; font-weight:700;">
-              <option value="SHIFT A">SHIFT A</option>
-              <option value="SHIFT B">SHIFT B</option>
-              <option value="SHIFT C">SHIFT C</option>
-            </select>
-            <input type="text" id="lineNo" placeholder="Line" class="neon-in" style="height:40px; border-radius:10px;">
-          </div>
-          <textarea id="remark" placeholder="Remarks..." class="neon-in" style="height:45px; border-radius:10px; min-height:45px;"></textarea>
-        </div>
+  <!-- แถวที่ 2: Shift และ Line (คงเดิม) -->
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+    <select id="shift" class="neon-in no-auto-glow" style="height:40px; border-radius:10px; font-weight:700;">
+      <option value="SHIFT A">SHIFT A</option>
+      <option value="SHIFT B">SHIFT B</option>
+      <option value="SHIFT C">SHIFT C</option>
+    </select>
+    <input type="text" id="lineNo" placeholder="Line" class="neon-in" style="height:40px; border-radius:10px;">
+  </div>
+  
+  <textarea id="remark" placeholder="Remarks..." class="neon-in" style="height:45px; border-radius:10px; min-height:45px;"></textarea>
+</div>
 
         <div style="background: var(--bg-card); border-radius:16px; padding:0.8rem; border:1px solid var(--border); box-shadow: var(--shadow-sm);">
           <div class="sidebar-section-title" style="margin-bottom:0.5rem; color:var(--blue-500); font-size:0.6rem;">JUDGMENT</div>
@@ -9479,15 +9906,16 @@ tbody tr {
     ═══════════════════════════════════════════════════════ -->
     <div class="cockpit-center">
       
-       <!-- ★ STATS ROW: SF, CTC, CAN USE, VENDOR ★ -->
-      <div class="stats-row">
-    <!-- SF FAULT -->
+    <!-- ★ STATS ROW: SF, CTC, CAN USE, VENDOR ★ -->
+<div class="stats-row">
+    <!-- 1. SF FAULT -->
     <div class="stat-card sf">
         <div class="stat-header">
             <span class="stat-title">SF Fault</span>
             <div style="color: var(--card-accent); font-size: 1rem;">◆</div>
         </div>
         <div class="stat-number" id="dashStatSF">0</div>
+        <!-- ✅ ลูกศรขึ้นลง % (ใช้ ID เดิม) -->
         <div class="stat-delta" id="deltaSF">--</div>
         <div class="stat-footer">
             <div>
@@ -9502,9 +9930,11 @@ tbody tr {
         <div class="stat-share-bar">
             <div class="stat-share-fill" id="barSF" style="width: 0%"></div>
         </div>
+        <!-- ✅ ป้ายแยกหน่วย (ใช้ ID ใหม่ที่ฐานล่างสุด) -->
+        <div id="unitBreakdownSF" class="unit-breakdown-container"></div> 
     </div>
 
-    <!-- CTC FAULT -->
+    <!-- 2. CTC FAULT -->
     <div class="stat-card ctc">
         <div class="stat-header">
             <span class="stat-title">CTC Fault</span>
@@ -9525,9 +9955,10 @@ tbody tr {
         <div class="stat-share-bar">
             <div class="stat-share-fill" id="barCTC" style="width: 0%"></div>
         </div>
+        <div id="unitBreakdownCTC" class="unit-breakdown-container"></div>
     </div>
 
-    <!-- CAN USE -->
+    <!-- 3. CAN USE (OK) -->
     <div class="stat-card canuse">
         <div class="stat-header">
             <span class="stat-title">Can Use (OK)</span>
@@ -9548,9 +9979,10 @@ tbody tr {
         <div class="stat-share-bar">
             <div class="stat-share-fill" id="barCanUse" style="width: 0%"></div>
         </div>
+        <div id="unitBreakdownCanUse" class="unit-breakdown-container"></div>
     </div>
 
-    <!-- VENDOR FAULT -->
+    <!-- 4. VENDOR FAULT -->
     <div class="stat-card vendor">
         <div class="stat-header">
             <span class="stat-title">Vendor Fault</span>
@@ -9571,6 +10003,7 @@ tbody tr {
         <div class="stat-share-bar">
             <div class="stat-share-fill" id="barVendor" style="width: 0%"></div>
         </div>
+        <div id="unitBreakdownVendor" class="unit-breakdown-container"></div>
     </div>
 </div>
       
@@ -9579,8 +10012,11 @@ tbody tr {
         <div class="chart-header">
           <div class="chart-title-group">
             <div class="chart-title">PRODUCTION TREND</div>
-            <div class="chart-subtitle">Monthly Performance Analysis</div>
-          </div>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <div class="chart-subtitle" style="margin-bottom: 0;">Monthly Performance Analysis</div>
+      <div id="chartMonthlyBreakdown" style="display: flex; gap: 6px;"></div>
+    </div>
+  </div>
 <div class="chart-stats" id="chartStats">
   <div class="stat-item">
     <span class="stat-label">MAX PEAK</span>
@@ -9625,20 +10061,6 @@ tbody tr {
             </div>
         </div>
         <div class="market-badge" style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid #3b82f6;">AUTO-SCAN</div>
-    </div>
-
-    <!-- Stats Summary Grid -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0;">
-        <div class="risk-summary-box" style="border-left: 3px solid #ef4444; background: rgba(239, 68, 68, 0.05);">
-            <div class="label">SENSITIVE SPIKES</div>
-            <div id="count-high-risk" class="value">0</div>
-            <div class="sub-label">Abnormal Activity</div>
-        </div>
-        <div class="risk-summary-box" style="border-left: 3px solid #10b981; background: rgba(16, 185, 129, 0.05);">
-            <div class="label">STABLE VENDORS</div>
-            <div id="count-stable" class="value">0</div>
-            <div class="sub-label">Consistently Good</div>
-        </div>
     </div>
 
     <!-- Detailed List (พิกัดความเสี่ยง) -->
@@ -9973,6 +10395,38 @@ function generateUUID() {
   });
 }
 
+/**
+ * แปลง Error Object เป็นข้อความที่พนักงานเข้าใจง่าย
+ */
+function getFriendlyErrorMessage(err) {
+    if (!err) return "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
+    
+    // 1. ตรวจสอบปัญหาเครือข่าย
+    if (!navigator.onLine || err.message?.includes('fetch') || err.message?.includes('network')) {
+        return "📶 ปัญหาการเชื่อมต่อ: กรุณาตรวจสอบอินเทอร์เน็ตของท่าน";
+    }
+
+    // 2. ตรวจสอบ Error Code จาก Supabase (PostgreSQL)
+    const code = err.code || (err.error && err.code);
+    switch (code) {
+        case '42501': return "🔒 สิทธิ์ปฏิเสธ: คุณไม่มีสิทธิ์จัดการข้อมูลชุดนี้ (Permission Denied)";
+        case '23505': return "🚫 ข้อมูลซ้ำ: เลข Reference นี้มีอยู่ในระบบแล้ว";
+        case 'PGRST116': return "🔎 ไม่พบข้อมูลที่ต้องการในฐานข้อมูล";
+        case 'PGRST100': return "⏳ การเชื่อมต่อหมดเวลา (Timeout) กรุณาลองใหม่อีกครั้ง";
+    }
+
+    // 3. ตรวจสอบ Error จากระบบ Auth
+    if (err.message?.includes('Invalid login credentials')) {
+        return "🔐 อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+    }
+    if (err.message?.includes('Email not confirmed')) {
+        return "📧 กรุณายืนยันอีเมลในกล่องจดหมายของท่านก่อนใช้งาน";
+    }
+
+    // 4. กรณีอื่นๆ ส่งข้อความเดิมกลับไป (หรือตัดให้สั้นลง)
+    return `❌ ${err.message || 'เกิดข้อผิดพลาดในการประมวลผล'}`;
+}
+
 function escapeHtml(text) {
   if (!text) return '';
   return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -10096,9 +10550,12 @@ function getSupabase() {
 
 async function fetchFromSupabase(inspector) {
   const sb = getSupabase();
-  if (!sb) return null;
+  // ป้องกันกรณี Supabase Client โหลดไม่ขึ้น
+  if (!sb) {
+    console.error("Supabase client is not initialized.");
+    return null; 
+  }
   
-  // 1. Clean Input: ตัดช่องว่างและแปลงเป็นตัวพิมพ์เล็กเพื่อความแม่นยำในการ Query
   const cleanInspector = (inspector || '').trim().toLowerCase();
   if (!cleanInspector) return [];
 
@@ -10106,46 +10563,61 @@ async function fetchFromSupabase(inspector) {
     let allData = [];
     let fetchMore = true;
     let from = 0;
-    const step = 1000; // ดึงรอบละ 1000 รายการ
+    const step = 1000; // ดึงรอบละ 1000 รายการเพื่อประสิทธิภาพ
 
     while (fetchMore) {
+      // เพิ่ม .timeout() ถ้า Supabase SDK รองรับ หรือใช้ระบบจัดการ Promise ทั่วไป
       const { data, error } = await sb
         .from('records')
         .select('*')
-        .eq('inspector', cleanInspector) // ใช้ข้อมูลที่ trim แล้วค้นหา
+        .eq('inspector', cleanInspector)
         .order('date', { ascending: false })
         .range(from, from + step - 1);
         
-      if (error) throw error;
+      if (error) throw error; // ส่ง Error ไปที่ catch block
       
       if (data && data.length > 0) {
-        // 2. Process & Merge: 
-        // - ใช้ Spread Operator (...) ในการ push ข้อมูลเข้า array แทน concat เพื่อประหยัด Memory
-        // - ทำความสะอาดข้อมูล strings แต่ละ field ที่ดึงมาจาก DB เพื่อป้องกัน Error ในการแสดงผล
+        // 2. Process & Sanitization: ป้องกัน Runtime Error เวลาแสดงผลตาราง
         const sanitizedChunk = data.map(r => ({
           ...r,
+          // บังคับข้อมูลเป็น String และ Trim เพื่อป้องกันค่า null/undefined ทำแอปค้าง
           inspector: String(r.inspector || '').trim().toLowerCase(),
-          supplier: String(r.supplier || '').trim(),
-          partNo: String(r.partNo || '').trim(),
-          _isSaved: true // ทำเครื่องหมายว่าข้อมูลชุดนี้อยู่บน Cloud แล้ว
+          supplier: String(r.supplier || '').trim() || 'Unknown',
+          partNo: String(r.partNo || '').trim() || '-',
+          partName: String(r.partName || '').trim() || '',
+          qty: parseInt(r.qty) || 0,
+          _isSaved: true 
         }));
 
         allData.push(...sanitizedChunk);
-        
-        // ขยับ index สำหรับดึงข้อมูลรอบถัดไป
         from += step;
         
-        // ถ้าจำนวนที่ดึงมาได้น้อยกว่าค่า step แสดงว่าหมดข้อมูลในระบบแล้ว
+        // ถ้าดึงมาได้น้อยกว่า step แสดงว่าหมดข้อมูลแล้ว
         if (data.length < step) fetchMore = false;
       } else {
         fetchMore = false;
       }
     }
 
+    // แม้จะดึงสำเร็จแต่ข้อมูลเป็น 0 ก็ต้องคืนค่าเป็น [] เพื่อให้ UI วาดสถานะ Empty State ได้
     return allData;
+
   } catch (err) {
     console.error('[Supabase Fetch Error]', err);
-    return null; // คืนค่า null เพื่อให้ระบบหลักรู้ว่าเกิด Network/Auth Error
+    
+    // แจ้งเตือนผู้ใช้ด้วยข้อความที่เข้าใจง่าย (ใช้ฟังก์ชันแปล Error จากหัวข้อก่อนหน้า)
+    const errorMsg = (typeof getFriendlyErrorMessage === 'function') 
+      ? getFriendlyErrorMessage(err) 
+      : "📶 ไม่สามารถเชื่อมต่อฐานข้อมูล Cloud ได้";
+    
+    toast(errorMsg);
+
+    /**
+     * 💡 จุดสำคัญ: คืนค่า null เพื่อบอกระบบหลัก (initApp) 
+     * ว่าการดึงข้อมูล "ล้มเหลว" ไม่ใช่ "ไม่มีข้อมูล" 
+     * เพื่อให้ระบบไปดึงข้อมูลจาก Local (IndexedDB) มาแสดงแทนแอปขาวโพลน
+     */
+    return null; 
   }
 }
 
@@ -10165,29 +10637,108 @@ async function dbPutBulk(recordsArray) {
 }
 
 async function pushToSupabase(rows) {
-  if (!rows || rows.length === 0) return true;  
+  if (!rows || rows.length === 0) return true;
   const sb = getSupabase();
   if (!sb) return false;
-  
-  try {
-    const cleanRows = rows.map(r => ({
-      id: r.id, date: r.date, shift: r.shift, inspector: r.inspector,
-      ref: r.ref, line: r.line, supplier: r.supplier, partNo: r.partNo,
-      partName: r.partName, qty: parseInt(r.qty) || 0, defect: r.defect,
-      remark: r.remark, judgment: r.judgment
-    }));
 
-    const chunkSize = 1000;
-    for (let i = 0; i < cleanRows.length; i += chunkSize) {
-      const chunk = cleanRows.slice(i, i + chunkSize);
-      const { error } = await sb.from('records').upsert(chunk);
-      if (error) throw error;
+  // 1. Sanitize & Clean Data (เตรียมข้อมูลให้สะอาดและเป็นระเบียบ)
+  const cleanRows = rows.map(r => ({
+    id: String(r.id), 
+    date: r.date,
+    shift: r.shift,
+    inspector: String(r.inspector || '').trim().toLowerCase(),
+    ref: String(r.ref || '').trim().toUpperCase(), 
+    line: r.line || '-',
+    supplier: r.supplier || 'Unknown',
+    partNo: r.partNo || '-',
+    partName: r.partName || '',
+    qty: parseInt(r.qty) || 0,
+    defect: r.defect || '-',
+    remark: r.remark || '',
+    judgment: r.judgment
+  }));
+
+  /**
+   * 2. Optimized Chunking Logic
+   * ปรับลดจาก 1000 เหลือ 100 รายการต่อรอบ
+   * เหตุผล: requests ขนาดใหญ่มีโอกาสเกิด Timeout สูงกว่าในเน็ตที่ไม่เสถียร
+   */
+  const chunkSize = 100; 
+  for (let i = 0; i < cleanRows.length; i += chunkSize) {
+    const chunk = cleanRows.slice(i, i + chunkSize);
+
+    try {
+      // 3. ใช้ Upsert (Idempotency) โดยอิงจาก 'id' 
+      // หากเกิดเน็ตหลุดขณะส่ง (ส่งถึงแต่ไม่ได้รับผลตอบกลับ) การส่งซ้ำจะไม่ทำให้ข้อมูลเบิ้ล
+      const { error } = await sb
+        .from('records')
+        .upsert(chunk, { 
+          onConflict: 'id', 
+          ignoreDuplicates: false 
+        });
+
+      if (error) {
+        // 4. Double-Lock: ตรวจสอบข้อมูลซ้ำที่ระดับเลข Reference (Constraint Error)
+        if (error.code === '23505') {
+          throw new Error(`🚫 พบข้อมูลซ้ำ: เลข Reference (${chunk[0].ref}) มีอยู่ในระบบแล้ว`);
+        }
+        // ตรวจสอบ Error สิทธิ์การใช้งาน (RLS)
+        if (error.code === '42501') {
+          throw new Error(`🔒 สิทธิ์ปฏิเสธ: คุณไม่มีสิทธิ์แก้ไขข้อมูลชุดนี้`);
+        }
+        throw error;
+      }
+
+    } catch (err) {
+      /**
+       * 5. Robust Timeout & Network Error Handling
+       * แยกแยะระหว่าง "ข้อมูลผิด" กับ "เน็ตล่ม"
+       */
+      const isNetworkError = 
+        err.message.includes('fetch') || 
+        err.message.includes('timeout') || 
+        err.code === 'PGRST100'; //รหัส PostgREST สำหรับการเชื่อมต่อล้มเหลว
+
+      if (isNetworkError) {
+        console.warn(`[Sync Timeout] Chunk ${i/chunkSize + 1} failed. Slower connection detected.`);
+        if (typeof toast === 'function') {
+          toast('📶 สัญญาณอินเทอร์เน็ตไม่เสถียร ระบบจะลองซิงค์ใหม่ภายหลัง');
+        }
+        // คืนค่า false เพื่อให้ฟังก์ชันหลัก (syncToCloud) หยุด loop และไม่ทำเครื่องหมายว่า _isSaved = true
+        return false; 
+      } else {
+        // กรณีเป็น Error จากข้อมูล (เช่น เลขซ้ำ) ให้แสดงเตือนพนักงานตรงๆ
+        if (typeof toast === 'function') {
+          toast(err.message);
+        }
+        return false;
+      }
     }
-    return true;
-  } catch (err) {
-    console.error('[Supabase Upsert Error]', err);
-    return false;
   }
+
+  return true;
+}
+
+// เมื่อมีการลบข้อมูล
+async function deleteRecord(id) {
+  // 1. หาข้อมูลใน RAM
+  const record = records.find(r => r.id === id);
+  if (!record) return;
+
+  if (isOnline) {
+    const success = await deleteFromSupabase(id);
+    if (success) {
+      records = records.filter(r => r.id !== id);
+      // ลบจาก IndexedDB ด้วย...
+    }
+  } else {
+    // 2. ถ้าออฟไลน์ ให้ทำเครื่องหมายไว้ว่า "รอการลบบน Cloud"
+    record._isDeleted = true;
+    await dbPutBulk([record]); // บันทึกสถานะรอลงถังขยะ
+    records = records.filter(r => r.id !== id);
+    toast('🗑️ รายการถูกลบ (จะซิงค์เมื่อออนไลน์)');
+  }
+  refreshAll();
 }
 
 async function deleteFromSupabase(id) {
@@ -10370,86 +10921,125 @@ async function initApp(inspector) {
 }
 
 async function syncToCloud(isInitial = false) {
-  if (!isOnline) { toast('🔴 ไม่มีอินเทอร์เน็ต ไม่สามารถซิงค์ได้'); return; }
-  if (!isInitial) toast('🔄 กำลังซิงค์ข้อมูล...');
-  
-  let pushSuccess = true;
-  
-  // 1. ส่งข้อมูลที่สร้างใหม่ตอนออฟไลน์ขึ้น Cloud
-  const unsyncedRecords = records.filter(r => r._isSaved === false);
-  if (unsyncedRecords.length > 0) {
-    const dataToPush = unsyncedRecords.map(r => {
-      const { _isOffline, _isSaved, _isDeleted, ...cleanData } = r;
-      return cleanData;
-    });
-    pushSuccess = await pushToSupabase(dataToPush);
+  if (!isOnline) { 
+    if (!isInitial) toast('🔴 ออฟไลน์: ข้อมูลจะถูกเก็บไว้ในเครื่องก่อน'); 
+    return; 
   }
-
-  // 2. จัดการข้อมูลที่ถูกสั่งลบตอนออฟไลน์
-  const allLocalData = await dbGetAll();
-  const deletedRecords = allLocalData.filter(r => r._isDeleted === true);
-  for (let r of deletedRecords) {
-    const delSuccess = await deleteFromSupabase(r.id);
-    if (delSuccess) {
-      await new Promise((resolve) => {
-        const tx = db.transaction(IDB_STORE, 'readwrite');
-        tx.objectStore(IDB_STORE).delete(String(r.id));
-        tx.oncomplete = () => resolve();
-      });
+  
+  if (!isInitial) toast('🔄 กำลังประสานข้อมูลกับ Cloud...');
+  
+  try {
+    // ══════════════════════════════════════════════════
+    // STEP 1: จัดการข้อมูลที่ถูกสั่งลบตอนออฟไลน์ (Offline Deletion)
+    // ══════════════════════════════════════════════════
+    const allLocalData = await dbGetAll();
+    const deletedRecords = allLocalData.filter(r => r._isDeleted === true);
+    
+    if (deletedRecords.length > 0) {
+      console.log(`[Sync] Found ${deletedRecords.length} pending deletions.`);
+      for (let r of deletedRecords) {
+        const delSuccess = await deleteFromSupabase(r.id);
+        if (delSuccess) {
+          // ลบออกจาก Local DB (IndexedDB) ถาวรเมื่อบน Cloud ลบสำเร็จแล้ว
+          await new Promise((resolve) => {
+            const tx = db.transaction(IDB_STORE, 'readwrite');
+            tx.objectStore(IDB_STORE).delete(String(r.id));
+            tx.oncomplete = () => resolve();
+          });
+        }
+      }
     }
-  }
 
-  // 3. โหลดข้อมูลล่าสุดจาก Cloud มาทับ Local
-  const cloudData = await fetchFromSupabase(currentUser);
-  if (cloudData) {
+    // ══════════════════════════════════════════════════
+    // STEP 2: ส่งข้อมูลใหม่/แก้ไข ขึ้น Cloud (Push Unsynced)
+    // ══════════════════════════════════════════════════
+    // กรองเฉพาะรายการที่ยังไม่ได้เซฟ (_isSaved: false) และไม่ใชรายการที่รอการลบ
+    const unsyncedRecords = records.filter(r => r._isSaved === false && !r._isDeleted);
     
-    // ✅ ตรงนี้คือส่วนที่แก้ไข: ใช้ Smart Merge แทนการทับหมด
+    if (unsyncedRecords.length > 0) {
+      console.log(`[Sync] Pushing ${unsyncedRecords.length} new/updated records.`);
+      
+      // ส่งขึ้น Supabase ผ่านฟังก์ชัน pushToSupabase ที่มีระบบ Chunking และ Upsert
+      const pushSuccess = await pushToSupabase(unsyncedRecords);
+      
+      if (pushSuccess) {
+        // อัปเดตสถานะใน RAM: เปลี่ยน _isSaved เป็น true ทันทีที่ Push สำเร็จ
+        unsyncedRecords.forEach(r => { 
+          r._isSaved = true;
+          delete r._isNew; // ล้างสถานะรายการใหม่ (ถ้ามี)
+        });
+        // บันทึกสถานะ _isSaved = true ลง Local DB ทันทีเพื่อป้องกันการส่งซ้ำ
+        await dbPutBulk(unsyncedRecords);
+      } else {
+        throw new Error("Push to cloud failed");
+      }
+    }
 
-    // 3.1 สร้าง Map จาก Cloud Data เพื่อให้ค้นหาเร็ว
-    const cloudMap = new Map();
-    cloudData.forEach(c => {
-        // กำหนดให้ข้อมูลจาก Cloud เป็นสถานะ Sync แล้ว
-        cloudMap.set(c.id, { ...c, _isSaved: true });
-    });
+    // ══════════════════════════════════════════════════
+    // STEP 3: SMART MERGE (ดึงข้อมูลล่าสุดจาก Cloud มาผสานกับ Local)
+    // ══════════════════════════════════════════════════
+    // ดึงเฉพาะ 1,000 รายการล่าสุด (หรือตามระบบ Pagination)
+    const cloudData = await fetchFromSupabase(currentUser, 0); 
+    
+    if (cloudData) {
+      // 3.1 สร้าง Map เพื่อการค้นหาที่รวดเร็ว (O(1))
+      const cloudMap = new Map();
+      cloudData.forEach(c => cloudMap.set(String(c.id), { ...c, _isSaved: true }));
 
-    // 3.2 สร้าง Array ผลลัพธ์จากการผสาน (Merge)
-    // เริ่มต้นด้วย Array ว่าง
-    const mergedRecords = [];
+      const mergedRecords = [];
+      const localIdsInMerged = new Set();
 
-    // 3.3 ตรวจสอบ Local Records ทีละตัว
-    records.forEach(localRec => {
-        // กรณี A: ข้อมูลนี้ถูกสร้าง/แก้ไขอยู่ในเครื่องและยังไม่ได้ Sync (_isSaved = false)
-        // -> จำเป็นต้องเก็บของ Local ไว้! (ป้องกันไม่ให้ข้อมูลหายถ้า Cloud ยังไม่รับรู้)
+      // 3.2 วนลูปเช็คข้อมูลใน RAM (Local)
+      records.forEach(localRec => {
+        const idStr = String(localRec.id);
+        
+        // กรณี A: ข้อมูลในเครื่องยังไม่ได้ซิงค์ (_isSaved: false) 
+        // -> ต้องรักษาของ Local ไว้เป็นลำดับความสำคัญสูงสุด (ห้ามหาย)
         if (localRec._isSaved === false) {
-            mergedRecords.push(localRec);
+          mergedRecords.push(localRec);
+          localIdsInMerged.add(idStr);
         } 
-        // กรณี B: ข้อมูลนี้ Sync แล้ว (_isSaved = true)
-        // -> ถ้า Cloud มีข้อมูลเดียวกัน ให้เอาของ Cloud (เพื่อให้ทันสมัยจากเครื่องอื่น)
-        // -> ถ้า Cloud ไม่มี (ลบไปแล้ว) ตัวอย่างนี้จะไม่ถูกเพิ่มเข้า mergedRecords
-        else if (cloudMap.has(localRec.id)) {
-            mergedRecords.push(cloudMap.get(localRec.id));
+        // กรณี B: ข้อมูลในเครื่องซิงค์แล้ว (_isSaved: true)
+        else {
+          if (cloudMap.has(idStr)) {
+            // ถ้า Cloud ยังมีอยู่ -> เอาเวอร์ชัน Cloud (ซึ่งอาจถูกแก้โดยพนักงานคนอื่นหรือระบบ)
+            mergedRecords.push(cloudMap.get(idStr));
+            localIdsInMerged.add(idStr);
+          }
+          // ถ้า Cloud ไม่มี ID นี้แล้ว -> แสดงว่าถูกลบจากเครื่องอื่น/หน้าอื่นไปแล้ว
+          // ผลคือ mergedRecords จะไม่เพิ่มรายการนี้ (เป็นการลบออกอัตโนมัติ)
         }
-    });
+      });
 
-    // 3.4 เพิ่มรายการใหม่ที่มีอยู่บน Cloud แต่ Local ไม่มี (จากเครื่องอื่น)
-    // เราทำการ Loop ผ่าน cloudMap และตรวจสอบว่ามีอยู่ใน mergedRecords หรือยัง
-    cloudData.forEach(cloudRec => {
-        // ถ้าหา ID นี้ไม่เจอในผลลัพธ์ ให้เพิ่มเข้าไป
-        if (!mergedRecords.find(r => r.id === cloudRec.id)) {
-            mergedRecords.push(cloudRec);
+      // 3.3 เพิ่มรายการจาก Cloud ที่ยังไม่มีใน Local (เช่น ข้อมูลที่พนักงานคนอื่นคีย์เข้ามา)
+      cloudData.forEach(cloudRec => {
+        if (!localIdsInMerged.has(String(cloudRec.id))) {
+          mergedRecords.push(cloudRec);
         }
-    });
+      });
 
-    // 3.5 อัปเดต Global variable
-    records = mergedRecords;
-    
-    await dbClear();
-    await dbPutBulk(records);
-    refreshAll();
-    
-    if (!isInitial) toast('✅ Sync สำเร็จแล้ว');
-  } else {
-    if (!isInitial) toast('❌ Sync ล้มเหลว');
+      // 3.4 จัดเรียงข้อมูลตามวันที่ล่าสุด
+      mergedRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // ══════════════════════════════════════════════════
+      // STEP 4: PERSISTENCE & UI UPDATE
+      // ══════════════════════════════════════════════════
+      // อัปเดตตัวแปร Global
+      records = mergedRecords;
+      
+      // ล้าง Local DB เก่าและแทนที่ด้วยข้อมูลที่ Merge แล้ว (เพื่อให้ Local กับ RAM ตรงกัน 100%)
+      await dbClear();
+      await dbPutBulk(records);
+      
+      // อัปเดตหน้าจอทั้งหมด
+      refreshAll();
+      
+      if (!isInitial) toast('✅ ซิงค์ข้อมูลสมบูรณ์');
+    }
+
+  } catch (err) {
+    console.error('[Sync Error Detail]', err);
+    if (!isInitial) toast('⚠️ การซิงค์สะดุด: ระบบจะพยายามใหม่เมื่อสัญญาณดีขึ้น');
   }
 }
 
@@ -10664,14 +11254,15 @@ function openJobProject() {
    5. CRUD OPERATIONS (CREATE, UPDATE, DELETE)
    จัดการข้อมูลฟอร์ม และการลบข้อมูล
 ═════════════════════════════════════════════════════════════════ */
-function isDuplicate(ref) {
-  const r = String(ref).trim();
-  if (!r) return false;
-  // เพิ่มเงื่อนไขเช็คว่าต้องไม่ใช่ ID เดียวกับที่กำลังแก้ไขอยู่
-  return records.some(x => 
-    String(x.ref).trim() === r && 
-    x.inspector === currentUser && 
-    x.id !== editingId 
+function isDuplicate(refVal) {
+  if (!refVal) return false;
+  const targetRef = String(refVal).trim().toUpperCase();
+  
+  // เช็คว่าใน records ทั้งหมด (ที่โหลดมาแล้ว) มี ref นี้หรือยัง
+  // และต้องไม่ใช่การแก้ไข้อมูลตัวเอง (id !== editingId)
+  return records.some(r => 
+    String(r.ref).trim().toUpperCase() === targetRef && 
+    r.id !== editingId
   );
 }
 
@@ -10828,6 +11419,7 @@ async function handleFormSubmit(e) {
     partNo: partNoVal,
     partName: $id('partOn') ? $id('partOn').value : '',
     qty: qty,
+    unit: $id('unit') ? $id('unit').value : 'PCS', // เพิ่มบรรทัดนี้
     defect: $id('defectName').value,
     remark: $id('remark').value,
     judgment: jdg,
@@ -10870,43 +11462,38 @@ async function handleFormSubmit(e) {
     const brandLogo = document.querySelector('#brandCard div:first-child');
     if(brandLogo) brandLogo.classList.add('logo-success-glow');
 
+    // 🌟 [SUCCESS UI FEEDBACK] ... โค้ดส่วนโชว์ความสำเร็จ ...
+
     // หน่วงเวลาเพื่อให้ผู้ใช้เห็นความสำเร็จ (UX)
     setTimeout(() => {
       
-      // --- [6] CLEANUP & RESET (Fix Kit 4) ---
+      // --- [6] CLEANUP & RESET ---
       const keepDate = dateInput.value;
       const keepShift = $id('shift').value;
 
       // ล้างค่าฟอร์ม
       $id('claimForm').reset();
-      editingId = null; // 🔴 สำคัญ: ต้องรีเซ็ตเป็น null ทุกครั้งหลังบันทึกเสร็จ
+      editingId = null; 
+
+      // --- ⭐ เพิ่ม 2 บรรทัดนี้ เพื่อปิดปุ่มยกเลิกเมื่อบันทึกเสร็จ ⭐ ---
+      if ($id('cancelEditBtn')) $id('cancelEditBtn').remove();
+      if ($id('cancelCopyBtn')) $id('cancelCopyBtn').remove();
+      // --------------------------------------------------------
 
       // คืนค่าฟิลด์ที่ควรค้างไว้
       if($id('inputDate')) $id('inputDate').value = keepDate;
       if($id('shift')) $id('shift').value = keepShift;
 
-      // ล้างสถานะแสงเรือง/Error ของ Input ทั้งหมด
+      // ... โค้ดส่วนล้างแสงนีออนเดิม ...
       extinguishAllGlows();
-      document.querySelectorAll('.neon-in').forEach(input => {
-        input.classList.remove('input-dropdown-open', 'is-valid', 'is-invalid');
-        input.style.borderColor = "";
-      });
       
-      removeAiResetButton();
-
-      // คืนสถานะปุ่ม
+      // คืนสถานะปุ่มบันทึก
       btn.innerHTML = originalBtnHTML;
       btn.style.background = ''; 
       btn.style.boxShadow = '';
       btn.disabled = false;
-      
-      if(brandLogo) brandLogo.classList.remove('logo-success-glow');
 
-      // --- [7] RE-RENDER & LOGGING ---
       refreshAll(); 
-      writeAuditLog(auditAction, rowData.id, oldRecord, rowData);
-      
-      if (document.activeElement) document.activeElement.blur();
       toast(auditAction === 'INSERT' ? '✅ บันทึกรายการใหม่เรียบร้อย' : '✅ อัปเดตข้อมูลเรียบร้อย');
 
     }, 1000);
@@ -10919,33 +11506,51 @@ async function handleFormSubmit(e) {
   }
 }
 
-// ฟังก์ชันจัดการแสงนีออนแบบอัจฉริยะ
 function refreshNeonGlow() {
-    const allFields = ['inputDate', 'shift', 'lineNo', 'partNo', 'partOn', 'supplier', 'defectName', 'qty', 'remark', 'refNo', 'judgmentSelect'];
-    
-    // 1. ตรวจสอบกลุ่ม PART DETAILS ว่ามีข้อมูลไหม
+    const qtyEl = $id('qty');
+    const unitEl = $id('unit');
+    const hasQty = qtyEl && qtyEl.value > 0;
+
+    if (unitEl) {
+        if (hasQty) {
+            // เมื่อมีข้อมูล Qty -> เปิดใช้งานและให้เรืองแสง
+            unitEl.disabled = false;
+            unitEl.style.opacity = "1";
+            unitEl.style.cursor = "pointer";
+            unitEl.classList.add('is-filled'); 
+        } else {
+            // เมื่อไม่มีข้อมูล Qty -> ปิดการใช้งาน และ "ดับไฟ" ทั้งหมด
+            unitEl.disabled = true;
+            unitEl.style.opacity = "0.5";
+            unitEl.style.cursor = "not-allowed";
+            unitEl.value = ""; // กลับไปที่คำว่า UNIT
+            
+            // --- จุดที่ต้องเพิ่ม/แก้ไข ---
+            unitEl.classList.remove('is-filled'); // ลบคลาสเรืองแสง
+            unitEl.style.borderColor = "var(--border)"; // คืนค่าสีขอบปกติ
+            unitEl.style.boxShadow = "none"; // ปิดแสงฟุ้ง
+            // -------------------------
+        }
+    }
     const partDetailsFields = ['partNo', 'partOn', 'supplier', 'defectName'];
     const hasPartData = partDetailsFields.some(id => {
         const el = $id(id);
         return el && el.value.trim() !== "" && el.value.trim() !== "-";
     });
 
-    // 2. วนลูปจัดการแสงทีละช่อง
     allFields.forEach(id => {
+        if (id === 'unit') return; // ข้ามไปเพราะจัดการด้านบนแล้ว
         const el = $id(id);
         if (!el) return;
 
-        // เงื่อนไขพิเศษ: ถ้าเป็น วันที่ หรือ กะ ให้เช็คจากกลุ่ม Part Details ด้วย
         if (id === 'inputDate' || id === 'shift') {
             if (hasPartData || (el.value && el.value !== "")) {
                 el.classList.add('is-filled');
             } else {
                 el.classList.remove('is-filled');
             }
-        } 
-        // ช่องอื่นๆ ให้เช็คตามข้อมูลของตัวเองปกติ
-        else {
-            if (el.value && el.value !== "" && el.value !== "-") {
+        } else {
+            if (el.value && el.value !== "" && el.value !== "-" && el.value !== "0") {
                 el.classList.add('is-filled');
             } else {
                 el.classList.remove('is-filled');
@@ -10986,7 +11591,9 @@ toggleSidebar('open'); // <--- เพิ่มบรรทัดนี้
   if($id('defectName')) $id('defectName').value = r.defect;
   if($id('remark')) $id('remark').value = r.remark;
   if($id('judgmentSelect')) $id('judgmentSelect').value = r.judgment;
-  
+  // เพิ่มบรรทัดนี้ไว้ด้านล่างสุดของฟังก์ชัน editRecord(id) และ copyRecord(id)
+if ($id('unit') && r.unit) $id('unit').value = r.unit;
+else if ($id('unit')) $id('unit').value = 'PCS'; // ค่าเริ่มต้น
   handleJudgment(r.judgment);
   
   // 4. อัปเดตปุ่ม Submit
@@ -11029,11 +11636,11 @@ toggleSidebar('open'); // <--- เพิ่มบรรทัดนี้
     }, 300); // รอ 0.3 วินาที
   }
   autoTranslateDefect(r.defect, false);
+  refreshNeonGlow(); 
 };
 
-// ฟังก์ชันสำหรับคัดลอกข้อมูล (Clone)
 window.copyRecord = function(id) {
-  toggleSidebar('open'); // <--- เพิ่มบรรทัดนี้
+  toggleSidebar('open'); 
   const r = records.find(x => x.id === id);
   if (!r) return;
 
@@ -11050,13 +11657,20 @@ window.copyRecord = function(id) {
   
   if($id('refNo')) {
     $id('refNo').value = ''; 
-    //$id('refNo').focus();
   }
 
   if($id('supplier')) $id('supplier').value = r.supplier;
   if($id('partNo')) $id('partNo').value = r.partNo;
   if($id('partOn')) $id('partOn').value = r.partName || '';
   if($id('qty')) $id('qty').value = r.qty;
+
+  // --- ⭐ ส่วนที่แก้ไข: เพิ่มการคัดลอกหน่วย (Unit) ---
+  if ($id('unit')) {
+      // คัดลอกค่าหน่วยจากแถวนั้นมาใส่ (ถ้าไม่มีให้เป็นค่าว่างเพื่อให้เห็นคำว่า UNIT)
+      $id('unit').value = r.unit || ''; 
+  }
+  // -------------------------------------------
+
   if($id('defectName')) $id('defectName').value = r.defect;
   if($id('remark')) $id('remark').value = r.remark;
   
@@ -11069,17 +11683,20 @@ window.copyRecord = function(id) {
   
   // ✅ 3. กลับเป็นปุ่ม "Commit Data" ปกติ (สีเขียว)
   if(btn) {
-    btn.innerHTML = '✦ Commit Data'; // ข้อความตัวเดิม
-    btn.style.background = '';       // สีตัวเดิม (จาก CSS หรือค่าเริ่มต้น)
+    btn.innerHTML = '✦ Commit Data'; 
+    btn.style.background = '';       
   }
 
-  // ✅ 4. ยังคงสร้างปุ่ม "ยกเลิกการคัดลอก" ไว้เพื่อล้างข้อมูลหากไม่ต้องการบันทึก
-if(!$id('cancelCopyBtn')) {
-  const cancelBtn = spawnCancelButton('ยกเลิกการคัดลอก', cancelCopy);
-  cancelBtn.id = 'cancelCopyBtn';
-  btn.parentNode.appendChild(cancelBtn);
-}
-refreshNeonGlow();
+  // ✅ 4. สร้างปุ่ม "ยกเลิกการคัดลอก"
+  if(!$id('cancelCopyBtn')) {
+    const cancelBtn = spawnCancelButton('ยกเลิกการคัดลอก', cancelCopy);
+    cancelBtn.id = 'cancelCopyBtn';
+    btn.parentNode.appendChild(cancelBtn);
+  }
+
+  // สั่งให้คำนวณแสงนีออนใหม่ (จะทำให้ช่อง Unit และ Qty เรืองแสงเขียวทันที)
+  refreshNeonGlow();
+
   toast('📋 คัดลอกข้อมูลแล้ว พร้อมบันทึกใหม่');
 };
 
@@ -11364,22 +11981,39 @@ async function performClearAll() {
   }
 }
 function extinguishAllGlows() {
-    // 1. ลบ Class ที่ทำให้เกิดแสง
-    const elements = document.querySelectorAll('.is-filled, .is-selected, .is-valid, .is-invalid');
-    elements.forEach(el => {
+    // 1. เลือกองค์ประกอบทั้งหมดที่อาจมี Class เกี่ยวกับแสงเรือง
+    const glowElements = document.querySelectorAll('.is-filled, .is-selected, .is-valid, .is-invalid, .neon-in, #judgmentSelect');
+    
+    glowElements.forEach(el => {
+        // ลบ Class ที่ทำให้เกิดแสงนีออน
         el.classList.remove('is-filled', 'is-selected', 'is-valid', 'is-invalid');
-        // 2. ล้าง Inline Style (สีขอบที่ถูกกำหนดโดย JS เช่น ช่อง REF)
+        
+        // ล้าง Inline Style ที่ถูกกำหนดโดย JavaScript (เช่น สีขอบตอนตรวจสอบข้อมูล)
         el.style.borderColor = "";
         el.style.backgroundColor = "";
         el.style.color = "";
+        el.style.boxShadow = "";
     });
     
-    // ล้างสีที่ปุ่ม Submit ด้วย
-    const btn = $id('submitBtn');
+    // 2. เจาะจงรีเซ็ตช่องหน่วย (Unit) เป็นพิเศษ
+    const unitEl = document.getElementById('unit');
+    if (unitEl) {
+        // คืนค่าพื้นหลังกลับไปใช้ตัวแปร CSS ของระบบ (--bg-input)
+        unitEl.style.backgroundColor = "var(--bg-input)";
+        // ตรวจสอบให้แน่ใจว่าขอบกลับเป็นสีปกติของ Border
+        unitEl.style.borderColor = "var(--border)";
+        unitEl.style.boxShadow = "none";
+        unitEl.classList.remove('is-filled');
+    }
+    
+    // 3. ล้างสีที่ปุ่ม Submit
+    const btn = document.getElementById('submitBtn');
     if (btn) {
         btn.style.background = "";
         btn.style.boxShadow = "";
     }
+
+    console.log("[System] All glows extinguished and Unit field reset.");
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -11613,11 +12247,17 @@ function renderVisibleRows() {
           <span style="color:var(--blue-600); font-weight:600;">${disp(r.partName)}</span>
         </div>
       </td>
-      <td style="text-align:center">
-        <span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900)">
-          ${r.qty.toLocaleString()}
-        </span>
-      </td>
+
+<td style="text-align:center">
+  <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <span style="font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--text-900);line-height:1;">
+      ${r.qty.toLocaleString()}
+    </span>
+    <span style="font-size:0.6rem; font-weight:900; color:var(--blue-600); margin-top:2px; text-transform:uppercase;">
+      ${r.unit || 'PCS'}
+    </span>
+  </div>
+</td>
       <td style="font-size:.73rem;font-weight:600;color:var(--text-600)">${disp(r.defect)}</td>
       <td style="font-size:.7rem;color:var(--text-400);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
         ${disp(r.remark)}
@@ -12076,87 +12716,130 @@ function renderList(elementId, data, key) {
 }
 
 function renderIncidentFeed(data) {
+  // กรองเฉพาะรายการที่เป็น VENDOR FAULT และเรียงลำดับล่าสุด
   const items = [...data].filter(r => r.judgment === 'VENDOR FAULT').sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 15);
-  const html = items.map(r => `
+  
+  const html = items.map(r => {
+    // ตรวจสอบหน่วย ถ้าไม่มีให้แสดงเป็น PCS เป็นค่าเริ่มต้น
+    const unitDisp = (r.unit || 'PCS').toUpperCase();
+    
+    return `
     <div class="incident-item critical"> 
-      <div class="inc-row-1"><div class="incident-ref-badge">${escapeHtml(r.ref)}</div><div class="inc-badge VENDOR">VENDOR FAULT</div></div>
-      <div class="inc-row-2"><div class="inc-text-main">${escapeHtml(r.supplier)}</div><div class="inc-qty">${r.qty.toLocaleString()} <span style="font-size:0.6rem;color:#94a3b8">PCS</span></div></div>
-      <div class="inc-text-sub"><span class="inc-text-highlight">${escapeHtml(r.partNo)}</span> | ${escapeHtml(r.partName) || 'N/A'}</div>
-      <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:0.4rem;margin-top:0.4rem;display:flex;flex-direction:column;gap:5px;">
-        <div class="inc-text-sub" style="display:flex; justify-content:space-between;"><span>🗓 ${r.date} | ${r.shift} | Line: ${escapeHtml(r.line)}</span></div>
+      <div class="inc-row-1">
+        <div class="incident-ref-badge">${escapeHtml(r.ref)}</div>
+        <div class="inc-badge VENDOR">VENDOR FAULT</div>
+      </div>
+      
+      <div class="inc-row-2">
+        <div class="inc-text-main">${escapeHtml(r.supplier)}</div>
+        <!-- แสดงจำนวน QTY พร้อมหน่วยที่ดึงมาจากข้อมูลจริง -->
+        <div class="inc-qty">
+            ${r.qty.toLocaleString()} 
+            <span style="font-size:0.65rem; color:#94a3b8; font-weight:800; margin-left:2px; text-transform:uppercase;">
+                ${unitDisp}
+            </span>
+        </div>
+      </div>
+      
+      <div class="inc-text-sub">
+        <span class="inc-text-highlight">${escapeHtml(r.partNo)}</span> | ${escapeHtml(r.partName) || 'N/A'}
+      </div>
+      
+      <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:0.4rem; margin-top:0.4rem; display:flex; flex-direction:column; gap:5px;">
+        <div class="inc-text-sub" style="display:flex; justify-content:space-between;">
+            <span>🗓 ${r.date} | ${r.shift} | Line: ${escapeHtml(r.line)}</span>
+        </div>
         <div class="inc-defect" style="width:fit-content;">⚠️ Defect: ${escapeHtml(r.defect)}</div>
         ${r.remark ? `<div style="font-size:0.65rem;color:#cbd5e1;background:rgba(0,0,0,0.2);padding:5px 8px;border-radius:4px;margin-top:2px;border-left:2px solid #ef4444;">📝 <b>Remark:</b> ${escapeHtml(r.remark)}</div>` : ''}
       </div>
-    </div>`).join('');
-  if($id('incidentList')) $id('incidentList').innerHTML = html || '<div style="text-align:center;color:#475569;padding:2rem">✅ No Vendor Fault incidents found</div>';
+    </div>`;
+  }).join('');
+
+  if($id('incidentList')) {
+      $id('incidentList').innerHTML = html || '<div style="text-align:center;color:#475569;padding:2rem">✅ No Vendor Fault incidents found</div>';
+  }
 }
 
 function renderTopLines(data) {
   const listEl = $id('topLineList');
   if (!listEl) return;
   
-  const map = {}; 
-  let totalAll = 0;
+  const lineStats = {}; 
+  let totalAllQty = 0;
   
-  // รวมยอดตาม Line
+  // 1. ประมวลผลข้อมูล: จัดกลุ่มตาม Line และแยกหน่วยข้างใน
   data.forEach(r => { 
     if(r.line && r.line !== '-') { 
-      map[r.line] = (map[r.line] || 0) + r.qty; 
-      totalAll += r.qty; 
+      const lName = r.line;
+      const qty = parseInt(r.qty) || 0;
+      const unit = (r.unit || 'PCS').toUpperCase();
+
+      if (!lineStats[lName]) {
+          lineStats[lName] = { total: 0, units: {} };
+      }
+      
+      lineStats[lName].total += qty;
+      lineStats[lName].units[unit] = (lineStats[lName].units[unit] || 0) + qty;
+      totalAllQty += qty; 
     } 
   });
   
-  const sorted = Object.entries(map).sort((a,b) => b[1] - a[1]).slice(0, 5);
+  // 2. จัดอันดับ Top 5 ตามยอดรวม
+  const sortedLines = Object.entries(lineStats)
+    .sort((a, b) => b[1].total - a[1].total)
+    .slice(0, 5);
   
-  if (sorted.length === 0) { 
-    listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:#475569">No data found</div>'; 
+  if (sortedLines.length === 0) { 
+    listEl.innerHTML = '<div style="text-align:center;padding:3rem;color:#475569;font-size:0.6rem;">- NO LINE ACTIVITY -</div>'; 
     return; 
   }
 
-  const maxVal = sorted[0][1]; // หาค่าสูงสุดเพื่อเทียบความยาว Bar
-  
-  // กำหนด Palette สี Neon สำหรับแต่ละอันดับ
+  const maxVal = sortedLines[0][1].total;
   const neonColors = [
-    'linear-gradient(90deg, #FF0080, #7928CA)', // Rank 1: Pink-Purple
-    'linear-gradient(90deg, #7928CA, #FF4D4D)', // Rank 2: Purple-Red
-    'linear-gradient(90deg, #0070F3, #00DFD8)', // Rank 3: Blue-Cyan
-    'linear-gradient(90deg, #50E3C2, #156963)', // Rank 4: Green-Dark
-    'linear-gradient(90deg, #F5A623, #F8E71C)'  // Rank 5: Orange-Yellow
+    '#ec4899', // Rank 1: Pink
+    '#a78bfa', // Rank 2: Purple
+    '#3b82f6', // Rank 3: Blue
+    '#10b981', // Rank 4: Green
+    '#f59e0b'  // Rank 5: Orange
   ];
 
-  const html = sorted.map((item, i) => {
-    const qty = item[1]; 
-    const pct = totalAll > 0 ? ((qty/totalAll)*100).toFixed(1) : 0;
-    const barWidth = (qty / maxVal) * 100;
-    const color = neonColors[i] || neonColors[4];
+  // 3. สร้าง HTML
+  const html = sortedLines.map(([name, stats], i) => {
+    const barWidth = (stats.total / maxVal) * 100;
+    const sharePct = ((stats.total / totalAllQty) * 100).toFixed(1);
+    const color = neonColors[i] || '#64748b';
+
+    // สร้างป้ายหน่วยงานแบบจิ๋ว
+    const unitTags = Object.entries(stats.units).map(([u, v]) => 
+        `<span class="line-unit-tag">${u}:<b>${v.toLocaleString()}</b></span>`
+    ).join('');
     
     return `
-      <div class="futuristic-line-item" style="margin-bottom: 8px; padding: 8px 12px; background: rgba(15, 23, 42, 0.4); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <!-- ปรับขนาด Rank Badge ให้เล็กลงเล็กน้อย -->
-            <div style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: ${color}; border-radius: 5px; font-size: 0.7rem; font-weight: 900; color: #fff; box-shadow: 0 0 10px ${color}66;">
-              ${i+1}
+      <div class="futuristic-line-item" style="margin-bottom: 12px; padding: 12px 16px; background: rgba(15, 23, 42, 0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                <div style="width: 20px; height: 20px; background: ${color}; color: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 10px;">${i+1}</div>
+                <span style="font-weight: 800; color: #fff; font-size: 0.85rem; letter-spacing: 0.5px;">LINE: ${name}</span>
             </div>
-            <span style="font-size: 0.75rem; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">LINE: ${item[0]}</span>
+            <!-- แสดงหน่วยงานที่พบในไลน์นี้ -->
+            <div style="display: flex; flex-wrap: wrap;">
+                ${unitTags}
+            </div>
           </div>
+          
           <div style="text-align: right;">
-             <span style="font-family: 'DM Mono', monospace; font-size: 0.9rem; font-weight: 700; color: #ffffff;">${qty.toLocaleString()}</span>
-             <span style="font-size: 0.55rem; color: #94a3b8; font-weight: 800; margin-left: 2px;">PCS</span>
+             <div class="line-stat-main">${stats.total.toLocaleString()}</div>
+             <div class="line-share-text" style="color: ${color}">SHARE: ${sharePct}%</div>
           </div>
         </div>
         
-        <!-- ปรับความสูง Progress Bar ให้บางลง (จาก 8px เหลือ 4px) -->
-        <div style="height: 4px; width: 100%; background: rgba(0,0,0,0.4); border-radius: 10px; overflow: hidden; position: relative;">
-          <div class="neon-bar" style="width: ${barWidth}%; height: 100%; background: ${color}; box-shadow: 0 0 10px ${color}; border-radius: 10px; transition: width 1s ease-out;"></div>
+        <!-- แถบพลัง (Energy Bar) -->
+        <div style="height: 4px; width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden; position: relative;">
+          <div class="neon-bar" style="width: ${barWidth}%; height: 100%; background: ${color}; box-shadow: 0 0 10px ${color}; border-radius: 10px; transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);"></div>
         </div>
-        
-        <!-- ปรับระยะห่าง SHARE ให้ชิดขึ้น -->
-        <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
-           <span style="font-family: 'DM Mono', monospace; font-size: 0.7rem; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">
-      SHARE: <span>${pct}%</span>
-           </span>
-        </div>
+
       </div>`;
   }).join('');
   
@@ -12209,6 +12892,8 @@ function getChartData(rawRecords, startVal, endVal) {
     label: months[i],
     type: 'monthly',
     totalQty: 0, 
+  // ✅ เพิ่มส่วนนี้: เก็บยอดแยกหน่วยประจำเดือน
+    units: { KG: 0, ROLL: 0, MTR: 0, SET: 0, PCS: 0 }, 
     totalLot: 0,
     SF: { qty: 0, lot: 0 }, 
     VENDOR: { qty: 0, lot: 0 }, 
@@ -12229,12 +12914,17 @@ function getChartData(rawRecords, startVal, endVal) {
     if (targetYear !== null && rYear !== targetYear) return;
 
     // ตรวจสอบ Index ป้องกันหายนอก Array และทำการรวมยอด
-    if (mIndex >= 0 && mIndex < 12) {
-        const mBox = monthlyData[mIndex];
-        const qtyValue = parseInt(r.qty) || 0;
+// ✅ เพิ่มการนับยอดหน่วยลงใน mBox
+if (mIndex >= 0 && mIndex < 12) {
+    const mBox = monthlyData[mIndex];
+    const qtyValue = parseInt(r.qty) || 0;
+    const unit = (r.unit || 'PCS').toUpperCase();
 
-        mBox.totalQty += qtyValue; 
-        mBox.totalLot += 1;
+    mBox.totalQty += qtyValue;
+    // นับยอดหน่วย
+    if(mBox.units.hasOwnProperty(unit)) {
+        mBox.units[unit] += qtyValue;
+    }
         
         // แยกหมวดหมู่ตาม Judgment
         if (r.judgment === 'SF') { 
@@ -12277,13 +12967,11 @@ function initMainChart() {
   const canvas = $id('mainTrendChart');
   if (!canvas) return;
 
-  // 1. [Memory Management] ตรวจสอบและทำลายอินสแตนซ์เดิมอย่างเข้มงวด
-  // ป้องกัน Error: Canvas is already in use. Chart with ID '0' must be destroyed before the canvas can be reused.
   if (mainTrendChartInstance !== null) {
     if (typeof mainTrendChartInstance.destroy === 'function') {
       mainTrendChartInstance.destroy();
     }
-    mainTrendChartInstance = null; // ปล่อย Reference ให้ Garbage Collector ทำงาน
+    mainTrendChartInstance = null;
   }
 
   const ctx = canvas.getContext('2d');
@@ -12291,7 +12979,6 @@ function initMainChart() {
   const tickColor = isDark ? '#94a3b8' : '#64748b';
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
 
-  // --- Helpers สำหรับ Dataset & Gradients (Premium UI) ---
   const palette = {
     canUse: { stroke: '#10b981', fill: 'rgba(16, 185, 129, 0.12)' },
     ctc:    { stroke: '#3b82f6', fill: 'rgba(59, 130, 246, 0.12)' },
@@ -12322,7 +13009,6 @@ function initMainChart() {
     pointHoverBorderWidth: 2
   });
 
-  // 2. [Initialization] สร้างกราฟใหม่ลงในตัวแปร Global
   mainTrendChartInstance = new Chart(ctx, {
     type: 'line',
     data: {
@@ -12339,6 +13025,27 @@ function initMainChart() {
       maintainAspectRatio: false,
       animation: { duration: 1500, easing: 'easeOutQuart' },
       interaction: { mode: 'index', intersect: false },
+      
+      // ✅ [ADDED] ระบบ Hover Sync: เปลี่ยนป้ายหน่วยงานตามจุดที่ชี้
+      onHover: (event, chartElement) => {
+        const breakdownEl = document.getElementById('chartMonthlyBreakdown');
+        if (!breakdownEl) return;
+
+        if (chartElement.length > 0) {
+          const index = chartElement[0].index;
+          // ดึงข้อมูล Rich Data ของเดือนนั้นๆ (ที่คำนวณไว้ใน refreshDash)
+          const monthRichData = globalRichChartData[index];
+          
+          if (monthRichData && monthRichData.totalQty > 0) {
+            // แสดงป้ายหน่วยงาน (ใช้ฟังก์ชัน renderUnitBreakdown ที่เราสร้างไว้)
+            breakdownEl.innerHTML = renderUnitBreakdown(monthRichData.units);
+            breakdownEl.style.opacity = "1";
+          } else {
+            breakdownEl.innerHTML = '<span style="color:#64748b; font-size:0.6rem; font-weight:800; letter-spacing:1px;">- NO DATA DETECTED -</span>';
+          }
+        }
+      },
+
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -12487,10 +13194,23 @@ function isAnomalyDetected(todayQty, allRecords) {
     return isSpike;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   MASTER DASHBOARD REFRESH (ULTIMATE ACCURACY VERSION)
-   ควบคุมทุก Metrics (PCS, LOT, %, RANKING, CHART) ให้ตรงตาม Filter 100%
-═══════════════════════════════════════════════════════════════ */
+function renderUnitBreakdown(unitMap) {
+    const units = ['KG', 'ROLL', 'MTR', 'SET', 'PCS'];
+    let html = ''; // เริ่มต้นเป็นว่าง
+    
+    units.forEach(u => {
+        const val = unitMap[u] || 0;
+        if (val > 0) {
+            html += `
+                <div class="unit-badge-compact" style="display:inline-flex; align-items:center; height:20px; border-radius:4px; overflow:hidden; margin-right:4px;">
+                    <span class="badge-label" style="padding:0 5px; font-size:9px;">${u}</span>
+                    <span class="badge-val" style="padding:0 5px; font-size:10px; font-weight:800;">${val.toLocaleString()}</span>
+                </div>`;
+        }
+    });
+    
+    return html;
+}
 /* ══════════════════════════════════════════════════════════════
    MASTER DASHBOARD REFRESH (INTEGRATED DAILY RISK & ANOMALY)
    ฟังก์ชันเดียวที่ควบคุมทุกระบบ: สถิติ, กราฟ, และการตรวจจับความเสี่ยง
@@ -12531,20 +13251,16 @@ window.refreshDash = function() {
         defaultYear = Math.max(...years);
     }
 
-    // 🌟 3. คัดกรองข้อมูล (Current, Previous, และ Today)
+    // 🌟 3. คัดกรองข้อมูล
     const displayData = []; 
     const previousData = [];
-    const recordsToday = []; // สำหรับ Risk Alert
+    const recordsToday = [];
 
     allMyRecords.forEach(r => {
         const rDate = new Date(r.date);
         const rDateStr = r.date ? String(r.date).substring(0, 10) : "";
         const rYear = rDate.getFullYear();
-
-        // กรอง Vendor ก่อน
         if (vendorFilter !== 'ALL' && r.supplier !== vendorFilter) return;
-
-        // แยกข้อมูล Current/Previous
         let matchCurrent = false;
         if (isCustomRange) {
             if (rDateStr >= startVal && rDateStr <= endVal) matchCurrent = true;
@@ -12553,25 +13269,39 @@ window.refreshDash = function() {
         }
         if (matchCurrent) displayData.push(r);
         if (rDate >= prevStart && rDate <= prevEnd) previousData.push(r);
-        
-        // เก็บข้อมูลของ "วันนี้" จริงๆ สำหรับ Risk Monitor
         if (rDateStr === todayStr) recordsToday.push(r);
     });
 
-    // 🌟 4. คำนวณสถิติหลัก (Display Period)
+    // 🌟 4. คำนวณสถิติหลัก
     let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
     let sfL = 0, venL = 0, ctcL = 0, okL = 0;
 
+    // 🚩 ตำแหน่งที่ 1: เพิ่มตัวแปรสำหรับเก็บยอดแยกหน่วย (NEW UNIT STATS INITIALIZATION)
+    let unitStats = {
+        'SF': { KG:0, ROLL:0, MTR:0, SET:0, PCS:0 },
+        'VENDOR FAULT': { KG:0, ROLL:0, MTR:0, SET:0, PCS:0 },
+        'CTC': { KG:0, ROLL:0, MTR:0, SET:0, PCS:0 },
+        'CAN USE': { KG:0, ROLL:0, MTR:0, SET:0, PCS:0 }
+    };
+
     displayData.forEach(r => {
         const qty = parseInt(r.qty) || 0;
+        const jdg = r.judgment;
+        const unit = (r.unit || 'PCS').toUpperCase(); // ดึงหน่วยข้อมูล
+
         tQ += qty;
-        if (r.judgment === 'SF') { sf += qty; sfL++; }
-        else if (r.judgment === 'VENDOR FAULT') { ven += qty; venL++; }
-        else if (r.judgment === 'CTC') { ctc += qty; ctcL++; }
-        else if (r.judgment === 'CAN USE') { ok += qty; okL++; }
+        if (jdg === 'SF') { sf += qty; sfL++; }
+        else if (jdg === 'VENDOR FAULT') { ven += qty; venL++; }
+        else if (jdg === 'CTC') { ctc += qty; ctcL++; }
+        else if (jdg === 'CAN USE') { ok += qty; okL++; }
+
+        // 🚩 ตำแหน่งที่ 2: นับข้อมูลลงในตัวแปรแยกหน่วย (COUNT BY UNIT)
+        if (unitStats[jdg]) {
+            unitStats[jdg][unit] = (unitStats[jdg][unit] || 0) + qty;
+        }
     });
 
-    // 🌟 5. คำนวณสถิติช่วงก่อนหน้า (สำหรับ Deltas)
+    // [โค้ดเดิม] 🌟 5. คำนวณสถิติช่วงก่อนหน้า (สำหรับ Deltas อ้างอิงในระบบ)
     let p_sf = 0, p_ven = 0, p_ctc = 0, p_ok = 0;
     previousData.forEach(r => {
         const qty = parseInt(r.qty) || 0;
@@ -12581,11 +13311,9 @@ window.refreshDash = function() {
         else if (r.judgment === 'CAN USE') p_ok += qty;
     });
 
-    // 🚀 6. [AI LOGIC] ANOMALY DETECTION (เช็คยอดรวมวันนี้พุ่งสูง)
+    // [โค้ดเดิม] 🚀 6. [AI LOGIC] ANOMALY DETECTION
     const checkAnomaly = () => {
         const todayTotalQty = recordsToday.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
-        
-        // หาค่าเฉลี่ย 7 วันย้อนหลัง (Baseline)
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(new Date().getDate() - 7);
         const histData = allMyRecords.filter(r => {
@@ -12593,21 +13321,16 @@ window.refreshDash = function() {
             return d >= sevenDaysAgo && d < new Date().setHours(0,0,0,0);
         });
         const avgHist = (histData.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0) / 7) || 1;
-
         const isSpike = todayTotalQty > (avgHist * 2) && todayTotalQty > 50;
         const heroEl = $id('heroTotalQty');
         if (heroEl) {
-            if (isSpike) {
-                heroEl.classList.add('anomaly-alert');
-                if (!_isInitializing) toast('🚨 SPIKE: วันนี้มียอด NG พุ่งสูงผิดปกติ!');
-            } else {
-                heroEl.classList.remove('anomaly-alert');
-            }
+            if (isSpike) { heroEl.classList.add('anomaly-alert'); } 
+            else { heroEl.classList.remove('anomaly-alert'); }
         }
     };
     checkAnomaly();
 
-    // 🌟 7. UI UPDATE: Main KPIs & Deltas
+    // 🌟 7. UI UPDATE: Main KPIs
     const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
     const calcPct = (val) => tQ > 0 ? Math.round((val / tQ) * 100) + '%' : '0%';
 
@@ -12615,7 +13338,6 @@ window.refreshDash = function() {
     if($id('heroLot')) $id('heroLot').textContent = displayData.length.toLocaleString();
     if($id('heroPct')) $id('heroPct').textContent = passPct + '%';
 
-    // อัปเดต Stats Cards และป้าย %
     const updateStat = (id, val, lotId, lotVal, pctId, pctVal) => {
         animNum(id, val);
         if($id(lotId)) $id(lotId).textContent = lotVal.toLocaleString();
@@ -12626,13 +13348,14 @@ window.refreshDash = function() {
     updateStat('dashStatCanUse', ok, 'dashLotCanUse', okL, 'dashPctCanUse', calcPct(ok));
     updateStat('dashStatVendor', ven, 'dashLotVendor', venL, 'dashPctVendor', calcPct(ven));
 
-    // อัปเดตลูกศรขึ้น/ลง (Deltas)
-    updateDelta('deltaSF', sf, p_sf, true);
-    updateDelta('deltaCTC', ctc, p_ctc, true);
-    updateDelta('deltaVendor', ven, p_ven, true);
-    updateDelta('deltaCanUse', ok, p_ok, false);
+    // 🚩 ตำแหน่งที่แสดงผล: เปลี่ยนจากการเรียก updateDelta เป็นการฉีด HTML แยกหน่วย (แทนที่ New ในรูป)
+// ค้นหา 4 บรรทัดนี้ใน refreshDash ของคุณ และเปลี่ยนชื่อ ID:
+$id('unitBreakdownSF').innerHTML = renderUnitBreakdown(unitStats['SF']);
+$id('unitBreakdownCTC').innerHTML = renderUnitBreakdown(unitStats['CTC']);
+$id('unitBreakdownVendor').innerHTML = renderUnitBreakdown(unitStats['VENDOR FAULT']);
+$id('unitBreakdownCanUse').innerHTML = renderUnitBreakdown(unitStats['CAN USE']);
 
-    // 🌟 8. VISUALS: Gauges, Energy Bars & Lists
+    // [โค้ดเดิม] 🌟 8. VISUALS: Gauges, Energy Bars & Lists
     updateMainGauge(passPct);
     updateMiniGauge('sf', sf, tQ);
     updateMiniGauge('vendor', ven, tQ);
@@ -12651,14 +13374,8 @@ window.refreshDash = function() {
     renderTopLines(displayData);   
     renderTickerTape(displayData); 
     renderRiskAlert(allMyRecords);
-
-    // 🌟 9. [NEW] INTEGRATED DAILY RISK ALERT
-    // เรียกฟังก์ชัน Risk Alert โดยใช้ข้อมูลทั้งหมดเพื่อหา Baseline
-    if (typeof renderRiskAlert === 'function') {
-        renderRiskAlert(allMyRecords);
-    }
-
-    // 🌟 10. TREND CHART & OTHERS
+    renderRiskAlert(displayData);
+    // [โค้ดเดิม] 🌟 9. TREND CHART & OTHERS
     const chartDataObj = getChartData(displayData, startVal, endVal);
     if (!mainTrendChartInstance) { initMainChart(); }
     if (mainTrendChartInstance && globalRichChartData) {
@@ -12674,7 +13391,7 @@ window.refreshDash = function() {
     renderParetoFocus(displayData);
     renderSupplierScorecard(displayData);
 
-    console.log(`[Dashboard Update] All systems synced. Records processed: ${displayData.length}`);
+    console.log(`[Dashboard Update] Unit breakdown rendered. Records: ${displayData.length}`);
 };
 /* ══════════════════════════════════════════════════════════════
    PARETO FOCUS LOGIC: Identifying High-Impact Suppliers
@@ -12682,80 +13399,75 @@ window.refreshDash = function() {
    ══════════════════════════════════════════════════════════════ */
 function renderParetoFocus(data) {
   const listEl = $id('paretoFocusList');
-  const statusEl = $id('paretoStatus');
-  const summaryEl = $id('paretoSummary');
   if (!listEl) return;
 
-  // 1. กรองเฉพาะ Vendor Fault และกลุ่มตาม Supplier
   const vendorData = data.filter(r => r.judgment === 'VENDOR FAULT');
-  const map = {};
-  let totalVendorQty = 0;
+  const supplierLots = {}; // เปลี่ยนมานับเป็น Lot
+  const supplierUnitMaps = {};
+  let totalAllVendorLots = 0; // ยอดรวมจำนวนรายการทั้งหมด
 
   vendorData.forEach(r => {
-    map[r.supplier] = (map[r.supplier] || 0) + r.qty;
-    totalVendorQty += r.qty;
+    const sName = r.supplier;
+    const qty = parseInt(r.qty) || 0;
+    const unit = (r.unit || 'PCS').toUpperCase();
+
+    // ✅ เปลี่ยนจาก += qty เป็น += 1 (นับจำนวนรายการที่พบ)
+    supplierLots[sName] = (supplierLots[sName] || 0) + 1;
+    totalAllVendorLots += 1;
+
+    if (!supplierUnitMaps[sName]) supplierUnitMaps[sName] = {};
+    // ป้ายหน่วยงานย่อยยังคงโชว์ Qty รวมเพื่อให้เห็นปริมาณของจริงได้
+    supplierUnitMaps[sName][unit] = (supplierUnitMaps[sName][unit] || 0) + qty;
   });
 
-  // 2. เรียงลำดับจากมากไปน้อย
-  const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]);
-
+  // จัดอันดับตามจำนวน Lot (ความถี่ที่เกิดปัญหา)
+  const sorted = Object.entries(supplierLots).sort((a, b) => b[1] - a[1]);
+  
   if (sorted.length === 0) {
-    listEl.innerHTML = '<div style="text-align:center; padding:1rem; color:#64748b;">✅ No Vendor Faults in this period.</div>';
-    statusEl.textContent = "SAFE";
-    statusEl.style.color = "#10b981"; statusEl.style.borderColor = "#10b981";
+    listEl.innerHTML = '<div style="text-align:center; padding:3rem; color:#475569; font-size:0.6rem;">✅ NO VENDOR RISKS</div>';
     return;
   }
 
-  // 3. คำนวณหาค่าสะสม (Cumulative)
-  let cumulativeQty = 0;
-  let focusHtml = '';
-  let top2Percentage = 0;
+  listEl.innerHTML = sorted.map(([name, lotCount], index) => {
+    const unitMap = supplierUnitMaps[name];
+    // คำนวณ Impact จากความถี่ (Lot Ratio)
+    const impact = ((lotCount / totalAllVendorLots) * 100).toFixed(1);
+    
+    let rankAnimationClass = '';
+    if (index === 0) rankAnimationClass = 'rank-top-1';
+    else if (index === 1) rankAnimationClass = 'rank-top-2';
 
-  sorted.forEach((item, index) => {
-    const supplierName = item[0];
-    const qty = item[1];
-    const pct = (qty / totalVendorQty) * 100;
-    cumulativeQty += qty;
+    const badgesHtml = Object.entries(unitMap).map(([u, v]) => `
+        <div class="unit-badge-split" style="--judgment-color: #ef4444">
+            <div class="ub-label">${u}</div>
+            <div class="ub-val">${v.toLocaleString()}</div>
+        </div>`).join('');
 
-    if (index < 2) top2Percentage += pct;
-
-    // --- ส่วนที่แก้ไข: การใส่ Class กระพริบ ---
-    const isCritical = index < 2 && top2Percentage > 50; // เช็คว่าเป็น 2 อันดับแรกที่เกิน 50% หรือไม่
-    const criticalClass = isCritical ? 'pareto-critical-item' : ''; // ถ้าวิกฤตให้ใส่คลาสกระพริบ
-
-    if (index < 3 || (cumulativeQty / totalVendorQty) <= 0.85) {
-      focusHtml += `
-        <div class="market-item ${criticalClass}" style="margin-bottom: 8px;">
-          <div class="market-rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : 'default'}">
-            ${index + 1}
+    return `
+      <div class="pareto-item-card ${rankAnimationClass}" style="margin-bottom: 10px; padding: 12px 16px;">
+        <div class="pareto-info" style="flex: 1; min-width: 0;">
+          <div class="pareto-name" style="font-size: 0.95rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+            <div class="market-rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : 'default'}" style="width:20px; height:20px; font-size:10px;">${index + 1}</div>
+            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${escapeHtml(name)}
+            </span>
           </div>
-          <div class="market-info">
-            <div class="market-name" style="${isCritical ? 'color: #f87171; font-weight: 800;' : ''}">
-               ${isCritical ? '🚨 ' : ''}${escapeHtml(supplierName)}
-            </div>
-            <div style="font-size: 0.55rem; color: #94a3b8;">Impact: ${pct.toFixed(1)}% of all defects</div>
+          <div class="pareto-impact-text" style="font-size: 0.6rem; color: #94a3b8; margin-top: 4px; font-weight: 600; text-transform: uppercase;">
+            Frequency Impact: <b style="color: ${index === 0 ? '#ef4444' : '#f59e0b'}">${impact}%</b>
           </div>
-          <div class="market-stats">
-            <div class="market-value" style="${isCritical ? 'color: #f87171;' : ''}">${qty.toLocaleString()}</div>
-            <div style="font-size: 0.5rem; color: #64748b; font-weight: 700;">PCS</div>
+          <div class="badge-row-container" style="margin-top: 8px;">
+            ${badgesHtml}
           </div>
         </div>
-      `;
-    }
-  });
-
-  // 4. อัปเดตสถานะ Strategy
-  if (top2Percentage > 50) {
-    statusEl.textContent = "CRITICAL AUDIT";
-    statusEl.className = "market-badge critical-alert"; // ใช้ class กระพริบที่มีอยู่แล้ว
-    summaryEl.innerHTML = `⚠️ <b>Focus Note:</b> Supplier 2 รายแรกนี้ครอบคลุมปัญหาเกิน <b>${top2Percentage.toFixed(0)}%</b> แนะนำให้เข้าทำ On-site Audit ทันที`;
-  } else if (sorted.length > 0) {
-    statusEl.textContent = "NORMAL TRACK";
-    statusEl.style.color = "#fbbf24"; statusEl.style.borderColor = "#fbbf24";
-    summaryEl.innerHTML = `💡 <b>Strategy:</b> กระจายการตรวจสอบตามแผนปกติ เนื่องจากไม่มี Supplier รายใดกินสัดส่วนพุ่งโดด`;
-  }
-
-  listEl.innerHTML = focusHtml;
+        <div class="pareto-stat-box" style="text-align: right; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 10px; min-width: 85px; border: 1px solid rgba(255,255,255,0.03);">
+          <!-- ✅ แสดงค่าจำนวนรายการ (Lot) -->
+          <div class="pareto-qty" style="font-family: 'DM Mono'; font-size: 1.4rem; font-weight: 900; color: #ffffff; line-height: 1;">${lotCount.toLocaleString()}</div>
+          <!-- ✅ เปลี่ยน Label เป็น TOTAL LOTS -->
+          <div class="pareto-label" style="font-size: 0.5rem; color: #475569; font-weight: 800; letter-spacing: 1.5px; margin-top: 2px;">TOTAL LOTS</div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 //เก็บข้อมูลตัวเลือกไว้ในตัวแปร Global
@@ -12984,54 +13696,93 @@ function guessQtyColumn(rawData, headerRowIdx) {
 
 function parseExcelDate(excelValue) {
   if (!excelValue) return null;
-  
-  // 1. กรณีเป็น Excel Serial Number (เลขทศนิยม)
-  if (!isNaN(excelValue)) {
-    const excelEpoch = new Date(1899, 11, 30);
-    const dateObj = new Date(excelEpoch.getTime() + excelValue * 86400000);
-    // ✅ FIX: ตัดเวลาทิ้ง เพื่อป้องกันปัญหา Timezone shift
-    return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
-  }
-  
-  const str = String(excelValue).trim();
-  
-  // 2. กรณีเป็น Text Format
-  if (str.match(/^\d{4}-\d{2}-\d{2}$/)) return str; // YYYY-MM-DD
-  
-  const parts = str.split(/[\/\-]/); // รองรับทั้ง / และ -
-  
-  if (parts.length === 3) {
-    const p1 = parseInt(parts[0]);
-    const p2 = parseInt(parts[1]);
-    const p3 = parseInt(parts[2]);
-    
-    // ✅ FIX: ตรวจสอบว่าตัวไหนคือปี (ค่า >= 1000 หรือค่ามี 4 หลัก)
-    // เพื่อรองรับทั้ง DD/MM/YYYY และ MM/DD/YYYY อัตโนมัติ
-    if (parts[2].length === 4) {
-      // Format แบบเอาปีไว้ท้าย: DD/MM/YYYY หรือ MM/DD/YYYY
-      // สมมติให้เป็น DD/MM/YYYY (มาตรฐานไทย/ยุโรป) เป็นหลัก
-      // ถ้า p1 > 12 แปลว่า p1 คือวันที่ (เช่น 13/01/2024)
-      // ถ้า p1 <= 12 และ p2 > 12 แปลว่า p1 คือเดือน (เช่น 01/13/2024)
-      
-      let d = p1, m = p2, y = p3;
-      
-      if (p1 > 12) { 
-        // p1 แน่นอนเป็นวันที่
-      } else if (p2 > 12) {
-        // p2 แน่นอนเป็นวันที่ -> สลับกัน
-        d = p2; m = p1;
-      }
-      // ถ้า p1 <= 12 และ p2 <= 12 ยากจะทาย แต่ให้ถือว่า p1=วัน, p2=เดือน
-      
-      return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+  let d, m, y;
+  const currentYear = new Date().getFullYear();
+
+  try {
+    // 1. กรณีเป็น Excel Serial Number (ตัวเลข เช่น 45444)
+    if (typeof excelValue === 'number' || (!isNaN(excelValue) && !String(excelValue).includes('-') && !String(excelValue).includes('/'))) {
+      const excelEpoch = new Date(1899, 11, 30);
+      const dateObj = new Date(excelEpoch.getTime() + Number(excelValue) * 86400000);
+      d = dateObj.getDate();
+      m = dateObj.getMonth() + 1;
+      y = dateObj.getFullYear();
     } 
     
-    if (parts[0].length === 4) {
-      // Format แบบเอาปีไว้หน้า: YYYY/MM/DD
-      return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+    // 2. กรณีเป็นข้อความ (String)
+    else {
+      let str = String(excelValue).trim();
+      if (!str) return null;
+
+      // ตรวจสอบเบื้องต้นว่าเป็น YYYY-MM-DD อยู่แล้วหรือไม่
+      if (str.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [sy, sm, sd] = str.split('-').map(Number);
+        y = sy; m = sm; d = sd;
+      } else {
+        // รองรับตัวคั่นหลายแบบ / , - , .
+        const parts = str.split(/[\/\-\.]/);
+
+        if (parts.length === 3) {
+          let p1 = parseInt(parts[0]);
+          let p2 = parseInt(parts[1]);
+          let p3 = parseInt(parts[2]);
+
+          // --- ตรรกะวิเคราะห์หา "ปี" (Year) ---
+          if (p1 > 1000) { // กรณีปีอยู่หน้า (YYYY/MM/DD)
+            y = p1; m = p2; d = p3;
+          } 
+          else if (p3 > 1000) { // กรณีปีอยู่หลัง (DD/MM/YYYY)
+            y = p3;
+            // --- Smart Swap: ป้องกันการสลับ วัน/เดือน ---
+            if (p1 > 12) { // เช่น 13/01/2024 -> p1 คือวันแน่นอน
+              d = p1; m = p2;
+            } else if (p2 > 12) { // เช่น 01/13/2024 -> p2 คือวันแน่นอน
+              d = p2; m = p1;
+            } else {
+              // กรณีไม่เกิน 12 ทั้งคู่ (เช่น 05/04/2024) ให้ยึดมาตรฐาน TH (DD/MM)
+              d = p1; m = p2;
+            }
+          } 
+          else if (p3 < 100) { // กรณีปีมี 2 หลัก (เช่น 01/01/24)
+            y = p3 + 2000;
+            d = p1; m = p2;
+          }
+        } else {
+          // ถ้าแยกส่วนไม่ได้ ลองใช้ตัวช่วยพื้นฐานของเบราว์เซอร์
+          const fallbackDate = new Date(str);
+          if (!isNaN(fallbackDate.getTime())) {
+            d = fallbackDate.getDate();
+            m = fallbackDate.getMonth() + 1;
+            y = fallbackDate.getFullYear();
+          } else {
+            return null;
+          }
+        }
+      }
     }
+
+    // 3. ✅ ตรวจสอบและแก้ไขปี พ.ศ. (Buddhist Era) อัตโนมัติ
+    // ถ้าปีเกินปีปัจจุบัน + 400 ปี (เช่น 2567) ให้ถือว่าเป็น พ.ศ. และแปลงเป็น ค.ศ.
+    if (y > currentYear + 400) {
+      y -= 543;
+    }
+
+    // 4. ✅ ตรวจสอบความถูกต้องของวันที่ผลลัพธ์ (Final Validation)
+    const finalDateStr = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const testDate = new Date(finalDateStr);
+    
+    if (isNaN(testDate.getTime())) {
+      console.warn("[Excel Date] Invalid date detected:", excelValue);
+      return null;
+    }
+
+    return finalDateStr; // คืนค่าในรูปแบบ YYYY-MM-DD
+
+  } catch (err) {
+    console.error("[Excel Date] Parsing error:", excelValue, err);
+    return null; // ป้องกันระบบล่ม คืนค่า null เพื่อให้ใช้ค่า Default ของระบบ
   }
-  return null;
 }
 
 
@@ -13333,6 +14084,7 @@ window.addEventListener('offline', () => {
   isOnline = false;
   toast('🔴 ออฟไลน์ ข้อมูลจะถูกบันทึกไว้ในเครื่อง');
 });
+
 
 /* ══════════════════════════════════════════════════════════════
    VIRTUAL TABLE RENDERING & LISTENERS (FIX PERFORMANCE)
@@ -13813,10 +14565,9 @@ function showAiResetButton() {
     resetBtn.onmouseover = () => { resetBtn.style.background = '#f1f5f9'; resetBtn.style.borderColor = '#cbd5e1'; };
     resetBtn.onmouseout = () => { resetBtn.style.background = '#f8fafc'; resetBtn.style.borderColor = '#e2e8f0'; };
     
-// --- ค้นหาบรรทัด resetBtn.onclick ภายในฟังก์ชัน showAiResetButton ---
-// ค้นหาในฟังก์ชัน showAiResetButton()
+// อัปเดตเฉพาะส่วน resetBtn.onclick ภายในฟังก์ชัน showAiResetButton()
 resetBtn.onclick = () => {
-    // 1. ล้างข้อมูลทุกช่อง (รวมวันที่และกะด้วยถ้าต้องการ)
+    // 1. ล้างข้อมูลทุกช่อง (Input ทั่วไป)
     const allInputs = ['partNo', 'partOn', 'supplier', 'lineNo', 'qty', 'defectName', 'remark', 'refNo'];
     allInputs.forEach(id => { 
         if($id(id)) {
@@ -13824,23 +14575,31 @@ resetBtn.onclick = () => {
         }
     });
     
-    // 2. รีเซ็ตตัวเลือก Judgment
+// ในส่วนการล้างข้อมูล (Reset)
+if ($id('unit')) {
+    $id('unit').value = ''; // จะทำให้ช่องกลับมาโชว์คำว่า UNIT (ตาม value="" ที่เราตั้งไว้)
+}
+     
+    // 3. รีเซ็ตตัวเลือก Judgment
     const jd = $id('judgmentSelect');
     if (jd) jd.value = '';
 
-    // 3. รีเซ็ตวันที่เป็นปัจจุบัน และ กะเป็น SHIFT A (ค่าเริ่มต้น)
+    // 4. รีเซ็ตวันที่เป็นปัจจุบัน และ กะเป็น SHIFT A (ค่าเริ่มต้น)
     if($id('inputDate')) $id('inputDate').valueAsDate = new Date();
     if($id('shift')) $id('shift').value = 'SHIFT A';
 
-    // 4. สำคัญที่สุด: ล้างสีและแสงทั้งหมด (เรียกใช้ฟังก์ชันที่แก้ในข้อ 1)
+    // 5. สำคัญที่สุด: ดับไฟเรืองแสงและรีเซ็ตสีขอบ/พื้นหลังทุกช่อง (รวมถึงช่อง Unit)
+    // โดยเรียกใช้ฟังก์ชัน extinguishAllGlows ที่เราได้ปรับปรุงใหม่
     extinguishAllGlows();
-    handleJudgment(''); // ล้างสถานะปุ่มบันทึก
+    
+    // 6. คืนค่าสถานะปุ่มบันทึก
+    handleJudgment(''); 
 
-    // 5. ปิด Dropdown ที่อาจค้างอยู่
+    // 7. ปิด Dropdown ค้นหาที่อาจค้างอยู่
     document.querySelectorAll('.search-results-container').forEach(box => box.style.display = 'none');
 
-    toast("🧹 ล้างข้อมูลและรีเซ็ตค่าสีทั้งหมดแล้ว");
-    resetBtn.remove(); // ลบปุ่มล้างออก
+    toast("🧹 ล้างข้อมูลและรีเซ็ตช่องหน่วยเรียบร้อยแล้ว");
+    resetBtn.remove(); // ลบปุ่มล้างออกหลังจากทำงานเสร็จ
 
     if (document.activeElement) document.activeElement.blur();
 };
@@ -14953,131 +15712,81 @@ function translateDefectToRemark() {
     if (typeof refreshNeonGlow === 'function') refreshNeonGlow();
 }
 
-function renderRiskAlert(allData) {
+function renderRiskAlert(filteredData) {
     const listEl = document.getElementById('riskAlertList');
     const dateLabel = document.getElementById('riskAnalysisDate');
-    if (!listEl || !allData || allData.length === 0) return;
+    if (!listEl) return;
 
-    // 1. ดึงช่วงวันที่ที่ User เลือกจากหน้า Dashboard
+    // 1. จัดการตัวแสดง PERIOD / DATE ให้ตรงตาม Filter
     const startVal = document.getElementById('dashStart').value;
     const endVal = document.getElementById('dashEnd').value;
-
-    let targetData = [];
-    let periodText = "";
-
+    
     if (startVal && endVal) {
-        // กรณีเลือกช่วงวันที่: วิเคราะห์ข้อมูลในช่วงนั้น
-        targetData = allData.filter(r => r.date >= startVal && r.date <= endVal);
-        periodText = `${formatDateDisplay(startVal)} - ${formatDateDisplay(endVal)}`;
+        dateLabel.textContent = `PERIOD: ${formatDateDisplay(startVal)} - ${formatDateDisplay(endVal)}`;
+    } else if (filteredData.length > 0) {
+        // หา Progress ล่าสุดจากข้อมูลที่แสดงอยู่
+        const dates = filteredData.map(r => r.date);
+        const latest = dates.reduce((a, b) => a > b ? a : b);
+        dateLabel.textContent = `PERIOD: LATEST: ${formatDateDisplay(latest)}`;
     } else {
-        // กรณีไม่ได้เลือกวันที่: หาวันล่าสุดที่มีการลงข้อมูล (ไม่ใช่เอา Today จริงๆ)
-        const latestDate = [...new Set(allData.map(r => r.date))].sort().reverse()[0];
-        targetData = allData.filter(r => r.date === latestDate);
-        periodText = `LATEST: ${formatDateDisplay(latestDate)}`;
+        dateLabel.textContent = `PERIOD: NO DATA`;
     }
 
-    if(dateLabel) dateLabel.textContent = `PERIOD: ${periodText}`;
+    // 2. โครงสร้างข้อมูลสำหรับการ Mapping (ต้องตรงกับ Judgment ใน KPI Cards)
+    const riskGroups = [
+        { id: 'VENDOR FAULT', color: '#ef4444', label: 'Vendor Fault', icon: '⚠️' },
+        { id: 'SF', color: '#f97316', label: 'SF Fault', icon: '⚙️' },
+        { id: 'CTC', color: '#3b82f6', label: 'CTC Fault', icon: '🔬' },
+        { id: 'CAN USE', color: '#10b981', label: 'Can Use (OK)', icon: '✅' }
+    ];
 
-    // 2. คำนวณ Historical Baseline (ข้อมูลก่อนหน้าช่วงที่เลือก)
-    const historyData = allData.filter(r => !targetData.includes(r));
-    const baselineStats = {};
-    historyData.forEach(r => {
-        if (!baselineStats[r.supplier]) baselineStats[r.supplier] = { total: 0, ng: 0 };
-        baselineStats[r.supplier].total += r.qty;
-        if (r.judgment === 'VENDOR FAULT') baselineStats[r.supplier].ng += r.qty;
-    });
+    // 3. ประมวลผลยอดรวม (Aggregation) จาก filteredData โดยตรง
+    let html = '';
+    riskGroups.forEach(group => {
+        const groupRecords = filteredData.filter(r => r.judgment === group.id);
+        const totalLots = groupRecords.length;
+        const totalQty = groupRecords.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
 
-    // 3. วิเคราะห์ข้อมูลในช่วงเป้าหมาย (Active Window)
-    const activeStats = {};
-    targetData.forEach(r => {
-        if (!activeStats[r.supplier]) activeStats[r.supplier] = { 
-            total: 0, ng: 0, defects: {}, lines: new Set() 
-        };
-        activeStats[r.supplier].total += r.qty;
-        if (r.judgment === 'VENDOR FAULT') {
-            activeStats[r.supplier].ng += r.qty;
-            // เก็บข้อมูลเพิ่ม: อาการเสียที่เจอ และ ไลน์ที่เจอ
-            activeStats[r.supplier].defects[r.defect] = (activeStats[r.supplier].defects[r.defect] || 0) + r.qty;
-            if(r.line) activeStats[r.supplier].lines.add(r.line);
+        // แสดงผลเฉพาะกลุ่มที่มีข้อมูล (หรือถ้าจะให้ตรง KPI ตลอดอาจจะโชว์ทั้งหมดก็ได้)
+        if (totalLots > 0) {
+            html += `
+                <div class="risk-intel-item" style="border-left: 5px solid ${group.color}; margin-bottom: 12px; background: rgba(30, 41, 59, 0.4);">
+                    <div class="risk-header-row" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <div class="risk-meta-info" style="font-size: 0.6rem; color: #64748b; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">CATEGORY</div>
+                            <div class="risk-title-main" style="font-family: 'Sora'; font-size: 1rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                                <span style="font-size: 1.1rem;">${group.icon}</span> ${group.label}
+                            </div>
+                        </div>
+                        <div style="text-align: right">
+                            <div class="risk-meta-info" style="font-size: 0.6rem; color: #64748b; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">LOTS</div>
+                            <div style="font-family: 'DM Mono'; font-size: 1.6rem; font-weight: 900; color: ${group.color}; line-height: 1; margin-top: 2px;">
+                                ${totalLots.toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quantity Badge (แสดงยอดรวม PCS ของกลุ่มนี้) -->
+                    <div class="badge-row-container" style="margin-top: 10px; display: flex; gap: 6px;">
+                        <div class="unit-badge-split" style="--judgment-color: ${group.color}">
+                            <div class="ub-label">PCS</div>
+                            <div class="ub-val">${totalQty.toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
     });
 
-    let highRiskCount = 0;
-    let stableCount = 0;
-    const results = [];
-
-    // 4. เปรียบเทียบ Neural Logic
-    Object.entries(activeStats).forEach(([name, cur]) => {
-        const curRate = (cur.ng / cur.total) * 100;
-        const hist = baselineStats[name] || { total: 100, ng: 0.5 }; // ป้องกันหาร 0
-        const histRate = hist.total > 0 ? (hist.ng / hist.total) * 100 : 0.5;
-
-        const volatility = curRate / (histRate || 0.1);
-        const isSpike = curRate > (histRate * 1.5) && cur.ng > 0; // เสียพุ่งเกิน 1.5 เท่าจากปกติ
-
-        if (isSpike) highRiskCount++; else stableCount++;
-
-        // หาอาการเสียที่หนักที่สุดของเจ้านี้ในรอบนี้
-        const topDefect = Object.entries(cur.defects).sort((a,b) => b[1] - a[1])[0] || ["N/A", 0];
-
-        results.push({
-            name, curRate, histRate, volatility, isSpike,
-            ng: cur.ng,
-            topDefect: topDefect[0],
-            lineCount: cur.lines.size
-        });
-    });
-
-    // 5. อัปเดต UI
-    animNum('count-high-risk', highRiskCount);
-    animNum('count-stable', stableCount);
+    listEl.innerHTML = html || `<div style="text-align:center; padding:3rem; color:#475569; font-size:0.7rem; font-family:'DM Mono';">--- NO DATA IN THIS PERIOD ---</div>`;
     
-    // เปลี่ยนสี Ping ตามความเสี่ยง
+    // อัปเดตจุดจุดไฟสถานะด้านบน Risk Intelligence
     const ping = document.getElementById('riskStatusPing');
-    if(ping) ping.style.background = highRiskCount > 0 ? '#ef4444' : '#10b981';
-
-    if (results.length === 0) {
-        listEl.innerHTML = `<div style="text-align:center; padding:4rem; color:#475569; font-size:0.6rem;">NO DATA IN THIS PERIOD</div>`;
-        return;
+    if(ping) {
+        const hasCritical = filteredData.some(r => r.judgment === 'VENDOR FAULT');
+        ping.style.background = hasCritical ? '#ef4444' : '#10b981';
+        ping.style.boxShadow = hasCritical ? '0 0 10px #ef4444' : '0 0 10px #10b981';
     }
-
-    // 6. วาดรายการ (เต็มกล่อง สวยงาม)
-    results.sort((a,b) => b.volatility - a.volatility);
-    listEl.innerHTML = results.map(item => {
-        const accent = item.isSpike ? '#ef4444' : '#10b981';
-        return `
-            <div class="risk-card ${item.isSpike ? 'high-volatility' : ''}" style="border-left: 4px solid ${accent}; margin-bottom:10px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div style="flex: 1; min-width: 0;">
-                        <div class="vendor-name-highlight" style="font-size: 0.8rem; color: #fff;">${item.name}</div>
-                        <div style="display: flex; gap: 6px; margin-top: 4px;">
-                            ${item.isSpike ? '<span class="status-glitch">VOLATILE</span>' : '<span style="color:#10b981; font-size:0.5rem; font-weight:800;">● STABLE</span>'}
-                            <span style="font-size: 0.55rem; color: #64748b; font-family: 'DM Mono';">NG: ${item.ng} PCS</span>
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-family: 'DM Mono'; font-size: 1.1rem; font-weight: 800; color: ${accent};">${item.curRate.toFixed(1)}%</div>
-                        <div style="font-size: 0.45rem; color: #475569; font-weight: 700;">BASE: ${item.histRate.toFixed(1)}%</div>
-                    </div>
-                </div>
-                
-                <!-- ข้อมูลเพิ่มเติมที่ทำให้กล่องดูเต็ม -->
-                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 0.55rem; color: #94a3b8;">
-                        <i style="color: ${accent}">⚠️ Top Issue:</i> ${item.topDefect}
-                    </div>
-                    <div style="font-size: 0.55rem; color: #64748b;">
-                        Lines Active: <b style="color:#cbd5e1">${item.lineCount}</b>
-                    </div>
-                </div>
-
-                <!-- แถบพลังความเสี่ยง -->
-                <div style="height: 2px; width: 100%; background: rgba(255,255,255,0.05); margin-top: 8px; border-radius: 2px; overflow: hidden;">
-                    <div style="height: 100%; width: ${Math.min(item.volatility * 20, 100)}%; background: ${accent}; box-shadow: 0 0 10px ${accent}; transition: width 1s ease;"></div>
-                </div>
-            </div>
-        `;
-    }).join('');
 }
 
 // แยก UI ออกมาเพื่อให้ Code สะอาดขึ้น
@@ -15338,7 +16047,19 @@ function displayFilteredScorecard() {
         `;
     }).join('');
 }
-
+// ป้องกันการแก้ไขข้อมูลที่ไม่ใช่ของตนเอง (ยกเว้นหัวหน้างาน)
+async function secureSave(record) {
+    if (isSupervisor && record.inspector !== viewingUser) {
+        toast("🚫 ไม่อนุญาตให้หัวหน้าแก้ไขข้อมูลพนักงานโดยตรง");
+        return false;
+    }
+    
+    // เขียน Audit Log อัตโนมัติ
+    const action = editingId ? 'UPDATE' : 'INSERT';
+    await writeAuditLog(action, record.id, oldRecord, record);
+    
+    return await pushToSupabase([record]);
+}
 // ฟังก์ชันช่วยแสดงชื่อสถานะแบบสวยๆ
 function getGradeLabel(grade) {
     const labels = { 'A': 'Excellent', 'B': 'Standard', 'C': 'Watchlist', 'D': 'Critical' };
@@ -15350,6 +16071,45 @@ window.addEventListener('resize', function() {
         mainTrendChartInstance.resize();
     }
 });
+/**
+ * UI/UX Protection: Keyboard Obscurity Handler
+ * ป้องกันคีย์บอร์ดบังช่องกรอกข้อมูลใน Tablet
+ */
+function initKeyboardAwareness() {
+    const inputs = document.querySelectorAll('.neon-in, #judgmentSelect, textarea');
+    const sidebar = document.getElementById('sidebar');
+
+    inputs.forEach(input => {
+        input.addEventListener('focus', function(e) {
+            // รอให้คีย์บอร์ด Tablet ดีดขึ้นมาเสร็จก่อน (ประมาณ 300ms)
+            setTimeout(() => {
+
+                
+                // ไฮไลท์พิเศษเพื่อบอกว่ากำลังพิมพ์ช่องนี้
+                this.classList.add('keyboard-focus-active');
+            }, 300);
+        });
+
+        input.addEventListener('blur', function() {
+            this.classList.remove('keyboard-focus-active');
+        });
+    });
+
+    // ตรวจสอบการเปลี่ยนขนาดของ Viewport (กรณีคีย์บอร์ดเปิด/ปิด)
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            // ถ้า Viewport หดสั้นลง (คีย์บอร์ดมา) ให้ลองหา element ที่ active แล้วเลื่อนไปหา
+            if (window.visualViewport.height < window.innerHeight * 0.8) {
+                const activeEl = document.activeElement;
+                if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'SELECT' || activeEl.tagName === 'TEXTAREA')) {
+                    activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+    }
+}
+// เรียกใช้งานฟังก์ชัน
+initKeyboardAwareness();
 </script>
 </body>
 </html>
