@@ -9067,7 +9067,637 @@ tbody tr {
     animation: pulse-yellow-glow 2s infinite ease-in-out;
     border-width: 1.5px !important;
 }
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE & GLOBAL THEME RE-DESIGN (V5.1)
+═══════════════════════════════════════════════════ */
+:root {
+  /* Light Theme Variables (Default) */
+  --bg-canvas: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-header: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+  --text-main: #0f172a;
+  --text-sub: #475569;
+  --border-light: #e2e8f0;
+  --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  
+  /* Accent Colors (Fresh & Vibrant) */
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-orange: #f59e0b;
+}
 
+/* บังคับพื้นหลัง Dashboard เมื่อเป็นโหมดสว่าง */
+html:not(.dark-mode) .cockpit-dash {
+    background: var(--bg-canvas) !important;
+}
+
+/* การ์ดในโหมดสว่าง: ขาวสะอาด ขอบคม เงาฟุ้ง */
+html:not(.dark-mode) .hero-kpi-card, 
+html:not(.dark-mode) .stat-card, 
+html:not(.dark-mode) .chart-panel, 
+html:not(.dark-mode) .market-panel, 
+html:not(.dark-mode) .incident-feed-panel, 
+html:not(.dark-mode) .top-line-panel {
+    background: #ffffff !important;
+    border: 1px solid var(--border-light) !important;
+    box-shadow: var(--shadow-card) !important;
+    backdrop-filter: none !important;
+}
+
+/* ปรับสีตัวหนังสือในโ模式สว่าง */
+html:not(.dark-mode) .stat-number,
+html:not(.dark-mode) .hero-main-val,
+html:not(.dark-mode) .chart-title,
+html:not(.dark-mode) .market-title,
+html:not(.dark-mode) .line-name,
+html:not(.dark-mode) .inc-text-main {
+    color: #1e293b !important;
+    text-shadow: none !important;
+}
+
+/* ปรับแต่งหน้าปัด (Gauges) ให้สว่าง */
+html:not(.dark-mode) .gauge-cluster.main-gauge {
+    background: #ffffff !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+html:not(.dark-mode) .gauge-center-data .gauge-value-main {
+    background: linear-gradient(180deg, #1e293b, #3b82f6);
+    -webkit-background-clip: text;
+    filter: none;
+}
+
+/* รายการ List ในโหมดสว่าง */
+html:not(.dark-mode) .futuristic-item,
+html:not(.dark-mode) .incident-item,
+html:not(.dark-mode) .futuristic-line-item {
+    background: #f8fafc !important;
+    border: 1px solid #f1f5f9 !important;
+}
+
+html:not(.dark-mode) .item-name,
+html:not(.dark-mode) .val-main {
+    color: #334155 !important;
+    text-shadow: none !important;
+}
+
+/* Header ของ Dashboard (โหมดสว่างจะดู Professional มากขึ้น) */
+html:not(.dark-mode) .dash-topbar-cockpit {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+html:not(.dark-mode) .brand-title {
+    color: #1e3a8a !important;
+}
+@keyframes numPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+.num-changed { animation: numPop 0.3s ease-out; }
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE: TOPBAR CONTROLS & TICKER RE-DESIGN
+═══════════════════════════════════════════════════ */
+
+/* ปรับสีแถบ Ticker (แถบวิ่ง) ให้สว่าง */
+html:not(.dark-mode) .topbar-ticker {
+    background: #f1f5f9 !important; /* สีเทาฟ้าอ่อนมาก */
+    border: 1px solid #e2e8f0 !important;
+}
+
+html:not(.dark-mode) .ticker-item .label { color: #64748b !important; } /* สีเทา */
+html:not(.dark-mode) .ticker-item .value { color: #1e3a8a !important; } /* สีน้ำเงินเข้ม */
+
+/* ปรับแต่งปุ่มลัด (วันนี้, 7 วัน, เดือนนี้) ในโหมดสว่าง */
+html:not(.dark-mode) .quick-btn {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+html:not(.dark-mode) .quick-btn:hover {
+    background: #f8fafc !important;
+    border-color: #3b82f6 !important;
+    color: #3b82f6 !important;
+}
+
+/* สถานะปุ่มที่ถูกเลือก (Active) - เน้นสีฟ้าสดใส */
+html:not(.dark-mode) .quick-btn.active-qb {
+    background: #eff6ff !important;
+    border-color: #3b82f6 !important;
+    color: #2563eb !important;
+    font-weight: 800;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
+}
+
+/* ปรับแต่งกลุ่มเลือกวันที่ (Date Input) */
+html:not(.dark-mode) .control-group {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+html:not(.dark-mode) .control-input {
+    color: #1e293b !important; /* ตัวเลขวันที่สีเข้ม */
+}
+
+/* ปรับแต่งช่องเลือก Vendor (Select) */
+html:not(.dark-mode) .control-select {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e293b !important;
+}
+
+/* ปรับแต่งปุ่ม Reset และปุ่ม Close */
+html:not(.dark-mode) .control-btn {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #64748b !important;
+}
+
+html:not(.dark-mode) .control-btn:hover {
+    background: #f1f5f9 !important;
+    color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
+html:not(.dark-mode) .control-btn.close {
+    color: #ef4444 !important; /* ปุ่มปิดสีแดงเข้ม */
+}
+
+html:not(.dark-mode) .control-btn.close:hover {
+    background: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+}
+html:not(.dark-mode) .change.up-dark {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669; /* เขียวเข้ม */
+}
+
+html:not(.dark-mode) .change.down-dark {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626; /* แดงเข้ม */
+}
+/* สีสำหรับ Ticker ในโหมดสว่าง (Light Mode Rich Colors) */
+
+/* กรณีงานปกติ (เขียวเข้ม) */
+html:not(.dark-mode) .change.up-rich {
+    background: rgba(5, 150, 105, 0.15) !important; /* เขียวมรกตอ่อน */
+    color: #047857 !important; /* ข้อความเขียวเข้มมาก */
+    border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+/* กรณีงานเสีย (แดงเข้ม) */
+html:not(.dark-mode) .change.down-rich {
+    background: rgba(220, 38, 38, 0.1) !important; /* แดงอ่อน */
+    color: #b91c1c !important; /* ข้อความแดงเข้มมาก */
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+/* ปรับระยะขอบ Ticker ในโหมดสว่างให้คมชัดขึ้น */
+html:not(.dark-mode) .ticker-item {
+    border-right: 1px solid #e2e8f0;
+}
+/* ═══════════════════════════════════════════════════
+   REMOVE ALL BACKGROUND GRID LINES
+═══════════════════════════════════════════════════ */
+
+/* ลบเส้นตารางหน้า Login */
+.lo-grid, .lo-lines {
+    display: none !important;
+}
+
+/* ลบเส้นตารางพื้นหลัง Dashboard (ถ้ามี) */
+.cockpit-dash::before {
+    background-image: none !important; /* ลบ Grid ที่เกิดจากลายเส้น */
+}
+
+/* ลบเงาหรือขอบที่จะทำให้ดูเหมือนมีเส้นตารางใน Card */
+html:not(.dark-mode) .stat-card, 
+html:not(.dark-mode) .chart-panel {
+    border: none !important; /* สำหรับโหมดสว่าง ถ้าต้องการให้คลีนสุดๆ */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+/* ═══════════════════════════════════════════════════
+   MINI GAUGE RE-DESIGN (MATCH MAIN GAUGE)
+═══════════════════════════════════════════════════ */
+
+/* ปรับสีพื้นหลังและการ์ดให้เข้ากับโหมดสว่าง */
+html:not(.dark-mode) .mini-gauge {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
+}
+
+/* สีตัวเลขในโหมดสว่าง */
+html:not(.dark-mode) .mini-gauge-value {
+    color: #1e293b !important;
+    text-shadow: none !important;
+}
+
+/* ตั้งค่าตัวกรองแสงเรือง (Glow) สำหรับ Mini Gauges */
+.mini-gauge-svg {
+    filter: drop-shadow(0 0 5px var(--mini-glow));
+}
+
+/* เส้นขีด Ticks ใน Mini Gauge */
+.mini-tick {
+    stroke: rgba(255, 255, 255, 0.1);
+}
+html:not(.dark-mode) .mini-tick {
+    stroke: #e2e8f0;
+}
+/* ═══════════════════════════════════════════════════
+   ULTRA-PREMIUM LIGHT MODE: FUTURISTIC FROSTED GLASS (V6.0)
+═══════════════════════════════════════════════════ */
+:root {
+  /* High-End Light Palette */
+  --bg-canvas: #f0f4f9; 
+  --bg-frosted: rgba(255, 255, 255, 0.75);
+  --border-glass: rgba(255, 255, 255, 0.4);
+  --text-main: #1e293b;
+  --text-sub: #64748b;
+  
+  /* Accent Glows for Light Mode */
+  --glow-blue: rgba(59, 130, 246, 0.15);
+  --glow-green: rgba(16, 185, 129, 0.15);
+  --glow-red: rgba(239, 68, 68, 0.15);
+  --glow-orange: rgba(249, 115, 22, 0.15);
+}
+
+/* พื้นหลังหลัก: ใช้ Gradient อ่อนๆ แบบท้องฟ้าตอนเช้า */
+html:not(.dark-mode) .cockpit-dash {
+    background: radial-gradient(circle at top right, #ffffff 0%, #e2e8f0 100%) !important;
+    color: var(--text-main);
+}
+
+/* [Cards Overhaul] การ์ดกระจกฝ้า พร้อมเงาสีฟุ้ง (Colored Bloom) */
+html:not(.dark-mode) .hero-kpi-card, 
+html:not(.dark-mode) .stat-card, 
+html:not(.dark-mode) .chart-panel, 
+html:not(.dark-mode) .market-panel, 
+html:not(.dark-mode) .incident-feed-panel, 
+html:not(.dark-mode) .top-line-panel,
+html:not(.dark-mode) .scorecard-panel {
+    background: var(--bg-frosted) !important;
+    backdrop-filter: blur(25px) saturate(160%) !important;
+    border: 1px solid var(--border-glass) !important;
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08), 
+                0 0 20px -5px var(--card-accent-light, rgba(59, 130, 246, 0.1)) !important;
+    border-radius: 24px !important;
+}
+
+/* กำหนดสีเงาสะท้อนแยกตามประเภทการ์ดในโหมดสว่าง */
+html:not(.dark-mode) .stat-card.sf { --card-accent-light: var(--glow-orange); }
+html:not(.dark-mode) .stat-card.ctc { --card-accent-light: var(--glow-blue); }
+html:not(.dark-mode) .stat-card.vendor { --card-accent-light: var(--glow-red); }
+html:not(.dark-mode) .stat-card.canuse { --card-accent-light: var(--glow-green); }
+html:not(.dark-mode) .hero-kpi-card { --card-accent-light: var(--glow-green); }
+
+/* หัวข้อและตัวเลข: ใช้สีเข้มคมชัด ตัดกับพื้นหลังสว่าง */
+html:not(.dark-mode) .stat-number,
+html:not(.dark-mode) .hero-main-val,
+html:not(.dark-mode) .chart-title,
+html:not(.dark-mode) .line-name {
+    color: #0f172a !important;
+    font-weight: 900 !important;
+    letter-spacing: -1px;
+}
+
+/* ปรับปรุงหน้าปัด (Gauges) ให้ดูเหมือนคริสตัล */
+html:not(.dark-mode) .gauge-cluster.main-gauge {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.02), 0 15px 30px rgba(0,0,0,0.05) !important;
+}
+
+html:not(.dark-mode) .gauge-center-data .gauge-value-main {
+    background: linear-gradient(180deg, #1e3a8a, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.2));
+}
+
+/* รายการ List: ให้ดูสะอาดแต่มีมิติความลึก */
+html:not(.dark-mode) .futuristic-item,
+html:not(.dark-mode) .incident-item,
+html:not(.dark-mode) .futuristic-line-item {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    transition: all 0.3s ease;
+}
+
+html:not(.dark-mode) .futuristic-item:hover {
+    background: #ffffff !important;
+    transform: translateX(5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* Ticker & Header: สีขาวนวลสะอาดตา */
+html:not(.dark-mode) .dash-topbar-cockpit {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    backdrop-filter: blur(15px);
+}
+
+html:not(.dark-mode) .topbar-ticker {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* ตัวเลขสถิติรายเดือนบนกราฟ */
+html:not(.dark-mode) .stat-item {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* ปุ่มลัดวันที่: High-End Pill Style */
+html:not(.dark-mode) .quick-btn {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
+}
+
+html:not(.dark-mode) .quick-btn.active-qb {
+    background: #1e40af !important;
+    color: #ffffff !important;
+    border-color: #1e3a8a !important;
+    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.2) !important;
+}
+
+/* ปรับสีเส้นกราฟ Tooltip ในโหมดสว่าง */
+html:not(.dark-mode) #chartjs-tooltip {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+}
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE: STATS SUB-VALUES CLARITY FIX
+═══════════════════════════════════════════════════ */
+
+html:not(.dark-mode) .stat-sub-label {
+    color: #64748b !important; /* สีเทาเข้มสำหรับหัวข้อ TOTAL LOTS */
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+}
+
+html:not(.dark-mode) .stat-sub-value {
+    color: #1e3a8a !important; /* สีน้ำเงินเข้ม (Navy) เพื่อให้เลข 2 เด่นออกมา */
+    font-weight: 800 !important;
+    font-family: 'DM Mono', monospace;
+    /* เพิ่มเงาจางๆ หลังตัวเลขเพื่อให้ดูมีมิติ */
+    text-shadow: 0 1px 2px rgba(30, 58, 138, 0.1); 
+}
+
+/* ส่วนของเปอร์เซ็นต์ Share ด้านขวา */
+html:not(.dark-mode) .stat-footer div:last-child .stat-sub-value {
+    background: rgba(30, 58, 138, 0.05); /* เพิ่มพื้นหลังจางๆ ให้ตัวเลข % */
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--card-accent-light-text, #1e40af) !important;
+}
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE: PCS LABEL & LINE STATS CLARITY
+═══════════════════════════════════════════════════ */
+
+/* ปรับสีคำว่า PCS: และตัวเลขสถิติย่อย */
+html:not(.dark-mode) .line-lots {
+    color: #64748b !important; /* สี Slate 500 (เทาเข้มคมชัด) */
+    opacity: 1 !important;     /* ยกเลิกความโปร่งใสเพื่อให้สีทึบชัดเจน */
+    font-weight: 800 !important;
+    font-size: 0.65rem !important;
+}
+
+/* ปรับสีตัวเลขจำนวนหลัก (Quantity) */
+html:not(.dark-mode) .line-qty {
+    color: #0f172a !important; /* สีดำน้ำเงิน (เข้มจัดอ่านง่าย) */
+    text-shadow: none !important;
+}
+
+/* สำหรับป้ายกำกับหน่วยย่อย (Unit Tags) */
+html:not(.dark-mode) .line-unit-tag {
+    background: rgba(30, 58, 138, 0.05) !important; /* พื้นหลังฟ้าจางๆ */
+    border: 1px solid #e2e8f0 !important;
+    color: #475569 !important;
+}
+
+html:not(.dark-mode) .line-unit-tag b {
+    color: #1e40af !important; /* ตัวเลขในป้ายเป็นสีน้ำเงินเข้ม */
+}
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE: MINI GAUGE BALANCED TYPOGRAPHY
+═══════════════════════════════════════════════════ */
+
+html:not(.dark-mode) .mini-gauge-value {
+    /* ลดขนาดตัวเลขลงเพื่อให้เห็นพื้นที่ว่างรอบตัวเลข (Breathability) */
+    font-size: 1.15rem !important; 
+    
+    /* ปรับตำแหน่งขึ้นเล็กน้อยให้ดูสมมาตรกับวงกลม */
+    bottom: 10% !important; 
+    
+    font-weight: 800 !important;
+    letter-spacing: -0.5px;
+    
+    /* ปรับสีให้คมชัดแต่ไม่เข้มจนเกินไป */
+    color: var(--gauge-color, #1e293b) !important;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* ปรับขนาดเครื่องหมาย % ให้เล็กลงตามสัดส่วน */
+html:not(.dark-mode) .mini-gauge-value .unit {
+    font-size: 0.55rem !important;
+    font-weight: 700;
+    margin-left: 1px;
+    opacity: 0.7;
+}
+
+/* เพิ่มความชัดของหัวข้อกำกับ (SF FAULT, VENDOR, CTC) */
+html:not(.dark-mode) .mini-gauge-label {
+    font-size: 0.55rem !important;
+    font-weight: 800 !important;
+    color: #64748b !important;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+}
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE: INCIDENT FEED CLARITY UPGRADE
+═══════════════════════════════════════════════════ */
+
+/* ปรับสีพื้นหลังการ์ดรายการให้ขาวสะอาด */
+html:not(.dark-mode) .incident-item {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* ชื่อ Supplier: ปรับให้เข้มและเด่นที่สุด */
+html:not(.dark-mode) .inc-text-main {
+    color: #0f172a !important; 
+    font-weight: 800 !important;
+}
+
+/* ข้อมูลพาร์ท และ รายละเอียด (Date/Shift/Line): ปรับให้เข้มขึ้นเพื่อให้อ่านออกชัดเจน */
+html:not(.dark-mode) .inc-text-sub {
+    color: #475569 !important; /* Slate 600 */
+    font-weight: 600 !important;
+}
+
+html:not(.dark-mode) .inc-text-highlight {
+    color: #1e3a8a !important; /* สีน้ำเงินเข้มสำหรับเลขพาร์ท */
+}
+
+/* ป้าย Defect: เพิ่มความสดของสีส้ม/แดง */
+html:not(.dark-mode) .inc-defect {
+    background: rgba(249, 115, 22, 0.08) !important;
+    color: #ea580c !important;
+    border: 1px solid rgba(249, 115, 22, 0.2) !important;
+    font-weight: 700 !important;
+}
+
+/* ช่อง Remark: เปลี่ยนจากสีเทาทึบ เป็นสีขาวนวลพร้อมขอบจางๆ (สไตล์ Clean Modern) */
+html:not(.dark-mode) div[style*="background:rgba(0,0,0,0.2)"] {
+    background: #f8fafc !important; /* เทาฟ้าจางมากๆ */
+    border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+    border-left: 3px solid #ef4444 !important; /* คงเส้นสีแดงไว้เพื่อบอกว่าเป็นความเสี่ยง */
+}
+
+/* ปรับสีไอคอนภายใน Remark */
+html:not(.dark-mode) b {
+    color: #1e293b !important;
+}
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE: ENHANCED CARD DEFINITION & DEPTH
+═══════════════════════════════════════════════════ */
+
+/* ปรับแต่งทุกกล่องหลักให้มีขอบคมและเงาที่มีมิติ */
+html:not(.dark-mode) .hero-kpi-card, 
+html:not(.dark-mode) .stat-card, 
+html:not(.dark-mode) .chart-panel, 
+html:not(.dark-mode) .market-panel, 
+html:not(.dark-mode) .incident-feed-panel, 
+html:not(.dark-mode) .top-line-panel,
+html:not(.dark-mode) .scorecard-panel {
+    /* 1. ปรับขอบให้ชัดเจนขึ้น (เพิ่มความเข้มของสีเทา Slate) */
+    border: 1.5px solid rgba(148, 163, 184, 0.35) !important; 
+    
+    /* 2. เพิ่มเงาแบบมีน้ำหนัก (Soft Elevated Shadow) */
+    box-shadow: 
+        0 1px 2px 0 rgba(0, 0, 0, 0.05),
+        0 8px 12px -3px rgba(0, 0, 0, 0.04),
+        0 4px 6px -4px rgba(0, 0, 0, 0.04) !important;
+        
+    /* 3. บังคับพื้นหลังให้เป็นสีขาวบริสุทธิ์เพื่อตัดกับขอบ */
+    background: #ffffff !important;
+}
+
+/* เอฟเฟกต์เมื่อนำเมาส์ไปชี้ (Hover) ให้กล่องดูเด่นขึ้นอีก */
+html:not(.dark-mode) .stat-card:hover, 
+html:not(.dark-mode) .market-panel:hover,
+html:not(.dark-mode) .incident-item:hover {
+    border-color: #3b82f6 !important; /* เปลี่ยนขอบเป็นสีฟ้าเมื่อชี้ */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.02) !important;
+    transform: translateY(-2px);
+}
+
+/* เพิ่มความชัดของเส้นขีดแบ่งภายในกล่อง */
+html:not(.dark-mode) .market-header,
+html:not(.dark-mode) .feed-header,
+html:not(.dark-mode) .chart-header {
+    border-bottom: 1.5px solid #e2e8f0 !important;
+}
+
+/* ปรับพื้นหลังของ Canvas (พื้นที่นอกกล่อง) ให้เข้มขึ้นนิดนึงเพื่อให้กล่องขาวๆ ดูเด่น */
+html:not(.dark-mode) .cockpit-dash {
+    background: #f1f5f9 !important; /* เปลี่ยนเป็น Gray-100 */
+}
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE: PPM BADGE STYLING
+═══════════════════════════════════════════════════ */
+
+html:not(.dark-mode) .stat-delta {
+    font-family: 'DM Mono', monospace; /* ใช้ฟอนต์แนว Technical */
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    color: #475569 !important; /* สีเทาเข้ม Slate-600 */
+    background: #f1f5f9 !important; /* พื้นหลังเทาจางๆ */
+    padding: 2px 8px !important;
+    border-radius: 6px !important;
+    border: 1px solid #e2e8f0 !important;
+    display: inline-block !important;
+    margin-bottom: 8px !important;
+    letter-spacing: 0.5px;
+}
+
+/* เพิ่ม Effect เมื่อเอาเมาส์ไปชี้ */
+html:not(.dark-mode) .stat-card:hover .stat-delta {
+    background: #ffffff !important;
+    border-color: #3b82f6 !important;
+    color: #3b82f6 !important;
+}
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE: CARD HEADERS VISIBILITY FIX
+═══════════════════════════════════════════════════ */
+
+/* ปรับสีชื่อหัวข้อ Live Incident Feed และ Top Lines ให้คมชัด */
+html:not(.dark-mode) .feed-title,
+html:not(.dark-mode) .top-line-title {
+    color: #0f172a !important; /* สีน้ำเงินเข้มเกือบดำ (Midnight Navy) */
+    font-weight: 900 !important; /* เพิ่มความหนาพิเศษ */
+    text-shadow: none !important; /* ปิดเงาสีขาวที่อาจทำให้ตัวหนังสือเบลอ */
+    letter-spacing: 0.05em !important;
+}
+
+/* ปรับสีไอคอนข้างชื่อหัวข้อให้เด่นขึ้น */
+html:not(.dark-mode) .top-line-title svg {
+    color: #db2777 !important; /* สีชมพูเข้มสำหรับไอคอน Top Lines */
+    filter: drop-shadow(0 2px 4px rgba(219, 39, 119, 0.2));
+}
+
+/* ปรับสีจุด Live Indicator */
+html:not(.dark-mode) .live-indicator {
+    background: #10b981 !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* ปรับพื้นหลังของ Header ด้านในให้มีสีฟ้าจางๆ เพื่อแยกส่วนหัวให้ชัดขึ้น */
+html:not(.dark-mode) .feed-header,
+html:not(.dark-mode) .top-line-header {
+    background: rgba(241, 245, 249, 0.5) !important; /* สี Slate 100 จางๆ */
+    padding: 0.75rem 1rem !important;
+    border-radius: 12px 12px 0 0 !important;
+    margin: -1rem -1rem 1rem -1rem !important; /* ชดเชย Padding การ์ดเพื่อให้พื้นหลังชนขอบ */
+}
+html:not(.dark-mode) .stat-delta {
+    background: rgba(241, 245, 249, 1) !important;
+    color: #64748b !important;
+    font-size: 0.6rem !important; /* ทำให้ตัวเล็กลงหน่อย เพื่อบอกว่าเป็นข้อมูลเสริม */
+}
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE: DUAL METRIC BAR STYLING
+═══════════════════════════════════════════════════ */
+
+html:not(.dark-mode) .stat-delta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem !important; /* ปรับเล็กลงนิดนึงเพื่อให้ใส่ % ได้พอดี */
+    font-weight: 800 !important;
+    padding: 3px 12px !important; /* เพิ่มพื้นที่ด้านข้าง */
+    letter-spacing: 0px !important; /* ลดช่องว่างตัวอักษรเพื่อความกระชับ */
+    white-space: nowrap !important; /* ป้องกันตัวเลขตกบรรทัด */
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #334155 !important;
+}
+
+/* เน้นส่วนที่เป็น % ในวงเล็บให้ดูซอฟต์ลงนิดนึง (ถ้าต้องการ) */
+html:not(.dark-mode) .stat-card:hover .stat-delta {
+    background: #ffffff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1) !important;
+}
 </style>
 </head>
 <body>
@@ -9916,7 +10546,7 @@ tbody tr {
         </div>
         <div class="stat-number" id="dashStatSF">0</div>
         <!-- ✅ ลูกศรขึ้นลง % (ใช้ ID เดิม) -->
-        <div class="stat-delta" id="deltaSF">--</div>
+        <div class="stat-delta" id="ppmSF">PPM: 0</div>
         <div class="stat-footer">
             <div>
                 <div class="stat-sub-label">Total Lots</div>
@@ -9941,7 +10571,7 @@ tbody tr {
             <div style="color: var(--card-accent); font-size: 1rem;">●</div>
         </div>
         <div class="stat-number" id="dashStatCTC">0</div>
-        <div class="stat-delta" id="deltaCTC">--</div>
+        <div class="stat-delta" id="ppmCTC">PPM: 0</div>
         <div class="stat-footer">
             <div>
                 <div class="stat-sub-label">Total Lots</div>
@@ -9965,7 +10595,7 @@ tbody tr {
             <div style="color: var(--card-accent); font-size: 1rem;">▲</div>
         </div>
         <div class="stat-number" id="dashStatCanUse">0</div>
-        <div class="stat-delta" id="deltaCanUse">--</div>
+        <div class="stat-delta" id="ppmCanUse">PPM: 0</div>
         <div class="stat-footer">
             <div>
                 <div class="stat-sub-label">Total Lots</div>
@@ -9989,7 +10619,7 @@ tbody tr {
             <div style="color: var(--card-accent); font-size: 1rem;">■</div>
         </div>
         <div class="stat-number" id="dashStatVendor">0</div>
-        <div class="stat-delta" id="deltaVendor">--</div>
+        <div class="stat-delta" id="ppmVendor">PPM: 0</div>
         <div class="stat-footer">
             <div>
                 <div class="stat-sub-label">Total Lots</div>
@@ -12417,10 +13047,10 @@ function openDashboard() {
   document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active-qb'));
 
   // ✅ ส่วนสำคัญ: สั่งวาดเส้นขีดบอกค่า (Ticks) ทันทีที่ Modal เปิด
-  drawGaugeTicks('gaugeTicks', 85, true);      // Main Gauge
-  drawGaugeTicks('sfGaugeTicks', 75);         // SF Gauge
-  drawGaugeTicks('vendorGaugeTicks', 75);    // Vendor Gauge
-  drawGaugeTicks('ctcGaugeTicks', 75);       // CTC Gauge
+  drawGaugeTicks('digitalTicks', 85, true);      // หน้าปัดใหญ่ (Main)
+  drawGaugeTicks('sfGaugeTicks', 75, false);     // หน้าปัดจิ๋ว SF
+  drawGaugeTicks('vendorGaugeTicks', 75, false); // หน้าปัดจิ๋ว Vendor
+  drawGaugeTicks('ctcGaugeTicks', 75, false);    // หน้าปัดจิ๋ว CTC
 
   // Animation เสริม (เดิม)
   if (typeof gsap !== 'undefined') {
@@ -12534,58 +13164,74 @@ function resetDashFilters() {
 }
 
 function updateMainGauge(pct) {
+    const isDark = document.documentElement.classList.contains('dark-mode');
     const valDisplay = document.getElementById('mainGaugeValue');
     const statusLabel = document.getElementById('mainGaugeStatus');
     const arc = document.getElementById('mainGaugeArc');
     const needle = document.getElementById('gaugeNeedle');
     const core = document.getElementById('needleCore');
+    const track = document.querySelector('.gauge-svg-engine path:nth-of-type(1)'); // รางพื้นหลัง
 
-    // 1. กำหนดสถานะคำพูดตาม Level
+    // 1. กำหนดชุดสีตามสถานะ (Vibrant Colors)
     let statusText = 'CRITICAL';
-    let statusColor = '#ef4444'; // สีสำหรับการเรืองแสงของตัวเลข
+    let statusColor = isDark ? '#ef4444' : '#dc2626'; // แดงสว่างในโหมดมืด, แดงเข้มในโหมดสว่าง
 
     if (pct >= 95) { 
         statusText = 'ULTRA-PERFECT'; 
-        statusColor = '#06b6d4'; 
+        statusColor = isDark ? '#06b6d4' : '#0891b2'; 
     } else if (pct >= 85) { 
         statusText = 'OPTIMIZED'; 
-        statusColor = '#22c55e'; 
+        statusColor = isDark ? '#22c55e' : '#16a34a'; 
     } else if (pct >= 70) { 
         statusText = 'STABLE'; 
-        statusColor = '#eab308'; 
+        statusColor = isDark ? '#eab308' : '#ca8a04'; 
     } else if (pct >= 50) { 
         statusText = 'CAUTION'; 
-        statusColor = '#f97316'; 
+        statusColor = isDark ? '#f97316' : '#ea580c'; 
     }
 
-    // 2. อัปเดตตัวเลขพร้อมแอนิเมชันเด้ง
+    // 2. ปรับแต่งตัวเลขกลางหน้าปัด (Typography)
     if (valDisplay) {
         valDisplay.textContent = pct + '%';
-        valDisplay.style.textShadow = `0 0 25px ${statusColor}88`;
+        // โหมดสว่างใช้เงาจางๆ หรือไม่ใช้เลย, โหมดมืดใช้ Digital Glow
+        valDisplay.style.textShadow = isDark ? `0 0 25px ${statusColor}88` : `0 2px 4px rgba(0,0,0,0.1)`;
+        valDisplay.style.color = isDark ? '#ffffff' : '#1e293b'; 
+        
         valDisplay.classList.remove('num-changed');
-        void valDisplay.offsetWidth; // Trigger reflow
+        void valDisplay.offsetWidth;
         valDisplay.classList.add('num-changed');
     }
 
-    // 3. อัปเดตป้ายชื่อสถานะ
+    // 3. ปรับสีรางเกจ (Track) และป้ายสถานะ
+    if (track) {
+        track.style.stroke = isDark ? "rgba(15, 23, 42, 0.6)" : "#f1f5f9"; 
+    }
+
     if (statusLabel) {
         statusLabel.textContent = statusText;
         statusLabel.style.color = statusColor;
-        statusLabel.style.borderColor = `${statusColor}44`;
+        statusLabel.style.background = isDark ? 'rgba(255,255,255,0.05)' : '#f8fafc';
+        statusLabel.style.borderColor = isDark ? `${statusColor}44` : '#e2e8f0';
     }
 
-    // 4. คำนวณความยาว Arc (อิงตาม Path 82 radius)
-    // ความยาวจริงของ Path ประมาณ 370 หน่วย
+    // 4. อัปเดตแถบสี (Arc)
     if (arc) {
         const pathLength = 370;
         const dashOffset = (pct / 100) * pathLength;
         arc.style.strokeDasharray = `${dashOffset} 400`;
+        arc.style.filter = isDark ? 'url(#ultraGlow)' : 'none'; // ปิด Filter เรืองแสงในโหมดสว่าง
     }
 
-    // 5. ขยับเข็ม (0% = -115deg, 100% = 115deg)
+    // 5. ปรับเข็ม (Needle)
     if (needle) {
         const angle = -130 + (pct * 2.6);
         needle.style.transform = `rotate(${angle}deg)`;
+        
+        const needleShape = needle.querySelector('path:nth-of-type(2)');
+        if (needleShape) {
+            // โหมดมืดเข็มสีขาว, โหมดสว่างเข็มสีน้ำเงิน Enterprise Blue
+            needleShape.style.fill = isDark ? "#ffffff" : "#1e40af";
+        }
     }
 
     if (core) core.style.fill = statusColor;
@@ -12593,13 +13239,13 @@ function updateMainGauge(pct) {
 
 // เรียกวาดขีดหน้าปัดทันทีที่เปิด Dashboard
 function drawGaugeUI() {
+    const isDark = document.documentElement.classList.contains('dark-mode');
     const ticksContainer = document.getElementById('digitalTicks');
     if (!ticksContainer) return;
     ticksContainer.innerHTML = '';
     
-    // วาด 40 ขีดดิจิทัล
     for (let i = 0; i <= 40; i++) {
-        const angle = -115 + (i * 5.75); // กระจาย 40 ขีดใน 230 องศา
+        const angle = -115 + (i * 5.75);
         const isMajor = i % 10 === 0;
         const r = 90;
         const len = isMajor ? 10 : 5;
@@ -12613,7 +13259,14 @@ function drawGaugeUI() {
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         line.setAttribute("x1", x1); line.setAttribute("y1", y1);
         line.setAttribute("x2", x2); line.setAttribute("y2", y2);
-        line.setAttribute("class", "gauge-tick-line");
+        
+        // กำหนดสีขีดสเกลตามโหมด
+        if (isDark) {
+            line.style.stroke = isMajor ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.1)";
+        } else {
+            line.style.stroke = isMajor ? "#94a3b8" : "#e2e8f0"; // สี Slate-400 และ Slate-200
+        }
+        
         line.style.strokeWidth = isMajor ? "2" : "1";
         ticksContainer.appendChild(line);
     }
@@ -12622,11 +13275,55 @@ function drawGaugeUI() {
 drawGaugeUI();
 
 function updateMiniGauge(type, val, total) {
-  const pct = total > 0 ? Math.round((val/total)*100) : 0;
-  const el = $id(type + 'GaugeValue');
-  if(el) el.textContent = pct + '%';
-  const needle = $id(type + 'GaugeNeedle');
-  if(needle) needle.style.transform = `rotate(${-90 + (pct*1.8)}deg)`;
+    const isDark = document.documentElement.classList.contains('dark-mode');
+    const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+    
+    // 1. กำหนดสีตามประเภท (เหมือนวงกลมใหญ่แต่แยกตาม Category)
+    const colors = {
+        'sf':     { main: '#f97316', light: '#ea580c' }, // ส้ม
+        'vendor': { main: '#ef4444', light: '#dc2626' }, // แดง
+        'ctc':    { main: '#3b82f6', light: '#2563eb' }  // ฟ้า
+    };
+    
+    const activeColor = isDark ? colors[type].main : colors[type].light;
+    const miniGauge = document.querySelector(`.mini-gauge[data-type="${type}"]`);
+    
+    if (miniGauge) {
+        miniGauge.style.setProperty('--mini-glow', isDark ? activeColor + '44' : 'transparent');
+    }
+
+    // 2. อัปเดตตัวเลข
+    const valEl = document.getElementById(`${type}GaugeValue`);
+    if (valEl) {
+        valEl.textContent = pct;
+        // ใส่เอฟเฟกต์สีตามสถานะ
+        valEl.style.color = activeColor;
+        if (isDark) valEl.style.textShadow = `0 0 15px ${activeColor}aa`;
+    }
+
+    // 3. อัปเดตแถบสี (Arc)
+    const arc = document.getElementById(`${type}GaugeArc`);
+    if (arc) {
+        const pathLength = 235; // ความยาวเส้นรอบวงโดยประมาณของวงกลมเล็ก
+        const dashOffset = (pct / 100) * pathLength;
+        arc.style.strokeDasharray = `${dashOffset} ${pathLength}`;
+        arc.style.stroke = activeColor;
+    }
+
+    // 4. ขยับเข็ม (Needle)
+    const needle = document.getElementById(`${type}GaugeNeedle`);
+    if (needle) {
+        // คำนวณมุม: เริ่มต้นที่ -90 องศา (0%) ถึง 90 องศา (100%)
+        const angle = -90 + (pct * 1.8);
+        needle.style.transform = `rotate(${angle}deg)`;
+        
+        // ปรับสีเข็ม
+        const needleShape = needle.querySelector('polygon');
+        if (needleShape) needleShape.style.fill = isDark ? '#ffffff' : activeColor;
+        
+        const hub = needle.querySelector('.mini-hub-inner');
+        if (hub) hub.style.fill = activeColor;
+    }
 }
 
 // --- Dashboard Lists (ปรับปรุงเพื่อความชัดเจนของตัวเลขทุกอุปกรณ์) ---
@@ -12849,13 +13546,38 @@ function renderTopLines(data) {
 function renderTickerTape(data) {
   const tickerEl = $id('tickerTape');
   if (!tickerEl) return;
+
+  // ตรวจสอบว่าปัจจุบันเป็นโหมดมืดหรือโหมดสว่าง
+  const isDark = document.documentElement.classList.contains('dark-mode');
+
   const recent = [...data].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 8);
-  if (recent.length === 0) { tickerEl.innerHTML = '<div class="ticker-content"><div class="ticker-item"><span class="label">STATUS:</span> <span class="value">NO DATA</span></div></div>'; return; }
+  
+  if (recent.length === 0) { 
+    tickerEl.innerHTML = '<div class="ticker-content"><div class="ticker-item"><span class="label">STATUS:</span> <span class="value">NO DATA</span></div></div>'; 
+    return; 
+  }
   
   const html = recent.map(r => {
     const isError = ['VENDOR FAULT', 'SF', 'CTC'].includes(r.judgment);
-    return `<div class="ticker-item"><span class="label">[${r.date}] ${escapeHtml(r.supplier)}</span><span class="value">${escapeHtml(r.partNo)}</span><span class="change ${isError?'down':'up'}">${isError?'▼':'▲'} ${r.qty} PCS (${r.judgment})</span></div>`;
+    
+    // เลือกคลาสสีตามโหมด: ถ้าโหมดสว่าง (Light) จะใช้คลาสที่มีคำว่า -rich ต่อท้าย
+    let statusClass = "";
+    if (isError) {
+        statusClass = isDark ? "down" : "down-rich";
+    } else {
+        statusClass = isDark ? "up" : "up-rich";
+    }
+
+    return `
+      <div class="ticker-item">
+        <span class="label">[${r.date}] ${escapeHtml(r.supplier)}</span>
+        <span class="value">${escapeHtml(r.partNo)}</span>
+        <span class="change ${statusClass}">
+          ${isError ? '▼' : '▲'} ${r.qty.toLocaleString()} PCS (${r.judgment})
+        </span>
+      </div>`;
   }).join('');
+
   tickerEl.innerHTML = `<div class="ticker-content">${html}${html}</div>`;
 }
 
@@ -12967,6 +13689,7 @@ function initMainChart() {
   const canvas = $id('mainTrendChart');
   if (!canvas) return;
 
+  // 1. จัดการทำลาย Chart เดิมก่อนสร้างใหม่
   if (mainTrendChartInstance !== null) {
     if (typeof mainTrendChartInstance.destroy === 'function') {
       mainTrendChartInstance.destroy();
@@ -12976,20 +13699,34 @@ function initMainChart() {
 
   const ctx = canvas.getContext('2d');
   const isDark = document.documentElement.classList.contains('dark-mode');
-  const tickColor = isDark ? '#94a3b8' : '#64748b';
-  const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
 
-  const palette = {
+  // 2. ตั้งค่าสีตามโหมด (Light vs Dark)
+  // ใน Light Mode เราใช้เส้นสีที่ทึบขึ้นเล็กน้อยเพื่อให้ตัดกับพื้นหลังสีขาว
+  const palette = isDark ? {
     canUse: { stroke: '#10b981', fill: 'rgba(16, 185, 129, 0.12)' },
     ctc:    { stroke: '#3b82f6', fill: 'rgba(59, 130, 246, 0.12)' },
     sf:     { stroke: '#f97316', fill: 'rgba(249, 115, 22, 0.12)' },
     vendor: { stroke: '#ef4444', fill: 'rgba(239, 68, 68, 0.12)' }
+  } : {
+    canUse: { stroke: '#059669', fill: 'rgba(5, 150, 105, 0.06)' }, // เขียวเข้มขึ้น
+    ctc:    { stroke: '#1d4ed8', fill: 'rgba(29, 78, 216, 0.06)' }, // น้ำเงินหลัก
+    sf:     { stroke: '#ea580c', fill: 'rgba(234, 88, 12, 0.06)' }, // ส้มอิฐ
+    vendor: { stroke: '#dc2626', fill: 'rgba(220, 38, 38, 0.06)' }  // แดงเข้ม
   };
+
+  const tickColor = isDark ? '#94a3b8' : '#475569'; // ตัวหนังสือแกน X-Y (Light Mode จะเข้มกว่า)
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : '#f1f5f9'; // เส้นตารางเบาๆ
+  
+  // สี Tooltip
+  const tooltipBg = isDark ? 'rgba(15, 23, 42, 0.98)' : '#ffffff';
+  const tooltipTitle = isDark ? '#34d399' : '#1e3a8a';
+  const tooltipBody = isDark ? '#e2e8f0' : '#475569';
+  const tooltipBorder = isDark ? 'rgba(59, 130, 246, 0.3)' : '#e2e8f0';
 
   const createSmoothGradient = (colorFill) => {
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
     gradient.addColorStop(0, colorFill);
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
     return gradient;
   };
 
@@ -12998,11 +13735,11 @@ function initMainChart() {
     data: [],
     borderColor: colorSet.stroke,
     backgroundColor: createSmoothGradient(colorSet.fill),
-    borderWidth: 3.5,
+    borderWidth: isDark ? 3.5 : 2.5, // ในโหมดสว่าง เส้นบางลงเล็กน้อยจะดูแพงกว่า
     fill: true,
     tension: 0.4,
     pointRadius: 0,
-    pointHitRadius: 15,
+    pointHitRadius: 20,
     pointHoverRadius: 6,
     pointHoverBackgroundColor: colorSet.stroke,
     pointHoverBorderColor: '#fff',
@@ -13026,38 +13763,41 @@ function initMainChart() {
       animation: { duration: 1500, easing: 'easeOutQuart' },
       interaction: { mode: 'index', intersect: false },
       
-      // ✅ [ADDED] ระบบ Hover Sync: เปลี่ยนป้ายหน่วยงานตามจุดที่ชี้
       onHover: (event, chartElement) => {
         const breakdownEl = document.getElementById('chartMonthlyBreakdown');
         if (!breakdownEl) return;
-
         if (chartElement.length > 0) {
           const index = chartElement[0].index;
-          // ดึงข้อมูล Rich Data ของเดือนนั้นๆ (ที่คำนวณไว้ใน refreshDash)
           const monthRichData = globalRichChartData[index];
-          
           if (monthRichData && monthRichData.totalQty > 0) {
-            // แสดงป้ายหน่วยงาน (ใช้ฟังก์ชัน renderUnitBreakdown ที่เราสร้างไว้)
             breakdownEl.innerHTML = renderUnitBreakdown(monthRichData.units);
             breakdownEl.style.opacity = "1";
           } else {
-            breakdownEl.innerHTML = '<span style="color:#64748b; font-size:0.6rem; font-weight:800; letter-spacing:1px;">- NO DATA DETECTED -</span>';
+            breakdownEl.innerHTML = `<span style="color:${tickColor}; font-size:0.6rem; font-weight:800; letter-spacing:1px;">- NO DATA DETECTED -</span>`;
           }
         }
       },
-
+    layout: {
+        padding: {
+            left: 15,   // เพิ่มพื้นที่ฝั่งซ้ายให้ตัวเลข
+            right: 20,
+            top: 10,
+            bottom: 5
+        }
+    },
       plugins: {
         legend: { display: false },
         tooltip: {
           enabled: true,
-          backgroundColor: isDark ? 'rgba(15, 23, 42, 0.98)' : 'rgba(255, 255, 255, 0.98)',
-          titleColor: isDark ? '#34d399' : '#0f172a',
-          bodyColor: isDark ? '#e2e8f0' : '#334155',
-          borderColor: isDark ? 'rgba(59, 130, 246, 0.3)' : 'rgba(226, 232, 240, 0.8)',
-          borderWidth: 1,
-          padding: 15,
+          backgroundColor: tooltipBg,
+          titleColor: tooltipTitle,
+          bodyColor: tooltipBody,
+          borderColor: tooltipBorder,
+          borderWidth: 1, // ขอบบางๆ ตามที่คุณต้องการ
+          padding: 10,
           cornerRadius: 12,
           displayColors: false,
+          elevation: 5, // เพิ่มเงาให้ Tooltip ใน Light Mode
           titleFont: { family: 'Sora', size: 14, weight: '800' },
           bodyFont: { family: "'DM Mono', monospace", size: 11, lineHeight: 1.8 },
           callbacks: {
@@ -13090,15 +13830,26 @@ function initMainChart() {
       },
       scales: {
         x: { 
-          grid: { display: false },
-          ticks: { color: tickColor, font: { family: 'Sora', size: 11, weight: '600' } } 
+          // ปิดเส้นตารางแนวตั้ง
+          grid: { 
+            display: false, // ลบเส้นหลัก
+            drawBorder: false // ลบเส้นขอบแกน
+          },
+          ticks: { 
+            color: tickColor, 
+            font: { family: 'Sora', size: 11, weight: '600' } 
+          } 
         },
         y: { 
           beginAtZero: true,
-          grid: { color: gridColor, drawTicks: false }, 
+          // ปิดเส้นตารางแนวนอน
+          grid: { 
+            display: false, // ลบเส้นหลัก
+            drawBorder: false // ลบเส้นขอบแกน
+          }, 
           ticks: { 
             color: tickColor, 
-            font: { family: 'DM Mono', size: 10 },
+            font: { family: 'DM Mono', size: 10, weight: '600' },
             callback: (val) => val >= 1000 ? (val/1000).toFixed(1) + 'k' : val 
           } 
         }
@@ -13276,7 +14027,6 @@ window.refreshDash = function() {
     let tQ = 0, sf = 0, ven = 0, ctc = 0, ok = 0;
     let sfL = 0, venL = 0, ctcL = 0, okL = 0;
 
-    // 🚩 ตำแหน่งที่ 1: เพิ่มตัวแปรสำหรับเก็บยอดแยกหน่วย (NEW UNIT STATS INITIALIZATION)
     let unitStats = {
         'SF': { KG:0, ROLL:0, MTR:0, SET:0, PCS:0 },
         'VENDOR FAULT': { KG:0, ROLL:0, MTR:0, SET:0, PCS:0 },
@@ -13287,7 +14037,7 @@ window.refreshDash = function() {
     displayData.forEach(r => {
         const qty = parseInt(r.qty) || 0;
         const jdg = r.judgment;
-        const unit = (r.unit || 'PCS').toUpperCase(); // ดึงหน่วยข้อมูล
+        const unit = (r.unit || 'PCS').toUpperCase();
 
         tQ += qty;
         if (jdg === 'SF') { sf += qty; sfL++; }
@@ -13295,13 +14045,28 @@ window.refreshDash = function() {
         else if (jdg === 'CTC') { ctc += qty; ctcL++; }
         else if (jdg === 'CAN USE') { ok += qty; okL++; }
 
-        // 🚩 ตำแหน่งที่ 2: นับข้อมูลลงในตัวแปรแยกหน่วย (COUNT BY UNIT)
         if (unitStats[jdg]) {
             unitStats[jdg][unit] = (unitStats[jdg][unit] || 0) + qty;
         }
     });
 
-    // [โค้ดเดิม] 🌟 5. คำนวณสถิติช่วงก่อนหน้า (สำหรับ Deltas อ้างอิงในระบบ)
+    // 🚩 [UPDATED] HYBRID LOGIC: % Defect for Small Batch / PPM for Mass Production
+// 🚩 [UPDATED] DUAL METRIC LOGIC: Show both PPM and %
+const totalPcs = tQ;
+
+const formatQualityMetric = (faultQty) => {
+    if (totalPcs <= 0) return "--";
+
+    // คำนวณ PPM
+    const ppm = Math.round((faultQty / totalPcs) * 1000000);
+    // คำนวณ % (ทศนิยม 2 ตำแหน่ง)
+    const pct = ((faultQty / totalPcs) * 100).toFixed(2);
+
+    // แสดงผลรูปแบบ: PPM: 110,996 (11.10%)
+    return `PPM: ${ppm.toLocaleString()} (${pct}%)`;
+};
+
+    // 🌟 5. คำนวณสถิติช่วงก่อนหน้า (สำหรับ Deltas อ้างอิงในระบบ)
     let p_sf = 0, p_ven = 0, p_ctc = 0, p_ok = 0;
     previousData.forEach(r => {
         const qty = parseInt(r.qty) || 0;
@@ -13311,7 +14076,7 @@ window.refreshDash = function() {
         else if (r.judgment === 'CAN USE') p_ok += qty;
     });
 
-    // [โค้ดเดิม] 🚀 6. [AI LOGIC] ANOMALY DETECTION
+    // 🚀 6. [AI LOGIC] ANOMALY DETECTION
     const checkAnomaly = () => {
         const todayTotalQty = recordsToday.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
         const sevenDaysAgo = new Date();
@@ -13330,7 +14095,7 @@ window.refreshDash = function() {
     };
     checkAnomaly();
 
-    // 🌟 7. UI UPDATE: Main KPIs
+    // 🌟 7. UI UPDATE: Main KPIs & Hybrid Metrics
     const passPct = tQ > 0 ? Math.round((ok / tQ) * 100) : 0;
     const calcPct = (val) => tQ > 0 ? Math.round((val / tQ) * 100) + '%' : '0%';
 
@@ -13348,14 +14113,19 @@ window.refreshDash = function() {
     updateStat('dashStatCanUse', ok, 'dashLotCanUse', okL, 'dashPctCanUse', calcPct(ok));
     updateStat('dashStatVendor', ven, 'dashLotVendor', venL, 'dashPctVendor', calcPct(ven));
 
-    // 🚩 ตำแหน่งที่แสดงผล: เปลี่ยนจากการเรียก updateDelta เป็นการฉีด HTML แยกหน่วย (แทนที่ New ในรูป)
-// ค้นหา 4 บรรทัดนี้ใน refreshDash ของคุณ และเปลี่ยนชื่อ ID:
-$id('unitBreakdownSF').innerHTML = renderUnitBreakdown(unitStats['SF']);
-$id('unitBreakdownCTC').innerHTML = renderUnitBreakdown(unitStats['CTC']);
-$id('unitBreakdownVendor').innerHTML = renderUnitBreakdown(unitStats['VENDOR FAULT']);
-$id('unitBreakdownCanUse').innerHTML = renderUnitBreakdown(unitStats['CAN USE']);
+    // 🚩 [UPDATED] UPDATE HYBRID DISPLAYS (PPM or %)
+    if($id('ppmSF')) $id('ppmSF').textContent = formatQualityMetric(sf);
+    if($id('ppmCTC')) $id('ppmCTC').textContent = formatQualityMetric(ctc);
+    if($id('ppmVendor')) $id('ppmVendor').textContent = formatQualityMetric(ven);
+    if($id('ppmCanUse')) $id('ppmCanUse').textContent = formatQualityMetric(ok);
 
-    // [โค้ดเดิม] 🌟 8. VISUALS: Gauges, Energy Bars & Lists
+    // 🚩 UPDATE UNIT BREAKDOWNS
+    $id('unitBreakdownSF').innerHTML = renderUnitBreakdown(unitStats['SF']);
+    $id('unitBreakdownCTC').innerHTML = renderUnitBreakdown(unitStats['CTC']);
+    $id('unitBreakdownVendor').innerHTML = renderUnitBreakdown(unitStats['VENDOR FAULT']);
+    $id('unitBreakdownCanUse').innerHTML = renderUnitBreakdown(unitStats['CAN USE']);
+
+    // 🌟 8. VISUALS: Gauges, Energy Bars & Lists
     updateMainGauge(passPct);
     updateMiniGauge('sf', sf, tQ);
     updateMiniGauge('vendor', ven, tQ);
@@ -13375,7 +14145,8 @@ $id('unitBreakdownCanUse').innerHTML = renderUnitBreakdown(unitStats['CAN USE'])
     renderTickerTape(displayData); 
     renderRiskAlert(allMyRecords);
     renderRiskAlert(displayData);
-    // [โค้ดเดิม] 🌟 9. TREND CHART & OTHERS
+
+    // 🌟 9. TREND CHART & OTHERS
     const chartDataObj = getChartData(displayData, startVal, endVal);
     if (!mainTrendChartInstance) { initMainChart(); }
     if (mainTrendChartInstance && globalRichChartData) {
@@ -13391,7 +14162,7 @@ $id('unitBreakdownCanUse').innerHTML = renderUnitBreakdown(unitStats['CAN USE'])
     renderParetoFocus(displayData);
     renderSupplierScorecard(displayData);
 
-    console.log(`[Dashboard Update] Unit breakdown rendered. Records: ${displayData.length}`);
+    console.log(`[Dashboard Update] Quality Metrics updated with Hybrid Logic. Records: ${displayData.length}`);
 };
 /* ══════════════════════════════════════════════════════════════
    PARETO FOCUS LOGIC: Identifying High-Impact Suppliers
@@ -13964,7 +14735,21 @@ function toggleDarkMode() {
   const isDark = document.documentElement.classList.toggle('dark-mode');
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
   updateThemeIcons(isDark);
-  updateChartsTheme();
+  
+  // ✅ เพิ่มตรงนี้: ถ้าเปิด Dashboard ค้างอยู่ ให้วาดขีดหน้าปัดใหม่ด้วยสีธีมใหม่ทันที
+  if ($id('dashboardModal').style.display === 'flex') {
+    drawGaugeTicks('digitalTicks', 85, true);
+    drawGaugeTicks('sfGaugeTicks', 75, false);
+    drawGaugeTicks('vendorGaugeTicks', 75, false);
+    drawGaugeTicks('ctcGaugeTicks', 75, false);
+    
+    // อัปเดตสีกราฟ Chart.js ด้วย
+    if (mainTrendChartInstance) {
+      mainTrendChartInstance.destroy();
+      initMainChart();
+      refreshDash();
+    }
+  }
 }
 
 function updateThemeIcons(isDark) {
@@ -14220,27 +15005,35 @@ window.exportToExcel = function() {
 };
 
 /* ════════════════════════════════════════════════════════════
-   HELPER: วาดเส้นขีดบอกค่ารอบหน้าปัด (Tick Marks)
+   UNIVERSAL GAUGE ENGINE: วาดขีดสเกลรองรับทุกขนาดหน้าปัด
 ═════════════════════════════════════════════════════════════════ */
 function drawGaugeTicks(elementId, radius, isMain = false) {
   const container = document.getElementById(elementId);
   if (!container) return;
   
-  // ✅ FIX ที่สำคัญ: เคลียร์เส้นเก่าและ Element เก่าทิ้งก่อนวาดใหม่ 
-  // เพื่อป้องกัน DOM ซ้อนทับ (Stacking) และ Memory Leak
+  // 1. ตรวจสอบโหมดปัจจุบันเพื่อเลือกสีขีด
+  const isDark = document.documentElement.classList.contains('dark-mode');
+  const majorColor = isDark ? "#f8fafc" : "#94a3b8"; // สีขีดหลัก
+  const minorColor = isDark ? "#475569" : "#e2e8f0"; // สีขีดรอง
+  const textColor  = isDark ? "#94a3b8" : "#64748b"; // สีตัวเลข
+
+  // ✅ FIX: เคลียร์ Element เก่าทิ้งก่อนวาดใหม่
   container.innerHTML = '';
 
   const cx = 100, cy = 100;
-  const totalTicks = 20; // แบ่ง 20 ขีด (ขีดละ 5 หน่วย)
+  
+  // ตั้งค่าความละเอียด: หน้าปัดใหญ่ 20 ขีด, หน้าปัดเล็ก 10 ขีดพอ (ลดความลายตา)
+  const totalTicks = isMain ? 20 : 10; 
   const startAngle = Math.PI; // 180 องศา (ซ้าย)
   const endAngle = 2 * Math.PI; // 360 องศา (ขวา)
 
   for (let i = 0; i <= totalTicks; i++) {
     const angle = startAngle + (endAngle - startAngle) * (i / totalTicks);
-    const isMajor = i % 2 === 0; // ขีดหลักทุกๆ 10 หน่วย (0, 10, 20...)
+    const isMajor = isMain ? (i % 2 === 0) : (i % 5 === 0); 
     
-    //1. วาดเส้นขีด (Ticks)
-    const innerR = isMajor ? radius - 10 : radius - 6;
+    // วาดเส้นขีด (Ticks)
+    const tickLen = isMajor ? (isMain ? 10 : 8) : (isMain ? 6 : 4);
+    const innerR = radius - tickLen;
     const outerR = radius;
 
     const x1 = cx + innerR * Math.cos(angle);
@@ -14251,27 +15044,33 @@ function drawGaugeTicks(elementId, radius, isMain = false) {
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.setAttribute("x1", x1); line.setAttribute("y1", y1);
     line.setAttribute("x2", x2); line.setAttribute("y2", y2);
-    line.setAttribute("stroke", isMajor ? "#f8fafc" : "#64748b");
+    line.setAttribute("stroke", isMajor ? majorColor : minorColor);
     line.setAttribute("stroke-width", isMajor ? "2" : "1");
+    line.setAttribute("stroke-linecap", "round");
     container.appendChild(line);
 
-    //2. วางตัวเลขที่ท้ายขีดหลัก (เฉพาะขีดหลัก 0, 20, 40, 60, 80, 100)
-    if (isMajor && (i % 4 === 0 || i === totalTicks)) {
-      const value = Math.round((i / totalTicks) * 100);
+    // 2. วางตัวเลข (เฉพาะหน้าปัดหลัก และหน้าปัดย่อยบางจุด)
+    if (isMajor) {
+      const showLabel = isMain ? (i % 4 === 0 || i === totalTicks) : (i === 0 || i === totalTicks);
       
-      //กำหนดระยะห่างจากขีด (ยิ่งลบเยอะ ยิ่งเข้าหาจุดศูนย์กลาง)
-      const textR = radius - 22; 
-      
-      const tx = cx + textR * Math.cos(angle);
-      const ty = cy + textR * Math.sin(angle);
+      if (showLabel) {
+        const value = Math.round((i / totalTicks) * 100);
+        const textR = radius - (isMain ? 22 : 18); // ระยะห่างตัวเลข
+        
+        const tx = cx + textR * Math.cos(angle);
+        const ty = cy + textR * Math.sin(angle);
 
-      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      text.setAttribute("x", tx);
-      text.setAttribute("y", ty + 4); // +4 เพื่อให้กึ่งกลางตัวอักษรพอดีกับสายตา
-      text.setAttribute("text-anchor", "middle");
-      text.setAttribute("class", "gauge-scale-num");
-      text.textContent = value;
-      container.appendChild(text);
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", tx);
+        text.setAttribute("y", ty + 4);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("fill", textColor);
+        text.style.fontSize = isMain ? "9px" : "8px";
+        text.style.fontWeight = "800";
+        text.style.fontFamily = "'DM Mono', monospace";
+        text.textContent = value;
+        container.appendChild(text);
+      }
     }
   }
 }
